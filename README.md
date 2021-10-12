@@ -212,3 +212,12 @@ This repository will expose two NuGet packages:
 
 1. The source-generated `IJSRuntime` extension methods for a select few well defined APIs.
 1. The source generator itself, as a consumable analyzer package.
+
+## References and resources
+
+- [MDN Web Docs: Web APIs](https://developer.mozilla.org/docs/Web/API)
+- [ASP.NET Core Docs: Blazor JavaScript interop](https://docs.microsoft.com/aspnet/core/blazor/javascript-interoperability/call-javascript-from-dotnet)
+- [Jared Parsons - GitHub Channel 9 Source Generators](https://github.com/jaredpar/channel9-source-generators)
+- [.NET Docs: C# Source Generators](https://docs.microsoft.com/dotnet/csharp/roslyn-sdk/source-generators-overview)
+- [Source Generators Cookbook](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md)
+- [Source Generators: Design Document](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
