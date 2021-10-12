@@ -1,0 +1,40 @@
+name: pull request
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+    - '**.cs'
+    - '**.json'
+    - '**.csproj'
+    - '**.sln'
+
+env:
+  DOTNET_VERSION: '6.0.x' # set this to the dot net version to use
+
+jobs:
+  validate:
+    name: build-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        dotnet restore
+      
+    - name: Build
+      run: |
+        dotnet build --configuration Release --no-restore
+  
+    - name: Test
+      run: |
+        dotnet test --no-restore --verbosity normal
