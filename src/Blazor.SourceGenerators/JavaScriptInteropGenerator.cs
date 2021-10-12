@@ -62,7 +62,7 @@ public sealed class JavaScriptInteropAttribute : Attribute
 
         internal sealed class SyntaxReceiver : ISyntaxReceiver
         {
-            internal List<(bool IsCaseInsensitve, TypeDeclarationSyntax TypeDeclaration)> TypeDeclarationSyntaxList { get; } = new();
+            internal HashSet<TypeDeclarationSyntax> TypeDeclarationSyntaxSet { get; } = new();
 
             public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
             {
@@ -71,7 +71,7 @@ public sealed class JavaScriptInteropAttribute : Attribute
                     var attribute =
                         typeDeclarationSyntax.AttributeLists.SelectMany(
                             list => list.Attributes.Where(
-                                attr => attr.Name.ToString() == "AutoEquality"))
+                                attr => attr.Name.ToString().Contains("JavaScriptInterop")))
                             .FirstOrDefault();
 
                     if (attribute is not null)
@@ -83,7 +83,8 @@ public sealed class JavaScriptInteropAttribute : Attribute
                                     .Arguments
                                     .FirstOrDefault()
                                     ?.Expression.ToString());
-                        TypeDeclarationSyntaxList.Add((isCaseInsensitive, typeDeclarationSyntax));
+
+                        TypeDeclarationSyntaxSet.Add(typeDeclarationSyntax);
                     }
                 }
             }

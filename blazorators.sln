@@ -17,6 +17,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A644CEC3-BD94-4EB6-9BF0-86B562806BF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.SourceGenerators.Tests", "tests\Blazor.SourceGenerators.Tests\Blazor.SourceGenerators.Tests.csproj", "{A84D365E-4FC5-46DB-B25E-D1BB5D3A8C4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScript.TypeConverter", "src\TypeScript.TypeConverter\TypeScript.TypeConverter.csproj", "{A3206A03-229D-44EC-ACB0-8C5A4851AD06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScript.TypeConverter.Tests", "tests\TypeScript.TypeConverter.Tests\TypeScript.TypeConverter.Tests.csproj", "{BAD6568A-B6E4-499A-989E-16DD159C171A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +39,18 @@ Global
 		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A84D365E-4FC5-46DB-B25E-D1BB5D3A8C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A84D365E-4FC5-46DB-B25E-D1BB5D3A8C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A84D365E-4FC5-46DB-B25E-D1BB5D3A8C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A84D365E-4FC5-46DB-B25E-D1BB5D3A8C4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3206A03-229D-44EC-ACB0-8C5A4851AD06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3206A03-229D-44EC-ACB0-8C5A4851AD06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3206A03-229D-44EC-ACB0-8C5A4851AD06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3206A03-229D-44EC-ACB0-8C5A4851AD06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAD6568A-B6E4-499A-989E-16DD159C171A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAD6568A-B6E4-499A-989E-16DD159C171A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAD6568A-B6E4-499A-989E-16DD159C171A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAD6568A-B6E4-499A-989E-16DD159C171A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +58,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
 		{E59EA4EC-082F-49AC-A162-03E5F30A5321} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
+		{A84D365E-4FC5-46DB-B25E-D1BB5D3A8C4A} = {A644CEC3-BD94-4EB6-9BF0-86B562806BF9}
+		{A3206A03-229D-44EC-ACB0-8C5A4851AD06} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
+		{BAD6568A-B6E4-499A-989E-16DD159C171A} = {A644CEC3-BD94-4EB6-9BF0-86B562806BF9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3F86284A-32D2-4F79-B23C-7A0CB8775971}
