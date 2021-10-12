@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31710.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SourceGenerators", "src\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj", "{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{537EB83C-6982-40B0-801A-479DF3B17DBE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.JavaScriptInterop.Extensions", "src\Blazor.JavaScriptInterop.Extensions\Blazor.JavaScriptInterop.Extensions.csproj", "{E59EA4EC-082F-49AC-A162-03E5F30A5321}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B0D41451-A5B0-49EC-A857-5F2E852CDC10}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E59EA4EC-082F-49AC-A162-03E5F30A5321}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EB31F4BB-B56E-42A3-A776-00FEDF9B73E4} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
+		{E59EA4EC-082F-49AC-A162-03E5F30A5321} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3F86284A-32D2-4F79-B23C-7A0CB8775971}
+	EndGlobalSection
+EndGlobal
