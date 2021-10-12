@@ -14,13 +14,6 @@ static class StringExtensions
             return default!;
         }
 
-        if (typeScriptDefinitionText.StartsWith("interface"))
-        {
-            return s_interfaceConverter.ToCSharpSourceText(typeScriptDefinitionText);
-        }
-
-        return default!;
-
         // Type conversions handled:
         // - interface
         // - type
@@ -29,6 +22,14 @@ static class StringExtensions
         // - any type or interface with "Element" in the name
         // - declare var
         // - declare function
+
+        // Add parser and case for "type", and maybe "function"
+        if (typeScriptDefinitionText.StartsWith("interface"))
+        {
+            return s_interfaceConverter.ToCSharpSourceText(typeScriptDefinitionText);
+        }
+
+        return default!;
     }
 
     internal static string CapitalizeFirstLetter(this string name) =>

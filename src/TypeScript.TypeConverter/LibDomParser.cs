@@ -15,6 +15,9 @@ namespace TypeScript.TypeConverter
                 var libDomDefinitionTypeScript = await _httpClient.GetStringAsync(_rawUrl);
                 if (libDomDefinitionTypeScript is { Length: > 0 })
                 {
+                    // TODO: parse entire file into
+                    // _typeNameToTypeDefinitionMap
+
 
                 }
             }
