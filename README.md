@@ -4,7 +4,7 @@
 
 ## Design goals
 
-I was hoping to use the [TypeScript DOM lib generator](https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles) bits as input. This input would be read, parsed, and cached within the generator.
+I was hoping to use the [TypeScript DOM lib generator](https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.
 
 ### Example consumption of source generator
 
@@ -31,7 +31,7 @@ With the type name, the generator will generate the corresponding methods, and r
 The following is an example resulting source generated `GeolocationExtensions` object:
 
 ```csharp
-using 
+using Microsoft.JSInterop;
 
 namespace Microsoft.JSInterop.Extensions;
 
