@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>10.0</LangVersion>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
 
@@ -18,6 +18,10 @@
   <ItemGroup>
     <!-- Package the generator in the analyzer directory of the nuget package -->
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypeScript.TypeConverter\TypeScript.TypeConverter.csproj" />
   </ItemGroup>
 
 </Project>
