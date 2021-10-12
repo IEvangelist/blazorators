@@ -216,6 +216,7 @@ This repository will expose two NuGet packages:
 ## References and resources
 
 - [MDN Web Docs: Web APIs](https://developer.mozilla.org/docs/Web/API)
+- [TypeScript DOM lib generator](https://github.com/microsoft/TypeScript-DOM-lib-generator)
 - [ASP.NET Core Docs: Blazor JavaScript interop](https://docs.microsoft.com/aspnet/core/blazor/javascript-interoperability/call-javascript-from-dotnet)
 - [Jared Parsons - GitHub Channel 9 Source Generators](https://github.com/jaredpar/channel9-source-generators)
 - [.NET Docs: C# Source Generators](https://docs.microsoft.com/dotnet/csharp/roslyn-sdk/source-generators-overview)

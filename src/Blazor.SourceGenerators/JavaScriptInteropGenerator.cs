@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
@@ -41,6 +40,24 @@ public sealed class JavaScriptInteropAttribute : Attribute
 
             if (context.SyntaxReceiver is not SyntaxReceiver receiver)
                 return;
+
+            // TODO:
+
+            // 1. Parse corresponding type:
+            //    a. Class name, less the "Extensions" suffix.
+            //    - or -
+            //    b. The TypeName as defined within the JavaScriptInterop itself.
+
+            // 2. Ask cache for API descriptors
+            //    a. If not found, request raw from values from
+            //    https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles
+            //    and populate cache.
+            //    - or -
+            //    b. If found, return it.
+
+            // 3. Source generate records, classes, structs, and interfaces that define the object surface area.
+            // 4. Source generate the extension methods.
+            // 5. Source generate the JavaScript, if necessary.
         }
 
         internal sealed class SyntaxReceiver : ISyntaxReceiver
