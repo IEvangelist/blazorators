@@ -156,7 +156,8 @@ const getCurrentLocation =
 // The "clearWatch" is a straight pass-thru, no wrapper needed.
 
 window.blazorator = {
-    getCurrentLocation
+    getCurrentLocation,
+    watchPosition
 };
 ```
 The resulting JavaScript will have to be exposed to consuming projects. Additionally, consuming projects will need to adhere to extension method consumption semantics. When calling generated extension methods that require .NET object references of type `T`, the callback names should be marked with `JSInvokable` and the `nameof` operator should be used to ensure names are accurate. Consider the following example consuming Blazor component:
