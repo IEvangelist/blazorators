@@ -21,8 +21,13 @@ public class LibDomParser
     /// </summary>
     internal bool IsInitialized => _typeNameToTypeDefinitionMap is { Count: > 100 };
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
+        if (IsInitialized)
+        {
+            return;
+        }
+
         try
         {
             var libDomDefinitionTypeScript = await _httpClient.GetStringAsync(_rawUrl);
@@ -44,13 +49,13 @@ public class LibDomParser
         }
     }
 
-    //private void ParseDefinitions(string libDomDefinitionTypeScript)
-    //{
-    //    //var tokenizer = new StringTokenizer(libDomDefinitionTypeScript, );
-    //}
-
     public bool TryParseType(string typeName, bool isParameter, out string? csharpSourceText)
     {
+        // TODO:
+        // This needs to become smarter.
+        // It needs to account for the fact that a single API could define peripheral assets in both
+        // JavaScript and C# files.
+        // As such it should probably return a more comprehensive type.
         if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
         {
             csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText(isParameter);
