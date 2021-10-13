@@ -21,9 +21,16 @@ namespace Microsoft.JSInterop.Attributes;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class JavaScriptInteropAttribute : Attribute
 {
-    public string TypeName { get; set; }
+    public string TypeName { get; }
 
-    public string Url { get; set; }
+    public string? Url { get; set; } = default!;
+
+    public JavaScriptInteropAttribute(string typeName)
+    {
+        ArgumentNullException.ThrowIfNull(nameof(typeName));
+
+        TypeName = typeName;
+    }
 }
 ";
 
@@ -76,14 +83,6 @@ public sealed class JavaScriptInteropAttribute : Attribute
 
                     if (attribute is not null)
                     {
-                        var isCaseInsensitive =
-                            attribute.ArgumentList is not null &&
-                            bool.Parse(
-                                attribute.ArgumentList
-                                    .Arguments
-                                    .FirstOrDefault()
-                                    ?.Expression.ToString());
-
                         TypeDeclarationSyntaxSet.Add(typeDeclarationSyntax);
                     }
                 }

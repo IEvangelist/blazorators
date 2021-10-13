@@ -1,47 +1,50 @@
-﻿using System.Collections.Concurrent;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
-namespace TypeScript.TypeConverter
+using System.Collections.Concurrent;
+
+namespace TypeScript.TypeConverter;
+
+public class LibDomParser
 {
-    public class LibDomParser
+    private readonly string _rawUrl = "https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts";
+    private readonly HttpClient _httpClient = new();
+    private readonly ConcurrentDictionary<string, string> _typeNameToTypeDefinitionMap = new();
+
+    public async Task InitializeAsync()
     {
-        private readonly string _rawUrl = "https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts";
-        private readonly HttpClient _httpClient = new();
-        private readonly ConcurrentDictionary<string, string> _typeNameToTypeDefinitionMap = new();
-
-        public async Task InitializeAsync()
+        try
         {
-            try
+            var libDomDefinitionTypeScript = await _httpClient.GetStringAsync(_rawUrl);
+            if (libDomDefinitionTypeScript is { Length: > 0 })
             {
-                var libDomDefinitionTypeScript = await _httpClient.GetStringAsync(_rawUrl);
-                if (libDomDefinitionTypeScript is { Length: > 0 })
-                {
-                    // TODO: parse entire file into
-                    // _typeNameToTypeDefinitionMap
+                // TODO: parse entire file into
+                // _typeNameToTypeDefinitionMap
 
-
-                }
-            }
-            catch (Exception ex)
-            {
-
+                // key: type name
+                // value: type definition
             }
         }
-
-        private void ParseDefinitions(string libDomDefinitionTypeScript)
+        catch (Exception ex)
         {
-            //var tokenizer = new StringTokenizer(libDomDefinitionTypeScript, );
+            Console.WriteLine($"Error intializing lib dom parser. {ex}");
+        }
+    }
+
+    private void ParseDefinitions(string libDomDefinitionTypeScript)
+    {
+        //var tokenizer = new StringTokenizer(libDomDefinitionTypeScript, );
+    }
+
+    public bool TryParseType(string typeName, out string? csharpSourceText)
+    {
+        if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
+        {
+            csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText();
+            return true;
         }
 
-        public bool TryParseType(string typeName, out string? csharpSourceText)
-        {
-            if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
-            {
-                csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText();
-                return true;
-            }
-
-            csharpSourceText = null;
-            return false;
-        }
+        csharpSourceText = null;
+        return false;
     }
 }

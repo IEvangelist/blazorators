@@ -19,7 +19,8 @@ namespace Blazor.SourceGenerators.Tests
         [Fact]
         public void Basic()
         {
-            var source = @"
+            // TODO: write test
+            _ = @"
 using System;
 using Microsoft.JSInterop.Attributes;
 
