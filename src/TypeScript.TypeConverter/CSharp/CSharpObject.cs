@@ -3,7 +3,7 @@
 
 using System.Text;
 
-namespace TypeScript.TypeConverter;
+namespace TypeScript.TypeConverter.CSharp;
 
 /// <summary>
 /// A record the represents various C# objects.
@@ -14,15 +14,15 @@ internal record CSharpObject(
 {
     /// <summary>
     /// Gets or sets if the object is considered a method parameter. This
-    /// changes the <see cref="CSharpObject.ToString"/> behavior.
+    /// changes the <see cref="ToString"/> behavior.
     /// </summary>
     public bool IsParameter { get; init; }
 
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
-    /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpMember"/> details.
+    /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpProperty"/> details.
     /// </summary>
-    public Dictionary<string, CSharpMember> Members { get; init; } =
+    public Dictionary<string, CSharpProperty> Members { get; init; } =
         new(StringComparer.OrdinalIgnoreCase);
 
     internal string ToParameterString()
