@@ -31,10 +31,10 @@ public class LibDomParser
         }
     }
 
-    private void ParseDefinitions(string libDomDefinitionTypeScript)
-    {
-        //var tokenizer = new StringTokenizer(libDomDefinitionTypeScript, );
-    }
+    //private void ParseDefinitions(string libDomDefinitionTypeScript)
+    //{
+    //    //var tokenizer = new StringTokenizer(libDomDefinitionTypeScript, );
+    //}
 
     public bool TryParseType(string typeName, out string? csharpSourceText)
     {

@@ -50,6 +50,8 @@ public sealed class JavaScriptInteropAttribute : Attribute
             if (context.SyntaxReceiver is not SyntaxReceiver receiver)
                 return;
 
+            _ = receiver;
+
             // TODO:
 
             // 1. Parse corresponding type:

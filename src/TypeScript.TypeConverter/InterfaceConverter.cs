@@ -55,12 +55,8 @@ class InterfaceConverter
             }
         }
 
-        if (csharpObject is not null)
-        {
-            return csharpObject.ToString();
-        }
-
-        throw new ApplicationException(
-            "Unable to parse TypeScript type definition.");
+        return csharpObject is not null
+            ? csharpObject.ToString()
+            : throw new ApplicationException("Unable to parse TypeScript type definition.");
     }
 }
