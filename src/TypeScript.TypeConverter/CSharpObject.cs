@@ -29,6 +29,7 @@ internal record CSharpObject(
     {
         if (IsParameter && Members is { Count: 1 })
         {
+            // TODO: Return simplified parameter declaration text.
             return $"";
         }
 
@@ -46,7 +47,7 @@ internal record CSharpObject(
                 var statementTerminator = index + 1 < memberCount ? "," : "";
                 var nullableExpression = member.IsNullable ? "?" : "";
                 builder.Append(
-                    $"    {member.TypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
+                    $"    {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
             }
 
             builder.Append(");\r\n");
@@ -61,7 +62,7 @@ internal record CSharpObject(
                 var nullableExpression = member.IsNullable ? "?" : "";
 
                 builder.Append(
-                    $"    public {member.TypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}\r\n");
+                    $"    public {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}\r\n");
             }
 
             builder.Append("}\r\n");

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace TypeScript.TypeConverter;
 
@@ -11,6 +12,15 @@ public class LibDomParser
     private readonly HttpClient _httpClient = new();
     private readonly ConcurrentDictionary<string, string> _typeNameToTypeDefinitionMap = new();
 
+    // See: https://regex101.com/r/GV3DiG/1
+    private readonly Regex _interfacesRegex = new("(?'declaration'interface.*?{.*?})", RegexOptions.Singleline);
+    private readonly Regex _interfaceTypeName = new("(?:interface )(?'TypeName'\\S+)");
+
+    /// <summary>
+    /// For testing purposes.
+    /// </summary>
+    internal bool IsInitialized => _typeNameToTypeDefinitionMap is { Count: > 100 };
+
     public async Task InitializeAsync()
     {
         try
@@ -18,11 +28,14 @@ public class LibDomParser
             var libDomDefinitionTypeScript = await _httpClient.GetStringAsync(_rawUrl);
             if (libDomDefinitionTypeScript is { Length: > 0 })
             {
-                // TODO: parse entire file into
-                // _typeNameToTypeDefinitionMap
-
-                // key: type name
-                // value: type definition
+                foreach (Match match in _interfacesRegex.Matches(libDomDefinitionTypeScript))
+                {
+                    var typeName = _interfaceTypeName.GetMatchGroupValue(match.Value, "TypeName");
+                    if (typeName is not null)
+                    {
+                        _typeNameToTypeDefinitionMap[typeName] = match.Value;
+                    }
+                }
             }
         }
         catch (Exception ex)

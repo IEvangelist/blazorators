@@ -10,4 +10,7 @@ internal record CSharpMember(
     string Name,
     string TypeName,
     bool IsNullable = false,
-    bool IsReadonly = false);
+    bool IsReadonly = false)
+{
+    public string MappedTypeName => TypeMap.PrimitiveTypes[TypeName];
+}
