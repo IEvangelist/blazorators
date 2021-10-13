@@ -7,7 +7,8 @@ static class StringExtensions
 {
     static readonly InterfaceConverter s_interfaceConverter = new();
 
-    internal static string? AsCSharpSourceText(this string? typeScriptDefinitionText)
+    internal static string? AsCSharpSourceText(
+        this string? typeScriptDefinitionText, bool isParameter = false)
     {
         if (typeScriptDefinitionText is null)
         {
@@ -26,7 +27,7 @@ static class StringExtensions
         // Add parser and case for "type", and maybe "function"
         if (typeScriptDefinitionText.StartsWith("interface"))
         {
-            return s_interfaceConverter.ToCSharpSourceText(typeScriptDefinitionText);
+            return s_interfaceConverter.ToCSharpSourceText(typeScriptDefinitionText, isParameter);
         }
 
         return default!;

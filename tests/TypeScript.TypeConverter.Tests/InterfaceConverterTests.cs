@@ -8,7 +8,7 @@ namespace TypeScript.TypeConverter.Tests
     public class InterfaceConverterTests
     {
         [Fact]
-        public void InterfaceConverterCorrectlyConvertsTypeScriptInterfaceToCSharp()
+        public void CorrectlyConvertsTypeScriptInterfaceToCSharpRecord()
         {
             var text = @"interface MediaKeySystemConfiguration {
     audioCapabilities?: MediaKeySystemMediaCapability[];
@@ -35,6 +35,19 @@ public record MediaKeySystemConfiguration(
 ";
 
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CorrectlyConvertsTypeScriptInterfaceToCSharpAction()
+        {
+//            var text = @"interface PositionCallback {
+//    (position: GeolocationPosition): void;
+//}";
+//            var sut = new InterfaceConverter();
+//            var actual = sut.ToCSharpSourceText(text);
+//            var expected = @"Action<GeolocationPosition> positionCallback";
+
+            //Assert.Equal(expected, actual);
         }
     }
 }

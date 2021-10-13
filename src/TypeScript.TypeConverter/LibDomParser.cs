@@ -36,11 +36,11 @@ public class LibDomParser
     //    //var tokenizer = new StringTokenizer(libDomDefinitionTypeScript, );
     //}
 
-    public bool TryParseType(string typeName, out string? csharpSourceText)
+    public bool TryParseType(string typeName, bool isParameter, out string? csharpSourceText)
     {
         if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
         {
-            csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText();
+            csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText(isParameter);
             return true;
         }
 

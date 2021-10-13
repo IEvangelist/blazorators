@@ -11,8 +11,37 @@ class InterfaceConverter
     private readonly Regex _interfaceTypeName = new("(?:interface )(?'TypeName'\\S+)");
     private readonly Regex _extendsTypeName = new("(?:extends )(?'TypeName'\\S+)");
 
-    internal string ToCSharpSourceText(string typeScriptInterfaceDefinition)
+    internal string ToCSharpSourceText(string typeScriptInterfaceDefinition, bool isParameter = false)
     {
+        /*
+
+        NOTES:
+
+        There are several kinds of possible TypeScript type definitions we should try to handle.
+
+        For example:
+
+        interface Geolocation {
+            clearWatch(watchId: number): void;
+            getCurrentPosition(
+                successCallback: PositionCallback,
+                errorCallback?: PositionErrorCallback | null,
+                options?: PositionOptions): void;
+            watchPosition(
+                successCallback: PositionCallback,
+                errorCallback?: PositionErrorCallback | null,
+                options?: PositionOptions): number;
+        }
+
+        This interface defines three methods. The only "pure" method is the `clearWatch`. It's considered "pure"
+        because it doesn't require any additional types, and can be called directly from JavaScript interop.
+
+        The `getCurrentPosition` on the other hand, is a bit more involved. It defines callbacks. In order for .NET objects
+        to satisfy JavaScript callbacks, we need an object reference and the corresponding `JSInvokable` method / method name.
+
+        A bit of JavaScript would also have to be generated from this.
+         */
+
         CSharpObject? csharpObject = null;
 
         var lineTokens = new StringTokenizer(typeScriptInterfaceDefinition, new[] { '\n' });
@@ -25,7 +54,7 @@ class InterfaceConverter
 
                 if (typeName is not null)
                 {
-                    csharpObject = new(typeName, subclass);
+                    csharpObject = new(typeName, subclass) { IsParameter = isParameter };
                     continue;
                 }
                 else
@@ -47,9 +76,8 @@ class InterfaceConverter
                         var isNullable = memberName.Value.EndsWith('?');
                         var memberType = memberDefinition[1];
 
-                        csharpObject.Members[
-                            isNullable ? memberName.Value[0..^1] : memberName.Value] =
-                            (isNullable, memberType.Value);
+                        CSharpMember member = new(memberName.Value, memberType.Value, isNullable);
+                        csharpObject.Members[isNullable ? memberName.Value[0..^1] : memberName.Value] = member;
                     }
                 }
             }

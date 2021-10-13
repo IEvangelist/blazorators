@@ -7,7 +7,8 @@ using Microsoft.JSInterop.Attributes;
 
 namespace Microsoft.JSInterop.Extensions;
 
-[JavaScriptInterop]
+[JavaScriptInterop(
+    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation")]
 public static partial class GeolocationExtensions
 {
 }
