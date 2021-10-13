@@ -50,7 +50,7 @@ public class LibDomParser
         }
     }
 
-    public bool TryParseType(string typeName, bool isParameter, out string? csharpSourceText)
+    public bool TryParseType(string typeName, out string? csharpSourceText)
     {
         // TODO:
         // This needs to become smarter.
@@ -59,7 +59,7 @@ public class LibDomParser
         // As such it should probably return a more comprehensive type.
         if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
         {
-            csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText(isParameter);
+            csharpSourceText = typeScriptDefinitionText.AsCSharpSourceText();
             return true;
         }
 

@@ -79,7 +79,7 @@ public class JavaScriptInteropGenerator : ISourceGenerator
 
             // TODO: This needs to be a bit smarter, it should be returning multipe types to generate
             // Both C# sources and even corresponding JavaScript functionality.
-            if (_libDomParser.TryParseType(typeName, false, out var csharpSourceText) &&
+            if (_libDomParser.TryParseType(typeName, out var csharpSourceText) &&
                 csharpSourceText is not null)
             {
                 context.AddSource($"{typeSymbol.Name}.generated.cs", csharpSourceText);

@@ -3,7 +3,9 @@
 
 namespace TypeScript.TypeConverter;
 
-public record ParserResult(
-    ParserResultStatus Status,
-
-    );
+public enum ParserResultStatus
+{
+    Unknown,
+    Successful,
+    Error
+};

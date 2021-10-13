@@ -37,7 +37,7 @@ public record PositionOptions(
 );
 ";
 
-        var result = sut.TryParseType("PositionOptions", false, out var actual);
+        var result = sut.TryParseType("PositionOptions", out var actual);
 
         Assert.True(result);
         Assert.Equal(expected, actual);

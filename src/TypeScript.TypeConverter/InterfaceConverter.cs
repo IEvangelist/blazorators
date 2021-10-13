@@ -12,7 +12,7 @@ class InterfaceConverter
     private readonly Regex _interfaceTypeName = new("(?:interface )(?'TypeName'\\S+)");
     private readonly Regex _extendsTypeName = new("(?:extends )(?'TypeName'\\S+)");
 
-    internal string ToCSharpSourceText(string typeScriptInterfaceDefinition, bool isParameter = false)
+    internal string ToCSharpSourceText(string typeScriptInterfaceDefinition)
     {
         /*
 
@@ -55,7 +55,7 @@ class InterfaceConverter
 
                 if (typeName is not null)
                 {
-                    csharpObject = new(typeName, subclass) { IsParameter = isParameter };
+                    csharpObject = new(typeName, subclass);
                     continue;
                 }
                 else
@@ -78,7 +78,7 @@ class InterfaceConverter
                         var memberType = memberDefinition[1];
 
                         CSharpProperty member = new(memberName.Value, memberType.Value, isNullable);
-                        csharpObject.Members[isNullable ? memberName.Value[0..^1] : memberName.Value] = member;
+                        csharpObject.Properties[isNullable ? memberName.Value[0..^1] : memberName.Value] = member;
                     }
                 }
             }
