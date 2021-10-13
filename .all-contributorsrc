@@ -13,6 +13,19 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "IEvangelist",
+      "name": "David Pine",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7679720?v=4",
+      "profile": "https://www.microsoft.com",
+      "contributions": [
+        "code",
+        "design",
+        "review",
+        "ideas",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
