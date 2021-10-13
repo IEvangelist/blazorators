@@ -23,6 +23,9 @@ trim_trailing_whitespace = true
 dotnet_separate_import_directive_groups = false
 dotnet_sort_system_directives_first = true
 
+# namespace style
+csharp_style_namespace_declarations=file_scoped:suggestion
+
 # this. preferences 
 dotnet_style_qualification_for_field = false:error 
 dotnet_style_qualification_for_property = false:error 
