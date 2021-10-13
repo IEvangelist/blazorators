@@ -1,15 +1,15 @@
 # Blazorators: Blazor C# Source Generators
+
+[![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml) [![pull request](https://github.com/IEvangelist/blazorators/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/pr-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml) [![pull request](https://github.com/IEvangelist/blazorators/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/pr-validation.yml)
-
-## Design goals
+## Design goals 🎯
 
 I was hoping to use the [TypeScript DOM lib generator](https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.
 
-### Example consumption of source generator
+### Example consumption of source generator ✔️
 
 Ideally, I would like to be able to define a C# class such as this:
 
@@ -209,14 +209,14 @@ public sealed partial class ConsumingComponent
 }
 ```
 
-## NuGet packages
+## NuGet packages 📦
 
 This repository will expose two NuGet packages:
 
 1. The source-generated `IJSRuntime` extension methods for a select few well defined APIs.
 1. The source generator itself, as a consumable analyzer package.
 
-## References and resources
+## References and resources 📑
 
 - [MDN Web Docs: Web APIs](https://developer.mozilla.org/docs/Web/API)
 - [TypeScript DOM lib generator](https://github.com/microsoft/TypeScript-DOM-lib-generator)
@@ -225,6 +225,7 @@ This repository will expose two NuGet packages:
 - [.NET Docs: C# Source Generators](https://docs.microsoft.com/dotnet/csharp/roslyn-sdk/source-generators-overview)
 - [Source Generators Cookbook](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md)
 - [Source Generators: Design Document](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
