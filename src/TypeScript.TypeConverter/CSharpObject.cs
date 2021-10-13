@@ -15,38 +15,37 @@ internal record CSharpObject(
     public sealed override string ToString()
     {
         StringBuilder builder = new("namespace Microsoft.JSInterop;");
-        builder.AppendLine();
-        builder.AppendLine();
+        builder.Append("\r\n\r\n");
 
         var memberCount = Members.Count;
         if (ExtendsTypeName is null)
         {
-            builder.AppendLine($"public record {TypeName}(");
+            builder.Append($"public record {TypeName}(\r\n");
 
             foreach (var (index, (memberName, (isNullable, memberType))) in Members.Select((kvp, index) => (index, kvp)))
             {
                 var statementTerminator = index + 1 < memberCount ? "," : "";
                 var nullableExpression = isNullable ? "?" : "";
-                builder.AppendLine(
-                    $"    {memberType}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}");
+                builder.Append(
+                    $"    {memberType}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
             }
 
-            builder.AppendLine(");");
+            builder.Append(");\r\n");
         }
         else
         {
-            builder.AppendLine($"public class {TypeName} : {ExtendsTypeName}");
-            builder.AppendLine("{");
+            builder.Append($"public class {TypeName} : {ExtendsTypeName}\r\n");
+            builder.Append("{\r\n");
 
             foreach (var (index, (memberName, (isNullable, memberType))) in Members.Select((kvp, index) => (index, kvp)))
             {
                 var nullableExpression = isNullable ? "?" : "";
 
-                builder.AppendLine(
-                    $"    public {memberType}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}");
+                builder.Append(
+                    $"    public {memberType}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}\r\n");
             }
 
-            builder.AppendLine("}");
+            builder.Append("}\r\n");
         }
 
         return builder.ToString();
