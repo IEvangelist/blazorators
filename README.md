@@ -9,12 +9,16 @@
 
 I was hoping to use the [TypeScript lib.dom.d.ts](https://github.com/microsoft/TypeScript/blob/315b807489b8ff3a892179488fb0c00398d9b2c3/lib/lib.dom.d.ts) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.
 
-Using the _lib.dom.d.ts_ file, we could hypothetically parse various TypeScript type defintions. These definitions could then be converted to C# counterparts. While I realize that not all TypeScript is mappable to C#, there is a bit of room for interpretation.
+Using the _lib.dom.d.ts_ file, we could hypothetically parse various TypeScript type definitions. These definitions could then be converted to C# counterparts. While I realize that not all TypeScript is mappable to C#, there is a bit of room for interpretation.
 
 Consider the following type definition:
 
 ```typescript
-/** An object able to programmatically obtain the position of the device. It gives Web content access to the location of the device. This allows a Web site or app to offer customized results based on the user's location. */
+/**
+An object can programmatically obtain the position of the device.
+It gives Web content access to the location of the device. This allows
+a Web site or app to offer customized results based on the user's location.
+*/
 interface Geolocation {
 
     clearWatch(watchId: number): void;
@@ -38,21 +42,13 @@ interface Geolocation {
 Ideally, I would like to be able to define a C# class such as this:
 
 ```csharp
-[JavaScriptInterop]
-public static partial class GeolocationExtensions { }
-```
-
-The source generator will expose the `JavaScriptInteropAttribute`, and consuming libraries will decorate their classes with it. The generator code will see this class, and remove the "Extensions" from the class name to find corresponding type to implement.
-
-Alternatively, the consumer can override the `TypeName` and provide the `Url` as well.
-
-```csharp
 [JavaScriptInterop(
     TypeName = "Geolocation",
     Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API")]
 public static partial class GeolocationExtensions { }
 ```
 
+The source generator will expose the `JavaScriptInteropAttribute`, and consuming libraries will decorate their classes with it. The generator code will see this class, and use the `TypeName` from the attribute to find the corresponding type to implement.
 With the type name, the generator will generate the corresponding methods, and return types. The method implementations will be extensions of the `IJSRuntime`.
 
 The following is an example resulting source generated `GeolocationExtensions` object:
@@ -187,6 +183,7 @@ window.blazorator = {
     watchPosition
 };
 ```
+
 The resulting JavaScript will have to be exposed to consuming projects. Additionally, consuming projects will need to adhere to extension method consumption semantics. When calling generated extension methods that require .NET object references of type `T`, the callback names should be marked with `JSInvokable` and the `nameof` operator should be used to ensure names are accurate. Consider the following example consuming Blazor component:
 
 ```csharp
@@ -209,7 +206,7 @@ public sealed partial class ConsumingComponent
             await JavaScript.GetCurrentPositionAsync(
                 this,
                 nameof(OnCoordinatesPermitted),
-                nameof(OnErrorRequestingCooridnates));
+                nameof(OnErrorRequestingCoordinates));
         }
     }
 
@@ -223,7 +220,7 @@ public sealed partial class ConsumingComponent
     }
 
     [JSInvokable]
-    public async Task OnErrorRequestingCooridnates(
+    public async Task OnErrorRequestingCoordinates(
         GeolocationPositionError error)
     {
         // TODO: consume/handle error.
@@ -233,11 +230,21 @@ public sealed partial class ConsumingComponent
 }
 ```
 
+## Pseudocode and logical flow ℹ️
+
+1. Consumer decorates a `static partial class` with the `JavaScriptInteropAttribute`.
+1. Source generator is called:
+   - `JavaScriptInteropGenerator.Initialize`
+   - `JavaScriptInteropGenerator.Execute`
+1. The generator determines the `TypeName` from the attribute of the contextual class.
+   1. The `TypeName` is used to look up the corresponding TypeScript type definition.
+   1. If found, and a valid API - attempt source generation.
+
 ## NuGet packages 📦
 
 This repository will expose two NuGet packages:
 
-1. The source-generated `IJSRuntime` extension methods for a select few well defined APIs.
+1. The source-generated `IJSRuntime` extension methods for a select few well-defined APIs.
 1. The source generator itself, as a consumable analyzer package.
 
 ## References and resources 📑
@@ -269,4 +276,4 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
