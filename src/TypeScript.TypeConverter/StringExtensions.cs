@@ -34,5 +34,8 @@ static class StringExtensions
 
     internal static string CapitalizeFirstLetter(this string name) =>
         $"{char.ToUpper(name[0])}{name[1..]}";
+
+    internal static string LowerCaseFirstLetter(this string name) =>
+        $"{char.ToLower(name[0])}{name[1..]}";
 }
 

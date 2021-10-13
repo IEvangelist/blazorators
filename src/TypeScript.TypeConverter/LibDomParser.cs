@@ -20,7 +20,9 @@ public class LibDomParser
     /// <summary>
     /// For testing purposes.
     /// </summary>
+#pragma warning disable CA1822 // Mark members as static
     internal bool IsInitialized => _typeNameToTypeDefinitionMap is { Count: > 0 };
+#pragma warning restore CA1822 // Mark members as static
 
     public async ValueTask InitializeAsync()
     {
@@ -48,6 +50,22 @@ public class LibDomParser
         {
             Console.WriteLine($"Error intializing lib dom parser. {ex}");
         }
+    }
+
+    public ParserResult ParseType(string typeName)
+    {
+        ParserResult result = new(ParserResultStatus.Unknown);
+
+        if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
+        {
+
+        }
+        else
+        {
+            result = result with { Status = ParserResultStatus.TargetTypeNotFound };
+        }
+
+        return result;
     }
 
     public bool TryParseType(string typeName, out string? csharpSourceText)

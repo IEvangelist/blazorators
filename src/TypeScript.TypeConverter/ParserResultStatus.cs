@@ -6,6 +6,7 @@ namespace TypeScript.TypeConverter;
 public enum ParserResultStatus
 {
     Unknown,
-    Successful,
-    Error
+    TargetTypeNotFound,
+    SuccessfullyParsed,
+    ErrorParsing
 };
