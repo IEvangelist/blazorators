@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <LangVersion>10.0</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>

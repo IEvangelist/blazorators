@@ -5,7 +5,7 @@ using Microsoft.JSInterop.Attributes;
 
 namespace Microsoft.JSInterop.Extensions;
 
-[JavaScriptInterop]
+[JavaScriptInterop("geolocation")]
 public static partial class GeolocationExtensions
 {
 }

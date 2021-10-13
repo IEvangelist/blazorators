@@ -16,6 +16,8 @@ namespace Blazor.SourceGenerators
         private const string attributeText = @"
 using System;
 
+#nullable enable
+
 namespace Microsoft.JSInterop.Attributes;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
