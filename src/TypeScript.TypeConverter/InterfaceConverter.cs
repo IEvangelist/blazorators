@@ -13,6 +13,35 @@ class InterfaceConverter
 
     internal string ToCSharpSourceText(string typeScriptInterfaceDefinition, bool isParameter = false)
     {
+        /*
+
+        NOTES:
+
+        There are several kinds of possible TypeScript type definitions we should try to handle.
+
+        For example:
+
+        interface Geolocation {
+            clearWatch(watchId: number): void;
+            getCurrentPosition(
+                successCallback: PositionCallback,
+                errorCallback?: PositionErrorCallback | null,
+                options?: PositionOptions): void;
+            watchPosition(
+                successCallback: PositionCallback,
+                errorCallback?: PositionErrorCallback | null,
+                options?: PositionOptions): number;
+        }
+
+        This interface defines three methods. The only "pure" method is the `clearWatch`. It's considered "pure"
+        because it doesn't require any additional types, and can be called directly from JavaScript interop.
+
+        The `getCurrentPosition` on the other hand, is a bit more involved. It defines callbacks. In order for .NET objects
+        to satisfy JavaScript callbacks, we need an object reference and the corresponding `JSInvokable` method / method name.
+
+        A bit of JavaScript would also have to be generated from this.
+         */
+
         CSharpObject? csharpObject = null;
 
         var lineTokens = new StringTokenizer(typeScriptInterfaceDefinition, new[] { '\n' });
