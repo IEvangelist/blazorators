@@ -9,9 +9,6 @@ on:
     - '**.csproj'
     - '**.sln'
 
-env:
-  DOTNET_VERSION: '6.0.x' # set this to the dot net version to use
-
 jobs:
   validate:
     name: build-${{matrix.os}}
@@ -25,7 +22,8 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: 6.0.x
+        include-prerelease: true
 
     - name: Install dependencies
       run: |
