@@ -15,6 +15,10 @@ namespace Blazor.SourceGenerators
 
         private const string JavaScriptInteropAttributeFullName = "Microsoft.JSInterop.Attributes.JavaScriptInteropAttribute";
 
+        public JavaScriptInteropGenerator() =>
+            // Fire and forget, start initialization asynchronously.
+            _ = Task.Run(_libDomParser.InitializeAsync);
+
         public void Initialize(GeneratorInitializationContext context)
         {
 #if DEBUG
@@ -68,9 +72,6 @@ namespace Blazor.SourceGenerators
                 //    and populate cache.
                 //    - or -
                 //    b. If found, return it.
-
-                // TODO: Figure out a better way to do this. Synch over async is the death of us all! :(
-                _libDomParser.InitializeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
                 // TODO: This needs to be a bit smarter, it should be returning multipe types to generate
                 // Both C# sources and even corresponding JavaScript functionality.

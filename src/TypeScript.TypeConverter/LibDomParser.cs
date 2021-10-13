@@ -8,9 +8,10 @@ namespace TypeScript.TypeConverter;
 
 public class LibDomParser
 {
+    private static readonly ConcurrentDictionary<string, string> _typeNameToTypeDefinitionMap = new();
+
     private readonly string _rawUrl = "https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts";
     private readonly HttpClient _httpClient = new();
-    private readonly ConcurrentDictionary<string, string> _typeNameToTypeDefinitionMap = new();
 
     // See: https://regex101.com/r/GV3DiG/1
     private readonly Regex _interfacesRegex = new("(?'declaration'interface.*?{.*?})", RegexOptions.Singleline);
@@ -19,7 +20,7 @@ public class LibDomParser
     /// <summary>
     /// For testing purposes.
     /// </summary>
-    internal bool IsInitialized => _typeNameToTypeDefinitionMap is { Count: > 100 };
+    internal bool IsInitialized => _typeNameToTypeDefinitionMap is { Count: > 0 };
 
     public async ValueTask InitializeAsync()
     {
