@@ -1,0 +1,8 @@
+{
+    "name": "blazorators CodeSpace",
+    "image": "mcr.microsoft.com/dotnet/sdk:6.0",
+    "forwardPorts": [5000], // [codespace]-[port].githubpreview.dev
+    "extensions": [
+        "ms-dotnettools.csharp"
+    ]
+}
