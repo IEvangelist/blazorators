@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "WeihanLi",
+      "name": "Weihan Li",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7604648?v=4",
+      "profile": "https://www.cnblogs.com/weihanli",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "blazorators",
+  "projectOwner": "IEvangelist",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
