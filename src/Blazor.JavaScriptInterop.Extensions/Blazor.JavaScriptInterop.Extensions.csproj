@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <EmitCompilerGeneratedFiles Condition="'$(Configuration)'=='Debug'">true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

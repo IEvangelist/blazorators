@@ -3,12 +3,11 @@
 
 // TODO: Get this working...
 
-//using Microsoft.JSInterop.Attributes;
-//
-//namespace Microsoft.JSInterop.Extensions;
-//
-//[JavaScriptInterop("geolocation")]
-//public static partial class GeolocationExtensions
-//{
-//}
-//
+using Microsoft.JSInterop.Attributes;
+
+namespace Microsoft.JSInterop.Extensions;
+
+[JavaScriptInterop]
+public static partial class GeolocationExtensions
+{
+}

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -13,6 +14,8 @@ namespace Blazor.SourceGenerators
     [Generator]
     public class JavaScriptInteropGenerator : ISourceGenerator
     {
+        private const string JavaScriptInteropAttributeFullName = "Microsoft.JSInterop.Attributes.JavaScriptInteropAttribute";
+
         private const string attributeText = @"
 using System;
 
@@ -23,71 +26,120 @@ namespace Microsoft.JSInterop.Attributes;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class JavaScriptInteropAttribute : Attribute
 {
-    public string TypeName { get; }
+    public string? TypeName { get; set; }
 
-    public string? Url { get; set; } = default!;
-
-    public JavaScriptInteropAttribute(string typeName)
-    {
-        ArgumentNullException.ThrowIfNull(nameof(typeName));
-
-        TypeName = typeName;
-    }
+    public string? Url { get; set; }
 }
 ";
 
         public void Initialize(GeneratorInitializationContext context)
         {
+#if DEBUG
+            // For debugging
+            if (!Debugger.IsAttached) Debugger.Launch(); 
+#endif
+
             // Register a syntax receiver that will be created for each generation pass
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForSyntaxNotifications(SyntaxContextReceiver.Create);
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
             // Add the attribute text
-            context.AddSource("JavaScriptInteropAttribute", SourceText.From(attributeText, Encoding.UTF8));
+            // context.AddSource("JavaScriptInteropAttribute", SourceText.From(attributeText, Encoding.UTF8));
 
-            if (context.SyntaxReceiver is not SyntaxReceiver receiver)
+            if (context.SyntaxContextReceiver is not SyntaxContextReceiver receiver
+                || receiver.ClassDeclarations.Count == 0)
                 return;
 
-            _ = receiver;
+            foreach (var classDeclaration in receiver.ClassDeclarations)
+            {
+                // TODO:
 
-            // TODO:
+                // 1. Parse corresponding type:
+                //    a. Class name, less the "Extensions" suffix.
+                //    - or -
+                //    b. The TypeName as defined within the JavaScriptInterop itself.
+                var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
+                var symbol = model.GetDeclaredSymbol(classDeclaration);
+                if (!(symbol is ITypeSymbol typeSymbol
+                    && typeSymbol.IsStatic))
+                {
+                    continue;
+                }
+                var assemblyName = GetType().Assembly.GetName().Name;
+                var attributes = typeSymbol.GetAttributes();
+                var attribute = attributes.First(c => c.AttributeClass.ContainingAssembly.Name == assemblyName
+                    && c.AttributeClass.ToDisplayString() == JavaScriptInteropAttributeFullName);
+                var attributeTypeName = attribute.NamedArguments.FirstOrDefault(a => a.Key == "TypeName").Value.Value?.ToString();
+                var classTypeName = typeSymbol.Name;
 
-            // 1. Parse corresponding type:
-            //    a. Class name, less the "Extensions" suffix.
-            //    - or -
-            //    b. The TypeName as defined within the JavaScriptInterop itself.
+                // The final type name to be used 
+                var typeName = string.IsNullOrEmpty(attributeTypeName) ? classTypeName : attributeTypeName;
+                if (typeName.EndsWith("Extensions"))
+                {
+                    typeName = typeName[..^"Extensions".Length];
+                }
 
-            // 2. Ask cache for API descriptors
-            //    a. If not found, request raw from values from
-            //    https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles
-            //    and populate cache.
-            //    - or -
-            //    b. If found, return it.
+                // 2. Ask cache for API descriptors
+                //    a. If not found, request raw from values from
+                //    https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles
+                //    and populate cache.
+                //    - or -
+                //    b. If found, return it.
 
-            // 3. Source generate records, classes, structs, and interfaces that define the object surface area.
-            // 4. Source generate the extension methods.
-            // 5. Source generate the JavaScript, if necessary.
+                // 3. Source generate records, classes, structs, and interfaces that define the object surface area.
+                // 4. Source generate the extension methods.
+
+                // maybe consider for a generate template
+                var generatedExtensions = new StringBuilder();
+                generatedExtensions.Append($@"// This file is generated
+using Microsoft.JSInterop;
+
+namespace {typeSymbol.ContainingNamespace.ToDisplayString()};
+
+public static partial class {typeSymbol.Name}
+{{
+    private static void TestMethod(this IJSRuntime jsRuntime){{}}
+}}
+");
+                var generatedText = generatedExtensions.ToString();
+                context.AddSource($"{typeSymbol.Name}.generated.cs", generatedText);
+
+                // 5. Source generate the JavaScript, if necessary.
+            }
         }
 
-        internal sealed class SyntaxReceiver : ISyntaxReceiver
+        private sealed class SyntaxContextReceiver : ISyntaxContextReceiver
         {
-            internal HashSet<TypeDeclarationSyntax> TypeDeclarationSyntaxSet { get; } = new();
-
-            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+            internal static ISyntaxContextReceiver Create()
             {
-                if (syntaxNode is TypeDeclarationSyntax typeDeclarationSyntax)
-                {
-                    var attribute =
-                        typeDeclarationSyntax.AttributeLists.SelectMany(
-                            list => list.Attributes.Where(
-                                attr => attr.Name.ToString().Contains("JavaScriptInterop")))
-                            .FirstOrDefault();
+                return new SyntaxContextReceiver();
+            }
 
-                    if (attribute is not null)
+            public HashSet<ClassDeclarationSyntax> ClassDeclarations { get; } = new();
+
+            public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
+            {
+                if(context.Node is ClassDeclarationSyntax classDeclaration
+                    && classDeclaration.AttributeLists.Count > 0)
+                {
+                    foreach (var attributeListSyntax in classDeclaration.AttributeLists)
                     {
-                        TypeDeclarationSyntaxSet.Add(typeDeclarationSyntax);
+                        foreach (var attributeSyntax in attributeListSyntax.Attributes)
+                        {
+                            var symbol = context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol;
+                            if (symbol is not IMethodSymbol attributeSymbol)
+                            {
+                                continue;
+                            }
+                            var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
+                            var fullName = attributeContainingTypeSymbol.ToDisplayString();
+                            if (fullName == JavaScriptInteropAttributeFullName)
+                            {
+                                ClassDeclarations.Add(classDeclaration);
+                            }
+                        }
                     }
                 }
             }
