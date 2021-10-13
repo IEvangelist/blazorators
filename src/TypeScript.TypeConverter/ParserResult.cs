@@ -4,6 +4,4 @@
 namespace TypeScript.TypeConverter;
 
 public record ParserResult(
-    ParserResultStatus Status,
-
-    );
+    ParserResultStatus Status);
