@@ -10,7 +10,7 @@ internal record CSharpProperty(
     string RawName,
     string RawTypeName,
     bool IsNullable = false,
-    bool IsReadonly = false) : CSharpType(RawName, RawTypeName)
+    bool IsReadonly = false) : CSharpType(RawName, RawTypeName, IsNullable)
 {
     public string MappedTypeName => TypeMap.PrimitiveTypes[RawTypeName];
 }
