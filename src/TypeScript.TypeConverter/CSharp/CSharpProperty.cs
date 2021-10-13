@@ -6,7 +6,7 @@ namespace TypeScript.TypeConverter.CSharp;
 /// <summary>
 /// A record the represents various C# members, such as properties, delegates and events.
 /// </summary>
-internal record CSharpProperty(
+public record CSharpProperty(
     string RawName,
     string RawTypeName,
     bool IsNullable = false,

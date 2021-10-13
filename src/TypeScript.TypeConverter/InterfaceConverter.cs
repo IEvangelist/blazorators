@@ -12,7 +12,7 @@ class InterfaceConverter
     private readonly Regex _interfaceTypeName = new("(?:interface )(?'TypeName'\\S+)");
     private readonly Regex _extendsTypeName = new("(?:extends )(?'TypeName'\\S+)");
 
-    internal CSharpExtensionObject? ToExtensionObject(string typeScriptTypeDeclaration)
+    internal CSharpExtensionObject? ToExtensionObject(string? typeScriptTypeDeclaration)
     {
         CSharpExtensionObject? extensionObject = null;
 

@@ -3,6 +3,7 @@
 
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using TypeScript.TypeConverter.CSharp;
 
 namespace TypeScript.TypeConverter;
 
@@ -52,17 +53,35 @@ public class LibDomParser
         }
     }
 
-    public ParserResult ParseType(string typeName)
+    public ParserResult<CSharpExtensionObject> ParseStaticType(string typeName)
     {
-        ParserResult result = new(ParserResultStatus.Unknown);
+        ParserResult<CSharpExtensionObject> result = new(ParserResultStatus.Unknown);
 
         if (_typeNameToTypeDefinitionMap.TryGetValue(typeName, out var typeScriptDefinitionText))
         {
-
+            try
+            {
+                result = result with
+                {
+                    Status = ParserResultStatus.SuccessfullyParsed,
+                    Result = typeScriptDefinitionText.ToExtensionObject()
+                };
+            }
+            catch (Exception ex)
+            {
+                result = result with
+                {
+                    Status = ParserResultStatus.ErrorParsing,
+                    Error = ex.Message
+                };
+            }
         }
         else
         {
-            result = result with { Status = ParserResultStatus.TargetTypeNotFound };
+            result = result with
+            {
+                Status = ParserResultStatus.TargetTypeNotFound
+            };
         }
 
         return result;
@@ -70,7 +89,7 @@ public class LibDomParser
 
     public bool TryParseType(string typeName, out string? csharpSourceText)
     {
-        // TODO:
+        // TODO: See ParseStaticType
         // This needs to become smarter.
         // It needs to account for the fact that a single API could define peripheral assets in both
         // JavaScript and C# files.

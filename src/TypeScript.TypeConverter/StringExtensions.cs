@@ -1,11 +1,16 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using TypeScript.TypeConverter.CSharp;
+
 namespace TypeScript.TypeConverter;
 
 static class StringExtensions
 {
     static readonly InterfaceConverter s_interfaceConverter = new();
+
+    internal static CSharpExtensionObject? ToExtensionObject(this string? typeScriptDefinitionText) =>
+        s_interfaceConverter.ToExtensionObject(typeScriptDefinitionText);
 
     internal static string? AsCSharpSourceText(this string? typeScriptDefinitionText)
     {

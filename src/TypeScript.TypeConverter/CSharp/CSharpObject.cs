@@ -8,7 +8,7 @@ namespace TypeScript.TypeConverter.CSharp;
 /// <summary>
 /// A record the represents various C# objects.
 /// </summary>
-internal record CSharpObject(
+public record CSharpObject(
     string TypeName,
     string? ExtendsTypeName)
 {

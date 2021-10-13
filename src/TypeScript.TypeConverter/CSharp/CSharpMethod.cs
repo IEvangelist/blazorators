@@ -5,8 +5,12 @@ using TypeScript.TypeConverter.JavaScript;
 
 namespace TypeScript.TypeConverter.CSharp;
 
-internal record CSharpMethod(
+public record CSharpMethod(
     string RawName,
     string RawReturnTypeName,
     List<CSharpType> ParameterDefinitions,
-    JavaScriptMethod? JavaScriptMethodDependency = null);
+    JavaScriptMethod? JavaScriptMethodDependency = null)
+{
+    public bool IsPureJavaScriptInvocation =>
+        JavaScriptMethodDependency is { IsPure: true };
+}

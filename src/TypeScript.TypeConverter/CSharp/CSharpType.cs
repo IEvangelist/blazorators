@@ -3,7 +3,7 @@
 
 namespace TypeScript.TypeConverter.CSharp;
 
-internal record CSharpType(
+public record CSharpType(
     string RawName,
     string RawTypeName,
     bool IsNullable = false)

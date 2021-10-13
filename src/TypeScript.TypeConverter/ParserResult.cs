@@ -3,5 +3,9 @@
 
 namespace TypeScript.TypeConverter;
 
-public record ParserResult(
-    ParserResultStatus Status);
+public record ParserResult<T>(ParserResultStatus Status) where T : class
+{
+    public string? Error { get; init; } = default!;
+
+    public T? Result { get; init; } = default!;
+}

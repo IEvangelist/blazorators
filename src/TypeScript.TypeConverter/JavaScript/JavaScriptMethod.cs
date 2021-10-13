@@ -5,7 +5,7 @@ using TypeScript.TypeConverter.CSharp;
 
 namespace TypeScript.TypeConverter.JavaScript;
 
-internal record JavaScriptMethod(
+public record JavaScriptMethod(
     /// <summary>
     /// The exact name of the JavaScript API method.
     /// </summary>
@@ -21,7 +21,7 @@ internal record JavaScriptMethod(
     /// <summary>
     /// The optional listing of method parameters.
     /// </summary>
-    List<CSharpType>? Parameters = null)
+    List<CSharpType>? ParameterDefinitions = null)
 {
     /// <summary>
     /// A "pure" JavaScript method is one that

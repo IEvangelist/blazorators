@@ -3,7 +3,7 @@
 
 namespace TypeScript.TypeConverter.CSharp;
 
-internal record CSharpExtensionObject(
+public record CSharpExtensionObject(
     string RawName,
     string RawTypeName,
     List<CSharpProperty>? Properties = null,
