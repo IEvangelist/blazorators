@@ -3,6 +3,7 @@
 
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
+using TypeScript.TypeConverter.CSharp;
 
 namespace TypeScript.TypeConverter;
 
@@ -76,7 +77,7 @@ class InterfaceConverter
                         var isNullable = memberName.Value.EndsWith('?');
                         var memberType = memberDefinition[1];
 
-                        CSharpMember member = new(memberName.Value, memberType.Value, isNullable);
+                        CSharpProperty member = new(memberName.Value, memberType.Value, isNullable);
                         csharpObject.Members[isNullable ? memberName.Value[0..^1] : memberName.Value] = member;
                     }
                 }
