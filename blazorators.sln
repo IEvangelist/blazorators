@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScript.TypeConverter.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.JavaScriptInterop", "src\Blazor.JavaScriptInterop\Blazor.JavaScriptInterop.csproj", "{B7375335-C790-4434-95B5-CA28818CA908}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{91A35318-B03F-4D41-AE18-2C21B9D9C3F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.ExampleConsumer", "samples\Blazor.ExampleConsumer\Blazor.ExampleConsumer.csproj", "{72914F05-4DF1-491C-B2E5-EFE9BB12FCC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,10 @@ Global
 		{B7375335-C790-4434-95B5-CA28818CA908}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7375335-C790-4434-95B5-CA28818CA908}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7375335-C790-4434-95B5-CA28818CA908}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72914F05-4DF1-491C-B2E5-EFE9BB12FCC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72914F05-4DF1-491C-B2E5-EFE9BB12FCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72914F05-4DF1-491C-B2E5-EFE9BB12FCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72914F05-4DF1-491C-B2E5-EFE9BB12FCC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +76,7 @@ Global
 		{A3206A03-229D-44EC-ACB0-8C5A4851AD06} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
 		{BAD6568A-B6E4-499A-989E-16DD159C171A} = {A644CEC3-BD94-4EB6-9BF0-86B562806BF9}
 		{B7375335-C790-4434-95B5-CA28818CA908} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
+		{72914F05-4DF1-491C-B2E5-EFE9BB12FCC2} = {91A35318-B03F-4D41-AE18-2C21B9D9C3F3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3F86284A-32D2-4F79-B23C-7A0CB8775971}

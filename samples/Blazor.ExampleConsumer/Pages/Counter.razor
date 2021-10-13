@@ -1,0 +1,26 @@
+﻿@page "/counter"
+@inject IJSRuntime JavaScript
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @_currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Increment</button>
+<button class="btn btn-success" @onclick="Prompt">Prompt</button>
+
+<p>Name: @_name</p>
+
+@code {
+    private int _currentCount = 0;
+    private string? _name;
+
+    private void IncrementCount() => ++ _currentCount;
+
+    // Example of "pure" JS interop, no need for 
+    // custom JavaScript to wrap or delegate.
+    private async Task Prompt() =>
+        _name = await JavaScript.InvokeAsync<string>(
+            "prompt", "What's your name", "< name >");
+}
