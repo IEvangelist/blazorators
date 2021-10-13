@@ -7,7 +7,31 @@
 
 ## Design goals 🎯
 
-I was hoping to use the [TypeScript DOM lib generator](https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.
+I was hoping to use the [TypeScript lib.dom.d.ts](https://github.com/microsoft/TypeScript/blob/315b807489b8ff3a892179488fb0c00398d9b2c3/lib/lib.dom.d.ts) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.
+
+Using the _lib.dom.d.ts_ file, we could hypothetically parse various TypeScript type defintions. These definitions could then be converted to C# counterparts. While I realize that not all TypeScript is mappable to C#, there is a bit of room for interpretation.
+
+Consider the following type definition:
+
+```typescript
+/** An object able to programmatically obtain the position of the device. It gives Web content access to the location of the device. This allows a Web site or app to offer customized results based on the user's location. */
+interface Geolocation {
+
+    clearWatch(watchId: number): void;
+
+    getCurrentPosition(
+        successCallback: PositionCallback,
+        errorCallback?: PositionErrorCallback | null,
+        options?: PositionOptions): void;
+    
+    watchPosition(
+        successCallback: PositionCallback,
+        errorCallback?: PositionErrorCallback | null,
+        options?: PositionOptions): number;
+}
+```
+
+> This is from the TypeScript repo, [lib.dom.d.ts file lines 5,498-5,502](https://github.com/microsoft/TypeScript/blob/315b807489b8ff3a892179488fb0c00398d9b2c3/lib/lib.dom.d.ts#L5497-L5502).
 
 ### Example consumption of source generator ✔️
 

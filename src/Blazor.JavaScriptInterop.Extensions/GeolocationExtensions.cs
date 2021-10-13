@@ -7,7 +7,11 @@
 //
 //namespace Microsoft.JSInterop.Extensions;
 //
-//[JavaScriptInterop("geolocation")]
+//[
+//    JavaScriptInterop(
+//        "Geolocation",
+//        Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation")
+//]
 //public static partial class GeolocationExtensions
 //{
 //}
