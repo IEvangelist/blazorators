@@ -4,8 +4,9 @@
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using TypeScript.TypeConverter.CSharp;
+using TypeScript.TypeConverter.Extensions;
 
-namespace TypeScript.TypeConverter;
+namespace TypeScript.TypeConverter.Parsers;
 
 public class LibDomParser
 {
@@ -37,14 +38,17 @@ public class LibDomParser
             var libDomDefinitionTypeScript = await _httpClient.GetStringAsync(_rawUrl);
             if (libDomDefinitionTypeScript is { Length: > 0 })
             {
-                foreach (Match match in _interfacesRegex.Matches(libDomDefinitionTypeScript))
-                {
-                    var typeName = _interfaceTypeName.GetMatchGroupValue(match.Value, "TypeName");
-                    if (typeName is not null)
+                var matchCollection = _interfacesRegex.Matches(libDomDefinitionTypeScript).Select(m => m.Value);
+                Parallel.ForEach(
+                    matchCollection,
+                    match =>
                     {
-                        _typeNameToTypeDefinitionMap[typeName] = match.Value;
-                    }
-                }
+                        var typeName = _interfaceTypeName.GetMatchGroupValue(match, "TypeName");
+                        if (typeName is not null)
+                        {
+                            _typeNameToTypeDefinitionMap[typeName] = match;
+                        }
+                    });
             }
         }
         catch (Exception ex)

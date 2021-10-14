@@ -4,7 +4,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using TypeScript.TypeConverter;
+using TypeScript.TypeConverter.Parsers;
 
 namespace Blazor.SourceGenerators;
 
@@ -70,12 +70,7 @@ public class JavaScriptInteropGenerator : ISourceGenerator
                 typeName = typeName[..^"Extensions".Length];
             }
 
-            // 2. Ask cache for API descriptors
-            //    a. If not found, request raw from values from
-            //    https://github.com/microsoft/TypeScript-DOM-lib-generator/tree/main/inputfiles
-            //    and populate cache.
-            //    - or -
-            //    b. If found, return it.
+            // 2. Ask Lib DOM parser to parse our target type
 
             // TODO: This needs to be a bit smarter, it should be returning multipe types to generate
             // Both C# sources and even corresponding JavaScript functionality.
@@ -84,6 +79,8 @@ public class JavaScriptInteropGenerator : ISourceGenerator
             {
                 context.AddSource($"{typeSymbol.Name}.generated.cs", csharpSourceText);
             }
+
+            var result = _libDomParser.ParseStaticType(typeName);
 
             // 3. Source generate records, classes, structs, and interfaces that define the object surface area.
             // 4. Source generate the extension methods.

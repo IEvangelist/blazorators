@@ -1,7 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-namespace TypeScript.TypeConverter;
+namespace TypeScript.TypeConverter.Types;
 
 static class TypeMap
 {
@@ -20,6 +20,9 @@ static class TypeMap
                 ["Date"] = "DateTime",
                 //["Array"] = "[]"
             };
+
+        internal bool IsPrimitiveType(string typeScriptType) =>
+            _primitiveTypeMap.ContainsKey(typeScriptType);
 
         internal string this[string typeScriptType] =>
             _primitiveTypeMap.TryGetValue(typeScriptType, out var csharpType) ? csharpType : typeScriptType;

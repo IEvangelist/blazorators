@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text;
+using TypeScript.TypeConverter.Extensions;
 
 namespace TypeScript.TypeConverter.CSharp;
 

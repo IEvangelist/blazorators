@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Diagnostics;
+using TypeScript.TypeConverter.Parsers;
 using Xunit;
 
 namespace TypeScript.TypeConverter.Tests;

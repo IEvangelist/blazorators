@@ -1,6 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using TypeScript.TypeConverter.Converters;
 using Xunit;
 
 namespace TypeScript.TypeConverter.Tests

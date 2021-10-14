@@ -1,9 +1,10 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using TypeScript.TypeConverter.Converters;
 using TypeScript.TypeConverter.CSharp;
 
-namespace TypeScript.TypeConverter;
+namespace TypeScript.TypeConverter.Extensions;
 
 static class StringExtensions
 {

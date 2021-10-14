@@ -4,8 +4,9 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
 using TypeScript.TypeConverter.CSharp;
+using TypeScript.TypeConverter.Extensions;
 
-namespace TypeScript.TypeConverter;
+namespace TypeScript.TypeConverter.Converters;
 
 class InterfaceConverter
 {
@@ -53,7 +54,7 @@ class InterfaceConverter
         CSharpObject? csharpObject = null;
 
         var lineTokens = new StringTokenizer(typeScriptInterfaceDefinition, new[] { '\n' });
-        foreach (var (index, segment) in lineTokens.Select((s, i) =>  (i, s)))
+        foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
         {
             if (index == 0)
             {

@@ -1,6 +1,9 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using TypeScript.TypeConverter.Extensions;
+using TypeScript.TypeConverter.Types;
+
 namespace TypeScript.TypeConverter.CSharp;
 
 public record CSharpType(
