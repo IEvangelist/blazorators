@@ -13,6 +13,17 @@ public record CSharpObject(
     string TypeName,
     string? ExtendsTypeName)
 {
+    private List<CSharpObject>? _dependentTypes = null!;
+
+    /// <summary>
+    /// The collection of types that this object depends on.
+    /// </summary>
+    public List<CSharpObject>? DependentTypes
+    {
+        get => _dependentTypes ??= new();
+        init => _dependentTypes = value;
+    }
+
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
     /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpProperty"/> details.

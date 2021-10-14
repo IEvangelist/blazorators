@@ -43,4 +43,17 @@ public record PositionOptions(
         Assert.True(result);
         Assert.Equal(expected, actual);
     }
+
+    [Fact]
+    public async Task ParseStaticObjectCorrectly()
+    {
+        var sut = new LibDomParser();
+
+        await sut.InitializeAsync();
+
+        var parserResult = sut.ParseStaticType("Geolocation");
+
+        Assert.Equal(ParserResultStatus.SuccessfullyParsed, parserResult.Status);
+        Assert.Equal(3, parserResult.Result!.MemberCount);
+    }
 }

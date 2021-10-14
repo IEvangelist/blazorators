@@ -50,5 +50,20 @@ public record MediaKeySystemConfiguration(
 
             //Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void CorrectlyConvertsTypeScriptInterfaceToCSharpStaticObject()
+        {
+//            var text = @"interface Geolocation {
+//    clearWatch(watchId: number): void;
+//    getCurrentPosition(successCallback: PositionCallback, errorCallback ?: PositionErrorCallback | null, options ?: PositionOptions): void;
+//    watchPosition(successCallback: PositionCallback, errorCallback ?: PositionErrorCallback | null, options ?: PositionOptions): number;
+//}";
+//            var sut = new InterfaceConverter();
+//            var actual = sut.ToCSharpSourceText(text);
+//            var expected = @"Action<GeolocationPosition> positionCallback";
+
+            //Assert.Equal(expected, actual);
+        }
     }
 }

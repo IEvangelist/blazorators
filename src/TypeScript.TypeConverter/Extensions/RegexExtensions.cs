@@ -15,9 +15,15 @@ static class RegexExtensions
             return default!;
         }
 
-        if (match is { Success: true } and { Groups: { Count: > 0 } })
+        return match.GetGroupValue(groupName);
+    }
+
+    internal static string? GetGroupValue(this Match match, string groupName)
+    {
+        if (match is { Success: true } &&
+            match.Groups.TryGetValue(groupName, out var group))
         {
-            return match.Groups[groupName]?.Value;
+            return group.Value;
         }
 
         return default!;
