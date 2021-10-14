@@ -13,27 +13,49 @@ public class LibDomReaderTests
     public void InitializesTypeDefinitionsCorrectly()
     {
         var stopwatch = Stopwatch.StartNew();
-        var sut = new LibDomReader();
 
+        var sut = new LibDomReader();
         _ = sut.TryGetDeclaration("foo", out var _);
+
         stopwatch.Stop();
 
         Assert.True(sut.IsInitialized);
         Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(1.5));
     }
 
-    [Fact]
-    public void TryParseDefinitionCorrectly()
+    public static IEnumerable<object[]> TryGetDeclarationInput
     {
-        var sut = new LibDomReader();
+        get
+        {
+            yield return new object[]
+            {
+                "PositionCallback",
+                @"interface PositionCallback {
+    (position: GeolocationPosition): void;
+}",
+            };
 
-        var expected = @"interface PositionOptions {
+            yield return new object[]
+            {
+                "PositionOptions",
+                @"interface PositionOptions {
     enableHighAccuracy?: boolean;
     maximumAge?: number;
     timeout?: number;
-}";
+}",
+            };
+        }
+    }
 
-        var result = sut.TryGetDeclaration("PositionOptions", out var actual);
+
+    [
+        Theory,
+        MemberData(nameof(TryGetDeclarationInput))
+    ]
+    public void TryGetDeclarationReturnsCorrectly(string typeName, string expected)
+    {
+        var sut = new LibDomReader();
+        var result = sut.TryGetDeclaration(typeName, out var actual);
 
         Assert.True(result);
         Assert.NotNull(actual);

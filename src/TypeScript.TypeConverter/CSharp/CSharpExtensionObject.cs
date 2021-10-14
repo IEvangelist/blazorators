@@ -7,7 +7,7 @@ public record CSharpExtensionObject(string RawTypeName)
 {
     private List<CSharpMethod>? _methods = null!;
     private List<CSharpProperty>? _properties = null!;
-    private List<CSharpObject>? _dependentTypes = null!;
+    private Dictionary<string, CSharpObject>? _dependentTypes = null!;
 
     public List<CSharpProperty>? Properties
     {
@@ -21,9 +21,9 @@ public record CSharpExtensionObject(string RawTypeName)
         init => _methods = value;
     }
 
-    public List<CSharpObject>? DependentTypes
+    public Dictionary<string, CSharpObject>? DependentTypes
     {
-        get => _dependentTypes ??= new();
+        get => _dependentTypes ??= new(StringComparer.OrdinalIgnoreCase);
         init => _dependentTypes = value;
     }
 

@@ -65,7 +65,9 @@ public partial class LibDomParser
                 }
 
                 var (parameterDefinitions, javaScriptMethod) =
-                    ParseParameters(parameters, obj => cSharpObject.DependentTypes!.Add(obj));
+                    ParseParameters(
+                        parameters,
+                        obj => cSharpObject.DependentTypes![obj.TypeName] = obj);
 
                 CSharpMethod cSharpMethod =
                     new(methodName, CleanseReturnType(returnType), parameterDefinitions, javaScriptMethod);
@@ -138,7 +140,9 @@ public partial class LibDomParser
                 }
 
                 var (parameterDefinitions, javaScriptMethod) =
-                    ParseParameters(parameters, obj => extensionObject.DependentTypes!.Add(obj));
+                    ParseParameters(
+                        parameters,
+                        obj => extensionObject.DependentTypes![obj.TypeName] = obj);
 
                 CSharpMethod cSharpMethod =
                     new(methodName, CleanseReturnType(returnType), parameterDefinitions, javaScriptMethod);
@@ -180,9 +184,11 @@ public partial class LibDomParser
 
         foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
         {
-            var parameterName = parameterPair[0].Value.Replace("?", "");
+            var parameterName = parameterPair[0].Value.Replace("?", "").Trim();
             var isNullable = parameterPair[0].Value.EndsWith('?');
-            var parameterType = parameterPair[1].Value;
+            var parameterType = isNullable
+                ? parameterPair[1].Value.Trim().Replace(" | null", "")
+                : parameterPair[1].Value.Trim();
 
             // When a parameter defines a custom type, that type needs to also be parsed
             // and source generated. This is so that dependent types are known / resolved.
@@ -202,7 +208,7 @@ public partial class LibDomParser
         return (parameters, null);
     }
 
-    internal bool IsMethod(
+    internal static bool IsMethod(
         string line, [NotNullWhen(true)] out Match? match)
     {
         match = TypeScriptMethodRegex.Match(line);

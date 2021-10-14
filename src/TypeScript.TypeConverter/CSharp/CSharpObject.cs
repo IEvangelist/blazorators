@@ -13,16 +13,11 @@ public record CSharpObject(
     string TypeName,
     string? ExtendsTypeName)
 {
-    private List<CSharpObject>? _dependentTypes = null!;
-
     /// <summary>
     /// The collection of types that this object depends on.
     /// </summary>
-    public List<CSharpObject>? DependentTypes
-    {
-        get => _dependentTypes ??= new();
-        init => _dependentTypes = value;
-    }
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
+        new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
