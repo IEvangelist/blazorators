@@ -43,8 +43,9 @@ public record CSharpObject(
         builder.Append($"public class {TypeName} : {ExtendsTypeName}\r\n");
         builder.Append("{\r\n");
 
-        foreach (var (index, (memberName, member)) in Properties.Select((kvp, index) => (index, kvp)))
+        foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
         {
+            var (memberName, member) = (kvp.Key, kvp.Value);
             var nullableExpression = member.IsNullable ? "?" : "";
 
             builder.Append(
@@ -63,8 +64,9 @@ public record CSharpObject(
         builder.Append($"public record {TypeName}(\r\n");
 
         var memberCount = Properties.Count;
-        foreach (var (index, (memberName, member)) in Properties.Select((kvp, index) => (index, kvp)))
+        foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
         {
+            var (memberName, member) = (kvp.Key, kvp.Value);
             var statementTerminator = index + 1 < memberCount ? "," : "";
             var nullableExpression = member.IsNullable ? "?" : "";
             builder.Append(

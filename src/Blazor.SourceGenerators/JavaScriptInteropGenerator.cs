@@ -2,8 +2,11 @@
 // Licensed under the MIT License.
 
 using System.Diagnostics;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using TypeScript.TypeConverter.Parsers;
 
 namespace Blazor.SourceGenerators;
@@ -13,12 +16,22 @@ public class JavaScriptInteropGenerator : ISourceGenerator
 {
     private readonly LibDomParser _libDomParser = new();
 
-    private const string JavaScriptInteropAttributeFullName = "Microsoft.JSInterop.Attributes.JavaScriptInteropAttribute";
+    private const string JSAutoInteropAttributeFullName = "JSAutoInteropAttribute";
+    private const string JSAutoInteropAttributeSource = @"using System;
+
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+public sealed class JSAutoInteropAttribute : Attribute
+{
+    public string? TypeName { get; set; }
+
+    public string? Url { get; set; }
+}
+";
 
     public void Initialize(GeneratorInitializationContext context)
     {
 #if DEBUG
-        if (!Debugger.IsAttached) Debugger.Launch();
+        //if (!Debugger.IsAttached) Debugger.Launch();
 #endif
         // Register a syntax receiver that will be created for each generation pass
         context.RegisterForSyntaxNotifications(SyntaxContextReceiver.Create);
@@ -26,59 +39,49 @@ public class JavaScriptInteropGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        if (context.SyntaxContextReceiver is not SyntaxContextReceiver receiver ||
-            receiver.ClassDeclarations.Count == 0)
+        // Add the attribute text
+        context.AddSource("JSAutoInteropAttribute.cs",
+            SourceText.From(JSAutoInteropAttributeSource, Encoding.UTF8));
+
+        return;
+
+        if (context.SyntaxContextReceiver is not SyntaxContextReceiver receiver)
         {
             return;
         }
 
-        foreach (var classDeclaration in receiver.ClassDeclarations)
+        foreach (var (typeName, classDeclaration) in receiver.ClassDeclarations)
         {
-            // TODO:
-
-            // 1. Parse corresponding type:
-            //    a. Class name, less the "Extensions" suffix.
-            //    - or -
-            //    b. The TypeName as defined within the JavaScriptInterop itself.
-            var isPartial = classDeclaration.Modifiers.Any(m => m.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword));
+            var isPartial = classDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
             if (!isPartial)
             {
                 continue;
             }
+
             var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
             var symbol = model.GetDeclaredSymbol(classDeclaration);
-            if (symbol is not ITypeSymbol typeSymbol
-                || !typeSymbol.IsStatic)
+            if (symbol is not ITypeSymbol typeSymbol || !typeSymbol.IsStatic)
             {
                 continue;
             }
-            var assemblyName = GetType().Assembly.GetName().Name;
-            var attributes = typeSymbol.GetAttributes();
-            var attribute = attributes.First(c => c.AttributeClass.ContainingAssembly.Name == assemblyName
-                && c.AttributeClass.ToDisplayString() == JavaScriptInteropAttributeFullName);
-            var attributeTypeName = attribute.NamedArguments.FirstOrDefault(a => a.Key == "TypeName").Value.Value?.ToString();
-            var classTypeName = typeSymbol.Name;
 
-            // The final type name to be used 
-            var typeName = string.IsNullOrEmpty(attributeTypeName) ? classTypeName : attributeTypeName;
-            if (typeName.EndsWith("Extensions"))
-            {
-                typeName = typeName[..^"Extensions".Length];
-            }
-
-            // 2. Ask Lib DOM parser to parse our target type
-
-            // TODO: This needs to be a bit smarter, it should be returning multipe types to generate
-            // Both C# sources and even corresponding JavaScript functionality.
             var result = _libDomParser.ParseStaticType(typeName);
-            if (result.Status == ParserResultStatus.SuccessfullyParsed)
+            if (result.Status == ParserResultStatus.SuccessfullyParsed &&
+                result.Value is not null)
             {
-                // context.AddSource($"{typeSymbol.Name}.generated.cs", csharpSourceText);
-            }
+                var staticObject = result.Value;
+                if (staticObject.DependentTypes?.Any() ?? false)
+                {
+                    foreach (var dependentObj in staticObject.DependentTypes)
+                    {
+                        context.AddSource($"{dependentObj.Key}.generated.cs",
+                            SourceText.From(dependentObj.ToString(), Encoding.UTF8));
+                    }
+                }
 
-            // 3. Source generate records, classes, structs, and interfaces that define the object surface area.
-            // 4. Source generate the extension methods.
-            // 5. Source generate the JavaScript, if necessary.
+                context.AddSource($"{typeSymbol.Name}.generated.cs",
+                    SourceText.From(staticObject.ToStaticPartialClassString(), Encoding.UTF8));
+            }
         }
     }
 
@@ -86,7 +89,7 @@ public class JavaScriptInteropGenerator : ISourceGenerator
     {
         internal static ISyntaxContextReceiver Create() => new SyntaxContextReceiver();
 
-        public HashSet<ClassDeclarationSyntax> ClassDeclarations { get; } = new();
+        public HashSet<(string TypeName, ClassDeclarationSyntax ClassDeclaration)> ClassDeclarations { get; } = new();
 
         public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
         {
@@ -102,15 +105,31 @@ public class JavaScriptInteropGenerator : ISourceGenerator
                         {
                             continue;
                         }
+
                         var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                         var fullName = attributeContainingTypeSymbol.ToDisplayString();
-                        if (fullName == JavaScriptInteropAttributeFullName)
+                        if (fullName == JSAutoInteropAttributeFullName)
                         {
-                            ClassDeclarations.Add(classDeclaration);
+                            var typeName = GetJavaScriptInteropTypeName(attributeSyntax);
+                            ClassDeclarations.Add((typeName, classDeclaration));
                         }
                     }
                 }
             }
+        }
+
+        private static string GetJavaScriptInteropTypeName(AttributeSyntax attribute)
+        {
+            if (attribute is { ArgumentList: not null })
+            {
+                return attribute.ArgumentList
+                    .Arguments
+                    .First()
+                    .Expression
+                    .ToString();
+            }
+
+            return ""; // 🤬
         }
     }
 }

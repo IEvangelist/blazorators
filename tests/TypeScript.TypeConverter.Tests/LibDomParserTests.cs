@@ -16,7 +16,7 @@ public class LibDomParserTests
 
         Assert.Equal(ParserResultStatus.SuccessfullyParsed, parserResult.Status);
 
-        var result = parserResult.Result;
+        var result = parserResult.Value;
         Assert.NotNull(result);
         Assert.Equal(3, result.MemberCount);
 

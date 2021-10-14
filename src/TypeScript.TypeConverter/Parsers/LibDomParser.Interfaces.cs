@@ -1,7 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
 using TypeScript.TypeConverter.CSharp;
@@ -53,7 +52,7 @@ public partial class LibDomParser
                 break;
             }
 
-            if (IsMethod(line, out var method))
+            if (IsMethod(line, out var method) && method is not null)
             {
                 var methodName = method.GetGroupValue("MethodName");
                 var parameters = method.GetGroupValue("Parameters");
@@ -77,7 +76,7 @@ public partial class LibDomParser
                 continue;
             }
 
-            if (IsProperty(line, out var property))
+            if (IsProperty(line, out var property) && property is not null)
             {
                 var (name, isNullable, type) = property.Value;
                 CSharpProperty cSharpProperty = new(name, type, isNullable);
@@ -128,7 +127,7 @@ public partial class LibDomParser
                 break;
             }
 
-            if (IsMethod(line, out var method))
+            if (IsMethod(line, out var method) && method is not null)
             {
                 var methodName = method.GetGroupValue("MethodName");
                 var parameters = method.GetGroupValue("Parameters");
@@ -152,7 +151,7 @@ public partial class LibDomParser
                 continue;
             }
 
-            if (IsProperty(line, out var property))
+            if (IsProperty(line, out var property) && property is not null)
             {
                 var (name, isNullable, type) = property.Value;
                 CSharpProperty cSharpProperty = new(name, type, isNullable);
@@ -185,7 +184,7 @@ public partial class LibDomParser
         foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
         {
             var parameterName = parameterPair[0].Value.Replace("?", "").Trim();
-            var isNullable = parameterPair[0].Value.EndsWith('?');
+            var isNullable = parameterPair[0].Value.EndsWith("?");
             var parameterType = isNullable
                 ? parameterPair[1].Value.Trim().Replace(" | null", "")
                 : parameterPair[1].Value.Trim();
@@ -209,7 +208,7 @@ public partial class LibDomParser
     }
 
     internal static bool IsMethod(
-        string line, [NotNullWhen(true)] out Match? match)
+        string line, out Match? match)
     {
         match = TypeScriptMethodRegex.Match(line);
         return match.Success;
@@ -217,7 +216,7 @@ public partial class LibDomParser
 
     internal static bool IsProperty(
         string line,
-        [NotNullWhen(true)] out (string Name, bool IsNullable, string ReturnType)? property)
+        out (string Name, bool IsNullable, string ReturnType)? property)
     {
         // TODO: refactor avoiding brute force parsing.
         // See "IsMethod" functiom for inspiration.
@@ -228,7 +227,7 @@ public partial class LibDomParser
             if (memberDefinition is { Length: 2 })
             {
                 var memberName = memberDefinition[0].Value.Replace("?", "");
-                var isNullable = memberDefinition[0].Value.EndsWith('?');
+                var isNullable = memberDefinition[0].Value.EndsWith("?");
                 var memberType = memberDefinition[1].Value;
 
                 property = (memberName, isNullable, memberType);
@@ -238,5 +237,17 @@ public partial class LibDomParser
 
         property = null!;
         return false;
+    }
+}
+
+static class EnumerableExtensions
+{
+    internal static IEnumerable<T[]> Chunk<T>(this IEnumerable<T> source, int chunksize)
+    {
+        while (source.Any())
+        {
+            yield return source.Take(chunksize).ToArray();
+            source = source.Skip(chunksize);
+        }
     }
 }

@@ -21,7 +21,7 @@ public partial class LibDomParser
                 result = result with
                 {
                     Status = ParserResultStatus.SuccessfullyParsed,
-                    Result = ToExtensionObject(typeScriptDefinitionText)
+                    Value = ToExtensionObject(typeScriptDefinitionText)
                 };
             }
             catch (Exception ex)

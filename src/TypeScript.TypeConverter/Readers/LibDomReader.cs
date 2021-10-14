@@ -3,6 +3,7 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using TypeScript.TypeConverter.Extensions;
 using static TypeScript.TypeConverter.Expressions.SharedRegex;
 
@@ -23,7 +24,7 @@ internal class LibDomReader
                 var libDomDefinitionTypeScript = _httpClient.GetStringAsync(rawUrl).ConfigureAwait(false).GetAwaiter().GetResult();
                 if (libDomDefinitionTypeScript is { Length: > 0 })
                 {
-                    var matchCollection = InterfaceRegex.Matches(libDomDefinitionTypeScript).Select(m => m.Value);
+                    var matchCollection = InterfaceRegex.Matches(libDomDefinitionTypeScript).Cast<Match>().Select(m => m.Value);
                     Parallel.ForEach(
                         matchCollection,
                         match =>
@@ -50,6 +51,6 @@ internal class LibDomReader
     internal bool IsInitialized => _lazyTypeDeclarationMap is { IsValueCreated: true };
 
     public bool TryGetDeclaration(
-        string typeName, [NotNullWhen(true)] out string? declaration) =>
+        string typeName, out string? declaration) =>
         _lazyTypeDeclarationMap.Value.TryGetValue(typeName, out declaration);
 }

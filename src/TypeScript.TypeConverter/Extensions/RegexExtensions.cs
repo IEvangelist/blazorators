@@ -20,10 +20,9 @@ static class RegexExtensions
 
     internal static string? GetGroupValue(this Match match, string groupName)
     {
-        if (match is { Success: true } &&
-            match.Groups.TryGetValue(groupName, out var group))
+        if (match is { Success: true })
         {
-            return group.Value;
+            return match.Groups?[groupName]?.Value;
         }
 
         return default!;

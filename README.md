@@ -42,7 +42,7 @@ interface Geolocation {
 Ideally, I would like to be able to define a C# class such as this:
 
 ```csharp
-[JavaScriptInterop(
+[JSAutoInterop(
     TypeName = "Geolocation",
     Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API")]
 public static partial class GeolocationExtensions { }
@@ -63,7 +63,7 @@ public static partial class GeolocationExtensions
     /// <summary>
     /// See <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition"></a>.
     /// </summary>
-    public ValueTask GetCurrentPositionAsync<T>(
+    public static ValueTask GetCurrentPositionAsync<T>(
         this IJSRuntime jsRuntime,
         T dotnetObject,
         string successMethodName,
@@ -83,7 +83,7 @@ public static partial class GeolocationExtensions
     /// <summary>
     /// See <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition"></a>
     /// </summary>
-    public ValueTask<long> WatchPositionAsync<T>(
+    public static ValueTask<long> WatchPositionAsync<T>(
         this IJSRuntime jsRuntime,
         T dotnetObject,
         string successMethodName,

@@ -1,6 +1,9 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Text;
+using TypeScript.TypeConverter.Extensions;
+
 namespace TypeScript.TypeConverter.CSharp;
 
 public record CSharpExtensionObject(string RawTypeName)
@@ -28,4 +31,26 @@ public record CSharpExtensionObject(string RawTypeName)
     }
 
     public int MemberCount => Properties!.Count + Methods!.Count;
+
+    public string ToStaticPartialClassString()
+    {
+        StringBuilder builder = new("namespace Microsoft.JSInterop;");
+
+        builder.Append("\r\n\r\n");
+        builder.Append("namespace Microsoft.JSInterop.Extensions;");
+
+        builder.Append("\r\n\r\n");
+        var typeName = RawTypeName.EndsWith("Extensions") ? RawTypeName : $"{RawTypeName}Extensions";
+        builder.Append($"public class {typeName}\r\n");
+        builder.Append("{\r\n");
+
+        foreach (var method in Methods ?? Enumerable.Empty<CSharpMethod>())
+        {
+            var methodName = method.RawName.CapitalizeFirstLetter();
+            builder.Append($"    public static ValueTask {methodName}Async(\r\n");
+        }
+
+        builder.Append("}\r\n");
+        return builder.ToString();
+    }
 }
