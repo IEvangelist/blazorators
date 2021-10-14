@@ -1,12 +1,12 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using TypeScript.TypeConverter.Converters;
+using TypeScript.TypeConverter.Parsers;
 using Xunit;
 
 namespace TypeScript.TypeConverter.Tests
 {
-    public class InterfaceConverterTests
+    public class LibDomParserInterfacesTests
     {
         [Fact]
         public void CorrectlyConvertsTypeScriptInterfaceToCSharpRecord()
@@ -20,8 +20,8 @@ namespace TypeScript.TypeConverter.Tests
     sessionTypes?: string[];
     videoCapabilities?: MediaKeySystemMediaCapability[];
 }";
-            var sut = new InterfaceConverter();
-            var actual = sut.ToCSharpSourceText(text);
+            var sut = new LibDomParser();
+            var actual = sut.ToObject(text);
             var expected = @"namespace Microsoft.JSInterop;
 
 public record MediaKeySystemConfiguration(
@@ -35,7 +35,10 @@ public record MediaKeySystemConfiguration(
 );
 ";
 
-            Assert.Equal(expected, actual);
+            Assert.NotNull(actual);
+
+            var actualRecordStr = actual.ToRecordString();
+            Assert.Equal(expected.NormalizeNewlines(), actualRecordStr.NormalizeNewlines());
         }
 
         [Fact]

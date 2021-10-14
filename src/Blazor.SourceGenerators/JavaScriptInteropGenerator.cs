@@ -15,10 +15,6 @@ public class JavaScriptInteropGenerator : ISourceGenerator
 
     private const string JavaScriptInteropAttributeFullName = "Microsoft.JSInterop.Attributes.JavaScriptInteropAttribute";
 
-    public JavaScriptInteropGenerator() =>
-        // Fire and forget, start initialization asynchronously.
-        _ = Task.Run(_libDomParser.InitializeAsync);
-
     public void Initialize(GeneratorInitializationContext context)
     {
 #if DEBUG
@@ -74,13 +70,11 @@ public class JavaScriptInteropGenerator : ISourceGenerator
 
             // TODO: This needs to be a bit smarter, it should be returning multipe types to generate
             // Both C# sources and even corresponding JavaScript functionality.
-            if (_libDomParser.TryParseType(typeName, out var csharpSourceText) &&
-                csharpSourceText is not null)
-            {
-                context.AddSource($"{typeSymbol.Name}.generated.cs", csharpSourceText);
-            }
-
             var result = _libDomParser.ParseStaticType(typeName);
+            if (result.Status == ParserResultStatus.SuccessfullyParsed)
+            {
+                // context.AddSource($"{typeSymbol.Name}.generated.cs", csharpSourceText);
+            }
 
             // 3. Source generate records, classes, structs, and interfaces that define the object surface area.
             // 4. Source generate the extension methods.
