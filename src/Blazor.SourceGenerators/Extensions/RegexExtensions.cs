@@ -3,7 +3,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace TypeScript.TypeConverter.Extensions
+namespace Blazor.SourceGenerators.Extensions
 {
     static class RegexExtensions
     {

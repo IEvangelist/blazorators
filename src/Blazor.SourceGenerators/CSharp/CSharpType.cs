@@ -1,15 +1,16 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using TypeScript.TypeConverter.Extensions;
-using TypeScript.TypeConverter.Types;
+using Blazor.SourceGenerators.Extensions;
+using Blazor.SourceGenerators.Types;
 
-namespace TypeScript.TypeConverter.CSharp
+namespace Blazor.SourceGenerators.CSharp
 {
     public record CSharpType(
         string RawName,
         string RawTypeName,
-        bool IsNullable = false)
+        bool IsNullable = false,
+        CSharpAction? ActionDeclation = null)
     {
         /// <summary>
         /// Gets a string representation of the C# type as a parameter declaration. For example,
@@ -17,7 +18,13 @@ namespace TypeScript.TypeConverter.CSharp
         /// <c>"date"</c> as its <see cref="RawName"/> and <c>"DateTime"</c>
         /// as its <see cref="RawTypeName"/>.
         /// </summary>
-        public string ToParameterString() =>
-            $"{TypeMap.PrimitiveTypes[RawTypeName]}{(IsNullable ? "?" : "")} {RawName.LowerCaseFirstLetter()}";
+        public string ToParameterString()
+        {
+            var typeName = TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName)
+                ? TypeMap.PrimitiveTypes[RawTypeName]
+                : RawTypeName;
+
+            return $"{typeName}{(IsNullable ? "?" : "")} {RawName.LowerCaseFirstLetter()}";
+        }
     }
 }

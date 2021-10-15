@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TypeScript.TypeConverter.Extensions;
-using TypeScript.TypeConverter.Types;
+using Blazor.SourceGenerators.Extensions;
+using Blazor.SourceGenerators.Types;
 
-namespace TypeScript.TypeConverter.CSharp
+namespace Blazor.SourceGenerators.CSharp
 {
     public record CSharpExtensionObject(string RawTypeName)
     {
@@ -38,9 +38,10 @@ namespace TypeScript.TypeConverter.CSharp
 
         public string ToStaticPartialClassString()
         {
-            StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
+            StringBuilder builder = new("using System.Threading.Tasks;\r\n\r\n");
 
-            builder.Append("{\r\n\r\n");
+            builder.Append("namespace Microsoft.JSInterop\r\n");
+            builder.Append("{\r\n");
 
             var typeName = RawTypeName.EndsWith("Extensions") ? RawTypeName : $"{RawTypeName}Extensions";
             builder.Append($"    public static partial class {typeName}\r\n");
@@ -62,14 +63,56 @@ namespace TypeScript.TypeConverter.CSharp
                             ? "ValueTask"
                             : method.RawReturnTypeName;
 
-                    var genericType = isPrimitiveType
+                    var bareType = isPrimitiveType
                         ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
                         : method.RawReturnTypeName;
 
+                    // Write the methd signature:
+                    // - access modifiers
+                    // - return type
+                    // - name
                     builder.Append($"        public static {returnType} {csharpMethodName}Async(\r\n");
-                    builder.Append($"            this IJSRuntime javaScript");
 
-                    if (method.ParameterDefinitions.Count == 0)
+                    // Write method parameters
+                    builder.Append($"            this IJSRuntime javaScript");
+                    if (method.ParameterDefinitions.Count > 0)
+                    {
+                        builder.Append(",\r\n");
+                        foreach (var (index, parameter) in method.ParameterDefinitions.Select((p, i) => (i, p)))
+                        {
+                            if (index == method.ParameterDefinitions.Count - 1)
+                            {
+                                builder.Append($"            {parameter.ToParameterString()}) =>\r\n");
+                            }
+                            else
+                            {
+                                builder.Append($"            {parameter.ToParameterString()}\r\n");
+                            }
+                        }
+
+                        if (isVoid)
+                        {
+                            builder.Append($"            javaScript.InvokeVoidAsync(\"{javaScriptMethodName}\",\r\n");
+                        }
+                        else
+                        {
+                            builder.Append($"            javaScript.InvokeAsync<{bareType}>(\"{javaScriptMethodName}\",\r\n");
+                        }
+
+                        // Write method body / expression
+                        foreach (var (index, parameter) in method.ParameterDefinitions.Select((p, i) => (i, p)))
+                        {
+                            if (index == method.ParameterDefinitions.Count - 1)
+                            {
+                                builder.Append($"                {parameter.RawName});\r\n\r\n");
+                            }
+                            else
+                            {
+                                builder.Append($"                {parameter.RawName},\r\n");
+                            }
+                        }
+                    }
+                    else
                     {
                         builder.Append(") =>\r\n");
                         if (isVoid)
@@ -79,34 +122,8 @@ namespace TypeScript.TypeConverter.CSharp
                         }
                         else
                         {
-                            builder.Append($"            javaScript.InvokeAsync<{genericType}>(\"{javaScriptMethodName}\");\r\n\r\n");
+                            builder.Append($"            javaScript.InvokeAsync<{bareType}>(\"{javaScriptMethodName}\");\r\n\r\n");
                             continue;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var (index, parameter) in method.ParameterDefinitions.Select((p, i) => (i, p)))
-                        {
-                            if (index == 0)
-                            {
-                                if (isVoid)
-                                {
-                                    builder.Append($"            javaScript.InvokeVoidAsync(\"{javaScriptMethodName}\",\r\n");
-                                }
-                                else
-                                {
-                                    builder.Append($"            javaScript.InvokeAsync<{genericType}>(\"{javaScriptMethodName}\",\r\n");
-                                }
-                            }
-
-                            if (index == method.ParameterDefinitions.Count - 1)
-                            {
-                                builder.Append($"                ${parameter.RawName});\r\n");
-                            }
-                            else
-                            {
-                                builder.Append($"                ${parameter.RawName},\r\n");
-                            }
                         }
                     }
                 }
@@ -120,7 +137,9 @@ namespace TypeScript.TypeConverter.CSharp
 
             builder.Append("    }\r\n");
             builder.Append("}\r\n");
-            return builder.ToString();
+
+            var staticPartialClassDefinition = builder.ToString();
+            return staticPartialClassDefinition;
         }
     }
 }

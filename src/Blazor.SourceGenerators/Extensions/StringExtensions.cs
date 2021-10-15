@@ -1,7 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-namespace TypeScript.TypeConverter.Extensions
+namespace Blazor.SourceGenerators.Extensions
 {
     static class StringExtensions
     {

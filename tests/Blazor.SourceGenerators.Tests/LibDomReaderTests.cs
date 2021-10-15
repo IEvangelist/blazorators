@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Diagnostics;
-using TypeScript.TypeConverter.Readers;
+using Blazor.SourceGenerators.Readers;
 using Xunit;
 
 namespace Blazor.SourceGenerators.Tests

@@ -3,7 +3,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace TypeScript.TypeConverter.Expressions
+namespace Blazor.SourceGenerators.Expressions
 {
     internal static class SharedRegex
     {
@@ -25,5 +25,19 @@ namespace TypeScript.TypeConverter.Expressions
         /// </summary>
         public static readonly Regex TypeScriptMethodRegex =
             new(@"^(?'MethodName'\S+(?=\())(?'Parameters'.*\))(?'ReturnType'\:.*)$", RegexOptions.Multiline);
+
+        /// <summary>
+        /// Given a string value of <c>"(position: GeolocationPosition): void;"</c>, the
+        /// following capture groups would be present:
+        /// <list type="bullet">
+        /// <item><c>Parameters</c>: <c>"(position: GeolocationPosition"</c></item>
+        /// <item><c>ReturnType</c>: <c>": void;"</c></item>
+        /// </list>
+        /// </summary>
+        public static readonly Regex TypeScriptCallbackRegex =
+            new(@"^(?'Parameters'\(.*\))(?'ReturnType'\:.*)$", RegexOptions.Multiline);
+
+        public static readonly Regex TypeScriptPropertyRegex =
+            new(@"^(?'Name'.*)\:(?:.{1})(?'Type'.*)\;$", RegexOptions.Multiline);
     }
 }

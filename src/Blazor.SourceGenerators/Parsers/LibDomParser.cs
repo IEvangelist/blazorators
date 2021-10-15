@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
-using TypeScript.TypeConverter.CSharp;
-using TypeScript.TypeConverter.Readers;
+using Blazor.SourceGenerators.CSharp;
+using Blazor.SourceGenerators.Readers;
 
-namespace TypeScript.TypeConverter.Parsers
+namespace Blazor.SourceGenerators.Parsers
 {
     public partial class LibDomParser
     {

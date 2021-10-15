@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TypeScript.TypeConverter.Types
+namespace Blazor.SourceGenerators.Types
 {
     static class TypeMap
     {

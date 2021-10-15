@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Blazor.SourceGenerators.Parsers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using TypeScript.TypeConverter.Parsers;
 
 namespace Blazor.SourceGenerators
 {
@@ -40,9 +40,9 @@ namespace System.Runtime.CompilerServices
 
         public void Initialize(GeneratorInitializationContext context)
         {
-//#if DEBUG
-//            if (!Debugger.IsAttached) Debugger.Launch();
-//#endif
+#if DEBUG
+            if (!Debugger.IsAttached) Debugger.Launch();
+#endif
 
             // Register a syntax receiver that will be created for each generation pass
             context.RegisterForSyntaxNotifications(SyntaxContextReceiver.Create);

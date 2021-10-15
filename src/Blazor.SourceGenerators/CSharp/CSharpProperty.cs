@@ -1,9 +1,9 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using TypeScript.TypeConverter.Types;
+using Blazor.SourceGenerators.Types;
 
-namespace TypeScript.TypeConverter.CSharp
+namespace Blazor.SourceGenerators.CSharp
 {
     /// <summary>
     /// A record the represents various C# members, such as properties, delegates and events.

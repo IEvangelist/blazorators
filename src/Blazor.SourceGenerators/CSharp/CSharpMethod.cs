@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
-using TypeScript.TypeConverter.JavaScript;
+using Blazor.SourceGenerators.JavaScript;
 
-namespace TypeScript.TypeConverter.CSharp
+namespace Blazor.SourceGenerators.CSharp
 {
     public record CSharpMethod(
         string RawName,

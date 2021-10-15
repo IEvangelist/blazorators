@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TypeScript.TypeConverter.Extensions;
+using Blazor.SourceGenerators.Extensions;
 
-namespace TypeScript.TypeConverter.CSharp
+namespace Blazor.SourceGenerators.CSharp
 {
     /// <summary>
     /// A record the represents various C# objects.

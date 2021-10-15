@@ -8,10 +8,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TypeScript.TypeConverter.Extensions;
-using static TypeScript.TypeConverter.Expressions.SharedRegex;
+using Blazor.SourceGenerators.Extensions;
+using static Blazor.SourceGenerators.Expressions.SharedRegex;
 
-namespace TypeScript.TypeConverter.Readers
+namespace Blazor.SourceGenerators.Readers
 {
     internal class LibDomReader
     {

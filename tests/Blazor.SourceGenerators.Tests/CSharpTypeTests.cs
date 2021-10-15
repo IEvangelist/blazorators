@@ -1,7 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using TypeScript.TypeConverter.CSharp;
+using Blazor.SourceGenerators.CSharp;
 using Xunit;
 
 namespace Blazor.SourceGenerators.Tests

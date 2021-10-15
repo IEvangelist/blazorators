@@ -5,13 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using TypeScript.TypeConverter.CSharp;
-using TypeScript.TypeConverter.Extensions;
-using TypeScript.TypeConverter.JavaScript;
-using TypeScript.TypeConverter.Types;
-using static TypeScript.TypeConverter.Expressions.SharedRegex;
+using Blazor.SourceGenerators.CSharp;
+using Blazor.SourceGenerators.Extensions;
+using Blazor.SourceGenerators.JavaScript;
+using Blazor.SourceGenerators.Types;
+using static Blazor.SourceGenerators.Expressions.SharedRegex;
 
-namespace TypeScript.TypeConverter.Parsers
+namespace Blazor.SourceGenerators.Parsers
 {
     public partial class LibDomParser
     {
@@ -81,8 +81,20 @@ namespace TypeScript.TypeConverter.Parsers
 
                 if (IsProperty(line, out var property) && property is not null)
                 {
-                    var (name, isNullable, type) = property.Value;
-                    CSharpProperty cSharpProperty = new(name, type, isNullable);
+                    var name = property.GetGroupValue("Name");
+                    var type = property.GetGroupValue("Type");
+
+                    if (name is null || type is null)
+                    {
+                        continue;
+                    }
+
+                    var isReadonly = name.StartsWith("readonly ");
+                    var isNullable = name.EndsWith("?");
+
+                    name = name.Replace("?", "").Replace("readonly ", "");
+
+                    CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
                     cSharpObject.Properties[cSharpProperty.RawName] = cSharpProperty;
 
                     continue;
@@ -157,8 +169,20 @@ namespace TypeScript.TypeConverter.Parsers
 
                 if (IsProperty(line, out var property) && property is not null)
                 {
-                    var (name, isNullable, type) = property.Value;
-                    CSharpProperty cSharpProperty = new(name, type, isNullable);
+                    var name = property.GetGroupValue("Name");
+                    var type = property.GetGroupValue("Type");
+
+                    if (name is null || type is null)
+                    {
+                        continue;
+                    }
+
+                    var isReadonly = name.StartsWith("readonly ");
+                    var isNullable = name.EndsWith("?");
+
+                    name = name.Replace("?", "").Replace("readonly ", "");
+
+                    CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
                     extensionObject.Properties!.Add(cSharpProperty);
 
                     continue;
@@ -166,6 +190,72 @@ namespace TypeScript.TypeConverter.Parsers
             }
 
             return extensionObject;
+        }
+
+        internal CSharpAction? ToAction(string typeScriptTypeDeclaration)
+        {
+            CSharpAction? cSharpAction = null;
+
+            var lineTokens = typeScriptTypeDeclaration.Split(new[] { '\n' });
+            foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
+            {
+                if (index == 0)
+                {
+                    var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
+                    if (typeName is not null)
+                    {
+                        cSharpAction = new(typeName);
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (cSharpAction is null)
+                {
+                    break;
+                }
+
+                var line = segment.Trim();
+                if (line.Length == 0)
+                {
+                    continue;
+                }
+
+                if (line == "}")
+                {
+                    // We're done
+                    break;
+                }
+
+                if (IsAction(line, out var action) && action is not null)
+                {
+                    var parameters = action.GetGroupValue("Parameters");
+                    var returnType = action.GetGroupValue("ReturnType");
+
+                    if (parameters is null || returnType is null)
+                    {
+                        continue;
+                    }
+
+                    var (parameterDefinitions, _) =
+                        ParseParameters(
+                            cSharpAction.RawName,
+                            parameters,
+                            obj => cSharpAction.DependentTypes![obj.TypeName] = obj);
+
+                    cSharpAction = cSharpAction with
+                    {
+                        ParameterDefinitions = parameterDefinitions
+                    };
+
+                    continue;
+                }
+            }
+
+            return cSharpAction;
         }
 
         internal static string CleanseReturnType(string returnType)
@@ -176,7 +266,7 @@ namespace TypeScript.TypeConverter.Parsers
         }
 
         internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
-            string rawMethodName,
+            string rawName,
             string parametersString,
             Action<CSharpObject> appendDependentType)
         {
@@ -187,7 +277,7 @@ namespace TypeScript.TypeConverter.Parsers
             var trimmedParameters = parametersString.Replace("(", "").Replace(")", "");
             var parameterLineTokenizer = trimmedParameters.Split(new[] { ':', ',', });
 
-            JavaScriptMethod? javaScriptMethod = new(rawMethodName);
+            JavaScriptMethod? javaScriptMethod = new(rawName);
             foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
             {
                 var parameterName = parameterPair[0].Replace("?", "").Trim();
@@ -195,6 +285,8 @@ namespace TypeScript.TypeConverter.Parsers
                 var parameterType = isNullable
                     ? parameterPair[1].Trim().Replace(" | null", "")
                     : parameterPair[1].Trim();
+
+                CSharpAction? action = null;
 
                 // When a parameter defines a custom type, that type needs to also be parsed
                 // and source generated. This is so that dependent types are known / resolved.
@@ -204,17 +296,24 @@ namespace TypeScript.TypeConverter.Parsers
                 {
                     javaScriptMethod = javaScriptMethod with
                     {
-                        InvokableMethodName = $"blazorators.{rawMethodName}"
+                        InvokableMethodName = $"blazorators.{rawName}"
                     };
 
-                    var obj = ToObject(typeScriptDefinitionText);
-                    if (obj is not null)
+                    if (parameterType.EndsWith("Callback"))
                     {
-                        appendDependentType(obj);
+                        action = ToAction(typeScriptDefinitionText);
+                    }
+                    else
+                    {
+                        var obj = ToObject(typeScriptDefinitionText);
+                        if (obj is not null)
+                        {
+                            appendDependentType(obj);
+                        }
                     }
                 }
 
-                parameters.Add(new(parameterName, parameterType, isNullable));
+                parameters.Add(new(parameterName, parameterType, isNullable, action));
             }
 
             javaScriptMethod = javaScriptMethod with
@@ -223,6 +322,13 @@ namespace TypeScript.TypeConverter.Parsers
             };
 
             return (parameters, javaScriptMethod);
+        }
+
+        internal static bool IsAction(
+            string line, out Match? match)
+        {
+            match = TypeScriptCallbackRegex.Match(line);
+            return match.Success;
         }
 
         internal static bool IsMethod(
@@ -234,27 +340,10 @@ namespace TypeScript.TypeConverter.Parsers
 
         internal static bool IsProperty(
             string line,
-            out (string Name, bool IsNullable, string ReturnType)? property)
+            out Match? match)
         {
-            // TODO: refactor avoiding brute force parsing.
-            // See "IsMethod" functiom for inspiration.
-            if (line is { Length: > 3 })
-            {
-                var memberLineTokenizer = line.Split(new[] { ':', ' ', ';' });
-                var memberDefinition = memberLineTokenizer.Where(t => t.Length > 0).ToArray();
-                if (memberDefinition is { Length: 2 })
-                {
-                    var memberName = memberDefinition[0].Replace("?", "");
-                    var isNullable = memberDefinition[0].EndsWith("?");
-                    var memberType = memberDefinition[1];
-
-                    property = (memberName, isNullable, memberType);
-                    return true;
-                }
-            }
-
-            property = null!;
-            return false;
+            match = TypeScriptPropertyRegex.Match(line);
+            return match.Success;
         }
     }
 

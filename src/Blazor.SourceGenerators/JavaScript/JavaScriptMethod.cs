@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
-using TypeScript.TypeConverter.CSharp;
+using Blazor.SourceGenerators.CSharp;
 
-namespace TypeScript.TypeConverter.JavaScript
+namespace Blazor.SourceGenerators.JavaScript
 {
     public record JavaScriptMethod(
         /// <summary>
