@@ -67,6 +67,7 @@ namespace TypeScript.TypeConverter.Parsers
 
                     var (parameterDefinitions, javaScriptMethod) =
                         ParseParameters(
+                            methodName,
                             parameters,
                             obj => cSharpObject.DependentTypes![obj.TypeName] = obj);
 
@@ -142,6 +143,7 @@ namespace TypeScript.TypeConverter.Parsers
 
                     var (parameterDefinitions, javaScriptMethod) =
                         ParseParameters(
+                            methodName,
                             parameters,
                             obj => extensionObject.DependentTypes![obj.TypeName] = obj);
 
@@ -174,7 +176,9 @@ namespace TypeScript.TypeConverter.Parsers
         }
 
         internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
-            string parametersString, Action<CSharpObject> appendDependentType)
+            string rawMethodName,
+            string parametersString,
+            Action<CSharpObject> appendDependentType)
         {
             List<CSharpType> parameters = new();
 
@@ -183,6 +187,7 @@ namespace TypeScript.TypeConverter.Parsers
             var trimmedParameters = parametersString.Replace("(", "").Replace(")", "");
             var parameterLineTokenizer = trimmedParameters.Split(new[] { ':', ',', });
 
+            JavaScriptMethod? javaScriptMethod = new(rawMethodName);
             foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
             {
                 var parameterName = parameterPair[0].Replace("?", "").Trim();
@@ -197,6 +202,11 @@ namespace TypeScript.TypeConverter.Parsers
                     _reader.TryGetDeclaration(parameterType, out var typeScriptDefinitionText) &&
                     typeScriptDefinitionText is not null)
                 {
+                    javaScriptMethod = javaScriptMethod with
+                    {
+                        InvokableMethodName = $"blazorators.{rawMethodName}"
+                    };
+
                     var obj = ToObject(typeScriptDefinitionText);
                     if (obj is not null)
                     {
@@ -207,7 +217,12 @@ namespace TypeScript.TypeConverter.Parsers
                 parameters.Add(new(parameterName, parameterType, isNullable));
             }
 
-            return (parameters, null);
+            javaScriptMethod = javaScriptMethod with
+            {
+                ParameterDefinitions = parameters
+            };
+
+            return (parameters, javaScriptMethod);
         }
 
         internal static bool IsMethod(

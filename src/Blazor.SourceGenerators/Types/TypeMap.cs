@@ -20,7 +20,7 @@ namespace TypeScript.TypeConverter.Types
                     ["string"] = "string",
                     ["boolean"] = "bool",
                     ["enum"] = "enum",
-                    ["Date"] = "DateTime",
+                    ["Date"] = "DateTime"
                     //["Array"] = "[]"
                 };
 

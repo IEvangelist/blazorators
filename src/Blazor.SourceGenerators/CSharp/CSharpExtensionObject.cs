@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TypeScript.TypeConverter.Extensions;
+using TypeScript.TypeConverter.Types;
 
 namespace TypeScript.TypeConverter.CSharp
 {
@@ -47,10 +48,74 @@ namespace TypeScript.TypeConverter.CSharp
 
             foreach (var method in Methods ?? Enumerable.Empty<CSharpMethod>())
             {
-                var methodName = method.RawName.CapitalizeFirstLetter();
-                builder.Append($"        public static ValueTask {methodName}Async(\r\n");
-                // TODO: implement
-                builder.Append($"        ) => new ValueTask();\r\n");
+                var isVoid = method.RawReturnTypeName == "void";
+                var isPrimitiveType = TypeMap.PrimitiveTypes.IsPrimitiveType(method.RawReturnTypeName);
+
+                var javaScriptMethodName = method.RawName;
+                var csharpMethodName = method.RawName.CapitalizeFirstLetter();
+
+                if (method.IsPureJavaScriptInvocation)
+                {
+                    var returnType = isPrimitiveType
+                        ? $"ValueTask<{TypeMap.PrimitiveTypes[method.RawReturnTypeName]}>"
+                        : isVoid
+                            ? "ValueTask"
+                            : method.RawReturnTypeName;
+
+                    var genericType = isPrimitiveType
+                        ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
+                        : method.RawReturnTypeName;
+
+                    builder.Append($"        public static {returnType} {csharpMethodName}Async(\r\n");
+                    builder.Append($"            this IJSRuntime javaScript");
+
+                    if (method.ParameterDefinitions.Count == 0)
+                    {
+                        builder.Append(") =>\r\n");
+                        if (isVoid)
+                        {
+                            builder.Append($"            javaScript.InvokeVoidAsync(\"{javaScriptMethodName}\");\r\n\r\n");
+                            continue;
+                        }
+                        else
+                        {
+                            builder.Append($"            javaScript.InvokeAsync<{genericType}>(\"{javaScriptMethodName}\");\r\n\r\n");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var (index, parameter) in method.ParameterDefinitions.Select((p, i) => (i, p)))
+                        {
+                            if (index == 0)
+                            {
+                                if (isVoid)
+                                {
+                                    builder.Append($"            javaScript.InvokeVoidAsync(\"{javaScriptMethodName}\",\r\n");
+                                }
+                                else
+                                {
+                                    builder.Append($"            javaScript.InvokeAsync<{genericType}>(\"{javaScriptMethodName}\",\r\n");
+                                }
+                            }
+
+                            if (index == method.ParameterDefinitions.Count - 1)
+                            {
+                                builder.Append($"                ${parameter.RawName});\r\n");
+                            }
+                            else
+                            {
+                                builder.Append($"                ${parameter.RawName},\r\n");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    builder.Append($"        public static ValueTask {csharpMethodName}Async(\r\n");
+                    // TODO: implement
+                    builder.Append($"        ) => new ValueTask();\r\n");
+                }
             }
 
             builder.Append("    }\r\n");

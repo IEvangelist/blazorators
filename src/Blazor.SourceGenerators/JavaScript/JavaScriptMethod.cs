@@ -17,7 +17,7 @@ namespace TypeScript.TypeConverter.JavaScript
         /// the <paramref name="JavaScriptApiMethodName"/>
         /// the method is not considered pure.
         /// </summary>
-        string InvokableMethodName,
+        string? InvokableMethodName = null,
 
         /// <summary>
         /// The optional listing of method parameters.
@@ -35,6 +35,8 @@ namespace TypeScript.TypeConverter.JavaScript
         /// </code>
         /// This can be called from an <c>IJSRuntime</c> or <c>IJSObjectReference</c> instance directly.
         /// </remarks>
-        public bool IsPure => JavaScriptApiMethodName != InvokableMethodName;
+        public bool IsPure =>
+            JavaScriptApiMethodName == InvokableMethodName ||
+            InvokableMethodName is null;
     }
 }
