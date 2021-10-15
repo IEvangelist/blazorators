@@ -40,6 +40,7 @@ namespace Blazor.SourceGenerators.CSharp
         {
             StringBuilder builder = new("using System.Threading.Tasks;\r\n\r\n");
 
+            builder.Append("#nullable enable\r\n");
             builder.Append("namespace Microsoft.JSInterop\r\n");
             builder.Append("{\r\n");
 
@@ -92,11 +93,13 @@ namespace Blazor.SourceGenerators.CSharp
 
                         if (isVoid)
                         {
-                            builder.Append($"            javaScript.InvokeVoidAsync(\"{javaScriptMethodName}\",\r\n");
+                            builder.Append($"            javaScript.InvokeVoidAsync(\r\n");
+                            builder.Append($"                \"{javaScriptMethodName}\",\r\n");
                         }
                         else
                         {
-                            builder.Append($"            javaScript.InvokeAsync<{bareType}>(\"{javaScriptMethodName}\",\r\n");
+                            builder.Append($"            javaScript.InvokeAsync<{bareType}>(\r\n");
+                            builder.Append($"                \"{javaScriptMethodName}\",\r\n");
                         }
 
                         // Write method body / expression
@@ -104,11 +107,11 @@ namespace Blazor.SourceGenerators.CSharp
                         {
                             if (index == method.ParameterDefinitions.Count - 1)
                             {
-                                builder.Append($"                {parameter.RawName});\r\n\r\n");
+                                builder.Append($"                {parameter.ToArgumentString()});\r\n\r\n");
                             }
                             else
                             {
-                                builder.Append($"                {parameter.RawName},\r\n");
+                                builder.Append($"                {parameter.ToArgumentString()},\r\n");
                             }
                         }
                     }
@@ -129,9 +132,80 @@ namespace Blazor.SourceGenerators.CSharp
                 }
                 else
                 {
-                    builder.Append($"        public static ValueTask {csharpMethodName}Async(\r\n");
-                    // TODO: implement
-                    builder.Append($"        ) => new ValueTask();\r\n");
+                    var returnType = isPrimitiveType
+                       ? $"ValueTask<{TypeMap.PrimitiveTypes[method.RawReturnTypeName]}>"
+                       : isVoid
+                           ? "ValueTask"
+                           : method.RawReturnTypeName;
+
+                    var bareType = isPrimitiveType
+                        ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
+                        : method.RawReturnTypeName;
+
+                    // Write the methd signature:
+                    // - access modifiers
+                    // - return type
+                    // - name
+                    builder.Append($"        public static {returnType} {csharpMethodName}Async<T>(\r\n");
+
+                    // Write method parameters
+                    builder.Append($"            this IJSRuntime javaScript,\r\n");
+                    builder.Append($"            T dotNetObj");
+                    if (method.ParameterDefinitions.Count > 0)
+                    {
+                        builder.Append(",\r\n");
+                        foreach (var (index, parameter) in method.ParameterDefinitions.Select((p, i) => (i, p)))
+                        {
+                            if (index == method.ParameterDefinitions.Count - 1)
+                            {
+                                builder.Append($"            {parameter.ToParameterString()}) where T : class =>\r\n");
+                            }
+                            else
+                            {
+                                builder.Append($"            {parameter.ToParameterString()},\r\n");
+                            }
+                        }
+
+                        if (isVoid)
+                        {
+                            builder.Append($"            javaScript.InvokeVoidAsync(\r\n");
+                            builder.Append($"                \"{javaScriptMethodName}\",\r\n");
+                        }
+                        else
+                        {
+                            builder.Append($"            javaScript.InvokeAsync<{bareType}>(\r\n");
+                            builder.Append($"                \"{javaScriptMethodName}\",\r\n");
+                        }
+
+                        builder.Append($"                DotNetObjectReference.Create(dotNetObj),\r\n");
+
+                        // Write method body / expression
+                        foreach (var (index, parameter) in method.ParameterDefinitions.Select((p, i) => (i, p)))
+                        {
+                            if (index == method.ParameterDefinitions.Count - 1)
+                            {
+                                builder.Append($"                {parameter.ToArgumentString()});\r\n\r\n");
+                            }
+                            else
+                            {
+                                builder.Append($"                {parameter.ToArgumentString()},\r\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        builder.Append(") =>\r\n");
+                        if (isVoid)
+                        {
+                            builder.Append($"            javaScript.InvokeVoidAsync(\"{javaScriptMethodName}\");\r\n\r\n");
+                            continue;
+                        }
+                        else
+                        {
+                            builder.Append($"            javaScript.InvokeAsync<{bareType}>(\"{javaScriptMethodName}\");\r\n\r\n");
+                            continue;
+                        }
+                    }
                 }
             }
 

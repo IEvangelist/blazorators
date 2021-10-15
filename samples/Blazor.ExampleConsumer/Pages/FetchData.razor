@@ -1,6 +1,10 @@
 ﻿@page "/fetchdata"
-@inject HttpClient Http
 
+@using Microsoft.JSInterop
+@using Blazor.ExampleConsumer.Extensions
+
+@inject IJSRuntime JavaScript
+@inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
 

@@ -40,9 +40,9 @@ namespace System.Runtime.CompilerServices
 
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG
-            if (!Debugger.IsAttached) Debugger.Launch();
-#endif
+//#if DEBUG
+//            if (!Debugger.IsAttached) Debugger.Launch();
+//#endif
 
             // Register a syntax receiver that will be created for each generation pass
             context.RegisterForSyntaxNotifications(SyntaxContextReceiver.Create);

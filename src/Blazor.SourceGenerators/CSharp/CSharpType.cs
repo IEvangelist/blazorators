@@ -20,11 +20,28 @@ namespace Blazor.SourceGenerators.CSharp
         /// </summary>
         public string ToParameterString()
         {
+            var isCallback = ActionDeclation is not null;
             var typeName = TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName)
                 ? TypeMap.PrimitiveTypes[RawTypeName]
-                : RawTypeName;
+                : isCallback
+                    ? "string" // When the action is a callback, we require `T` instance and callback names.
+                    : RawTypeName;
 
-            return $"{typeName}{(IsNullable ? "?" : "")} {RawName.LowerCaseFirstLetter()}";
+            var parameterName = ToArgumentString();
+
+            return IsNullable
+                ? $"{typeName}? {parameterName} = null"
+                : $"{typeName} {parameterName}";
+        }
+
+        public string ToArgumentString()
+        {
+            var isCallback = ActionDeclation is not null;
+            var parameterName = isCallback
+                ? $"on{RawName.CapitalizeFirstLetter()}MethodName"
+                : RawName.LowerCaseFirstLetter();
+
+            return parameterName;
         }
     }
 }
