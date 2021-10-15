@@ -33,10 +33,8 @@ namespace Blazor.SourceGenerators.Tests
 
             var dependencies = result.DependentTypes;
             Assert.NotNull(dependencies);
-            Assert.Equal(3, dependencies.Count);
+            Assert.Single(dependencies);
             Assert.True(dependencies.ContainsKey("PositionOptions"));
-            Assert.True(dependencies.ContainsKey("PositionCallback"));
-            Assert.True(dependencies.ContainsKey("PositionErrorCallback"));
         }
     }
 }

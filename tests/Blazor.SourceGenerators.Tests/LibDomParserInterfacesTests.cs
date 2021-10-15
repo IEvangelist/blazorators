@@ -22,17 +22,18 @@ namespace Blazor.SourceGenerators.Tests
 }";
             var sut = new LibDomParser();
             var actual = sut.ToObject(text);
-            var expected = @"namespace Microsoft.JSInterop;
-
-public record MediaKeySystemConfiguration(
-    MediaKeySystemMediaCapability[]? AudioCapabilities,
-    MediaKeysRequirement? DistinctiveIdentifier,
-    string[]? InitDataTypes,
-    string? Label,
-    MediaKeysRequirement? PersistentState,
-    string[]? SessionTypes,
-    MediaKeySystemMediaCapability[]? VideoCapabilities
-);
+            var expected = @"namespace Microsoft.JSInterop
+{
+    public record MediaKeySystemConfiguration(
+        MediaKeySystemMediaCapability[]? AudioCapabilities,
+        MediaKeysRequirement? DistinctiveIdentifier,
+        string[]? InitDataTypes,
+        string? Label,
+        MediaKeysRequirement? PersistentState,
+        string[]? SessionTypes,
+        MediaKeySystemMediaCapability[]? VideoCapabilities
+    );
+}
 ";
 
             Assert.NotNull(actual);

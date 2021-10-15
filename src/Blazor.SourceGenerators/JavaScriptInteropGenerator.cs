@@ -90,6 +90,9 @@ namespace System.Runtime.CompilerServices
                         }
                     }
 
+                    // TODO:
+                    // Output JavaScript also
+
                     context.AddSource($"{typeSymbol.Name}.generated.cs",
                         SourceText.From(staticObject.ToStaticPartialClassString(), Encoding.UTF8));
                 }

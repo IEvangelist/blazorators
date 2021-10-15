@@ -45,7 +45,7 @@ namespace Blazor.SourceGenerators.CSharp
 
             StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
 
-            builder.Append("{\r\n\r\n");
+            builder.Append("{\r\n");
 
             var memberCount = Properties.Count;
             builder.Append($"    public class {TypeName} : {ExtendsTypeName}\r\n");
@@ -69,7 +69,7 @@ namespace Blazor.SourceGenerators.CSharp
         {
             StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
 
-            builder.Append("{\r\n\r\n");
+            builder.Append("{\r\n");
             builder.Append($"    public record {TypeName}(\r\n");
 
             var memberCount = Properties.Count;

@@ -10,9 +10,9 @@ namespace Blazor.SourceGenerators.Tests
     {
         [
             Theory,
-            InlineData("date", "Date", true, "DateTime? date"),
+            InlineData("date", "Date", true, "DateTime? date = null"),
             InlineData("date", "Date", false, "DateTime date"),
-            InlineData("count", "number", true, "double? count"),
+            InlineData("count", "number", true, "double? count = null"),
             InlineData("IsBusy", "boolean", false, "bool isBusy")
         ]
         public void ToParametersCorrectlyFormatsString(
