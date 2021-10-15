@@ -9,11 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.JSInterop" Version="3.1.20" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.1" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj"
-                      OutputItemType="Analyzer"
+                      OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 

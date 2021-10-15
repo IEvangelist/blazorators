@@ -48,7 +48,7 @@ Ideally, I would like to be able to define a C# class such as this:
 public static partial class GeolocationExtensions { }
 ```
 
-The source generator will expose the `JavaScriptInteropAttribute`, and consuming libraries will decorate their classes with it. The generator code will see this class, and use the `TypeName` from the attribute to find the corresponding type to implement.
+The source generator will expose the `JSAutoInteropAttribute`, and consuming libraries will decorate their classes with it. The generator code will see this class, and use the `TypeName` from the attribute to find the corresponding type to implement.
 With the type name, the generator will generate the corresponding methods, and return types. The method implementations will be extensions of the `IJSRuntime`.
 
 The following is an example resulting source generated `GeolocationExtensions` object:

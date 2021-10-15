@@ -6,6 +6,7 @@ namespace Blazor.ExampleConsumer;
 //[JSAutoInterop(
 //    TypeName = "Geolocation",
 //    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation")]
+
 public static class GeolocationExtensions
 {
 }
