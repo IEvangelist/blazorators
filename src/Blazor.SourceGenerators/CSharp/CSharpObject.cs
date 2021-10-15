@@ -43,7 +43,7 @@ namespace TypeScript.TypeConverter.CSharp
         {
             if (IsActionParameter) return "";
 
-            StringBuilder builder = new("namespace Microsoft.JSInterop");
+            StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
 
             builder.Append("{\r\n\r\n");
 
@@ -67,10 +67,10 @@ namespace TypeScript.TypeConverter.CSharp
 
         internal string ToRecordString()
         {
-            StringBuilder builder = new("namespace Microsoft.JSInterop;");
+            StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
 
-            builder.Append("\r\n\r\n");
-            builder.Append($"public record {TypeName}(\r\n");
+            builder.Append("{\r\n\r\n");
+            builder.Append($"    public record {TypeName}(\r\n");
 
             var memberCount = Properties.Count;
             foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
@@ -79,10 +79,11 @@ namespace TypeScript.TypeConverter.CSharp
                 var statementTerminator = index + 1 < memberCount ? "," : "";
                 var nullableExpression = member.IsNullable ? "?" : "";
                 builder.Append(
-                    $"    {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
+                    $"        {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
             }
 
-            builder.Append(");\r\n");
+            builder.Append("    );\r\n");
+            builder.Append("}\r\n");
             return builder.ToString();
         }
 

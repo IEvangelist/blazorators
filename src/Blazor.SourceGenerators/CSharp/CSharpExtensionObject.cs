@@ -37,20 +37,20 @@ namespace TypeScript.TypeConverter.CSharp
 
         public string ToStaticPartialClassString()
         {
-            StringBuilder builder = new("namespace Microsoft.JSInterop");
+            StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
 
             builder.Append("{\r\n\r\n");
 
             var typeName = RawTypeName.EndsWith("Extensions") ? RawTypeName : $"{RawTypeName}Extensions";
-            builder.Append($"public class {typeName}\r\n");
-            builder.Append("{\r\n");
+            builder.Append($"    public static partial class {typeName}\r\n");
+            builder.Append("    {\r\n");
 
             foreach (var method in Methods ?? Enumerable.Empty<CSharpMethod>())
             {
                 var methodName = method.RawName.CapitalizeFirstLetter();
                 builder.Append($"        public static ValueTask {methodName}Async(\r\n");
                 // TODO: implement
-                builder.Append($"        ) => ValueTask.CompletedTask;\r\n");
+                builder.Append($"        ) => new ValueTask();\r\n");
             }
 
             builder.Append("    }\r\n");

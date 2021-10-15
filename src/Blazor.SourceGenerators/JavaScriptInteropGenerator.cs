@@ -40,9 +40,9 @@ namespace System.Runtime.CompilerServices
 
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG
-            if (!Debugger.IsAttached) Debugger.Launch();
-#endif
+//#if DEBUG
+//            if (!Debugger.IsAttached) Debugger.Launch();
+//#endif
 
             // Register a syntax receiver that will be created for each generation pass
             context.RegisterForSyntaxNotifications(SyntaxContextReceiver.Create);
@@ -86,7 +86,7 @@ namespace System.Runtime.CompilerServices
                         foreach (var dependentObj in staticObject.DependentTypes.Where(t => !t.Value.IsActionParameter))
                         {
                             context.AddSource($"{dependentObj.Key}.generated.cs",
-                                SourceText.From(dependentObj.ToString(), Encoding.UTF8));
+                                SourceText.From(dependentObj.Value.ToString(), Encoding.UTF8));
                         }
                     }
 
