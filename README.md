@@ -44,7 +44,9 @@ Ideally, I would like to be able to define a C# class such as this:
 ```csharp
 [JSAutoInterop(
     TypeName = "Geolocation",
-    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API")]
+    Path = "window.navigator.geolocation",
+    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API",
+    OnlyGeneratePureJS = false)]
 public static partial class GeolocationExtensions { }
 ```
 
@@ -68,7 +70,7 @@ public static partial class GeolocationExtensions
         T dotnetObject,
         string successMethodName,
         string? errorMethodName = null,
-        GeolocationOptions? options = null)
+        PositionOptions? options = null)
         where T : class
     {
         return jsRuntime.InvokeVoidAsync(
@@ -83,15 +85,15 @@ public static partial class GeolocationExtensions
     /// <summary>
     /// See <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition"></a>
     /// </summary>
-    public static ValueTask<long> WatchPositionAsync<T>(
+    public static ValueTask<double> WatchPositionAsync<T>(
         this IJSRuntime jsRuntime,
         T dotnetObject,
         string successMethodName,
         string? errorMethodName = null,
-        GeolocationOptions? options = null)
+        PositionOptions? options = null)
         where T : class
     {
-        return jsRuntime.InvokeAsync<long>(
+        return jsRuntime.InvokeAsync<double>(
             "blazorator.watchPosition",
             DotNetObjectReference.Create(dotnetObject),
             successMethodName,
@@ -103,7 +105,7 @@ public static partial class GeolocationExtensions
     /// <summary>
     /// See <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/clearWatch"></a>
     /// </summary>
-    public ValueTask ClearWatchAsync(this IJSRuntime jsRuntime, long id)
+    public ValueTask ClearWatchAsync(this IJSRuntime jsRuntime, double id)
     {
         return jsRuntime.InvokevoidAsync(
             "navigator.geolocation.clearWatch", id
@@ -114,6 +116,7 @@ public static partial class GeolocationExtensions
 
 The generator will also produce the corresponding APIs object types. For example, the Geolocation API defines the following:
 
+- `PositionOptions`
 - `GeolocationCoordinates`
 - `GeolocationPosition`
 - `GeolocationPositionError`
