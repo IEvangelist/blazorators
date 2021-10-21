@@ -44,7 +44,7 @@ Ideally, I would like to be able to define a C# class such as this:
 ```csharp
 [JSAutoInterop(
     TypeName = "Geolocation",
-    Path = "window.navigator.geolocation",
+    PathFromWidow = "window.navigator.geolocation",
     Url = "https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API",
     OnlyGeneratePureJS = false)]
 public static partial class GeolocationExtensions { }
