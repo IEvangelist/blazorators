@@ -1,7 +1,6 @@
 ﻿@page "/fetchdata"
 
 @using Microsoft.JSInterop
-@using Blazor.ExampleConsumer.Extensions
 
 @inject IJSRuntime JavaScript
 @inject HttpClient Http
@@ -47,7 +46,17 @@ else
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        await JavaScript.GetCurrentPositionAsync(
+            this,
+            nameof(OnPositionRecievedAsync));
     }
+
+    [JSInvokable]
+    public Task OnPositionRecievedAsync() =>
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
 
     public class WeatherForecast
     {

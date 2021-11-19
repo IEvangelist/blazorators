@@ -8,11 +8,15 @@ namespace Blazor.SourceGenerators.Expressions
     internal static class SharedRegex
     {
         // See: https://regex101.com/r/GV3DiG/1
-        public static readonly Regex InterfaceRegex = new("(?'declaration'interface.*?{.*?})", RegexOptions.Singleline);
+        public static readonly Regex InterfaceRegex =
+            new("^(?'declaration'interface.*?{.*?})$",
+                RegexOptions.Singleline | RegexOptions.Multiline);
 
-        public static readonly Regex InterfaceTypeNameRegex = new("(?:interface )(?'TypeName'\\S+)");
+        public static readonly Regex InterfaceTypeNameRegex =
+            new("(?:interface )(?'TypeName'\\S+)");
 
-        public static readonly Regex ExtendsTypeNameRegex = new("(?:extends )(?'TypeName'\\S+)");
+        public static readonly Regex ExtendsTypeNameRegex =
+            new("(?:extends )(?'TypeName'\\S+)");
 
         /// <summary>
         /// Given a string value of <c>"clearWatch(watchId: number): void;"</c>, the

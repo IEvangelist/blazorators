@@ -42,6 +42,8 @@ public sealed class JSAutoInteropAttribute : Attribute
 {
     /// <summary>
     /// The type name that corresponds to the lib.dom.d.ts interface. For example, <c>""Geolocation""</c>.
+    /// For more information, search 'interface {Name}'
+    /// <a href='https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts'>here for types</a>.
     /// </summary>
     public string TypeName { get; set; } = null!;
 
@@ -85,9 +87,9 @@ namespace System.Runtime.CompilerServices
         public void Execute(GeneratorExecutionContext context)
         {
             // Add source from text.
-            context.AddSource("JSAutoInteropAttribute",
+            context.AddSource("JSAutoInteropAttribute.g.cs",
                 SourceText.From(JSAutoInteropAttributeSource, Encoding.UTF8));
-            context.AddSource("RecordCompat",
+            context.AddSource("RecordCompat.g.cs",
                 SourceText.From(RecordCompatSource, Encoding.UTF8));
 
             if (context.SyntaxContextReceiver is not SyntaxContextReceiver receiver)
@@ -135,18 +137,32 @@ namespace System.Runtime.CompilerServices
                     var staticObject = result.Value;
                     if (staticObject.DependentTypes?.Any() ?? false)
                     {
-                        foreach (var dependentObj in staticObject.DependentTypes.Where(t => !t.Value.IsActionParameter))
+                        foreach (var dependentObj in
+                            staticObject.DependentTypes.Where(
+                                t => !t.Value.IsActionParameter))
                         {
-                            context.AddSource($"{dependentObj.Key}.generated.cs",
-                                SourceText.From(dependentObj.Value.ToString(), Encoding.UTF8));
+                            context.AddSource($"{dependentObj.Key}.g.cs",
+                                SourceText.From(dependentObj.Value.ToString(),
+                                Encoding.UTF8));
                         }
                     }
 
-                    // TODO:
-                    // Output JavaScript also
+                    var namespaceString =
+                        (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
+                        {
+                            (string { Length: > 0 } containingNamespace, _) => containingNamespace,
+                            (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
+                            _ => null
+                        };
 
-                    context.AddSource($"{typeSymbol.Name}.generated.cs",
-                        SourceText.From(staticObject.ToStaticPartialClassString(), Encoding.UTF8));
+                    context.AddSource(
+                        $"{typeSymbol.Name}.g.cs",
+                        SourceText.From(
+                            staticObject.ToStaticPartialClassString(
+                                options,
+                                classDeclaration.Identifier.ValueText,
+                                namespaceString),
+                            Encoding.UTF8));
                 }
             }
         }

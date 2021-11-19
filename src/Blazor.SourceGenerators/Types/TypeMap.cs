@@ -20,7 +20,12 @@ namespace Blazor.SourceGenerators.Types
                     ["string"] = "string",
                     ["boolean"] = "bool",
                     ["enum"] = "enum",
-                    ["Date"] = "DateTime"
+                    ["Date"] = "DateTime",
+                    ["number | null"] = "double?",
+                    ["string | null"] = "string?",
+                    ["boolean | null"] = "bool?",
+                    ["enum | null"] = "enum?",
+                    ["Date | null"] = "DateTime?"
                     //["Array"] = "[]"
                 };
 

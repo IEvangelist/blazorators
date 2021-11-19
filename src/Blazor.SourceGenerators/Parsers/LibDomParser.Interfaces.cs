@@ -260,9 +260,20 @@ namespace Blazor.SourceGenerators.Parsers
 
         internal static string CleanseReturnType(string returnType)
         {
-            // Example input:
-            // ": void;"
+            // Example inputs:
+            // 1) ": void;"
+            // 2) ": string | null;"
             return returnType.Replace(":", "").Replace(";", "").Trim();
+
+            //var isNullable = false;
+            //if (returnType.Contains(" | null"))
+            //{
+            //    isNullable = true;
+            //    returnType = returnType.Replace(" | null", "");
+            //}
+
+            //var cleansedType = returnType.Replace(":", "").Replace(";", "").Trim();
+            //return $"{cleansedType}{(isNullable ? "?" : "")}";
         }
 
         internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(

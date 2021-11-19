@@ -1,7 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Blazor.ExampleConsumer.Extensions;
+namespace Microsoft.JSInterop;
 
 [JSAutoInterop(
     TypeName = "Geolocation",

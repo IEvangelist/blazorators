@@ -36,15 +36,18 @@ namespace Blazor.SourceGenerators.CSharp
 
         public int MemberCount => Properties!.Count + Methods!.Count;
 
-        public string ToStaticPartialClassString()
+        internal string ToStaticPartialClassString(
+            GeneratorOptions options,
+            string existingClassName,
+            string? namespaceString = "Microsoft.JSInterop")
         {
             StringBuilder builder = new("using System.Threading.Tasks;\r\n\r\n");
 
             builder.Append("#nullable enable\r\n");
-            builder.Append("namespace Microsoft.JSInterop\r\n");
+            builder.Append($"namespace {namespaceString}\r\n");
             builder.Append("{\r\n");
 
-            var typeName = RawTypeName.EndsWith("Extensions") ? RawTypeName : $"{RawTypeName}Extensions";
+            var typeName = existingClassName;
             builder.Append($"    public static partial class {typeName}\r\n");
             builder.Append("    {\r\n");
 
@@ -53,7 +56,9 @@ namespace Blazor.SourceGenerators.CSharp
                 var isVoid = method.RawReturnTypeName == "void";
                 var isPrimitiveType = TypeMap.PrimitiveTypes.IsPrimitiveType(method.RawReturnTypeName);
 
-                var javaScriptMethodName = method.RawName;
+                var javaScriptMethodName = options.PathFromWindow is not null
+                    ? $"{options.PathFromWindow}.{method.RawName}"
+                    : method.RawName;
                 var csharpMethodName = method.RawName.CapitalizeFirstLetter();
 
                 if (method.IsPureJavaScriptInvocation)
@@ -87,7 +92,7 @@ namespace Blazor.SourceGenerators.CSharp
                             }
                             else
                             {
-                                builder.Append($"            {parameter.ToParameterString()}\r\n");
+                                builder.Append($"            {parameter.ToParameterString()},\r\n");
                             }
                         }
 
@@ -130,7 +135,7 @@ namespace Blazor.SourceGenerators.CSharp
                         }
                     }
                 }
-                else
+                else if (options.OnlyGeneratePureJS is false)
                 {
                     var returnType = isPrimitiveType
                        ? $"ValueTask<{TypeMap.PrimitiveTypes[method.RawReturnTypeName]}>"
