@@ -5,7 +5,6 @@ namespace Microsoft.JSInterop;
 
 /// <summary>
 /// Source generated extension methods on the <see cref="IJSInProcessRuntime"/> implementation.
-/// All extension me
 /// </summary>
 [JSAutoInterop(
     TypeName = "Storage",
