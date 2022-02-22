@@ -5,6 +5,11 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+A C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implemenation of the `IJSInProcessRuntime` type. This library is comprised of two NuGet packages:
+
+- [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators)
+- [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly)
+
 ## Design goals 🎯
 
 I was hoping to use the [TypeScript lib.dom.d.ts](https://github.com/microsoft/TypeScript/blob/315b807489b8ff3a892179488fb0c00398d9b2c3/lib/lib.dom.d.ts) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.
