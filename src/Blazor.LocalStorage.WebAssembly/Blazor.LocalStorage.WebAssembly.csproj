@@ -22,7 +22,7 @@
         <PackageId>Blazor.LocalStorage.WebAssembly</PackageId>
         <PackageTags>dotnet;dotnetcore;csharp;blazor;webassembly;wasm;generators;sourcegen;roslyn;</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
-        <PackageProjectUrl>https://github.com/IEvangelist/pwned-client</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
         <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>

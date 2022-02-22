@@ -42,7 +42,7 @@
     <IncludeSource>false</IncludeSource>
     <NoWarn>NU5125;NU5039</NoWarn>
     <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
-    <RepositoryUrl>https://github.com/IEvangelist/pwned-client</RepositoryUrl>
+    <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryType>git</RepositoryType>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
