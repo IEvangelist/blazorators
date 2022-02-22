@@ -3,10 +3,8 @@ name: build and test
 on:
   push:
     branches: [ main ]
-    paths:
-    - '**.cs'
-    - '**.json'
-    - '**.csproj'
+    paths-ignore:
+    - 'README.md'
   workflow_dispatch:
     inputs:
       reason:
