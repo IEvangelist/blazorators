@@ -7,8 +7,10 @@
 
 A C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implemenation of the `IJSInProcessRuntime` type. This library is comprised of two NuGet packages:
 
-- [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators)
-- [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly)
+| NuGet package | NuGet version |
+|--|--| 
+| [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) |
+| [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) |
 
 ## Design goals 🎯
 
