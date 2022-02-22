@@ -10,6 +10,7 @@ namespace Microsoft.JSInterop;
     TypeName = "Storage",
     PathFromWindow = "window.localStorage",
     HostingModel = BlazorHostingModel.WebAssembly,
+    OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage")]
 public static partial class LocalStorageExtensions
 {
