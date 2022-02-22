@@ -1,6 +1,6 @@
 # Blazorators: Blazor C# Source Generators
 
-![Blazorators Logo](logo.png)
+![Blazorators Logo](https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png)
 
 > Thank you for perusing my Blazor C# Source Generators repository. I'd really appreciate a ⭐ if you find this interesting.
 
