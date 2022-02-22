@@ -1,38 +1,26 @@
 ﻿@page "/counter"
-@inject IJSRuntime JavaScript
+@inject IJSInProcessRuntime JavaScript
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Counter (@_currentCount)</PageTitle>
 
 <h1>Counter</h1>
 
 <p role="status">Current count: @_currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Increment</button>
-<button class="btn btn-success" @onclick="Prompt">Prompt</button>
-
-<p>Name: @_name</p>
 
 @code {
     private int _currentCount = 0;
-    private string? _name;
-    private IJSInProcessRuntime _javaScript = null!;
 
-    private void IncrementCount() => _javaScript.SetItem("CounterValue", (++ _currentCount).ToString());
+    private void IncrementCount() => JavaScript.SetItem("CounterValue", (++ _currentCount).ToString());
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        _javaScript = (IJSInProcessRuntime)JavaScript!;
-        if (_javaScript.GetItem("CounterValue") is { } count && int.TryParse(count, out var currentCount))
+        if (JavaScript.GetItem("CounterValue") is { } count && int.TryParse(count, out var currentCount))
         {
             _currentCount = currentCount;
         }
     }
-
-    // Example of "pure" JS interop, no need for 
-    // custom JavaScript to wrap or delegate.
-    private async Task Prompt() =>
-    _name = await JavaScript.InvokeAsync<string>(
-            "prompt", "What's your name", "< name >");
 }

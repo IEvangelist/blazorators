@@ -1,16 +1,177 @@
 # Blazorators: Blazor C# Source Generators
 
+![Blazorators Logo](logo.png)
+
+> Thank you for perusing my Blazor C# Source Generators repository. I'd really appreciate a ⭐ if you find this interesting.
+
+<!-- TODO: Create separate README.md files specific to the NuGet packages. -->
+
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml) [![pull request](https://github.com/IEvangelist/blazorators/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/pr-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-A C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implemenation of the `IJSInProcessRuntime` type. This library is comprised of two NuGet packages:
+A C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implementation of the `IJSInProcessRuntime` type. This library is comprised of two NuGet packages:
 
 | NuGet package | NuGet version |
-|--|--| 
+|--|--|
 | [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) |
 | [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) |
+
+## Using the `Blazor.SourceGenerators` package 📦
+
+As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) Web API.
+
+Consider the _LocalStorageExtensions.cs_ C# file:
+
+```csharp
+namespace Microsoft.JSInterop;
+
+/// <summary>
+/// Source generated extension methods on the 
+/// <see cref="IJSInProcessRuntime"/> implementation.
+/// </summary>
+[JSAutoInterop(
+    TypeName = "Storage",
+    PathFromWindow = "window.localStorage",
+    HostingModel = BlazorHostingModel.WebAssembly,
+    OnlyGeneratePureJS = true,
+    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage")]
+public static partial class LocalStorageExtensions
+{
+}
+```
+
+This code designates itself into the `Microsoft.JSInterop` namespace, making all of the source generated extensions available to anyone consumer who uses types from this namespace. It uses the `JSAutoInterop` to specify:
+
+- `TypeName = "Storage"`: sets the type to [`Storage`](https://developer.mozilla.org/docs/Web/API/Storage).
+- `PathFromWindow = "window.localStorage"`: expresses how to locate the implementation of the specified type from the globally scoped `window` object, this is the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) implementation.
+- `HostingModel = BlazorHostingModel.WebAssembly`: tells the generator to create synchronous extension methods on the `IJSInProcessRuntime` type (default), use `.Server` for `IJSRuntime` and Task-based asynchronous methods instead.
+- `OnlyGeneratePureJS = true`: configures the source generator to emit only C#, when `false` will emit JavaScript.
+- `Url`: sets the URL for the implementation.
+
+The file needs to define an extension class and needs to be `partial`, for example; `public static partial class`. Decorating the class with the `JSAutoInterop` attribute will source generate the following C# code:
+
+```csharp
+#nullable enable
+namespace Microsoft.JSInterop
+{
+    public static partial class LocalStorageExtensions
+    {
+        /// <summary>
+        /// Source generated extension method implementation of <c>window.localStorage.clear</c>.
+        /// <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/clear"></a>
+        /// </summary>
+        public static void Clear(
+            this IJSInProcessRuntime javaScript) =>
+            javaScript.InvokeVoid("window.localStorage.clear");
+
+        /// <summary>
+        /// Source generated extension method implementation of <c>window.localStorage.getItem</c>.
+        /// <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/getItem"></a>
+        /// </summary>
+        public static string? GetItem(
+            this IJSInProcessRuntime javaScript,
+            string key) =>
+            javaScript.Invoke<string?>(
+                "window.localStorage.getItem",
+                key);
+
+        /// <summary>
+        /// Source generated extension method implementation of <c>window.localStorage.key</c>.
+        /// <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/key"></a>
+        /// </summary>
+        public static string? Key(
+            this IJSInProcessRuntime javaScript,
+            double index) =>
+            javaScript.Invoke<string?>(
+                "window.localStorage.key",
+                index);
+
+        /// <summary>
+        /// Source generated extension method implementation of <c>window.localStorage.removeItem</c>.
+        /// <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/removeItem"></a>
+        /// </summary>
+        public static void RemoveItem(
+            this IJSInProcessRuntime javaScript,
+            string key) =>
+            javaScript.InvokeVoid(
+                "window.localStorage.removeItem",
+                key);
+
+        /// <summary>
+        /// Source generated extension method implementation of <c>window.localStorage.setItem</c>.
+        /// <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/setItem"></a>
+        /// </summary>
+        public static void SetItem(
+            this IJSInProcessRuntime javaScript,
+            string key,
+            string value) =>
+            javaScript.InvokeVoid(
+                "window.localStorage.setItem",
+                key,
+                value);
+    }
+}
+```
+
+## Using the `Blazor.LocalStorage.WebAssembly` package 📦
+
+The [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package is a WebAssembly specific implementation of the `localStorage` Web API that has been source generated. The example above is the result of this published package.
+
+This package exposes a convenience extension method on the `IServiceCollection` type, named `AddWebAssemblyLocalStorage`. Calling this will expose the `IJSInProcessRuntime` as a dependency injection service type as a scoped lifetime. Consider the following _Program.cs_ C# file for an example Blazor WebAssembly template project:
+
+```csharp
+using Blazor.ExampleConsumer;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+builder.Services.AddScoped(
+    sp => new HttpClient
+    {
+        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    });
+
+// Adds the IJSInProcessRuntime type to DI.
+builder.Services.AddWebAssemblyLocalStorage();
+
+await builder.Build().RunAsync();
+```
+
+Then, in your components you can consume this as you would any other service type. Consider the _Counter.razor_ file:
+
+```razor
+@page "/counter"
+@inject IJSInProcessRuntime JavaScript
+
+<PageTitle>Counter (@_currentCount)</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @_currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Increment</button>
+
+@code {
+    private int _currentCount = 0;
+
+    private void IncrementCount() => JavaScript.SetItem("CounterValue", (++ _currentCount).ToString());
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (JavaScript.GetItem("CounterValue") is { } count && int.TryParse(count, out var currentCount))
+        {
+            _currentCount = currentCount;
+        }
+    }
+}
+```
 
 ## Design goals 🎯
 
@@ -240,9 +401,9 @@ public sealed partial class ConsumingComponent
 }
 ```
 
-## Pseudocode and logical flow ℹ️
+## Pseudocode and logical flow ➡️
 
-1. Consumer decorates a `static partial class` with the `JavaScriptInteropAttribute`.
+1. Consumer decorates a `static partial class` with the `JSAutoInteropAttribute`.
 1. Source generator is called:
    - `JavaScriptInteropGenerator.Initialize`
    - `JavaScriptInteropGenerator.Execute`
@@ -250,12 +411,18 @@ public sealed partial class ConsumingComponent
    1. The `TypeName` is used to look up the corresponding TypeScript type definition.
    1. If found, and a valid API - attempt source generation.
 
-## NuGet packages 📦
+<!-- TODO: Add mermaid sequence diagram here -->
 
-This repository will expose two NuGet packages:
+## Known limitations ⚠️
 
-1. The source-generated `IJSRuntime` extension methods for a select few well-defined APIs.
-1. The source generator itself, as a consumable analyzer package.
+At the time of writing, only pure JavaScript interop is supported. It is a stretch goal to add the following (currently missing) features:
+
+- Source generate corresponding (and supporting) JavaScript files.
+  - We'd need to accept a desired output path from the consumer, `JavaScriptOutputPath`.
+  - We would need to append all JavaScript into a single builder, and emit it collectively.
+- Allow for declarative and custom type mappings, for example; suppose the consumer wants the API to use generics instead of `string`.
+  - We'd need to expose a `TypeConverter` parameter and allow for consumers to implement their own.
+  - We'd provide a default one for standard JSON serialization, `StringTypeConverter` (maybe make this the default).
 
 ## References and resources 📑
 

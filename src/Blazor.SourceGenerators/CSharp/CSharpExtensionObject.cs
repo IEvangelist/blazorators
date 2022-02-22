@@ -41,7 +41,8 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
         string existingClassName,
         string? namespaceString = "Microsoft.JSInterop")
     {
-        StringBuilder builder = new("using System.Threading.Tasks;\r\n\r\n");
+        StringBuilder builder =
+            new(options.IsWebAssembly ? "" : "using System.Threading.Tasks;\r\n\r\n");
 
         builder.Append("#nullable enable\r\n");
         builder.Append($"namespace {namespaceString}\r\n");
@@ -217,7 +218,7 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
 
         var jsMethodName = method.RawName.LowerCaseFirstLetter();
         var func = $"{options.PathFromWindow}.{jsMethodName}";
-        builder.Append($"        /// Source genated extension method implemention of <c>{func}</c>.\r\n");
+        builder.Append($"        /// Source generated extension method implementation of <c>{func}</c>.\r\n");
         if (options.Url is { Length: > 0 } url)
         {
             url = url.EndsWith("/") ? url.Remove(url.Length - 1) : url;

@@ -2,7 +2,7 @@
 
 @using Microsoft.JSInterop
 
-@inject IJSRuntime JavaScript
+@inject IJSInProcessRuntime JavaScript
 @inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
@@ -46,9 +46,9 @@ else
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-        await JavaScript.GetCurrentPositionAsync(
-            this,
-            nameof(OnPositionRecievedAsync));
+        //await JavaScript.GetCurrentPositionAsync(
+        //    this,
+        //    nameof(OnPositionRecievedAsync));
     }
 
     [JSInvokable]

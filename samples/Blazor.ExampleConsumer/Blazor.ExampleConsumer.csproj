@@ -12,10 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj"
-                      OutputItemType="Analyzer"
-                      SetTargetFramework="TargetFramework=netstandard2.0"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\Blazor.LocalStorage.WebAssembly\Blazor.LocalStorage.WebAssembly.csproj" />
   </ItemGroup>
 
 </Project>
