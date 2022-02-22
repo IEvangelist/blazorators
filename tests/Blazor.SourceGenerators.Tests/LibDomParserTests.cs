@@ -4,37 +4,36 @@
 using Blazor.SourceGenerators.Parsers;
 using Xunit;
 
-namespace Blazor.SourceGenerators.Tests
+namespace Blazor.SourceGenerators.Tests;
+
+public class LibDomParserTests
 {
-    public class LibDomParserTests
+    [Fact]
+    public void ParseStaticObjectCorrectly()
     {
-        [Fact]
-        public void ParseStaticObjectCorrectly()
-        {
-            var sut = new LibDomParser();
-            var parserResult = sut.ParseStaticType("Geolocation");
+        var sut = new LibDomParser();
+        var parserResult = sut.ParseStaticType("Geolocation");
 
-            Assert.Equal(ParserResultStatus.SuccessfullyParsed, parserResult.Status);
+        Assert.Equal(ParserResultStatus.SuccessfullyParsed, parserResult.Status);
 
-            var result = parserResult.Value;
-            Assert.NotNull(result);
-            Assert.Equal(3, result.MemberCount);
+        var result = parserResult.Value;
+        Assert.NotNull(result);
+        Assert.Equal(3, result.MemberCount);
 
-            var methods = result.Methods;
-            Assert.NotNull(methods);
-            Assert.Equal(3, methods.Count);
-            Assert.Contains(methods, m => m.RawName == "clearWatch");
-            Assert.Contains(methods, m => m.RawName == "getCurrentPosition");
-            Assert.Contains(methods, m => m.RawName == "watchPosition");
+        var methods = result.Methods;
+        Assert.NotNull(methods);
+        Assert.Equal(3, methods.Count);
+        Assert.Contains(methods, m => m.RawName == "clearWatch");
+        Assert.Contains(methods, m => m.RawName == "getCurrentPosition");
+        Assert.Contains(methods, m => m.RawName == "watchPosition");
 
-            var properties = result.Properties;
-            Assert.NotNull(properties);
-            Assert.Empty(properties);
+        var properties = result.Properties;
+        Assert.NotNull(properties);
+        Assert.Empty(properties);
 
-            var dependencies = result.DependentTypes;
-            Assert.NotNull(dependencies);
-            Assert.Single(dependencies);
-            Assert.True(dependencies.ContainsKey("PositionOptions"));
-        }
+        var dependencies = result.DependentTypes;
+        Assert.NotNull(dependencies);
+        Assert.Single(dependencies);
+        Assert.True(dependencies.ContainsKey("PositionOptions"));
     }
 }

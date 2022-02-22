@@ -18,3 +18,17 @@ using System.Diagnostics.CodeAnalysis;
     Justification = "<Pending>",
     Scope = "member",
     Target = "~F:Blazor.SourceGenerators.JavaScriptInteropGenerator.s_pathFromWindowRequiredDiagnostic")]
+
+[assembly: SuppressMessage(
+    "Style",
+    "IDE0057:Use range operator",
+    Justification = "<Pending>",
+    Scope = "member",
+    Target = "~M:Blazor.SourceGenerators.Extensions.StringExtensions.CapitalizeFirstLetter(System.String)~System.String")]
+
+[assembly: SuppressMessage("" +
+    "Style",
+    "IDE0057:Use range operator",
+    Justification = "<Pending>",
+    Scope = "member",
+    Target = "~M:Blazor.SourceGenerators.Extensions.StringExtensions.LowerCaseFirstLetter(System.String)~System.String")]

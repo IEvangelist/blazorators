@@ -1,16 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>10.0</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Description>Source generated JavaScript interop for the browser's localStorage API compatibel with WebAssembly.</Description>
     <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
-    
-    <!-- Generates a package at build -->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <!-- Do not include the generator as a lib dependency -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-  
     <NeutralLanguage>en-US</NeutralLanguage>
     <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
     <ClientVersion Condition=" '$(IsPreview)' != 'true' ">$(ClientOfficialVersion)</ClientVersion>
@@ -22,14 +17,12 @@
     <FileVersion>$(ClientVersion)</FileVersion>
     <Authors>David Pine</Authors>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Blazor.SourceGenerators</AssemblyName>
-    <Title>Blazor Source Generators</Title>
-    <Description>The source generator used to generate extension methods on the IJSInProcessRuntime type for WebAssembly JavaScript interop.</Description>
-    <RootNamespace>Blazor.SourceGenerators</RootNamespace>
-    <PackageId>Blazor.SourceGenerators</PackageId>
-    <PackageTags>dotnet;dotnetcore;csharp;analyzers;sourcegen;generators;roslyn;</PackageTags>
+    <AssemblyName>Blazor.LocalStorage.WebAssembly</AssemblyName>
+    <Title>A C# source-generated class library implementation of the native browser's localStorage API available as IJSInProcessRuntime extension methods.</Title>
+    <PackageId>Blazor.LocalStorage.WebAssembly</PackageId>
+    <PackageTags>dotnet;dotnetcore;csharp;blazor;webassembly;wasm;generators;sourcegen;roslyn;</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/IEvangelist/pwned-client</PackageProjectUrl>
     <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -40,9 +33,10 @@
     <DebugType>embedded</DebugType>
     <IncludeSymbols>false</IncludeSymbols>
     <IncludeSource>false</IncludeSource>
+    <RootNamespace>Blazor.LocalStorage.WebAssembly</RootNamespace>
     <NoWarn>NU5125;NU5039</NoWarn>
     <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
-    <RepositoryUrl>https://github.com/IEvangelist/pwned-client</RepositoryUrl>
+    <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryType>git</RepositoryType>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -53,25 +47,6 @@
     <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;NU5128</NoWarn>
-  </PropertyGroup>
- 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;NU5128</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Package the generator in the analyzer directory of the nuget package -->
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <!--<None Include="$(PkgMicrosoft_Extensions_Primitives)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
@@ -81,6 +56,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
+    <PackageReference Include="Microsoft.JSInterop" Version="6.0.0" />
   </ItemGroup>
-
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" 
+                          OutputItemType="Analyzer" 
+                          SetTargetFramework="TargetFramework=netstandard2.0" 
+                          ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    
 </Project>

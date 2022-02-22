@@ -1,0 +1,63 @@
+name: publish nuget
+on:
+  push:
+    tags:
+      - 1.*
+
+jobs: 
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Print tag ref
+      run: echo $GITHUB_REF
+      
+    - name: Extract version number
+      uses: actions-ecosystem/action-regex-match@v2
+      id: regex-match
+      with:
+        text: ${{ github.ref }}
+        regex: '[0-9.]+'
+       
+    - name: Print version number
+      run: echo '${{ steps.regex-match.outputs.match }}'
+      
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: |
+        dotnet restore ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj
+        dotnet restore ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
+      
+    - name: Build
+      run: |
+        dotnet build ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
+    
+    - name: Test
+      run: dotnet test
+      
+    - name: Pack
+      run: |
+        dotnet pack ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --output packages
+        dotnet pack ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
+      
+    - name: Publish package
+      run: |
+        nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -NoSymbols -NonInteractive -ApiKey ${{secrets.NUGET_API_KEY}}
+
+    - name: Upload abstractions package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.SourceGenerators.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload client package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.LocalStorage.WebAssembly.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/

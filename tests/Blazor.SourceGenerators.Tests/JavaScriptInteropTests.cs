@@ -4,24 +4,24 @@
 using Microsoft.CodeAnalysis;
 using Xunit;
 
-namespace Blazor.SourceGenerators.Tests
+namespace Blazor.SourceGenerators.Tests;
+
+public class JavaScriptInteropTests : GeneratorBaseUnitTests
 {
-    public class JavaScriptInteropTests : GeneratorBaseUnitTests
+    public override IEnumerable<ISourceGenerator> SourceGenerators =>
+        new[] { new JavaScriptInteropGenerator() };
+
+    public SyntaxTree GetGeneratedTree(string sourceCode)
     {
-        public override IEnumerable<ISourceGenerator> SourceGenerators =>
-            new[] { new JavaScriptInteropGenerator() };
+        var result = GetRunResult(sourceCode);
+        return result.GeneratedTrees.Single(x => x.FilePath.Contains("Extensions"));
+    }
 
-        public SyntaxTree GetGeneratedTree(string sourceCode)
-        {
-            var result = GetRunResult(sourceCode);
-            return result.GeneratedTrees.Single(x => x.FilePath.Contains("Extensions"));
-        }
-
-        [Fact]
-        public void Basic()
-        {
-            // TODO: write test
-            _ = @"
+    [Fact]
+    public void Basic()
+    {
+        // TODO: write test
+        _ = @"
 using System;
 using Microsoft.JSInterop.Attributes;
 
@@ -30,6 +30,5 @@ using Microsoft.JSInterop.Attributes;
 [JavaScriptInterop]
 public static partial class 
 ";
-        }
     }
 }

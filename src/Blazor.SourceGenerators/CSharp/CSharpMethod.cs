@@ -4,15 +4,14 @@
 using System.Collections.Generic;
 using Blazor.SourceGenerators.JavaScript;
 
-namespace Blazor.SourceGenerators.CSharp
+namespace Blazor.SourceGenerators.CSharp;
+
+internal record CSharpMethod(
+    string RawName,
+    string RawReturnTypeName,
+    List<CSharpType> ParameterDefinitions,
+    JavaScriptMethod? JavaScriptMethodDependency = null)
 {
-    public record CSharpMethod(
-        string RawName,
-        string RawReturnTypeName,
-        List<CSharpType> ParameterDefinitions,
-        JavaScriptMethod? JavaScriptMethodDependency = null)
-    {
-        public bool IsPureJavaScriptInvocation =>
-            JavaScriptMethodDependency is { IsPure: true };
-    }
+    public bool IsPureJavaScriptInvocation =>
+        JavaScriptMethodDependency is { IsPure: true };
 }

@@ -1,11 +1,10 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Blazor.SourceGenerators.Parsers
+namespace Blazor.SourceGenerators.Parsers;
+
+internal enum ParserResultOutputType
 {
-    public enum ParserResultOutputType
-    {
-        CSharp,
-        JavaScript
-    };
-}
+    CSharp,
+    JavaScript
+};

@@ -15,12 +15,24 @@
 @code {
     private int _currentCount = 0;
     private string? _name;
+    private IJSInProcessRuntime _javaScript = null!;
 
-    private void IncrementCount() => ++ _currentCount;
+    private void IncrementCount() => _javaScript.SetItem("CounterValue", (++ _currentCount).ToString());
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _javaScript = (IJSInProcessRuntime)JavaScript!;
+        if (_javaScript.GetItem("CounterValue") is { } count && int.TryParse(count, out var currentCount))
+        {
+            _currentCount = currentCount;
+        }
+    }
 
     // Example of "pure" JS interop, no need for 
     // custom JavaScript to wrap or delegate.
     private async Task Prompt() =>
-        _name = await JavaScript.InvokeAsync<string>(
+    _name = await JavaScript.InvokeAsync<string>(
             "prompt", "What's your name", "< name >");
 }

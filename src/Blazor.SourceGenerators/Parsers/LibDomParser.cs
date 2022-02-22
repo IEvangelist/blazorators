@@ -5,45 +5,44 @@ using System;
 using Blazor.SourceGenerators.CSharp;
 using Blazor.SourceGenerators.Readers;
 
-namespace Blazor.SourceGenerators.Parsers
+namespace Blazor.SourceGenerators.Parsers;
+
+internal sealed partial class LibDomParser
 {
-    public partial class LibDomParser
+    private readonly LibDomReader _reader = new();
+
+    public ParserResult<CSharpExtensionObject> ParseStaticType(string typeName)
     {
-        private readonly LibDomReader _reader = new();
+        ParserResult<CSharpExtensionObject> result = new(ParserResultStatus.Unknown);
 
-        public ParserResult<CSharpExtensionObject> ParseStaticType(string typeName)
+        if (_reader.TryGetDeclaration(typeName, out var typeScriptDefinitionText) &&
+            typeScriptDefinitionText is not null)
         {
-            ParserResult<CSharpExtensionObject> result = new(ParserResultStatus.Unknown);
-
-            if (_reader.TryGetDeclaration(typeName, out var typeScriptDefinitionText) &&
-                typeScriptDefinitionText is not null)
-            {
-                try
-                {
-                    result = result with
-                    {
-                        Status = ParserResultStatus.SuccessfullyParsed,
-                        Value = ToExtensionObject(typeScriptDefinitionText)
-                    };
-                }
-                catch (Exception ex)
-                {
-                    result = result with
-                    {
-                        Status = ParserResultStatus.ErrorParsing,
-                        Error = ex.Message
-                    };
-                }
-            }
-            else
+            try
             {
                 result = result with
                 {
-                    Status = ParserResultStatus.TargetTypeNotFound
+                    Status = ParserResultStatus.SuccessfullyParsed,
+                    Value = ToExtensionObject(typeScriptDefinitionText)
                 };
             }
-
-            return result;
+            catch (Exception ex)
+            {
+                result = result with
+                {
+                    Status = ParserResultStatus.ErrorParsing,
+                    Error = ex.Message
+                };
+            }
         }
+        else
+        {
+            result = result with
+            {
+                Status = ParserResultStatus.TargetTypeNotFound
+            };
+        }
+
+        return result;
     }
 }

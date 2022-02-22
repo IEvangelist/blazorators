@@ -7,89 +7,88 @@ using System.Linq;
 using System.Text;
 using Blazor.SourceGenerators.Extensions;
 
-namespace Blazor.SourceGenerators.CSharp
+namespace Blazor.SourceGenerators.CSharp;
+
+/// <summary>
+/// A record the represents various C# objects.
+/// </summary>
+internal record CSharpObject(
+    string TypeName,
+    string? ExtendsTypeName)
 {
     /// <summary>
-    /// A record the represents various C# objects.
+    /// The collection of types that this object depends on.
     /// </summary>
-    public record CSharpObject(
-        string TypeName,
-        string? ExtendsTypeName)
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
+    /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpProperty"/> details.
+    /// </summary>
+    public Dictionary<string, CSharpProperty> Properties { get; init; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
+    /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpMethod"/> details.
+    /// </summary>
+    public Dictionary<string, CSharpMethod> Methods { get; init; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    public bool IsActionParameter =>
+        TypeName.EndsWith("Callback");
+
+    internal string ToClassString()
     {
-        /// <summary>
-        /// The collection of types that this object depends on.
-        /// </summary>
-        public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
-            new(StringComparer.OrdinalIgnoreCase);
+        if (IsActionParameter) return "";
 
-        /// <summary>
-        /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
-        /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpProperty"/> details.
-        /// </summary>
-        public Dictionary<string, CSharpProperty> Properties { get; init; } =
-            new(StringComparer.OrdinalIgnoreCase);
+        StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
 
-        /// <summary>
-        /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
-        /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpMethod"/> details.
-        /// </summary>
-        public Dictionary<string, CSharpMethod> Methods { get; init; } =
-            new(StringComparer.OrdinalIgnoreCase);
+        builder.Append("{\r\n");
 
-        public bool IsActionParameter =>
-            TypeName.EndsWith("Callback");
+        var memberCount = Properties.Count;
+        builder.Append($"    public class {TypeName} : {ExtendsTypeName}\r\n");
+        builder.Append("    {\r\n");
 
-        internal string ToClassString()
+        foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
         {
-            if (IsActionParameter) return "";
+            var (memberName, member) = (kvp.Key, kvp.Value);
+            var nullableExpression = member.IsNullable ? "?" : "";
 
-            StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
-
-            builder.Append("{\r\n");
-
-            var memberCount = Properties.Count;
-            builder.Append($"    public class {TypeName} : {ExtendsTypeName}\r\n");
-            builder.Append("    {\r\n");
-
-            foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
-            {
-                var (memberName, member) = (kvp.Key, kvp.Value);
-                var nullableExpression = member.IsNullable ? "?" : "";
-
-                builder.Append(
-                    $"        public {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}\r\n");
-            }
-
-            builder.Append("    }\r\n");
-            builder.Append("}\r\n");
-            return builder.ToString();
+            builder.Append(
+                $"        public {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}\r\n");
         }
 
-        internal string ToRecordString()
+        builder.Append("    }\r\n");
+        builder.Append("}\r\n");
+        return builder.ToString();
+    }
+
+    internal string ToRecordString()
+    {
+        StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
+
+        builder.Append("{\r\n");
+        builder.Append($"    public record {TypeName}(\r\n");
+
+        var memberCount = Properties.Count;
+        foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
         {
-            StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
-
-            builder.Append("{\r\n");
-            builder.Append($"    public record {TypeName}(\r\n");
-
-            var memberCount = Properties.Count;
-            foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
-            {
-                var (memberName, member) = (kvp.Key, kvp.Value);
-                var statementTerminator = index + 1 < memberCount ? "," : "";
-                var nullableExpression = member.IsNullable ? "?" : "";
-                builder.Append(
-                    $"        {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
-            }
-
-            builder.Append("    );\r\n");
-            builder.Append("}\r\n");
-            return builder.ToString();
+            var (memberName, member) = (kvp.Key, kvp.Value);
+            var statementTerminator = index + 1 < memberCount ? "," : "";
+            var nullableExpression = member.IsNullable ? "?" : "";
+            builder.Append(
+                $"        {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
         }
 
-        public override string ToString()
-        {
-            return ExtendsTypeName is null ? ToRecordString() : ToClassString();
-        }
+        builder.Append("    );\r\n");
+        builder.Append("}\r\n");
+        return builder.ToString();
+    }
+
+    public override string ToString()
+    {
+        return ExtendsTypeName is null ? ToRecordString() : ToClassString();
     }
 }

@@ -3,11 +3,10 @@
 
 using System.Text.RegularExpressions;
 
-namespace Blazor.SourceGenerators.Tests
+namespace Blazor.SourceGenerators.Tests;
+
+static class AssertStringExtensions
 {
-    static class AssertStringExtensions
-    {
-        internal static string NormalizeNewlines(this string value) =>
-            Regex.Replace(value, @"\r\n|\n\r|\n|\r", "\r\n");
-    }
+    internal static string NormalizeNewlines(this string value) =>
+        Regex.Replace(value, @"\r\n|\n\r|\n|\r", "\r\n");
 }

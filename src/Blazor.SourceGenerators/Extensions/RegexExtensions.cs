@@ -3,29 +3,21 @@
 
 using System.Text.RegularExpressions;
 
-namespace Blazor.SourceGenerators.Extensions
+namespace Blazor.SourceGenerators.Extensions;
+
+static class RegexExtensions
 {
-    static class RegexExtensions
-    {
-        internal static string? GetMatchGroupValue(this Regex regex, string input, string groupName)
+    internal static string? GetMatchGroupValue(
+        this Regex regex, string input, string groupName) =>
+        regex.Match(input) is Match match
+            ? match.GetGroupValue(groupName)
+            : default;
+
+    internal static string? GetGroupValue(
+        this Match match, string groupName) =>
+        match switch
         {
-            var match = regex.Match(input);
-            if (match is null)
-            {
-                return default!;
-            }
-
-            return match.GetGroupValue(groupName);
-        }
-
-        internal static string? GetGroupValue(this Match match, string groupName)
-        {
-            if (match is { Success: true })
-            {
-                return match.Groups?[groupName]?.Value;
-            }
-
-            return default!;
-        }
-    }
+            { Success: true } => match.Groups?[groupName]?.Value,
+            _ => default
+        };
 }
