@@ -218,6 +218,12 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
 
         var jsMethodName = method.RawName.LowerCaseFirstLetter();
         var func = $"{options.PathFromWindow}.{jsMethodName}";
+
+        // TODO: Bug, fix URL
+        // For example:
+        // https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/getItem
+        // should be:
+        // https://developer.mozilla.org/en-US/docs/Web/API/Storage/getItem
         builder.Append($"        /// Source generated extension method implementation of <c>{func}</c>.\r\n");
         if (options.Url is { Length: > 0 } url)
         {

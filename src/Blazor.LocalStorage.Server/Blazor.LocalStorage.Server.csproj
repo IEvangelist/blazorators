@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
-        <Description>Source generated JavaScript interop for the browser's localStorage API compatible with Blazor WebAssembly.</Description>
+        <Description>Source generated JavaScript interop for the browser's localStorage API compatible with Blazor Server.</Description>
         <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
         <NeutralLanguage>en-US</NeutralLanguage>
         <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
@@ -17,10 +17,10 @@
         <FileVersion>$(ClientVersion)</FileVersion>
         <Authors>David Pine</Authors>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <AssemblyName>Blazor.LocalStorage.WebAssembly</AssemblyName>
-        <Title>A C# source-generated class library implementation of the native browser's localStorage API available as IJSInProcessRuntime extension methods.</Title>
-        <PackageId>Blazor.LocalStorage.WebAssembly</PackageId>
-        <PackageTags>dotnet;dotnetcore;csharp;blazor;webassembly;wasm;generators;sourcegen;roslyn;</PackageTags>
+        <AssemblyName>Blazor.LocalStorage.Server</AssemblyName>
+        <Title>A C# source-generated class library implementation of the native browser's localStorage API available as IJSRuntime extension methods.</Title>
+        <PackageId>Blazor.LocalStorage.Server</PackageId>
+        <PackageTags>dotnet;dotnetcore;csharp;blazor;generators;sourcegen;roslyn;</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
         <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
         <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
@@ -33,7 +33,7 @@
         <DebugType>embedded</DebugType>
         <IncludeSymbols>false</IncludeSymbols>
         <IncludeSource>false</IncludeSource>
-        <RootNamespace>Blazor.LocalStorage.WebAssembly</RootNamespace>
+        <RootNamespace>Blazor.LocalStorage.Server</RootNamespace>
         <NoWarn>NU5125;NU5039</NoWarn>
         <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
         <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>

@@ -15,7 +15,16 @@ public static class ServiceCollectionExtensions
     /// Adds the ability to either <c>@inject</c>
     /// (or <c>[Inject]</c>) the <c>IJSInProcessRuntime</c> type.
     /// </summary>
+    [Obsolete("Call AddInProcessJavaScript instead.")]
     public static IServiceCollection AddWebAssemblyLocalStorage(
+        this IServiceCollection services) =>
+        services.AddInProcessJavaScript();
+
+    /// <summary>
+    /// Adds the ability to either <c>@inject</c>
+    /// (or <c>[Inject]</c>) the <c>IJSInProcessRuntime</c> type.
+    /// </summary>
+    public static IServiceCollection AddInProcessJavaScript(
         this IServiceCollection services) =>
         services.AddScoped<IJSInProcessRuntime>(
             serviceProvider =>

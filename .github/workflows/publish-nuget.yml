@@ -32,12 +32,14 @@ jobs:
       run: |
         dotnet restore ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj
         dotnet restore ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
+        dotnet restore ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj
       
     - name: Build
       run: |
         dotnet build ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
-    
+        dotnet build ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
+
     - name: Test
       run: dotnet test
       
@@ -45,19 +47,26 @@ jobs:
       run: |
         dotnet pack ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
+        dotnet pack ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
       
     - name: Publish package
       run: |
         nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -NoSymbols -NonInteractive -ApiKey ${{secrets.NUGET_API_KEY}}
 
-    - name: Upload abstractions package
+    - name: Upload source generators package
       uses: actions/upload-artifact@v2
       with:
         name: Blazor.SourceGenerators.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/
 
-    - name: Upload client package
+    - name: Upload localStorage WebAssembly package
       uses: actions/upload-artifact@v2
       with:
         name: Blazor.LocalStorage.WebAssembly.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload localStorage Server package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.LocalStorage.Server.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/
