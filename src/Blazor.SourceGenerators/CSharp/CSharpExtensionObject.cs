@@ -219,18 +219,10 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
         var jsMethodName = method.RawName.LowerCaseFirstLetter();
         var func = $"{options.PathFromWindow}.{jsMethodName}";
 
-        // TODO: Bug, fix URL
-        // For example:
-        // https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage/getItem
-        // should be:
-        // https://developer.mozilla.org/en-US/docs/Web/API/Storage/getItem
         builder.Append($"        /// Source generated extension method implementation of <c>{func}</c>.\r\n");
-        if (options.Url is { Length: > 0 } url)
-        {
-            url = url.EndsWith("/") ? url.Remove(url.Length - 1) : url;
-            var fullUrl = $"{url}/{method.RawName.LowerCaseFirstLetter()}";
-            builder.Append($"        /// <a href=\"{fullUrl}\"></a>\r\n");
-        }
+        var rootUrl = "https://developer.mozilla.org/en-US/docs/Web/API";
+        var fullUrl = $"{rootUrl}/{options.TypeName}/{method.RawName.LowerCaseFirstLetter()}";
+        builder.Append($"        /// <a href=\"{fullUrl}\"></a>\r\n");
         builder.Append($"        /// </summary>\r\n");
 
         return builder;

@@ -15,10 +15,10 @@ public abstract class GeneratorBaseUnitTests
 {
     public abstract IEnumerable<ISourceGenerator> SourceGenerators { get; }
 
-    public Compilation GetCompilation(string sourceCode) =>
+    public static Compilation GetCompilation(string sourceCode) =>
         GetCompilation(new[] { CSharpSyntaxTree.ParseText(sourceCode) });
 
-    public Compilation GetCompilation(IEnumerable<SyntaxTree> syntaxTrees)
+    public static Compilation GetCompilation(IEnumerable<SyntaxTree> syntaxTrees)
     {
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
 
@@ -51,12 +51,15 @@ public abstract class GeneratorBaseUnitTests
         Assert.Empty(diagnostics);
     }
 
-    public void VerifyGeneratedCode(string expectedCode, SyntaxTree actualTree)
+    public static void VerifyGeneratedCode(string expectedCode, SyntaxTree actualTree)
     {
         var actualCode = Trim(actualTree.ToString());
 
         Assert.Equal(Trim(expectedCode), actualCode);
 
-        static string Trim(string s) => s.Trim(' ', '\n', '\r');
+        static string Trim(string s)
+        {
+            return s.Trim(' ', '\n', '\r');
+        }
     }
 }
