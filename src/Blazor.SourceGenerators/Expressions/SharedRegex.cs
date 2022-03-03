@@ -43,4 +43,7 @@ internal static class SharedRegex
 
     public static readonly Regex TypeScriptPropertyRegex =
         new(@"^(?'Name'.*)\:(?:.{1})(?'Type'.*)\;$", RegexOptions.Multiline);
+
+    public static readonly Regex ArrayValuesRegex =
+        new(@"\[(?'Values'[^[\]]*)\]", RegexOptions.Multiline);
 }

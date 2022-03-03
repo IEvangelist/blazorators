@@ -34,7 +34,7 @@
         <IncludeSymbols>false</IncludeSymbols>
         <IncludeSource>false</IncludeSource>
         <RootNamespace>Blazor.LocalStorage.WebAssembly</RootNamespace>
-        <NoWarn>NU5125;NU5039</NoWarn>
+        <NoWarn>NU5125;NU5039;MSB3243</NoWarn>
         <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
         <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -62,7 +62,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" 
+                          OutputItemType="Analyzer" 
+                          SetTargetFramework="TargetFramework=netstandard2.0" 
+                          ReferenceOutputAssembly="true" />
     </ItemGroup>
 
     <ItemGroup Label="Files">

@@ -18,8 +18,15 @@ internal record CSharpType(
     /// <c>"date"</c> as its <see cref="RawName"/> and <c>"DateTime"</c>
     /// as its <see cref="RawTypeName"/>.
     /// </summary>
-    public string ToParameterString()
+    public string ToParameterString(bool isGenericType = false)
     {
+        if (isGenericType)
+        {
+            return IsNullable
+                ? $"T? {ToArgumentString()}"
+                : $"T {ToArgumentString()}";
+        }
+
         var isCallback = ActionDeclation is not null;
         var typeName = TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName)
             ? TypeMap.PrimitiveTypes[RawTypeName]

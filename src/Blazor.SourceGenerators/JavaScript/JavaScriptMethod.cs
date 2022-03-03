@@ -1,7 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
 using Blazor.SourceGenerators.CSharp;
 
 namespace Blazor.SourceGenerators.JavaScript;

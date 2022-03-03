@@ -1,92 +1,93 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>10.0</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
+
+        <!-- Generates a package at build -->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <!-- Do not include the generator as a lib dependency -->
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
+        <ClientVersion Condition=" '$(IsPreview)' != 'true' ">$(ClientOfficialVersion)</ClientVersion>
+        <ClientVersion Condition=" '$(IsPreview)' == 'true' ">$(ClientPreviewVersion)</ClientVersion>
+        <VersionSuffix Condition=" '$(IsNightly)' == 'true' ">nightly-$(CurrentDate)</VersionSuffix>
+        <VersionSuffix Condition=" '$(IsPreview)' == 'true' ">preview</VersionSuffix>
+        <Version Condition=" '$(VersionSuffix)' == '' ">$(ClientVersion)</Version>
+        <Version Condition=" '$(VersionSuffix)' != '' ">$(ClientVersion)-$(VersionSuffix)</Version>
+        <FileVersion>$(ClientVersion)</FileVersion>
+        <Authors>David Pine</Authors>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <AssemblyName>Blazor.SourceGenerators</AssemblyName>
+        <Title>Blazor Source Generators</Title>
+        <Description>The source generator used to generate extension methods on the IJSInProcessRuntime type for WebAssembly JavaScript interop.</Description>
+        <RootNamespace>Blazor.SourceGenerators</RootNamespace>
+        <PackageId>Blazor.SourceGenerators</PackageId>
+        <PackageTags>dotnet;dotnetcore;csharp;analyzers;sourcegen;generators;roslyn;</PackageTags>
+        <PackageReleaseNotes></PackageReleaseNotes>
+        <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
+        <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <ShippingScope>External</ShippingScope>
+        <SigningType>Product</SigningType>
+        <DebugType>embedded</DebugType>
+        <IncludeSymbols>false</IncludeSymbols>
+        <IncludeSource>false</IncludeSource>
+        <NoWarn>NU5125;NU5039</NoWarn>
+        <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+        <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <RepositoryType>git</RepositoryType>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IsPackable>true</IsPackable>
+        <PackageIcon>logo.png</PackageIcon>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <NoWarn>1701;1702;NU5128</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <NoWarn>1701;1702;NU5128</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Package the generator in the analyzer directory of the nuget package -->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+       </ItemGroup>
     
-    <!-- Generates a package at build -->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <!-- Do not include the generator as a lib dependency -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-  
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
-    <ClientVersion Condition=" '$(IsPreview)' != 'true' ">$(ClientOfficialVersion)</ClientVersion>
-    <ClientVersion Condition=" '$(IsPreview)' == 'true' ">$(ClientPreviewVersion)</ClientVersion>
-    <VersionSuffix Condition=" '$(IsNightly)' == 'true' ">nightly-$(CurrentDate)</VersionSuffix>
-    <VersionSuffix Condition=" '$(IsPreview)' == 'true' ">preview</VersionSuffix>
-    <Version Condition=" '$(VersionSuffix)' == '' ">$(ClientVersion)</Version>
-    <Version Condition=" '$(VersionSuffix)' != '' ">$(ClientVersion)-$(VersionSuffix)</Version>
-    <FileVersion>$(ClientVersion)</FileVersion>
-    <Authors>David Pine</Authors>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Blazor.SourceGenerators</AssemblyName>
-    <Title>Blazor Source Generators</Title>
-    <Description>The source generator used to generate extension methods on the IJSInProcessRuntime type for WebAssembly JavaScript interop.</Description>
-    <RootNamespace>Blazor.SourceGenerators</RootNamespace>
-    <PackageId>Blazor.SourceGenerators</PackageId>
-    <PackageTags>dotnet;dotnetcore;csharp;analyzers;sourcegen;generators;roslyn;</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
-    <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ShippingScope>External</ShippingScope>
-    <SigningType>Product</SigningType>
-    <DebugType>embedded</DebugType>
-    <IncludeSymbols>false</IncludeSymbols>
-    <IncludeSource>false</IncludeSource>
-    <NoWarn>NU5125;NU5039</NoWarn>
-    <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
-    <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <RepositoryType>git</RepositoryType>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <IsPackable>true</IsPackable>
-    <PackageIcon>logo.png</PackageIcon>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MinVer" Version="2.5.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;NU5128</NoWarn>
-  </PropertyGroup>
- 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;NU5128</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Package the generator in the analyzer directory of the nuget package -->
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <!--<None Include="$(PkgMicrosoft_Extensions_Primitives)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="MinVer" Version="2.5.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup Label="Files">
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+    <ItemGroup Label="Files">
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>

@@ -6,12 +6,17 @@ namespace Microsoft.JSInterop;
 /// <summary>
 /// Source generated extension methods on the <see cref="IJSRuntime"/> implementation.
 /// </summary>
-[JSAutoInterop(
+[JSAutoGenericInterop(
     TypeName = "Storage",
     PathFromWindow = "window.localStorage",
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
-    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage")]
-public static partial class LocalStorageExtensions
+    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage",
+    GenericMethodDescriptors = new[]
+    {
+        "getItem",
+        "setItem:value"
+    })]
+public static partial class AsynchronousLocalStorageExtensions
 {
 }
