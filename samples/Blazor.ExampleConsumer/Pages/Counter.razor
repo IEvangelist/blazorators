@@ -1,5 +1,7 @@
 ﻿@page "/counter"
 @inject IJSInProcessRuntime JavaScript
+@inject NavigationManager Nav
+@implements IDisposable
 
 <PageTitle>Counter (@_currentCount)</PageTitle>
 
@@ -7,20 +9,33 @@
 
 <p role="status">Current count: @_currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Increment</button>
+<input type="checkbox" @bind=_isDisabled /> Disabled: @_isDisabled
+
+<button class="btn btn-primary"
+    disabled=@_isDisabled @onclick="IncrementCount">Increment</button>
 
 @code {
     private int _currentCount = 0;
+    private bool _isDisabled = true;
 
-    private void IncrementCount() => JavaScript.SetItem("CounterValue", (++ _currentCount).ToString());
+    private void IncrementCount() => 
+        JavaScript.SetItem<int>("CounterValue", ++_currentCount);
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        if (JavaScript.GetItem("CounterValue") is { } count && int.TryParse(count, out var currentCount))
-        {
-            _currentCount = currentCount;
-        }
+        Nav.LocationChanged += OnLocationChanged;
+
+        _isDisabled = JavaScript.GetItem<bool>("Disabled");
+        _currentCount = JavaScript.GetItem<int>("CounterValue");
     }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+
+    void OnLocationChanged(object? sender, LocationChangedEventArgs args) =>
+        JavaScript.SetItem<bool>("Disabled", _isDisabled);
 }

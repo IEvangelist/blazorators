@@ -1,9 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Text;
-using Blazor.SourceGenerators.Extensions;
-
 namespace Blazor.SourceGenerators.CSharp;
 
 /// <summary>

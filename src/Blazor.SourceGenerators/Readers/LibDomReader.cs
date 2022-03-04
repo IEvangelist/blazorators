@@ -1,11 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
-using Blazor.SourceGenerators.Extensions;
-using static Blazor.SourceGenerators.Expressions.SharedRegex;
-
 namespace Blazor.SourceGenerators.Readers;
 
 internal sealed class LibDomReader

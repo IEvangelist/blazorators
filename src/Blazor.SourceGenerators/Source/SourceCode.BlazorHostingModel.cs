@@ -1,7 +1,11 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-/// <summary>
+namespace Blazor.SourceGenerators.Source;
+
+static partial class SourceCode
+{
+    internal const string BlazorHostingModel = @"/// <summary>
 /// The Blazor hosting model source, either WebAssembly or Server.
 /// </summary>
 public enum BlazorHostingModel
@@ -16,3 +20,5 @@ public enum BlazorHostingModel
     /// </summary>
     Server
 };
+";
+}

@@ -1,37 +1,28 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Text;
-using Blazor.SourceGenerators.Diagnostics;
-using Blazor.SourceGenerators.Parsers;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
-
 namespace Blazor.SourceGenerators;
 
 [Generator]
 internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 {
     private readonly LibDomParser _libDomParser = new();
-
-    private const string RecordCompatSource = @"using System.ComponentModel;
-
-namespace System.Runtime.CompilerServices
-{
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    internal class IsExternalInit { }
-}";
+    private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd = new()
+    {
+        (nameof(RecordCompat).ToGeneratedFileName(), RecordCompat),
+        (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
+        (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
+        (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
+    };    
 
     public void Initialize(GeneratorInitializationContext context)
     {
-//#if DEBUG
-//        if (!System.Diagnostics.Debugger.IsAttached)
-//        {
-//            System.Diagnostics.Debugger.Launch();
-//        }
-//#endif
+#if DEBUG
+        if (!System.Diagnostics.Debugger.IsAttached)
+        {
+            //System.Diagnostics.Debugger.Launch();
+        }
+#endif
 
         // Register a syntax receiver that will be created for each generation pass
         context.RegisterForSyntaxNotifications(
@@ -41,8 +32,11 @@ namespace System.Runtime.CompilerServices
     public void Execute(GeneratorExecutionContext context)
     {
         // Add source from text.
-        context.AddSource("RecordCompat.g.cs",
-            SourceText.From(RecordCompatSource, Encoding.UTF8));
+        foreach (var (fileName, sourceCode) in _sourceCodeToAdd)
+        {
+            context.AddSource(fileName,
+                SourceText.From(sourceCode, Encoding.UTF8));
+        }
 
         if (context.SyntaxContextReceiver is not JavaScriptInteropSyntaxContextReceiver receiver)
         {
@@ -66,6 +60,18 @@ namespace System.Runtime.CompilerServices
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         Descriptors.PathFromWindowRequiredDiagnostic,
+                        attribute.GetLocation()));
+
+                continue;
+            }
+
+            if (options.SupportsGenerics &&
+                context.Compilation.ReferencedAssemblyNames.Any(ai =>
+                ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)) is false)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.MissingBlazorSerializationPackageReferenceDiagnostic,
                         attribute.GetLocation()));
 
                 continue;
@@ -95,7 +101,7 @@ namespace System.Runtime.CompilerServices
                         staticObject.DependentTypes.Where(
                             t => !t.Value.IsActionParameter))
                     {
-                        context.AddSource($"{dependentObj.Key}.g.cs",
+                        context.AddSource(dependentObj.Key.ToGeneratedFileName(),
                             SourceText.From(dependentObj.Value.ToString(),
                             Encoding.UTF8));
                     }
@@ -110,7 +116,7 @@ namespace System.Runtime.CompilerServices
                     };
 
                 context.AddSource(
-                    $"{typeSymbol.Name}.g.cs",
+                    typeSymbol.Name.ToGeneratedFileName(),
                     SourceText.From(
                         staticObject.ToStaticPartialClassString(
                             options,

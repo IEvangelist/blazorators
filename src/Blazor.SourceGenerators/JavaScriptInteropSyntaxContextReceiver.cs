@@ -1,10 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.Extensions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Blazor.SourceGenerators;
 
 internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
@@ -23,12 +19,17 @@ internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
                 foreach (var attributeSyntax in attributeListSyntax.Attributes)
                 {
                     var name = attributeSyntax.Name.ToString();
-                    if (nameof(JSAutoInteropAttribute).Contains(name) ||
-                        nameof(JSAutoGenericInteropAttribute).Contains(name))
+
+                    var isAutoInterop =
+                        nameof(JSAutoInteropAttribute).Contains(name);
+                    var isAutoGenericInterop =
+                        nameof(JSAutoGenericInteropAttribute).Contains(name);
+
+                    if (isAutoInterop || isAutoGenericInterop)
                     {
                         ClassDeclarations.Add(
                             new(
-                                Options: attributeSyntax.GetGeneratorOptions(),
+                                Options: attributeSyntax.GetGeneratorOptions(isAutoGenericInterop),
                                 ClassDeclaration: classDeclaration,
                                 InteropAttribute: attributeSyntax));
                     }

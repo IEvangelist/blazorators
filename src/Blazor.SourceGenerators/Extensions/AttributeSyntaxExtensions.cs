@@ -1,16 +1,17 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.Expressions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 
 namespace Blazor.SourceGenerators.Extensions;
 
 static class AttributeSyntaxExtensions
 {
-    internal static GeneratorOptions GetGeneratorOptions(this AttributeSyntax attribute)
+    internal static GeneratorOptions GetGeneratorOptions(
+        this AttributeSyntax attribute,
+        bool supportsGenerics)
     {
-        GeneratorOptions options = new();
+        GeneratorOptions options = new(supportsGenerics);
         if (attribute is { ArgumentList: not null })
         {
             var removeQuotes = static string (string value) => value.Replace("\"", "");
@@ -36,9 +37,9 @@ static class AttributeSyntaxExtensions
                     {
                         Url = removeQuotes(arg.Expression.ToString())
                     },
-                    nameof(options.HostingModel) => options with
+                    "HostingModel" => options with
                     {
-                        HostingModel = ToEnum(arg.Expression.ToString())
+                        IsWebAssembly = arg.Expression.ToString().Contains("WebAssembly")
                     },
                     nameof(options.GenericMethodDescriptors) => options with
                     {
@@ -51,17 +52,6 @@ static class AttributeSyntaxExtensions
         }
 
         return options;
-    }
-
-    static BlazorHostingModel ToEnum(string arg)
-    {
-        var index = arg.IndexOf('.');
-        if (index > -1)
-        {
-            arg = arg.Substring(index + 1);
-        }
-
-        return arg.ToEnum<BlazorHostingModel>();
     }
 
     static string[]? ParseDescriptors(string args)

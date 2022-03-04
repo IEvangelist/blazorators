@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.JavaScript;
-
 namespace Blazor.SourceGenerators.CSharp;
 
 internal record CSharpMethod(
@@ -13,4 +11,7 @@ internal record CSharpMethod(
 {
     public bool IsPureJavaScriptInvocation =>
         JavaScriptMethodDependency is { IsPure: true };
+
+    public bool IsReturnTypeNullable =>
+        RawReturnTypeName.Contains("null");
 }

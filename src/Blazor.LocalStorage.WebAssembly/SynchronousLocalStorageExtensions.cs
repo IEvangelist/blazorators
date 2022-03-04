@@ -11,7 +11,7 @@ namespace Microsoft.JSInterop;
     PathFromWindow = "window.localStorage",
     HostingModel = BlazorHostingModel.WebAssembly,
     OnlyGeneratePureJS = true,
-    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage",
+    Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
     GenericMethodDescriptors = new[]
     {
         "getItem",

@@ -10,4 +10,6 @@ static class StringExtensions
 
     internal static string LowerCaseFirstLetter(this string name) =>
         $"{char.ToLower(name[0])}{name.Substring(1, name.Length - 1)}";
+
+    internal static string ToGeneratedFileName(this string name) => $"{name}.g.cs";
 }

@@ -1,13 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Text.RegularExpressions;
-using Blazor.SourceGenerators.CSharp;
-using Blazor.SourceGenerators.Extensions;
-using Blazor.SourceGenerators.JavaScript;
-using Blazor.SourceGenerators.Types;
-using static Blazor.SourceGenerators.Expressions.SharedRegex;
-
 namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class LibDomParser

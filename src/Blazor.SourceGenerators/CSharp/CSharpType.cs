@@ -1,9 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.Extensions;
-using Blazor.SourceGenerators.Types;
-
 namespace Blazor.SourceGenerators.CSharp;
 
 internal record CSharpType(
@@ -23,8 +20,8 @@ internal record CSharpType(
         if (isGenericType)
         {
             return IsNullable
-                ? $"T? {ToArgumentString()}"
-                : $"T {ToArgumentString()}";
+                ? $"TArg? {ToArgumentString()}"
+                : $"TArg {ToArgumentString()}";
         }
 
         var isCallback = ActionDeclation is not null;
@@ -41,13 +38,15 @@ internal record CSharpType(
             : $"{typeName} {parameterName}";
     }
 
-    public string ToArgumentString()
+    public string ToArgumentString(bool isGenericType = false)
     {
         var isCallback = ActionDeclation is not null;
         var parameterName = isCallback
             ? $"on{RawName.CapitalizeFirstLetter()}MethodName"
             : RawName.LowerCaseFirstLetter();
 
-        return parameterName;
+        return isGenericType
+            ? $"{parameterName}.ToJson(options)"
+            : parameterName;
     }
 }

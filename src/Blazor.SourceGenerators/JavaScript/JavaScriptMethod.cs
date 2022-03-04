@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.CSharp;
-
 namespace Blazor.SourceGenerators.JavaScript;
 
 internal sealed record JavaScriptMethod(
