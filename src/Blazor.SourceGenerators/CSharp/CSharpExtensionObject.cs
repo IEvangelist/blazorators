@@ -36,6 +36,7 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
     {
         StringBuilder builder = new();
 
+        AppendCopyRightHeader(builder);
         AppendUsingDeclarations(builder, options);
         AppendNamespace(builder, namespaceString ?? "Microsoft.JSInterop");
         AppendClassName(existingClassName, builder);
@@ -43,6 +44,7 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
         Indentation indentation = new(0);
         AppendOpeningCurlyBrace(builder, indentation);
         indentation = indentation.Increase();
+        var methodLevel = indentation.Level;
 
         foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
         {
@@ -65,6 +67,8 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
             var (returnType, bareType) =
                 GetMethodTypes(isGenericReturnType, isPrimitiveType, isVoid, method, options);
 
+            indentation = indentation.ResetTo(methodLevel);
+
             if (method.IsPureJavaScriptInvocation)
             {
                 // Write the method signature:
@@ -74,10 +78,7 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
                 AppendTripleSlashComments(builder, method, options, indentation);
 
                 builder.Append($"{indentation}public static {returnType} {csharpMethodName}{suffix}{genericTypeArgs}(\r\n");
-                if (index.IsFirst)
-                {
-                    indentation = indentation.Increase();
-                }
+                indentation = indentation.Increase();
 
                 // Write method parameters
                 builder.Append($"{indentation}this {extendingType} javaScript");
@@ -86,11 +87,6 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
                     builder.Append(",\r\n");
                     foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
                     {
-                        if (index.IsFirst)
-                        {
-                            indentation = indentation.Increase();
-                        }
-
                         var isGenericType = IsGenericParameter(method.RawName, parameter, options);
                         if (pi.IsLast)
                         {
@@ -113,46 +109,35 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
                     if (isVoid)
                     {
                         builder.Append($"{indentation}javaScript.InvokeVoid{suffix}(\r\n");
-                        if (index.IsFirst)
-                        {
-                            indentation = indentation.Increase();
-                        }
-                        builder.Append($"{indentation}\"{javaScriptMethodName}\",\r\n");
                     }
                     else
                     {
                         builder.Append($"{indentation}javaScript.Invoke{suffix}<{bareType}>(\r\n");
-                        if (index.IsFirst)
-                        {
-                            indentation = indentation.Increase();
-                        }
-                        builder.Append($"{indentation}\"{javaScriptMethodName}\",\r\n");
                     }
+                    indentation = indentation.Increase();
+                    builder.Append($"{indentation}\"{javaScriptMethodName}\",\r\n");
 
                     // Write method body / expression, and arguments to javaScript.Invoke*
                     foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
                     {
-                        if (ai.IsFirst)
-                        {
-                            indentation = indentation.Increase();
-                        }
-
                         var isGenericType = IsGenericParameter(method.RawName, parameter, options);
                         if (ai.IsLast)
                         {
                             if (isGenericReturnType)
                             {
-                                builder.Append($"            {parameter.ToArgumentString(isGenericType)})\r\n");
-                                builder.Append($"            .FromJson{genericTypeArgs}(options);\r\n\r\n");
+                                builder.Append($"{indentation}{parameter.ToArgumentString(isGenericType)})\r\n");
+                                builder.Append($"{indentation}.FromJson{genericTypeArgs}(options);\r\n");
                             }
                             else
                             {
-                                builder.Append($"            {parameter.ToArgumentString(isGenericType)});\r\n\r\n");
+                                builder.Append($"{indentation}{parameter.ToArgumentString(isGenericType)});\r\n");
                             }
+
+                            if (!index.IsLast) builder.Append("\r\n");
                         }
                         else
                         {
-                            builder.Append($"            {parameter.ToArgumentString(isGenericType)},\r\n");
+                            builder.Append($"{indentation}{parameter.ToArgumentString(isGenericType)},\r\n");
                         }
                     }
 
@@ -163,12 +148,12 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
                     builder.Append(") =>\r\n");
                     if (isVoid)
                     {
-                        builder.Append($"        javaScript.InvokeVoid{suffix}(\"{javaScriptMethodName}\");\r\n\r\n");
+                        builder.Append($"{indentation}javaScript.InvokeVoid{suffix}(\"{javaScriptMethodName}\");\r\n\r\n");
                         continue;
                     }
                     else
                     {
-                        builder.Append($"        javaScript.Invoke{suffix}<{bareType}>(\"{javaScriptMethodName}\");\r\n\r\n");
+                        builder.Append($"{indentation}javaScript.Invoke{suffix}<{bareType}>(\"{javaScriptMethodName}\");\r\n\r\n");
                         continue;
                     }
                 }
@@ -261,10 +246,18 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
             }
         }
 
-        AppendClosingCurlyBrace(builder, indentation);
+        AppendClosingCurlyBrace(builder, indentation.Reset());
 
         var staticPartialClassDefinition = builder.ToString();
         return staticPartialClassDefinition;
+    }
+
+    static void AppendCopyRightHeader(StringBuilder builder)
+    {
+        builder.Append("// Copyright (c) David Pine. All rights reserved.\r\n");
+        builder.Append("// Licensed under the MIT License:\r\n");
+        builder.Append("// https://github.com/IEvangelist/blazorators/blob/main/LICENSE\r\n");
+        builder.Append("// Auto-generated by blazorators.\r\n\r\n");
     }
 
     static void AppendUsingDeclarations(StringBuilder builder, GeneratorOptions options)
@@ -397,8 +390,10 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
     {
         private readonly int _spaces = 4;
 
-        internal Indentation Increase() => this with { Level = Level + 1 };
-        internal Indentation Decrease() => this with { Level = Level - 1 };
+        internal Indentation Reset() => ResetTo(0);
+        internal Indentation ResetTo(int level) => this with { Level = level };
+        internal Indentation Increase(int extra = 0) => this with { Level = Level + 1 + extra };
+        internal Indentation Decrease(int extra = 0) => this with { Level = Level - 1 - extra };
 
         public override string ToString() =>
             new(' ', _spaces * Level);

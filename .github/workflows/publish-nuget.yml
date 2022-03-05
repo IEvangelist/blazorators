@@ -33,12 +33,14 @@ jobs:
         dotnet restore ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj
         dotnet restore ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
         dotnet restore ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj
+        dotnet restore ./src/Blazor.Serialization/Blazor.Serialization.csproj
       
     - name: Build
       run: |
         dotnet build ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.Serialization/Blazor.Serialization.csproj --configuration Release --no-restore
 
     - name: Test
       run: dotnet test
@@ -48,6 +50,7 @@ jobs:
         dotnet pack ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
+        dotnet pack ./src/Blazor.Serialization/Blazor.Serialization.csproj --output packages
       
     - name: Publish package
       run: |
@@ -69,4 +72,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Blazor.LocalStorage.Server.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload serialization package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.Serialization.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/
