@@ -13,12 +13,12 @@
 
 A C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implementation of the `IJSInProcessRuntime` type. This library provides several NuGet packages:
 
-| NuGet package | NuGet version |
-|--|--|
-| [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) |
-| [`Blazor.Serialization`](https://www.nuget.org/packages/Blazor.Serialization) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Serialization.svg?style=flat)](https://www.nuget.org/packages/Blazor.Serialization) |
-| [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) |
-| [`Blazor.LocalStorage.Server`](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.Server) |
+| NuGet package | NuGet version | Description |
+|--|--|--|
+| [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) | Core source generator library. |
+| [`Blazor.Serialization`](https://www.nuget.org/packages/Blazor.Serialization) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Serialization.svg?style=flat)](https://www.nuget.org/packages/Blazor.Serialization) | Common serialization library, required in some scenarios when using generics. |
+| [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | Blazor WebAssembly class library exposing extenion methods on the `IJSInProcessRuntime` type for the `localStorage` implementation. |
+| [`Blazor.LocalStorage.Server`](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | Blazor Server class library exposing extenion methods on the `IJSRuntime` type for the `localStorage` implementation. |
 
 ## Using the `Blazor.SourceGenerators` package 📦
 
