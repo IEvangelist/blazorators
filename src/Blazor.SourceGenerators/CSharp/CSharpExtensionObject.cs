@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.CSharp;
 
-internal sealed record CSharpExtensionObject(string RawTypeName)
+internal sealed partial record CSharpExtensionObject(string RawTypeName)
 {
     private List<CSharpMethod>? _methods = null!;
     private List<CSharpProperty>? _properties = null!;
@@ -46,6 +46,7 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
         indentation = indentation.Increase();
         var methodLevel = indentation.Level;
 
+        // Add methods.
         foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
         {
             var isVoid = method.RawReturnTypeName == "void";
@@ -246,6 +247,40 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
             }
         }
 
+        // Add properties.
+        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
+        {
+            if (index.IsFirst) builder.Append("\r\n");
+            if (property.IsIndexer) continue;
+
+            indentation = indentation.ResetTo(methodLevel);
+
+            var (suffix, extendingType) = options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
+            var csharpMethodName = property.RawName.CapitalizeFirstLetter();
+            var javaScriptIndentifier = options.PathFromWindow is not null
+                ? $"{options.PathFromWindow}.{property.RawName}"
+                : property.RawName;
+            var (returnType, bareType) = GetMethodTypes(property, options);
+            var genericTypeArgs = $"<{bareType}>";
+
+            AppendTripleSlashComments(builder, property, options, indentation);
+
+            builder.Append($"{indentation}public static {returnType} {csharpMethodName}{suffix}(\r\n");
+            indentation = indentation.Increase();
+
+            builder.Append($"{indentation}this {extendingType} javaScript) =>\r\n");
+            indentation = indentation.Increase();
+
+            builder.Append($"{indentation}javaScript.Invoke{suffix}{genericTypeArgs}(\r\n");
+            indentation = indentation.Increase();
+
+            builder.Append($"{indentation}\"eval\", \"{javaScriptIndentifier}\");\r\n");
+            if (!index.IsLast)
+            {
+                builder.Append("\r\n");
+            }
+        }
+
         AppendClosingCurlyBrace(builder, indentation.Reset());
 
         var staticPartialClassDefinition = builder.ToString();
@@ -347,6 +382,22 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
         builder.Append($"{indent}/// </summary>\r\n");
     }
 
+    static void AppendTripleSlashComments(
+        StringBuilder builder, CSharpProperty property, GeneratorOptions options, Indentation indentation)
+    {
+        var indent = indentation.ToString();
+        builder.Append($"{indent}/// <summary>\r\n");
+
+        var jsMethodName = property.RawName.LowerCaseFirstLetter();
+        var func = $"{options.PathFromWindow}.{jsMethodName}";
+
+        builder.Append($"{indent}/// Source generated extension method implementation of <c>{func}</c>.\r\n");
+        var rootUrl = "https://developer.mozilla.org/docs/Web/API";
+        var fullUrl = $"{rootUrl}/{options.TypeName}/{property.RawName.LowerCaseFirstLetter()}";
+        builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>\r\n");
+        builder.Append($"{indent}/// </summary>\r\n");
+    }
+
     static (string ReturnType, string BareType) GetMethodTypes(
         bool isGenericReturnType, bool isPrimitiveType, bool isVoid, CSharpMethod method, GeneratorOptions options)
     {
@@ -386,16 +437,11 @@ internal sealed record CSharpExtensionObject(string RawTypeName)
         }
     }
 
-    private readonly record struct Indentation(int Level)
+    static (string ReturnType, string BareType) GetMethodTypes(
+        CSharpProperty property, GeneratorOptions options)
     {
-        private readonly int _spaces = 4;
-
-        internal Indentation Reset() => ResetTo(0);
-        internal Indentation ResetTo(int level) => this with { Level = level };
-        internal Indentation Increase(int extra = 0) => this with { Level = Level + 1 + extra };
-        internal Indentation Decrease(int extra = 0) => this with { Level = Level - 1 - extra };
-
-        public override string ToString() =>
-            new(' ', _spaces * Level);
+        return (
+            ReturnType: options.IsWebAssembly ? property.MappedTypeName : $"ValueTask<{property.MappedTypeName}>",
+            BareType: property.MappedTypeName);
     }
 }

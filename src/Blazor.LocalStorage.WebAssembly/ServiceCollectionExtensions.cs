@@ -19,8 +19,5 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services) =>
         services.AddScoped<IJSInProcessRuntime>(
             serviceProvider =>
-                (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
-            .AddScoped<IJSUnmarshalledRuntime>(
-                serviceProvider =>
-                (IJSUnmarshalledRuntime)serviceProvider.GetRequiredService<IJSRuntime>());
+                (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>());
 }

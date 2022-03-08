@@ -13,4 +13,6 @@ internal record CSharpProperty(
     bool IsReadonly = false) : CSharpType(RawName, RawTypeName, IsNullable)
 {
     public string MappedTypeName => TypeMap.PrimitiveTypes[RawTypeName];
+
+    public bool IsIndexer => RawName.StartsWith("[") && RawName.EndsWith("]");
 }

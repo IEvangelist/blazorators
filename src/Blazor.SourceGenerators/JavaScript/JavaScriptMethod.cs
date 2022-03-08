@@ -3,23 +3,19 @@
 
 namespace Blazor.SourceGenerators.JavaScript;
 
+/// <summary>
+/// An object that represents a JavaScript method.
+/// </summary>
+/// <param name="JavaScriptApiMethodName">The exact name of the JavaScript API method.</param>
+/// <param name="InvokableMethodName">
+/// The invokable method name, when different than
+/// the <paramref name="JavaScriptApiMethodName"/>
+/// the method is not considered pure.</param>
+/// <param name="ParameterDefinitions">The optional listing of method parameters.</param>
 internal sealed record JavaScriptMethod(
-        // <summary>
-        // The exact name of the JavaScript API method.
-        // </summary>
-        string JavaScriptApiMethodName,
-
-        // <summary>
-        // The invokable method name, when different than
-        // the <paramref name="JavaScriptApiMethodName"/>
-        // the method is not considered pure.
-        // </summary>
-        string? InvokableMethodName = null,
-
-        // <summary>
-        // The optional listing of method parameters.
-        // </summary>
-        List<CSharpType>? ParameterDefinitions = null)
+    string JavaScriptApiMethodName,
+    string? InvokableMethodName = null,
+    List<CSharpType>? ParameterDefinitions = null)
 {
     /// <summary>
     /// A "pure" JavaScript method is one that

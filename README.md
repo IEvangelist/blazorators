@@ -135,6 +135,15 @@ public static partial class SynchronousLocalStorageExtensions
             "window.localStorage.setItem",
             key,
             value.ToJson(options));
+
+    /// <summary>
+    /// Source generated extension method implementation of <c>window.localStorage.length</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
+    /// </summary>
+    public static double Length(
+        this IJSInProcessRuntime javaScript) =>
+            javaScript.Invoke<double>(
+                "eval", "window.localStorage.length");
 }
 ```
 
@@ -228,6 +237,15 @@ public static partial class AsynchronousLocalStorageExtensions
             "window.localStorage.setItem",
             key,
             value);
+
+    /// <summary>
+    /// Source generated extension method implementation of <c>window.localStorage.length</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
+    /// </summary>
+    public static ValueTask<double> LengthAsync(
+        this IJSRuntime javaScript) =>
+            javaScript.InvokeAsync<double>(
+                "eval", "window.localStorage.length");
 }
 ```
 
