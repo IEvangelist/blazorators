@@ -9,8 +9,6 @@ namespace Microsoft.JSInterop;
 [JSAutoGenericInterop(
     TypeName = "Storage",
     PathFromWindow = "window.localStorage",
-    HostingModel = BlazorHostingModel.WebAssembly,
-    OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
     GenericMethodDescriptors = new[]
     {

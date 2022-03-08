@@ -11,7 +11,7 @@ static partial class SourceCode
 /// For example:
 /// <example>
 /// <code>
-/// [JSAutoInterop(
+/// [JSAutoGenericInterop(
 ///    TypeName = ""Storage"",
 ///    PathFromWindow = ""window.localStorage"",
 ///    HostingModel = BlazorHostingModel.WebAssembly,
@@ -28,7 +28,7 @@ static partial class SourceCode
 /// </example>
 /// This will source generate all the extension methods for the IJSInProcessRuntime type for the localStorage APIs.
 /// </summary>
-public sealed class JSAutoGenericInteropAttribute : JSAutoInteropAttribute
+public class JSAutoGenericInteropAttribute : JSAutoInteropAttribute
 {
     /// <summary>
     /// The descriptors that define which APIs are to use default JSON serialization and support generics.
