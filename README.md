@@ -24,7 +24,7 @@ A C# source generator that creates extensions methods on the Blazor WebAssembly 
 
 As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) Web API.
 
-Consider the SynchronousLocalStorageExtensions.cs_ C# file:
+Consider the _SynchronousLocalStorageExtensions.cs_ C# file:
 
 ```csharp
 // Copyright (c) David Pine. All rights reserved.
@@ -260,7 +260,7 @@ public static class LocalStorageServiceCollectionExtensions
 }
 ```
 
-Putting this all together, the ``Blazor.LocalStorage.WebAssembly` NuGet package is actually only 20 lines of code, and it generates full DI-ready services with JavaScript interop.
+Putting this all together, the `Blazor.LocalStorage.WebAssembly` NuGet package is actually only 20 lines of code, and it generates full DI-ready services with JavaScript interop.
 
 The `Blazor.LocalStorage.Server` package, generates extensions on the `IJSRuntime` type.
 
