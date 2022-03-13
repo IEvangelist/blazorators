@@ -24,7 +24,7 @@ A C# source generator that creates extensions methods on the Blazor WebAssembly 
 
 As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) Web API.
 
-Consider the _LocalStorageExtensions.cs_ C# file:
+Consider the SynchronousLocalStorageExtensions.cs_ C# file:
 
 ```csharp
 // Copyright (c) David Pine. All rights reserved.
@@ -37,16 +37,14 @@ namespace Microsoft.JSInterop;
 /// </summary>
 [JSAutoGenericInterop(
     TypeName = "Storage",
-    PathFromWindow = "window.localStorage",
-    HostingModel = BlazorHostingModel.WebAssembly,
-    OnlyGeneratePureJS = true,
+    Implementation = "window.localStorage",
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
     GenericMethodDescriptors = new[]
     {
         "getItem",
         "setItem:value"
     })]
-public static partial class SynchronousLocalStorageExtensions
+internal static partial class SynchronousLocalStorageExtensions
 {
 }
 ```
@@ -54,16 +52,14 @@ public static partial class SynchronousLocalStorageExtensions
 This code designates itself into the `Microsoft.JSInterop` namespace, making all of the source generated extensions available to anyone consumer who uses types from this namespace. It uses the `JSAutoInterop` to specify:
 
 - `TypeName = "Storage"`: sets the type to [`Storage`](https://developer.mozilla.org/docs/Web/API/Storage).
-- `PathFromWindow = "window.localStorage"`: expresses how to locate the implementation of the specified type from the globally scoped `window` object, this is the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) implementation.
-- `HostingModel = BlazorHostingModel.WebAssembly`: tells the generator to create synchronous extension methods on the `IJSInProcessRuntime` type (default), use `.Server` for `IJSRuntime` and Task-based asynchronous methods instead.
-- `OnlyGeneratePureJS = true`: configures the source generator to emit only C#, when `false` will emit JavaScript.
+- `Implementation = "window.localStorage"`: expresses how to locate the implementation of the specified type from the globally scoped `window` object, this is the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) implementation.
 - `Url`: sets the URL for the implementation.
 - `GenericMethodDescriptors`: Defines the methods that should support generics as part of their source-generation. The `localStorage.getItem` is specified to return a generic `TResult` type, and the `localStorage.setItem` has its parameter with a name of `value` specified as a generic `TArg` type.
 
 > The generic method descriptors syntax is:
 > `"methodName"` for generic return type and `"methodName:parameterName"` for generic parameter type.
 
-The file needs to define an extension class and needs to be `partial`, for example; `public static partial class`. Decorating the class with the `JSAutoInterop` attribute will source generate the following C# code:
+The file needs to define an extension class and needs to be `partial`, for example; `internal static partial class`. Decorating the class with the `JSAutoInterop` (or `JSAutoGenericInterop) attribute will source generate the following C# code:
 
 ```csharp
 // Copyright (c) David Pine. All rights reserved.
@@ -77,7 +73,7 @@ using System.Text.Json;
 #nullable enable
 namespace Microsoft.JSInterop;
 
-public static partial class SynchronousLocalStorageExtensions
+internal static partial class SynchronousLocalStorageExtensions
 {
     /// <summary>
     /// Source generated extension method implementation of <c>window.localStorage.clear</c>.
@@ -147,6 +143,125 @@ public static partial class SynchronousLocalStorageExtensions
 }
 ```
 
+These internal extension methods rely on the `IJSInProcessRuntime` to perform JavaScript interop. From the given `TypeName` and corresponding `Implementation`, the following code is also generated:
+
+- `IStorage.g.cs`: The interface for the corresponding `Storage` Web API surface area.
+- `LocalStorge.g.cs`: The `internal` implementation of the `IStorage` interface.
+- `LocalStorageServiceCollectionExtensions.g.cs`: Extension methods to add the `IStorage` service to the dependency injection `IServiceCollection`.
+
+Here is the source generated `IStorage.g.cs`:
+
+```csharp
+using Blazor.Serialization.Extensions;
+using System.Text.Json;
+
+#nullable enable
+namespace Microsoft.JSInterop;
+
+/// <summary>
+/// Source generated interface definition of the <c>Storage</c> type.
+/// </summary>
+public interface IStorage
+{
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.clear</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/clear"></a>
+    /// </summary>
+    void Clear();
+
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.getItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/getItem"></a>
+    /// </summary>
+    TResult? GetItem<TResult>(string key, JsonSerializerOptions? options = null);
+
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.key</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/key"></a>
+    /// </summary>
+    string? Key(double index);
+
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.removeItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/removeItem"></a>
+    /// </summary>
+    void RemoveItem(string key);
+
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.setItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/setItem"></a>
+    /// </summary>
+    void SetItem<TArg>(string key, TArg value, JsonSerializerOptions? options = null);
+
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.length</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
+    /// </summary>
+    double Length { get; }
+}
+```
+
+Here is the source generated `LocalStorage` implementation:
+
+```csharp
+using Blazor.Serialization.Extensions;
+using System.Text.Json;
+
+#nullable enable
+namespace Microsoft.JSInterop;
+
+/// <inheritdoc/>
+internal class LocalStorage : IStorage
+{
+    private readonly IJSInProcessRuntime _javaScript = null!;
+
+    public LocalStorage(IJSInProcessRuntime javaScript) => _javaScript = javaScript;
+
+    /// <inheritdoc/>
+    void IStorage.Clear() => _javaScript.Clear();
+
+    /// <inheritdoc/>
+    TResult? IStorage.GetItem<TResult>(string key, JsonSerializerOptions? options)
+        where TResult : default => _javaScript.GetItem<TResult>(key, options);
+
+    /// <inheritdoc/>
+    string? IStorage.Key(double index) => _javaScript.Key(index);
+
+    /// <inheritdoc/>
+    void IStorage.RemoveItem(string key) => _javaScript.RemoveItem(key);
+
+    /// <inheritdoc/>
+    void IStorage.SetItem<TArg>(string key, TArg value, JsonSerializerOptions? options) =>
+        _javaScript.SetItem(key, value, options);
+    
+    /// <inheritdoc/>
+    double IStorage.Length => _javaScript.Length();
+}
+```
+
+Finally, here is the source generated service collection extension methods:
+
+```csharp
+using Microsoft.JSInterop;
+
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary></summary>
+public static class LocalStorageServiceCollectionExtensions
+{
+    /// <summary>
+    /// Adds the <see cref="IStorage" /> service to the service collection.
+    /// </summary>
+    public static IServiceCollection AddLocalStorageServices(
+        this IServiceCollection services) =>
+        services.AddSingleton<IJSInProcessRuntime>(serviceProvider =>
+            (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
+            .AddSingleton<IStorage, LocalStorage>();
+}
+```
+
+Putting this all together, the ``Blazor.LocalStorage.WebAssembly` NuGet package is actually only 20 lines of code, and it generates full DI-ready services with JavaScript interop.
+
 The `Blazor.LocalStorage.Server` package, generates extensions on the `IJSRuntime` type.
 
 ```csharp
@@ -160,7 +275,7 @@ namespace Microsoft.JSInterop;
 /// </summary>
 [JSAutoInterop(
     TypeName = "Storage",
-    PathFromWindow = "window.localStorage",
+    Implementation = "window.localStorage",
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]

@@ -8,7 +8,7 @@ namespace Microsoft.JSInterop;
 /// </summary>
 [JSAutoGenericInterop(
     TypeName = "Storage",
-    PathFromWindow = "window.localStorage",
+    Implementation = "window.localStorage",
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
     GenericMethodDescriptors = new[]
     {

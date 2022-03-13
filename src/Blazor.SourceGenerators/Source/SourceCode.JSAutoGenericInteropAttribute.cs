@@ -13,7 +13,7 @@ static partial class SourceCode
 /// <code>
 /// [JSAutoGenericInterop(
 ///    TypeName = ""Storage"",
-///    PathFromWindow = ""window.localStorage"",
+///    Implementation = ""window.localStorage"",
 ///    HostingModel = BlazorHostingModel.WebAssembly,
 ///    Url = ""https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage"",
 ///    GenericMethodDescriptors = new[]

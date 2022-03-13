@@ -25,9 +25,9 @@ static class AttributeSyntaxExtensions
                     {
                         TypeName = removeQuotes(arg.Expression.ToString())
                     },
-                    nameof(options.PathFromWindow) => options with
+                    nameof(options.Implementation) => options with
                     {
-                        PathFromWindow = removeQuotes(arg.Expression.ToString())
+                        Implementation = removeQuotes(arg.Expression.ToString())
                     },
                     nameof(options.OnlyGeneratePureJS) => options with
                     {

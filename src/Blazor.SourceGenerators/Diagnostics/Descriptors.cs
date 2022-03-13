@@ -15,8 +15,8 @@ static class Descriptors
 
     internal static readonly DiagnosticDescriptor PathFromWindowRequiredDiagnostic = new(
         "BR0002",
-        "The PathFromWindow is required to source generator JavaScript interop",
-        "JSAutoInteropAttribute must provide a 'PathFromWindow', as it is required to source generate JavaScript interop extensions",
+        "The Implementation is required to source generator JavaScript interop",
+        "JSAutoInteropAttribute must provide a 'Implementation', as it is required to source generate JavaScript interop extensions",
         "Blazorators.JSAutoInteropAttribute",
         DiagnosticSeverity.Error,
         true);

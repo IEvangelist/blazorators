@@ -19,7 +19,7 @@ internal sealed class SourceBuilder
     private string? _interfaceName;
 
     internal int IndentationLevel => _indentation.Level;
-    internal string ImplementationName => _implementationName ??= _options.PathFromWindow!.ToImplementationName();
+    internal string ImplementationName => _implementationName ??= _options.Implementation!.ToImplementationName();
     internal string InterfaceName => _interfaceName ??= $"I{_options.TypeName}";
 
     internal SourceBuilder(GeneratorOptions options) => _options = options;
@@ -136,7 +136,7 @@ internal sealed class SourceBuilder
         _builder.Append($"{indent}/// <summary>{_newLine}");
 
         var jsMethodName = method.RawName.LowerCaseFirstLetter();
-        var func = $"{_options.PathFromWindow}.{jsMethodName}";
+        var func = $"{_options.Implementation}.{jsMethodName}";
 
         _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.{_newLine}");
         var rootUrl = "https://developer.mozilla.org/docs/Web/API";
@@ -181,7 +181,7 @@ internal sealed class SourceBuilder
         _builder.Append($"{indent}/// <summary>{_newLine}");
 
         var jsMethodName = property.RawName.LowerCaseFirstLetter();
-        var func = $"{_options.PathFromWindow}.{jsMethodName}";
+        var func = $"{_options.Implementation}.{jsMethodName}";
 
         _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.\r\n");
         var rootUrl = "https://developer.mozilla.org/docs/Web/API";

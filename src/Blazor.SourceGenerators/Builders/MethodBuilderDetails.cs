@@ -54,8 +54,8 @@ internal readonly record struct MethodBuilderDetails(
             IsGenericReturnType: isGenericReturnType,
             ContainsGenericParameters: containsGenericParameters,
             CSharpMethodName: method.RawName.CapitalizeFirstLetter(),
-            FullyQualifiedJavaScriptIdentifier: options.PathFromWindow is not null
-                ? $"{options.PathFromWindow}.{method.RawName}"
+            FullyQualifiedJavaScriptIdentifier: options.Implementation is not null
+                ? $"{options.Implementation}.{method.RawName}"
                 : method.RawName,
             ReturnType: returnType,
             BareType: bareType,

@@ -16,8 +16,8 @@ internal readonly record struct PropertyBuilderDetails(
     internal static PropertyBuilderDetails Create(CSharpProperty property, GeneratorOptions options)
     {
         var csharpPropertyName = property.RawName.CapitalizeFirstLetter();
-        var javaScriptIndentifier = options.PathFromWindow is not null
-            ? $"{options.PathFromWindow}.{property.RawName}"
+        var javaScriptIndentifier = options.Implementation is not null
+            ? $"{options.Implementation}.{property.RawName}"
             : property.RawName;
         var (returnType, bareType) = property.GetPropertyTypes(options);
         var (suffix, extendingType) =
@@ -35,11 +35,3 @@ internal readonly record struct PropertyBuilderDetails(
             GenericTypeArgs: genericTypeArgs);
     }
 }
-
-//var (suffix, extendingType) = options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
-//var csharpMethodName = property.RawName.CapitalizeFirstLetter();
-//var javaScriptIndentifier = options.PathFromWindow is not null
-//    ? $"{options.PathFromWindow}.{property.RawName}"
-//    : property.RawName;
-//var (returnType, bareType) = GetMethodTypes(property, options);
-//var genericTypeArgs = $"<{bareType}>";

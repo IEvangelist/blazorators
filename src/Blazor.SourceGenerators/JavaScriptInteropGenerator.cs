@@ -18,10 +18,10 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
 #if DEBUG
-        if (!System.Diagnostics.Debugger.IsAttached)
-        {
-            //System.Diagnostics.Debugger.Launch();
-        }
+        //if (!System.Diagnostics.Debugger.IsAttached)
+        //{
+        //    System.Diagnostics.Debugger.Launch();
+        //}
 #endif
 
         // Register a syntax receiver that will be created for each generation pass
@@ -55,7 +55,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                 continue;
             }
 
-            if (options.PathFromWindow is null)
+            if (options.Implementation is null)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
@@ -136,7 +136,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                         Encoding.UTF8));
 
                 var implementation =
-                    options.PathFromWindow.ToImplementationName();
+                    options.Implementation.ToImplementationName();
 
                 // Source generate the internal implementation
                 context.AddSource(

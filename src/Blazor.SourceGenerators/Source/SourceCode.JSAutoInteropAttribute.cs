@@ -12,7 +12,7 @@ static partial class SourceCode
 /// <code>
 /// [JSAutoInterop(
 ///    TypeName = ""Storage"",
-///    PathFromWindow = ""window.localStorage"",
+///    Implementation = ""window.localStorage"",
 ///    HostingModel = BlazorHostingModel.WebAssembly,
 ///    Url = ""https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage"")]
 /// public static partial LocalStorageExtensions
@@ -36,7 +36,7 @@ public class JSAutoInteropAttribute : Attribute
     /// For example, if the <see cref=""TypeName""/> was <c>""Geolocation""</c>, this would be
     /// <c>""window.navigator.geolocation""</c> (or <c>""navigator.geolocation""</c>).
     /// </summary>
-    public string PathFromWindow { get; set; } = null!;
+    public string Implementation { get; set; } = null!;
 
     /// <summary>
     /// Whether to generate only pure JavaScript functions that do not require callbacks.
