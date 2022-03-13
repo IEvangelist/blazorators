@@ -18,10 +18,10 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
 #if DEBUG
-        //if (!System.Diagnostics.Debugger.IsAttached)
-        //{
-        //    System.Diagnostics.Debugger.Launch();
-        //}
+        if (!System.Diagnostics.Debugger.IsAttached)
+        {
+            //System.Diagnostics.Debugger.Launch();
+        }
 #endif
 
         // Register a syntax receiver that will be created for each generation pass
@@ -115,6 +115,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                         _ => null
                     };
 
+                // Source generate the internal extension methods
                 context.AddSource(
                     typeSymbol.Name.ToGeneratedFileName(),
                     SourceText.From(
@@ -122,6 +123,38 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                             options,
                             classDeclaration.Identifier.ValueText,
                             namespaceString),
+                        Encoding.UTF8));
+
+                // Source generate the public interface
+                context.AddSource(
+                    $"I{options.TypeName}".ToGeneratedFileName(),
+                    SourceText.From(
+                        staticObject.ToInterfaceString(
+                            options,
+                            classDeclaration.Identifier.ValueText,
+                            namespaceString),
+                        Encoding.UTF8));
+
+                var implementation =
+                    options.PathFromWindow.ToImplementationName();
+
+                // Source generate the internal implementation
+                context.AddSource(
+                    $"{implementation}".ToGeneratedFileName(),
+                    SourceText.From(
+                        staticObject.ToImplementationString(
+                            options,
+                            classDeclaration.Identifier.ValueText,
+                            namespaceString),
+                        Encoding.UTF8));
+                
+                // Source generate the service collection DI extension
+                context.AddSource(
+                    $"{implementation}ServiceCollectionExtensions".ToGeneratedFileName(),
+                    SourceText.From(
+                        staticObject.ToServiceCollectionExtensions(
+                            options,
+                            implementation),
                         Encoding.UTF8));
             }
         }

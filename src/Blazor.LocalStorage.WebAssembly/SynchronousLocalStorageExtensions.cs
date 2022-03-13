@@ -15,6 +15,6 @@ namespace Microsoft.JSInterop;
         "getItem",
         "setItem:value"
     })]
-public static partial class SynchronousLocalStorageExtensions
+internal static partial class SynchronousLocalStorageExtensions
 {
 }

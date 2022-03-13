@@ -1,74 +1,41 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.Builders;
+
 namespace Blazor.SourceGenerators.CSharp;
 
 internal sealed partial record CSharpExtensionObject(string RawTypeName)
 {
-    private List<CSharpMethod>? _methods = null!;
-    private List<CSharpProperty>? _properties = null!;
-    private Dictionary<string, CSharpObject>? _dependentTypes = null!;
+    public List<CSharpProperty>? Properties { get; init; } = new();
 
-    public List<CSharpProperty>? Properties
-    {
-        get => _properties ??= new();
-        init => _properties = value;
-    }
+    public List<CSharpMethod>? Methods { get; init; } = new();
 
-    public List<CSharpMethod>? Methods
-    {
-        get => _methods ??= new();
-        init => _methods = value;
-    }
-
-    public Dictionary<string, CSharpObject>? DependentTypes
-    {
-        get => _dependentTypes ??= new(StringComparer.OrdinalIgnoreCase);
-        init => _dependentTypes = value;
-    }
+    public Dictionary<string, CSharpObject>? DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
     public int MemberCount => Properties!.Count + Methods!.Count;
 
     internal string ToStaticPartialClassString(
         GeneratorOptions options,
         string existingClassName,
-        string? namespaceString)
+        string? namespaceString,
+        bool? isPublic = null)
     {
-        StringBuilder builder = new();
+        var builder = new SourceBuilder(options)
+            .AppendCopyRightHeader()
+            .AppendUsingDeclarations()
+            .AppendNamespace(namespaceString ?? "Microsoft.JSInterop")
+            .AppendStaticPartialClassDeclaration(existingClassName, isPublic.GetValueOrDefault() ? "public" : null)
+            .AppendOpeningCurlyBrace()
+            .IncreaseIndentation();
 
-        AppendCopyRightHeader(builder);
-        AppendUsingDeclarations(builder, options);
-        AppendNamespace(builder, namespaceString ?? "Microsoft.JSInterop");
-        AppendClassName(existingClassName, builder);
-
-        Indentation indentation = new(0);
-        AppendOpeningCurlyBrace(builder, indentation);
-        indentation = indentation.Increase();
-        var methodLevel = indentation.Level;
+        var methodLevel = builder.IndentationLevel;
 
         // Add methods.
         foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
         {
-            var isVoid = method.RawReturnTypeName == "void";
-            var isPrimitiveType = TypeMap.PrimitiveTypes.IsPrimitiveType(method.RawReturnTypeName);
-            var javaScriptMethodName = options.PathFromWindow is not null
-                ? $"{options.PathFromWindow}.{method.RawName}"
-                : method.RawName;
-            var csharpMethodName = method.RawName.CapitalizeFirstLetter();
-            var isGenericReturnType = IsGenericReturnType(method, options);
-            var containsAnyGenericParameters =
-                method.ParameterDefinitions.Any(p => IsGenericParameter(method.RawName, p, options));
-            var (suffix, extendingType) = options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
-            var genericTypeArgs = isGenericReturnType
-                ? "<TResult>"
-                : containsAnyGenericParameters
-                    ? "<TArg>"
-                    : "";
-
-            var (returnType, bareType) =
-                GetMethodTypes(isGenericReturnType, isPrimitiveType, isVoid, method, options);
-
-            indentation = indentation.ResetTo(methodLevel);
+            var details = MethodBuilderDetails.Create(method, options);
+            builder.ResetIndentiationTo(methodLevel);
 
             if (method.IsPureJavaScriptInvocation)
             {
@@ -76,372 +43,405 @@ internal sealed partial record CSharpExtensionObject(string RawTypeName)
                 // - access modifiers
                 // - return type
                 // - name
-                AppendTripleSlashComments(builder, method, options, indentation);
+                builder.AppendTripleSlashMethodComments(method)
+                    .AppendRaw($"public static {details.ReturnType} {details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
+                    .AppendRaw($"this {details.ExtendingType} javaScript", appendNewLine: false);
 
-                builder.Append($"{indentation}public static {returnType} {csharpMethodName}{suffix}{genericTypeArgs}(\r\n");
-                indentation = indentation.Increase();
-
-                // Write method parameters
-                builder.Append($"{indentation}this {extendingType} javaScript");
                 if (method.ParameterDefinitions.Count > 0)
                 {
-                    builder.Append(",\r\n");
+                    builder.AppendRaw(",");
                     foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
                     {
-                        var isGenericType = IsGenericParameter(method.RawName, parameter, options);
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
                         if (pi.IsLast)
                         {
-                            if (isGenericReturnType || containsAnyGenericParameters)
+                            if (details.IsSerializable)
                             {
-                                builder.Append($"{indentation}{parameter.ToParameterString(isGenericType)},\r\n");
-                                builder.Append($"{indentation}JsonSerializerOptions? options = null) =>\r\n");
+                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+                                builder.AppendRaw($"JsonSerializerOptions? options = null) =>");
                             }
                             else
                             {
-                                builder.Append($"{indentation}{parameter.ToParameterString(isGenericType)}) =>\r\n");
+                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)}) =>");
                             }
                         }
                         else
                         {
-                            builder.Append($"{indentation}{parameter.ToParameterString(isGenericType)},\r\n");
+                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
                         }
                     }
 
-                    if (isVoid)
+                    if (details.IsVoid)
                     {
-                        builder.Append($"{indentation}javaScript.InvokeVoid{suffix}(\r\n");
+                        builder.AppendRaw($"javaScript.InvokeVoid{details.Suffix}(");
                     }
                     else
                     {
-                        builder.Append($"{indentation}javaScript.Invoke{suffix}<{bareType}>(\r\n");
+                        builder.AppendRaw($"javaScript.Invoke{details.Suffix}<{details.BareType}>(");
                     }
-                    indentation = indentation.Increase();
-                    builder.Append($"{indentation}\"{javaScriptMethodName}\",\r\n");
+
+                    builder.IncreaseIndentation()
+                        .AppendRaw($"\"{details.FullyQualifiedJavaScriptIdentifier}\",");
 
                     // Write method body / expression, and arguments to javaScript.Invoke*
                     foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
                     {
-                        var isGenericType = IsGenericParameter(method.RawName, parameter, options);
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
                         if (ai.IsLast)
                         {
-                            if (isGenericReturnType)
+                            if (details.IsGenericReturnType)
                             {
-                                builder.Append($"{indentation}{parameter.ToArgumentString(isGenericType)})\r\n");
-                                builder.Append($"{indentation}.FromJson{genericTypeArgs}(options);\r\n");
+                                builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)})");
+                                builder.AppendRaw($".FromJson{details.GenericTypeArgs}(options);");
                             }
                             else
                             {
-                                builder.Append($"{indentation}{parameter.ToArgumentString(isGenericType)});\r\n");
+                                builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)});");
                             }
 
-                            if (!index.IsLast) builder.Append("\r\n");
+                            if (!index.IsLast) builder.AppendLine();
                         }
                         else
                         {
-                            builder.Append($"{indentation}{parameter.ToArgumentString(isGenericType)},\r\n");
+                            builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)},");
                         }
                     }
 
-                    indentation = indentation.Decrease();
+                    builder.DecreaseIndentation();
                 }
                 else
                 {
-                    builder.Append(") =>\r\n");
-                    if (isVoid)
+                    builder.AppendRaw(") =>");
+                    if (details.IsVoid)
                     {
-                        builder.Append($"{indentation}javaScript.InvokeVoid{suffix}(\"{javaScriptMethodName}\");\r\n\r\n");
+                        builder.AppendRaw($"javaScript.InvokeVoid{details.Suffix}(\"{details.FullyQualifiedJavaScriptIdentifier}\");");
+                        builder.AppendLine();
                         continue;
                     }
                     else
                     {
-                        builder.Append($"{indentation}javaScript.Invoke{suffix}<{bareType}>(\"{javaScriptMethodName}\");\r\n\r\n");
+                        builder.AppendRaw($"javaScript.Invoke{details.Suffix}<{details.BareType}>(\"{details.FullyQualifiedJavaScriptIdentifier}\");");
+                        builder.AppendLine();
                         continue;
                     }
                 }
             }
             else if (options.OnlyGeneratePureJS is false) // TODO: non-pure JS is not currently supported...
             {
-                // Write the methd signature:
-                // - access modifiers
-                // - return type
-                // - name
-                AppendTripleSlashComments(builder, method, options, indentation);
-                builder.Append($"    public static {returnType} {csharpMethodName}{suffix}<T>(\r\n");
-
-                // Write method parameters
-                builder.Append($"        this {extendingType} javaScript,\r\n");
-                builder.Append($"        T dotNetObj");
-                if (method.ParameterDefinitions.Count > 0)
-                {
-                    builder.Append(",\r\n");
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = IsGenericParameter(method.RawName, parameter, options);
-                        if (pi.IsLast)
-                        {
-                            if (isGenericType)
-                            {
-                                builder.Append($"{indentation}{parameter.ToParameterString(isGenericType)},");
-                                builder.Append($"{indentation}JsonSerializerOptions? options = null) where T : class =>\r\n");
-                            }
-                            else
-                            {
-                                builder.Append($"{indentation}{parameter.ToParameterString(isGenericType)}) where T : class =>\r\n");
-                            }
-                        }
-                        else
-                        {
-                            builder.Append($"{indentation}{parameter.ToParameterString(isGenericType)},\r\n");
-                        }
-                    }
-
-                    if (isVoid)
-                    {
-                        builder.Append($"        javaScript.InvokeVoid{suffix}(\r\n");
-                        builder.Append($"            \"{javaScriptMethodName}\",\r\n");
-                    }
-                    else
-                    {
-                        builder.Append($"        javaScript.Invoke{suffix}<{bareType}>(\r\n");
-                        builder.Append($"            \"{javaScriptMethodName}\",\r\n");
-                    }
-
-                    builder.Append($"            DotNetObjectReference.Create(dotNetObj),\r\n");
-
-                    // Write method body / expression
-                    foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = IsGenericParameter(method.RawName, parameter, options);
-                        if (ai.IsLast)
-                        {
-                            if (isGenericReturnType)
-                            {
-                                builder.Append($"            {parameter.ToArgumentString(isGenericType)})\r\n");
-                                builder.Append($"            .FromJson{genericTypeArgs}(options);\r\n\r\n");
-                            }
-                            else
-                            {
-                                builder.Append($"            {parameter.ToArgumentString(isGenericType)});\r\n\r\n");
-                            }                            
-                        }
-                        else
-                        {
-                            builder.Append($"            {parameter.ToArgumentString(isGenericType)},\r\n");
-                        }
-                    }
-                }
-                else
-                {
-                    builder.Append(") =>\r\n");
-                    if (isVoid)
-                    {
-                        builder.Append($"        javaScript.InvokeVoid{suffix}(\"{javaScriptMethodName}\");\r\n\r\n");
-                        continue;
-                    }
-                    else
-                    {
-                        builder.Append($"        javaScript.Invoke{suffix}<{bareType}>(\"{javaScriptMethodName}\");\r\n\r\n");
-                        continue;
-                    }
-                }
+                // TODO: non-pure JS is not currently supported...
             }
         }
 
         // Add properties.
         foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
         {
-            if (index.IsFirst) builder.Append("\r\n");
+            if (index.IsFirst) builder.AppendLine();
             if (property.IsIndexer) continue;
 
-            indentation = indentation.ResetTo(methodLevel);
+            builder.ResetIndentiationTo(methodLevel);
 
-            var (suffix, extendingType) = options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
-            var csharpMethodName = property.RawName.CapitalizeFirstLetter();
-            var javaScriptIndentifier = options.PathFromWindow is not null
-                ? $"{options.PathFromWindow}.{property.RawName}"
-                : property.RawName;
-            var (returnType, bareType) = GetMethodTypes(property, options);
-            var genericTypeArgs = $"<{bareType}>";
+            var details = PropertyBuilderDetails.Create(property, options);
 
-            AppendTripleSlashComments(builder, property, options, indentation);
+            builder.AppendTripleSlashPropertyComments(details.Property)
+                .AppendRaw($"public static {details.ReturnType} {details.CSharpPropertyName}(", postIncreaseIndentation: true)
+                .AppendRaw($"this {details.ExtendingType} javaScript) =>", postIncreaseIndentation: true)
+                .AppendRaw($"javaScript.Invoke{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
+                .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");
 
-            builder.Append($"{indentation}public static {returnType} {csharpMethodName}{suffix}(\r\n");
-            indentation = indentation.Increase();
-
-            builder.Append($"{indentation}this {extendingType} javaScript) =>\r\n");
-            indentation = indentation.Increase();
-
-            builder.Append($"{indentation}javaScript.Invoke{suffix}{genericTypeArgs}(\r\n");
-            indentation = indentation.Increase();
-
-            builder.Append($"{indentation}\"eval\", \"{javaScriptIndentifier}\");\r\n");
             if (!index.IsLast)
             {
-                builder.Append("\r\n");
+                builder.AppendLine();
             }
         }
 
-        AppendClosingCurlyBrace(builder, indentation.Reset());
+        builder.ResetIndentiationTo(0);
+        builder.AppendClosingCurlyBrace();
 
-        var staticPartialClassDefinition = builder.ToString();
+        var staticPartialClassDefinition = TryFormatCSharpSourceText(builder.ToSourceCodeString());
         return staticPartialClassDefinition;
     }
 
-    static void AppendCopyRightHeader(StringBuilder builder)
+    internal string ToInterfaceString(
+        GeneratorOptions options,
+        string existingClassName,
+        string? namespaceString)
     {
-        builder.Append("// Copyright (c) David Pine. All rights reserved.\r\n");
-        builder.Append("// Licensed under the MIT License:\r\n");
-        builder.Append("// https://github.com/IEvangelist/blazorators/blob/main/LICENSE\r\n");
-        builder.Append("// Auto-generated by blazorators.\r\n\r\n");
-    }
+        var builder = new SourceBuilder(options)
+            .AppendCopyRightHeader()
+            .AppendUsingDeclarations()
+            .AppendNamespace(namespaceString ?? "Microsoft.JSInterop")
+            .AppendPublicInterfaceDeclaration()
+            .AppendOpeningCurlyBrace()
+            .IncreaseIndentation();
 
-    static void AppendUsingDeclarations(StringBuilder builder, GeneratorOptions options)
-    {
-        if (!options.IsWebAssembly)
+        var methodLevel = builder.IndentationLevel;
+
+        // Methods
+        foreach (var method in Methods ?? new List<CSharpMethod>())
         {
-            builder.Append("using System.Threading.Tasks;\r\n\r\n");
-        }
+            var details = MethodBuilderDetails.Create(method, options);
+            builder.ResetIndentiationTo(methodLevel);
 
-        if (options.SupportsGenerics)
-        {
-            builder.Append("using Blazor.Serialization.Extensions;\r\n");
-            builder.Append("using System.Text.Json;\r\n\r\n");
-        }
-    }
-
-    static void AppendNamespace(StringBuilder builder, string namespaceString)
-    {
-        builder.Append("#nullable enable\r\n");
-        builder.Append($"namespace {namespaceString};\r\n\r\n");
-    }
-
-    static void AppendClassName(string existingClassName, StringBuilder builder)
-    {
-        var typeName = existingClassName;
-        builder.Append($"public static partial class {typeName}\r\n");
-    }
-
-    static void AppendOpeningCurlyBrace(StringBuilder builder, Indentation indentation)
-    {
-        builder.Append($"{indentation}{{\r\n");
-    }
-
-    static void AppendClosingCurlyBrace(StringBuilder builder, Indentation indentation)
-    {
-        builder.Append($"{indentation}}}\r\n");
-    }
-
-    static bool IsGenericReturnType(CSharpMethod method, GeneratorOptions options) =>
-        options.GenericMethodDescriptors
-            ?.Any(descriptor =>
+            if (method.IsPureJavaScriptInvocation)
             {
-                // If the descriptor describes a parameter, it's not a generic return.
-                // TODO: consider APIs that might do this.
-                if (descriptor.Contains(":"))
+                builder.AppendTripleSlashMethodComments(details.Method)
+                    .AppendRaw(
+                        $"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(",
+                        appendNewLine: false,
+                        postIncreaseIndentation: true);
+
+                if (method.ParameterDefinitions.Count > 0)
                 {
-                    return false;
+                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+                    {
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                        if (pi.IsLast)
+                        {
+                            if (details.IsSerializable)
+                            {
+                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},")
+                                    .AppendRaw($"JsonSerializerOptions? options = null);")
+                                    .AppendLine();
+                            }
+                            else
+                            {
+                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)});")
+                                    .AppendLine();
+                            }
+                        }
+                        else
+                        {
+                            if (pi.IsFirst)
+                            {
+                                builder.AppendLine();
+                            }
+
+                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+                        }
+                    }
+
+                    builder.DecreaseIndentation();
                 }
-
-                // If the descriptor is the method name
-                return descriptor == method.RawName;
-            })
-            ?? false;
-
-    static bool IsGenericParameter(string methodName, CSharpType parameter, GeneratorOptions options) =>
-        options.GenericMethodDescriptors
-            ?.Any(descriptor =>
+                else
+                {
+                    builder.AppendRaw(");", appendNewLine: true, omitIndentation: true);
+                }
+            }
+            else if (options.OnlyGeneratePureJS is false) // TODO: non-pure JS is not currently supported...
             {
-                if (!descriptor.StartsWith(methodName))
+                // TODO: non-pure JS is not currently supported...
+            }
+        }
+
+        // Properties
+        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
+        {
+            if (index.IsFirst) builder.AppendLine();
+            if (property.IsIndexer) continue;
+
+            builder.ResetIndentiationTo(methodLevel);
+
+            var details = PropertyBuilderDetails.Create(property, options);
+
+            var accessors = details.Property.IsReadonly
+                ? "{ get; }" : "{ get; set; }";
+            builder.AppendTripleSlashPropertyComments(details.Property)
+                .AppendRaw($"{details.ReturnType} {details.CSharpPropertyName} {accessors}");
+
+            if (!index.IsLast)
+            {
+                builder.AppendLine();
+            }
+        }
+
+        builder.ResetIndentiationTo(0);
+        builder.AppendClosingCurlyBrace();
+
+        var interfaceDeclaration = TryFormatCSharpSourceText(builder.ToSourceCodeString());
+        return interfaceDeclaration;
+    }
+
+    internal string ToImplementationString(
+        GeneratorOptions options,
+        string existingClassName,
+        string? namespaceString)
+    {
+        var builder = new SourceBuilder(options)
+            .AppendCopyRightHeader()
+            .AppendUsingDeclarations()
+            .AppendNamespace(namespaceString ?? "Microsoft.JSInterop")
+            .AppendInternalImplementationDeclaration()
+            .AppendOpeningCurlyBrace()
+            .IncreaseIndentation()
+            .AppendImplementationCtor();
+
+        var methodLevel = builder.IndentationLevel;
+
+        // Methods
+        foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
+        {
+            var details = MethodBuilderDetails.Create(method, options);
+            builder.ResetIndentiationTo(methodLevel);
+
+            if (method.IsPureJavaScriptInvocation)
+            {
+                builder.AppendEmptyTripleSlashInheritdocComments()
+                    .AppendRaw(
+                        $"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(",
+                        appendNewLine: false,
+                        postIncreaseIndentation: true);
+
+                if (method.ParameterDefinitions.Count > 0)
                 {
-                    return false;
-                }
+                    var genericTypeParameterConstraint = details.IsGenericReturnType
+                        ? $" where {MethodBuilderDetails.GenericReturnType} : default"
+                        : "";
 
-                if (descriptor.Contains(":"))
+                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+                    {
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                        if (pi.IsLast)
+                        {
+                            if (details.IsSerializable)
+                            {
+                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+                                builder.AppendRaw($"JsonSerializerOptions? options){genericTypeParameterConstraint} =>");
+                            }
+                            else
+                            {
+                                builder.AppendRaw($"{parameter.ToParameterString(false)}) =>");
+                            }
+                        }
+                        else
+                        {
+                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+                        }
+                    }
+
+                    if (details.IsVoid)
+                    {
+                        builder.AppendRaw(
+                            $"_javaScript.{details.CSharpMethodName}{details.Suffix}(",
+                            postIncreaseIndentation: true);
+                    }
+                    else
+                    {
+                        builder.AppendRaw(
+                            $"_javaScript.{details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(",
+                            postIncreaseIndentation: true);
+                    }
+
+                    foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
+                    {
+                        if (ai.IsLast)
+                        {
+                            if (details.IsSerializable)
+                            {
+                                builder.AppendRaw($"{parameter.ToArgumentString(false)},");
+                                builder.AppendRaw($"options);");
+                            }
+                            else
+                            {
+                                builder.AppendRaw($"{parameter.ToArgumentString(false)});");
+                            }
+                            
+                            if (!index.IsLast)
+                            {
+                                builder.AppendLine();
+                            }
+                        }
+                        else
+                        {
+                            builder.AppendRaw($"{parameter.ToArgumentString(false)},");
+                        }
+                    }
+                }
+                else
                 {
-                    var nameParamPair = descriptor.Split(':');
-                    return nameParamPair[1].StartsWith(parameter.RawName);
+                    builder.AppendRaw($") => _javaScript.{details.CSharpMethodName}{details.Suffix}();");
                 }
-
-                return false;
-            })
-            ?? false;
-
-    static void AppendTripleSlashComments(
-        StringBuilder builder, CSharpMethod method, GeneratorOptions options, Indentation indentation)
-    {
-        var indent = indentation.ToString();
-        builder.Append($"{indent}/// <summary>\r\n");
-
-        var jsMethodName = method.RawName.LowerCaseFirstLetter();
-        var func = $"{options.PathFromWindow}.{jsMethodName}";
-
-        builder.Append($"{indent}/// Source generated extension method implementation of <c>{func}</c>.\r\n");
-        var rootUrl = "https://developer.mozilla.org/docs/Web/API";
-        var fullUrl = $"{rootUrl}/{options.TypeName}/{method.RawName.LowerCaseFirstLetter()}";
-        builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>\r\n");
-        builder.Append($"{indent}/// </summary>\r\n");
-    }
-
-    static void AppendTripleSlashComments(
-        StringBuilder builder, CSharpProperty property, GeneratorOptions options, Indentation indentation)
-    {
-        var indent = indentation.ToString();
-        builder.Append($"{indent}/// <summary>\r\n");
-
-        var jsMethodName = property.RawName.LowerCaseFirstLetter();
-        var func = $"{options.PathFromWindow}.{jsMethodName}";
-
-        builder.Append($"{indent}/// Source generated extension method implementation of <c>{func}</c>.\r\n");
-        var rootUrl = "https://developer.mozilla.org/docs/Web/API";
-        var fullUrl = $"{rootUrl}/{options.TypeName}/{property.RawName.LowerCaseFirstLetter()}";
-        builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>\r\n");
-        builder.Append($"{indent}/// </summary>\r\n");
-    }
-
-    static (string ReturnType, string BareType) GetMethodTypes(
-        bool isGenericReturnType, bool isPrimitiveType, bool isVoid, CSharpMethod method, GeneratorOptions options)
-    {
-        var primitiveType = isPrimitiveType
-            ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
-            : method.RawReturnTypeName;
-
-        if (!isVoid && isGenericReturnType)
-        {
-            var nullable =
-                method.IsReturnTypeNullable ? "?" : "";
-
-            return options.IsWebAssembly
-                ? ($"TResult{nullable}", primitiveType)
-                : ($"ValueTask<TResult{nullable}>", primitiveType);
+            }
+            else if (options.OnlyGeneratePureJS is false) // TODO: non-pure JS is not currently supported...
+            {
+                // TODO: non-pure JS is not currently supported...
+            }
         }
 
-        if (options.IsWebAssembly)
+        // Properties
+        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
         {
-            var returnType = isPrimitiveType
-                ? primitiveType
-                    : isVoid
-                        ? "void"
-                        : method.RawReturnTypeName;
+            if (index.IsFirst) builder.AppendLine();
+            if (property.IsIndexer) continue;
 
-            return (returnType, primitiveType);
-        }
-        else
-        {
-            var returnType = isPrimitiveType
-                ? $"ValueTask<{primitiveType}>"
-                    : isVoid
-                        ? "ValueTask"
-                        : method.RawReturnTypeName;
+            builder.ResetIndentiationTo(methodLevel);
 
-            return (returnType, primitiveType);
+            var details = PropertyBuilderDetails.Create(property, options);
+
+            var expression = details.Property.IsReadonly
+                ? $"_javaScript.{details.CSharpPropertyName}();"
+                : "throw new System.NotImplementedException();";
+
+            builder.AppendEmptyTripleSlashInheritdocComments()
+                .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} => {expression}");
+
+            if (!index.IsLast)
+            {
+                builder.AppendLine();
+            }
         }
+
+        builder.ResetIndentiationTo(0);
+        builder.AppendClosingCurlyBrace();
+
+        var implementation = TryFormatCSharpSourceText(builder.ToSourceCodeString());
+        return implementation;
     }
 
-    static (string ReturnType, string BareType) GetMethodTypes(
-        CSharpProperty property, GeneratorOptions options)
+    internal string ToServiceCollectionExtensions(
+        GeneratorOptions options,
+        string implementation)
     {
-        return (
-            ReturnType: options.IsWebAssembly ? property.MappedTypeName : $"ValueTask<{property.MappedTypeName}>",
-            BareType: property.MappedTypeName);
+        var typeName = $"I{options.TypeName}";
+        var extensions = $@"// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License:
+// https://github.com/IEvangelist/blazorators/blob/main/LICENSE
+// Auto-generated by blazorators.
+
+using Microsoft.JSInterop;
+
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary></summary>
+public static class {implementation}ServiceCollectionExtensions
+{{
+    /// <summary>
+    /// Adds the <see cref=""{typeName}"" /> service to the service collection.
+    /// </summary>
+    public static IServiceCollection Add{implementation}Services(
+        this IServiceCollection services) =>
+        services.AddSingleton<IJSInProcessRuntime>(serviceProvider =>
+            (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
+            .AddSingleton<{typeName}, {implementation}>();
+}}
+";
+
+        return extensions;
+    }
+
+    static string TryFormatCSharpSourceText(string csharpSourceText)
+    {
+        try
+        {
+            return CSharpSyntaxTree.ParseText(csharpSourceText)
+                .GetRoot()
+                .NormalizeWhitespace()
+                .ToFullString();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+
+            return csharpSourceText;
+        }
     }
 }

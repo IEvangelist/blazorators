@@ -12,6 +12,6 @@ namespace Microsoft.JSInterop;
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
-public static partial class AsynchronousLocalStorageExtensions
+internal static partial class AsynchronousLocalStorageExtensions
 {
 }

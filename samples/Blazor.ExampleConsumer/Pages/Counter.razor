@@ -1,5 +1,5 @@
 ﻿@page "/counter"
-@inject IJSInProcessRuntime JavaScript
+@inject IStorage LocalStorage
 @inject NavigationManager Nav
 @implements IDisposable
 
@@ -19,7 +19,7 @@
     private bool _isDisabled = true;
 
     private void IncrementCount() => 
-        JavaScript.SetItem<int>("CounterValue", ++_currentCount);
+        LocalStorage.SetItem<int>("CounterValue", ++_currentCount);
 
     protected override void OnInitialized()
     {
@@ -27,8 +27,8 @@
 
         Nav.LocationChanged += OnLocationChanged;
 
-        _isDisabled = JavaScript.GetItem<bool>("Disabled");
-        _currentCount = JavaScript.GetItem<int>("CounterValue");
+        _isDisabled = LocalStorage.GetItem<bool>("Disabled");
+        _currentCount = LocalStorage.GetItem<int>("CounterValue");
     }
 
     public void Dispose()
@@ -37,5 +37,5 @@
     }
 
     void OnLocationChanged(object? sender, LocationChangedEventArgs args) =>
-        JavaScript.SetItem<bool>("Disabled", _isDisabled);
+        LocalStorage.SetItem<bool>("Disabled", _isDisabled);
 }

@@ -38,14 +38,14 @@ internal record CSharpType(
             : $"{typeName} {parameterName}";
     }
 
-    public string ToArgumentString(bool isGenericType = false)
+    public string ToArgumentString(bool toJson = false)
     {
         var isCallback = ActionDeclation is not null;
         var parameterName = isCallback
             ? $"on{RawName.CapitalizeFirstLetter()}MethodName"
             : RawName.LowerCaseFirstLetter();
 
-        return isGenericType
+        return toJson
             ? $"{parameterName}.ToJson(options)"
             : parameterName;
     }

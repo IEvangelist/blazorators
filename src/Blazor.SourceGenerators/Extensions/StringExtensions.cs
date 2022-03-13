@@ -12,4 +12,10 @@ static class StringExtensions
         $"{char.ToLower(name[0])}{name.Substring(1, name.Length - 1)}";
 
     internal static string ToGeneratedFileName(this string name) => $"{name}.g.cs";
+
+    internal static string ToImplementationName(this string pathFromWindow) =>
+        (pathFromWindow.Contains(".")
+            ? pathFromWindow.Substring(pathFromWindow.LastIndexOf(".") + 1)
+            : pathFromWindow)
+        .CapitalizeFirstLetter();
 }

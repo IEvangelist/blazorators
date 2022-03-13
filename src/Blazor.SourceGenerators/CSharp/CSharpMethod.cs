@@ -14,4 +14,6 @@ internal record CSharpMethod(
 
     public bool IsReturnTypeNullable =>
         RawReturnTypeName.Contains("null");
+
+    public bool IsVoid => RawReturnTypeName == "void";
 }
