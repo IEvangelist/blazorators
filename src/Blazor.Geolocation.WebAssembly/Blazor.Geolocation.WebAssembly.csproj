@@ -19,7 +19,7 @@
         <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
         <AssemblyName>Blazor.Geolocation.WebAssembly</AssemblyName>
         <Title>A C# source-generated Razor class library implementation of the native browser's geolocation API available as a DI-ready service.</Title>
-        <PackageId>Blazor.LocalStorage.WebAssembly</PackageId>
+        <PackageId>Blazor.Geolocation.WebAssembly</PackageId>
         <PackageTags>dotnet;dotnetcore;csharp;blazor;webassembly;wasm;generators;sourcegen;roslyn;</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
         <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
