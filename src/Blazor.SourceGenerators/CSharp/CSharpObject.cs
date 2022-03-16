@@ -8,13 +8,34 @@ namespace Blazor.SourceGenerators.CSharp;
 /// </summary>
 internal record CSharpObject(
     string TypeName,
-    string? ExtendsTypeName)
+    string? ExtendsTypeName) : ICSharpDependencyGraphObject
 {
     /// <summary>
     /// The collection of types that this object depends on.
     /// </summary>
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
         new(StringComparer.OrdinalIgnoreCase);
+
+    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
+    {
+        get
+        {
+            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
+            foreach (var prop
+                in this.GetAllDependencies()
+                    .Concat(Properties.SelectMany(
+                        p => p.Value.AllDependentTypes))
+                    .Concat(Methods.SelectMany(
+                        p => p.Value.AllDependentTypes)))
+            {
+                result[prop.TypeName] = prop.Object;
+            }
+
+            return result.Select(kvp => (kvp.Key, kvp.Value))
+                .Concat(new[] { (TypeName, Object: this) })
+                .ToImmutableHashSet();
+        }
+    }
 
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
@@ -35,54 +56,28 @@ internal record CSharpObject(
 
     internal string ToClassString()
     {
-        if (IsActionParameter) return "";
+        StringBuilder builder = new("#nullable enable\r\n");
 
-        StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
-
-        builder.Append("{\r\n");
-
-        var memberCount = Properties.Count;
-        builder.Append($"    public class {TypeName} : {ExtendsTypeName}\r\n");
-        builder.Append("    {\r\n");
-
-        foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
-        {
-            var (memberName, member) = (kvp.Key, kvp.Value);
-            var nullableExpression = member.IsNullable ? "?" : "";
-
-            builder.Append(
-                $"        public {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}\r\n");
-        }
-
-        builder.Append("    }\r\n");
-        builder.Append("}\r\n");
-        return builder.ToString();
-    }
-
-    internal string ToRecordString()
-    {
-        StringBuilder builder = new("namespace Microsoft.JSInterop\r\n");
-
-        builder.Append("{\r\n");
-        builder.Append($"    public record {TypeName}(\r\n");
+        builder.Append("namespace Microsoft.JSInterop;\r\n\r\n");
+        builder.Append($"public class {TypeName}\r\n{{\r\n");
 
         var memberCount = Properties.Count;
         foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
         {
             var (memberName, member) = (kvp.Key, kvp.Value);
-            var statementTerminator = index + 1 < memberCount ? "," : "";
-            var nullableExpression = member.IsNullable ? "?" : "";
+            var typeName = member.MappedTypeName;
+            var nullableExpression = member.IsNullable && !typeName.EndsWith("?") ? "?" : "";
+            var trivia = member.IsArray ? "[]" : "";
+            var statementTerminator = member.IsNullable ? " = default!;" : "";
+
             builder.Append(
-                $"        {member.MappedTypeName}{nullableExpression} {memberName.CapitalizeFirstLetter()}{statementTerminator}\r\n");
+                $"    public {typeName}{trivia}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}{statementTerminator}\r\n");
         }
 
-        builder.Append("    );\r\n");
         builder.Append("}\r\n");
-        return builder.ToString();
+        var result = builder.ToString();
+        return result;
     }
 
-    public override string ToString()
-    {
-        return ExtendsTypeName is null ? ToRecordString() : ToClassString();
-    }
+    public override string ToString() => ToClassString();
 }

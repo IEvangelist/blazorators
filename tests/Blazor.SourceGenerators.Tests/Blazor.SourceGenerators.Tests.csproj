@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
     <ProjectReference Include="..\..\src\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" />
   </ItemGroup>
 

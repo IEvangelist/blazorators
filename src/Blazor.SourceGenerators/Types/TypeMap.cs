@@ -18,11 +18,13 @@ internal static class TypeMap
                 ["boolean"] = "bool",
                 ["enum"] = "enum",
                 ["Date"] = "DateTime",
+                ["DOMTimeStamp"] = "DateTime",
                 ["number | null"] = "double?",
                 ["string | null"] = "string?",
                 ["boolean | null"] = "bool?",
                 ["enum | null"] = "enum?",
-                ["Date | null"] = "DateTime?"
+                ["Date | null"] = "DateTime?",
+                ["DOMTimeStamp | null"] = "DateTime?",
                 //["Array"] = "[]"
             };
 

@@ -34,6 +34,7 @@ jobs:
         dotnet restore ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
         dotnet restore ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj
         dotnet restore ./src/Blazor.Serialization/Blazor.Serialization.csproj
+        dotnet restore ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj
       
     - name: Build
       run: |
@@ -41,6 +42,7 @@ jobs:
         dotnet build ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Serialization/Blazor.Serialization.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --configuration Release --no-restore
 
     - name: Test
       run: dotnet test
@@ -51,7 +53,8 @@ jobs:
         dotnet pack ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
         dotnet pack ./src/Blazor.Serialization/Blazor.Serialization.csproj --output packages
-      
+        dotnet pack ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --output packages
+
     - name: Publish package
       run: |
         nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -NoSymbols -NonInteractive -ApiKey ${{secrets.NUGET_API_KEY}}
@@ -78,4 +81,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Blazor.Serialization.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload geolocation WebAssembly package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.Geolocation.WebAssembly.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/

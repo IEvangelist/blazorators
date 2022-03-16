@@ -1,17 +1,33 @@
 ﻿@page "/fetchdata"
 
 @using Microsoft.JSInterop
+@using System.Text.Json
 
-@inject IJSInProcessRuntime JavaScript
+@inject IGeolocation Geolocation
 @inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
 
 <h1>Weather forecast</h1>
-
+@if (_position is { Coords: { } })
+{
+    <pre class="bg-dark text-light p-4 pb-0"> 
+        <code>
+            @_position.ToJson(_opts);
+        </code>
+    </pre>
+}
+else if (_positionError is not null)
+{
+    <pre class="bg-danger text-light p-4 pb-0">
+        <code>
+            @_positionError.ToJson(_opts);
+        </code>
+    </pre>
+}
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (_forecasts is null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,7 +43,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var forecast in _forecasts)
             {
                 <tr>
                     <td>@forecast.Date.ToShortDateString()</td>
@@ -41,20 +57,49 @@ else
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private WeatherForecast[]? _forecasts;
+    private JsonSerializerOptions _opts = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    private readonly PositionOptions _options =
+        new PositionOptions()
+        {
+            EnableHighAccuracy = true,
+            MaximumAge = 0 ,
+            Timeout = 5_000
+        };
+
+    private GeolocationPosition? _position;
+    private GeolocationPositionError? _positionError;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-        //await JavaScript.GetCurrentPositionAsync(
-        //    this,
-        //    nameof(OnPositionRecievedAsync));
+        _forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+
+        Geolocation.GetCurrentPosition(
+            this,
+            nameof(OnPositionRecievedAsync),
+            nameof(OnPositionErrorAsync));
     }
 
     [JSInvokable]
-    public Task OnPositionRecievedAsync() =>
+    public Task OnPositionRecievedAsync(GeolocationPosition position) =>
         InvokeAsync(() =>
         {
+            _position = position;
+
+            StateHasChanged();
+        });
+
+    [JSInvokable]
+    public Task OnPositionErrorAsync(GeolocationPositionError positionError) =>
+        InvokeAsync(() =>
+        {
+            _positionError = positionError;
+
             StateHasChanged();
         });
 

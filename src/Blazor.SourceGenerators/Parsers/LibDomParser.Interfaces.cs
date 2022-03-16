@@ -87,6 +87,21 @@ internal sealed partial class LibDomParser
                 CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
                 cSharpObject.Properties[cSharpProperty.RawName] = cSharpProperty;
 
+                var mappedType = cSharpProperty.MappedTypeName;
+
+                // When a property defines a custom type, that type needs to also be parsed
+                // and source generated. This is so that dependent types are known and resolved.
+                if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
+                    _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
+                    typeScriptDefinitionText is not null)
+                {
+                    var obj = ToObject(typeScriptDefinitionText);
+                    if (obj is not null)
+                    {
+                        cSharpObject.DependentTypes![obj.TypeName] = obj;
+                    }
+                }
+
                 continue;
             }
         }
@@ -175,6 +190,21 @@ internal sealed partial class LibDomParser
                 CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
                 extensionObject.Properties!.Add(cSharpProperty);
 
+                var mappedType = cSharpProperty.MappedTypeName;
+
+                // When a property defines a custom type, that type needs to also be parsed
+                // and source generated. This is so that dependent types are known and resolved.
+                if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
+                    _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
+                    typeScriptDefinitionText is not null)
+                {
+                    var obj = ToObject(typeScriptDefinitionText);
+                    if (obj is not null)
+                    {
+                        extensionObject.DependentTypes![obj.TypeName] = obj;
+                    }
+                }
+
                 continue;
             }
         }
@@ -254,16 +284,6 @@ internal sealed partial class LibDomParser
         // 1) ": void;"
         // 2) ": string | null;"
         return returnType.Replace(":", "").Replace(";", "").Trim();
-
-        //var isNullable = false;
-        //if (returnType.Contains(" | null"))
-        //{
-        //    isNullable = true;
-        //    returnType = returnType.Replace(" | null", "");
-        //}
-
-        //var cleansedType = returnType.Replace(":", "").Replace(";", "").Trim();
-        //return $"{cleansedType}{(isNullable ? "?" : "")}";
     }
 
     internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
@@ -281,8 +301,8 @@ internal sealed partial class LibDomParser
         JavaScriptMethod? javaScriptMethod = new(rawName);
         foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
         {
-            var parameterName = parameterPair[0].Replace("?", "").Trim();
             var isNullable = parameterPair[0].EndsWith("?");
+            var parameterName = parameterPair[0].Replace("?", "").Trim();
             var parameterType = isNullable
                 ? parameterPair[1].Trim().Replace(" | null", "")
                 : parameterPair[1].Trim();

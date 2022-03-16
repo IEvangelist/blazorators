@@ -13,5 +13,6 @@ builder.Services.AddScoped(
     });
 
 builder.Services.AddLocalStorageServices();
+builder.Services.AddGeolocationServices();
 
 await builder.Build().RunAsync();

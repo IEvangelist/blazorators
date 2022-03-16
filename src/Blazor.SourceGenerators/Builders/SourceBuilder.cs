@@ -128,6 +128,7 @@ internal sealed class SourceBuilder
 
     internal SourceBuilder AppendTripleSlashMethodComments(
         CSharpMethod method,
+        bool extrapolateParameters = false,
         IndentationAdjustment adjustment = IndentationAdjustment.Noop)
     {
         AdjustIndentation(adjustment);
@@ -143,6 +144,33 @@ internal sealed class SourceBuilder
         var fullUrl = $"{rootUrl}/{_options.TypeName}/{jsMethodName}";
         _builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>{_newLine}");
         _builder.Append($"{indent}/// </summary>{_newLine}");
+
+        if (extrapolateParameters)
+        {
+            foreach (var (index, param) in method.ParameterDefinitions.Select())
+            {
+                if (index.IsFirst)
+                {
+                    _builder.Append(
+                        $"/// <param name=\"component\">The calling Razor (or Blazor) component.</param>{_newLine}");
+                }
+
+                if (param.ActionDeclation is not null)
+                {
+                    var dependentTypes = param.ActionDeclation.DependentTypes.Keys;
+                    var action =
+                        $"Expects the name of a <c>\"JSInvokableAttribute\"</c> C# method with the following " +
+                        $"<c>System.Action{{{string.Join(", ", dependentTypes)}}}\"</c>.";
+                    _builder.Append(
+                        $"/// <param name=\"{param.RawName}\">{action}</param>{_newLine}");
+                }
+                else
+                {
+                    _builder.Append(
+                        $"/// <param name=\"{param.RawName}\">The <c>{param.RawTypeName}</c> value.</param>{_newLine}");
+                }
+            }
+        }
 
         return this;
     }

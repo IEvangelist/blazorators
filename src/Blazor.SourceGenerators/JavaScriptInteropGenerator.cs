@@ -18,10 +18,10 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
 #if DEBUG
-        //if (!System.Diagnostics.Debugger.IsAttached)
-        //{
-        //    System.Diagnostics.Debugger.Launch();
-        //}
+        if (!System.Diagnostics.Debugger.IsAttached)
+        {
+            //System.Diagnostics.Debugger.Launch();
+        }
 #endif
 
         // Register a syntax receiver that will be created for each generation pass
@@ -95,16 +95,13 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                 result.Value is not null)
             {
                 var staticObject = result.Value;
-                if (staticObject.DependentTypes?.Any() ?? false)
+                foreach (var (type, dependentObj) in
+                    staticObject.AllDependentTypes.Where(
+                        t => !t.Object.IsActionParameter))
                 {
-                    foreach (var dependentObj in
-                        staticObject.DependentTypes.Where(
-                            t => !t.Value.IsActionParameter))
-                    {
-                        context.AddSource(dependentObj.Key.ToGeneratedFileName(),
-                            SourceText.From(dependentObj.Value.ToString(),
-                            Encoding.UTF8));
-                    }
+                    context.AddSource(type.ToGeneratedFileName(),
+                        SourceText.From(dependentObj.ToString(),
+                        Encoding.UTF8));
                 }
 
                 var namespaceString =
@@ -131,7 +128,6 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                     SourceText.From(
                         staticObject.ToInterfaceString(
                             options,
-                            classDeclaration.Identifier.ValueText,
                             namespaceString),
                         Encoding.UTF8));
 
@@ -144,7 +140,6 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                     SourceText.From(
                         staticObject.ToImplementationString(
                             options,
-                            classDeclaration.Identifier.ValueText,
                             namespaceString),
                         Encoding.UTF8));
                 

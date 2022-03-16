@@ -58,7 +58,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
-        <PackageReference Include="Microsoft.JSInterop" Version="6.0.2" />
+        <PackageReference Include="Microsoft.JSInterop" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

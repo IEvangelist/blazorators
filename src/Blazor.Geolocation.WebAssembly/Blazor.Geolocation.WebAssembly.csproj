@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>true</ImplicitUsings>
-        <Description>Source generated JavaScript interop for the browser's localStorage API compatible with Blazor Server.</Description>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Description>Source generated JavaScript interop for the browser's geolocation API compatible with Blazor WebAssembly.</Description>
         <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
         <NeutralLanguage>en-US</NeutralLanguage>
         <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
@@ -16,11 +16,11 @@
         <Version Condition=" '$(VersionSuffix)' != '' ">$(ClientVersion)-$(VersionSuffix)</Version>
         <FileVersion>$(ClientVersion)</FileVersion>
         <Authors>David Pine</Authors>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <AssemblyName>Blazor.LocalStorage.Server</AssemblyName>
-        <Title>A C# source-generated class library implementation of the native browser's localStorage API available as IJSRuntime extension methods.</Title>
-        <PackageId>Blazor.LocalStorage.Server</PackageId>
-        <PackageTags>dotnet;dotnetcore;csharp;blazor;generators;sourcegen;roslyn;</PackageTags>
+        <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+        <AssemblyName>Blazor.Geolocation.WebAssembly</AssemblyName>
+        <Title>A C# source-generated Razor class library implementation of the native browser's geolocation API available as a DI-ready service.</Title>
+        <PackageId>Blazor.LocalStorage.WebAssembly</PackageId>
+        <PackageTags>dotnet;dotnetcore;csharp;blazor;webassembly;wasm;generators;sourcegen;roslyn;</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
         <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
         <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
@@ -33,8 +33,8 @@
         <DebugType>embedded</DebugType>
         <IncludeSymbols>false</IncludeSymbols>
         <IncludeSource>false</IncludeSource>
-        <RootNamespace>Blazor.LocalStorage.Server</RootNamespace>
-        <NoWarn>NU5125;NU5039</NoWarn>
+        <RootNamespace>Blazor.Geolocation.WebAssembly</RootNamespace>
+        <NoWarn>NU5125;NU5039;</NoWarn>
         <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
         <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -48,6 +48,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <SupportedPlatform Include="browser" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -56,16 +60,11 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
-        <PackageReference Include="Microsoft.JSInterop" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" 
-                          OutputItemType="Analyzer" 
-                          SetTargetFramework="TargetFramework=netstandard2.0" 
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup Label="Files">

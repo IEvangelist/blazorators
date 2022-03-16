@@ -15,7 +15,7 @@ internal readonly record struct MethodBuilderDetails(
     string BareType,
     string Suffix,
     string ExtendingType,
-    string GenericTypeArgs)
+    string? GenericTypeArgs)
 {
     /// <summary>
     /// A value representing the generic return type, <c>"TResult"</c>.
@@ -26,6 +26,11 @@ internal readonly record struct MethodBuilderDetails(
     /// A value representing the generic return type, <c>"TArg"</c>.
     /// </summary>
     internal const string GenericArgumentType = "TArg";
+
+    /// <summary>
+    /// A value representing the generic component type, <c>"TComponent"</c>.
+    /// </summary>
+    internal const string GenericComponentType = "TComponent";
 
     internal static readonly Func<string, string> ToGenericTypeArgument =
         string (string value) => $"<{value}>";
@@ -39,8 +44,13 @@ internal readonly record struct MethodBuilderDetails(
         var containsGenericParameters =
             method.ParameterDefinitions.Any(p => p.IsGenericParameter(method.RawName, options));
         var genericTypeArgs = isGenericReturnType
-                ? ToGenericTypeArgument(GenericReturnType)
-                : containsGenericParameters ? ToGenericTypeArgument(GenericArgumentType) : "";
+            ? ToGenericTypeArgument(GenericReturnType)
+            : containsGenericParameters ? ToGenericTypeArgument(GenericArgumentType) : null;
+        var fullyQualifiedJavaScriptIdentifier = method.JavaScriptMethodDependency?.InvokableMethodName;
+        fullyQualifiedJavaScriptIdentifier ??=
+            options.Implementation is not null
+                ? $"{options.Implementation}.{method.RawName}"
+                : method.RawName;
         var (suffix, extendingType) = options.IsWebAssembly
             ? ("", "IJSInProcessRuntime")
             : ("Async", "IJSRuntime");
@@ -54,9 +64,7 @@ internal readonly record struct MethodBuilderDetails(
             IsGenericReturnType: isGenericReturnType,
             ContainsGenericParameters: containsGenericParameters,
             CSharpMethodName: method.RawName.CapitalizeFirstLetter(),
-            FullyQualifiedJavaScriptIdentifier: options.Implementation is not null
-                ? $"{options.Implementation}.{method.RawName}"
-                : method.RawName,
+            FullyQualifiedJavaScriptIdentifier: fullyQualifiedJavaScriptIdentifier,
             ReturnType: returnType,
             BareType: bareType,
             Suffix: suffix,

@@ -23,11 +23,30 @@ namespace Blazor.SourceGenerators.CSharp;
 internal record CSharpAction(
     string RawName,
     string? RawReturnTypeName = "void",
-    List<CSharpType>? ParameterDefinitions = null)
+    List<CSharpType>? ParameterDefinitions = null) : ICSharpDependencyGraphObject
 {
     /// <summary>
     /// The collection of types that this object depends on.
     /// </summary>
-    public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
-        new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; }
+        = new(StringComparer.OrdinalIgnoreCase);
+
+    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
+    {
+        get
+        {
+            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
+            foreach (var prop
+                in DependentTypes.Select(
+                        kvp => (TypeName: kvp.Key, Object: kvp.Value))
+                    .Concat(ParameterDefinitions.SelectMany(
+                        p => p.AllDependentTypes)))
+            {
+                result[prop.TypeName] = prop.Object;
+            }
+
+            return result.Select(kvp => (kvp.Key, kvp.Value))
+                .ToImmutableHashSet();
+        }
+    }
 }

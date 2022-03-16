@@ -12,7 +12,28 @@ internal record CSharpProperty(
     bool IsNullable = false,
     bool IsReadonly = false) : CSharpType(RawName, RawTypeName, IsNullable)
 {
-    public string MappedTypeName => TypeMap.PrimitiveTypes[RawTypeName];
+    public string MappedTypeName
+    {
+        get
+        {
+            var mappedTypeName = TypeMap.PrimitiveTypes[RawTypeName];
+            if (mappedTypeName == RawTypeName)
+            {
+                if (IsArray)
+                {
+                    mappedTypeName = mappedTypeName
+                        .Replace("[]", "")
+                        .Replace("ReadonlyArray<", "")
+                        .Replace(">", "");
+                }
+            }
+
+            return mappedTypeName;
+        }
+    }
 
     public bool IsIndexer => RawName.StartsWith("[") && RawName.EndsWith("]");
+
+    public bool IsArray => RawTypeName.EndsWith("[]") ||
+        (RawTypeName.StartsWith("ReadonlyArray<") && RawTypeName.EndsWith(">"));
 }
