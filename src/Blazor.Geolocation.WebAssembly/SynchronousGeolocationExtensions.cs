@@ -7,6 +7,6 @@ namespace Microsoft.JSInterop;
     TypeName = "Geolocation",
     Implementation = "window.navigator.geolocation",
     Url = "https://developer.mozilla.org/docs/Web/API/Geolocation")]
-internal static partial class GeolocationExtensions
+internal static partial class SynchronousGeolocationExtensions
 {
 }

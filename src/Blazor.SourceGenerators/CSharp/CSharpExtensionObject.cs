@@ -574,6 +574,12 @@ internal sealed partial record CSharpExtensionObject(string RawTypeName)
         GeneratorOptions options,
         string implementation)
     {
+        var addExpression = options.IsWebAssembly
+            ? @"        services.AddSingleton<IJSInProcessRuntime>(serviceProvider =>
+            (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
+            "
+            : "services";
+
         var typeName = $"I{options.TypeName}";
         var extensions = $@"// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License:
@@ -592,9 +598,7 @@ public static class {implementation}ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection Add{implementation}Services(
         this IServiceCollection services) =>
-        services.AddSingleton<IJSInProcessRuntime>(serviceProvider =>
-            (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
-            .AddSingleton<{typeName}, {implementation}>();
+        {addExpression}.AddSingleton<{typeName}, {implementation}>();
 }}
 ";
 

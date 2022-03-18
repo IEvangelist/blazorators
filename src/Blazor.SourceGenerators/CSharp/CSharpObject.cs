@@ -58,20 +58,35 @@ internal record CSharpObject(
     {
         StringBuilder builder = new("#nullable enable\r\n");
 
+        builder.Append("using System.Text.Json.Serialization;\r\n\r\n");
         builder.Append("namespace Microsoft.JSInterop;\r\n\r\n");
         builder.Append($"public class {TypeName}\r\n{{\r\n");
 
         var memberCount = Properties.Count;
-        foreach (var (index, kvp) in Properties.Select((kvp, index) => (index, kvp)))
+        foreach (var (index, kvp)
+            in Properties.Select((kvp, index) => (index, kvp)))
         {
             var (memberName, member) = (kvp.Key, kvp.Value);
             var typeName = member.MappedTypeName;
             var nullableExpression = member.IsNullable && !typeName.EndsWith("?") ? "?" : "";
             var trivia = member.IsArray ? "[]" : "";
             var statementTerminator = member.IsNullable ? " = default!;" : "";
+            var csharpMemberName = memberName.CapitalizeFirstLetter();
 
             builder.Append(
-                $"    public {typeName}{trivia}{nullableExpression} {memberName.CapitalizeFirstLetter()} {{ get; set; }}{statementTerminator}\r\n");
+                $"    [JsonPropertyName(\"{memberName}\")]\r\n");
+            builder.Append(
+                $"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\r\n");
+
+            // Add readonly property for converting DOMTimeStamp (long) to DateTime.
+            if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null")
+            {
+                var nullable = member.IsNullable ? "?" : "";
+                builder.Append(
+                    $"    [JsonIgnore]\r\n");
+                builder.Append(
+                    $"    public DateTime{nullable} {csharpMemberName}AsDateTime => {csharpMemberName}.ToDateTimeFromUnix();\r\n");
+            }
         }
 
         builder.Append("}\r\n");

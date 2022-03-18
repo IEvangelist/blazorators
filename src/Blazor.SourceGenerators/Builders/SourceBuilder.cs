@@ -157,12 +157,13 @@ internal sealed class SourceBuilder
 
                 if (param.ActionDeclation is not null)
                 {
+                    var name = param.ToArgumentString();
                     var dependentTypes = param.ActionDeclation.DependentTypes.Keys;
                     var action =
                         $"Expects the name of a <c>\"JSInvokableAttribute\"</c> C# method with the following " +
                         $"<c>System.Action{{{string.Join(", ", dependentTypes)}}}\"</c>.";
                     _builder.Append(
-                        $"/// <param name=\"{param.RawName}\">{action}</param>{_newLine}");
+                        $"/// <param name=\"{name}\">{action}</param>{_newLine}");
                 }
                 else
                 {

@@ -35,6 +35,7 @@ jobs:
         dotnet restore ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj
         dotnet restore ./src/Blazor.Serialization/Blazor.Serialization.csproj
         dotnet restore ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj
+        dotnet restore ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj
       
     - name: Build
       run: |
@@ -43,6 +44,7 @@ jobs:
         dotnet build ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Serialization/Blazor.Serialization.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj --configuration Release --no-restore
 
     - name: Test
       run: dotnet test
@@ -54,6 +56,7 @@ jobs:
         dotnet pack ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
         dotnet pack ./src/Blazor.Serialization/Blazor.Serialization.csproj --output packages
         dotnet pack ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --output packages
+        dotnet pack ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj --output packages
 
     - name: Publish package
       run: |
@@ -87,4 +90,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Blazor.Geolocation.WebAssembly.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload geolocation Server package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.Geolocation.Server.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/

@@ -32,7 +32,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.LocalStorage.Server"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Serialization", "src\Blazor.Serialization\Blazor.Serialization.csproj", "{5E4658A7-4751-4F85-A558-12B8EBCA2BCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Geolocation.WebAssembly", "src\Blazor.Geolocation.WebAssembly\Blazor.Geolocation.WebAssembly.csproj", "{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.WebAssembly", "src\Blazor.Geolocation.WebAssembly\Blazor.Geolocation.WebAssembly.csproj", "{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Geolocation.Server", "src\Blazor.Geolocation.Server\Blazor.Geolocation.Server.csproj", "{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{9AA2BB50-9F1A-43D0-BB6B-C3C4E9765BE1} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
 		{5E4658A7-4751-4F85-A558-12B8EBCA2BCA} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
 		{0BAC9703-45EE-4E9E-A0F0-556F02FCB901} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
+		{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84} = {537EB83C-6982-40B0-801A-479DF3B17DBE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3F86284A-32D2-4F79-B23C-7A0CB8775971}
