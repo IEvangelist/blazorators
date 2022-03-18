@@ -10,7 +10,7 @@ namespace Blazor.SourceGenerators.Tests;
 public class LibDomParserInterfacesTests
 {
     [Fact]
-    public void CorrectlyConvertsTypeScriptInterfaceToCSharpRecord()
+    public void CorrectlyConvertsTypeScriptInterfaceToCSharpClass()
     {
         var text = @"interface MediaKeySystemConfiguration {
     audioCapabilities?: MediaKeySystemMediaCapability[];
@@ -24,16 +24,25 @@ public class LibDomParserInterfacesTests
         var sut = new LibDomParser();
         var actual = sut.ToObject(text);
         var expected = @"#nullable enable
+using System.Text.Json.Serialization;
+
 namespace Microsoft.JSInterop;
 
 public class MediaKeySystemConfiguration
 {
+    [JsonPropertyName(""audioCapabilities"")]
     public MediaKeySystemMediaCapability[]? AudioCapabilities { get; set; } = default!;
+    [JsonPropertyName(""distinctiveIdentifier"")]
     public MediaKeysRequirement? DistinctiveIdentifier { get; set; } = default!;
+    [JsonPropertyName(""initDataTypes"")]
     public string[]? InitDataTypes { get; set; } = default!;
+    [JsonPropertyName(""label"")]
     public string? Label { get; set; } = default!;
+    [JsonPropertyName(""persistentState"")]
     public MediaKeysRequirement? PersistentState { get; set; } = default!;
+    [JsonPropertyName(""sessionTypes"")]
     public string[]? SessionTypes { get; set; } = default!;
+    [JsonPropertyName(""videoCapabilities"")]
     public MediaKeySystemMediaCapability[]? VideoCapabilities { get; set; } = default!;
 }
 ";
