@@ -8,16 +8,16 @@ project relies on the [Roslyn source generator APIs][source-gen] to add source f
 [web-apis]: https://developer.mozilla.org/docs/Web/API
 [source-gen]: https://docs.microsoft.com/dotnet/csharp/roslyn-sdk/source-generators-overview?wt.mc_id=dapine
 
-A C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implementation of the `IJSInProcessRuntime` type. This library provides several NuGet packages:
+This C# source generator that creates extensions methods on the Blazor WebAssembly JavaScript implementation of the `IJSInProcessRuntime` type. This library provides several NuGet packages:
 
 | NuGet package | NuGet version | Build | Description |
-|--|--|--|
+|--|--|--|--|
 | [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml) | Core source generator library. |
 
 It's consumed by the following NuGet packages:
 
 - 📦 [Blazor.LocalStorage.WebAssembly](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly)
-- 📦 [Blazor.LocalStorage.Server)](https://www.nuget.org/packages/Blazor.LocalStorage.Server)
+- 📦 [Blazor.LocalStorage.Server](https://www.nuget.org/packages/Blazor.LocalStorage.Server)
 - 📦 [Blazor.Geolocation.WebAssembly](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly)
 - 📦 [Blazor.Geolocation.Server](https://www.nuget.org/packages/Blazor.Geolocation.Server)
 
