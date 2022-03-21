@@ -1,6 +1,5 @@
+<img src="https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png" align="right"></img>
 # Blazorators: Blazor C# Source Generators
-
-![Blazorators Logo](https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png)
 
 > Thank you for perusing my Blazor C# Source Generators repository. I'd really appreciate a ⭐ if you find this interesting.
 
@@ -21,6 +20,7 @@ A C# source generator that creates extensions methods on the Blazor WebAssembly 
 | [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | Blazor WebAssembly class library exposing DI-ready `IStorage` type for the `localStorage` implementation (relies on `IJSInProcessRuntime`). |
 | [`Blazor.LocalStorage.Server`](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | Blazor Server class library exposing DI-ready `IStorage` type for the `localStorage` implementation (relies on `IJSRuntime`) |
 | [`Blazor.Geolocation.WebAssembly`](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly) | Razor class library exposing DI-ready `IGeolocation` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSInProcessRuntime`). |
+| [`Blazor.Geolocation.Server`](https://www.nuget.org/packages/Blazor.Geolocation.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.Server) | Razor class library exposing DI-ready `IGeolocation` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSRuntime`). |
 
 ## Using the `Blazor.SourceGenerators` package 📦
 
