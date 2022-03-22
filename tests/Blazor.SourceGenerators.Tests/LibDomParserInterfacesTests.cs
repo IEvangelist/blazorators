@@ -1,7 +1,6 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.Serialization.Extensions;
 using Blazor.SourceGenerators.Parsers;
 using Xunit;
 
@@ -28,20 +27,44 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.JSInterop;
 
+/// <summary>
+/// Source-generated object representing an ideally immutable <c>MediaKeySystemConfiguration</c> value.
+/// </summary>
 public class MediaKeySystemConfiguration
 {
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.audioCapabilities</c> value.
+    /// </summary>
     [JsonPropertyName(""audioCapabilities"")]
     public MediaKeySystemMediaCapability[]? AudioCapabilities { get; set; } = default!;
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.distinctiveIdentifier</c> value.
+    /// </summary>
     [JsonPropertyName(""distinctiveIdentifier"")]
     public MediaKeysRequirement? DistinctiveIdentifier { get; set; } = default!;
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.initDataTypes</c> value.
+    /// </summary>
     [JsonPropertyName(""initDataTypes"")]
     public string[]? InitDataTypes { get; set; } = default!;
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.label</c> value.
+    /// </summary>
     [JsonPropertyName(""label"")]
     public string? Label { get; set; } = default!;
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.persistentState</c> value.
+    /// </summary>
     [JsonPropertyName(""persistentState"")]
     public MediaKeysRequirement? PersistentState { get; set; } = default!;
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.sessionTypes</c> value.
+    /// </summary>
     [JsonPropertyName(""sessionTypes"")]
     public string[]? SessionTypes { get; set; } = default!;
+    /// <summary>
+    /// Source-generated property representing the <c>MediaKeySystemConfiguration.videoCapabilities</c> value.
+    /// </summary>
     [JsonPropertyName(""videoCapabilities"")]
     public MediaKeySystemMediaCapability[]? VideoCapabilities { get; set; } = default!;
 }
