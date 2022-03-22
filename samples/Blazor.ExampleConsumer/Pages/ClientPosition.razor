@@ -1,10 +1,6 @@
 ﻿@page "/geolocation"
 
-@using Microsoft.JSInterop
-@using System.Text.Json
-
 @inject IGeolocation Geolocation
-@inject IJSInProcessRuntime JavaScript
 
 <PageTitle>Geolocation</PageTitle>
 <h1>
@@ -28,8 +24,8 @@
 @{
     var (bgClass, json) = (_position, _positionError) switch
     {
-        (_, { }) => ("bg-danger", _positionError.ToJson(_opts)),
-        ({ }, _) => ("bg-dark", _position.ToJson(_opts)),
+        (null, { }) => ("bg-danger", _positionError.ToJson(_opts)),
+        ({ }, null) => ("bg-dark", _position.ToJson(_opts)),
         _ => ("", null)
     };
     if (bgClass is not "" && json is not null)
@@ -41,10 +37,12 @@
 }
 
 @code {
+    const string GeolocationOptionsKey = "geolocation-options";
     readonly JsonSerializerOptions _opts = new()
     {
         WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     readonly PositionOptions _options = new()
@@ -53,7 +51,6 @@
         MaximumAge = 0,
         Timeout = 15_000
     };
-
     GeolocationPosition? _position;
     GeolocationPositionError? _positionError;
     bool _isLoading = true;

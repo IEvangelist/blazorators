@@ -14,7 +14,7 @@ This C# source generator that creates extensions methods on the Blazor WebAssemb
 |--|--|--|--|
 | [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml) | Core source generator library. |
 
-It's consumed by the following NuGet packages:
+This package is consumed by the following NuGet packages:
 
 - 📦 [Blazor.LocalStorage.WebAssembly](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly)
 - 📦 [Blazor.LocalStorage.Server](https://www.nuget.org/packages/Blazor.LocalStorage.Server)
