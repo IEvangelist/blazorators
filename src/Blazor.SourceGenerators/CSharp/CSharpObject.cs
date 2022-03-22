@@ -60,6 +60,14 @@ internal record CSharpObject(
 
         builder.Append("using System.Text.Json.Serialization;\r\n\r\n");
         builder.Append("namespace Microsoft.JSInterop;\r\n\r\n");
+
+        builder.Append(
+                $"/// <summary>\r\n");
+        builder.Append(
+            $"/// Source-generated object representing an ideally immutable <c>{TypeName}</c> value.\r\n");
+        builder.Append(
+            $"/// </summary>\r\n");
+
         builder.Append($"public class {TypeName}\r\n{{\r\n");
 
         var memberCount = Properties.Count;
@@ -74,6 +82,12 @@ internal record CSharpObject(
             var csharpMemberName = memberName.CapitalizeFirstLetter();
 
             builder.Append(
+                $"    /// <summary>\r\n");
+            builder.Append(
+                $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value.\r\n");
+            builder.Append(
+                $"    /// </summary>\r\n");
+            builder.Append(
                 $"    [JsonPropertyName(\"{memberName}\")]\r\n");
             builder.Append(
                 $"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\r\n");
@@ -81,11 +95,21 @@ internal record CSharpObject(
             // Add readonly property for converting DOMTimeStamp (long) to DateTime.
             if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null")
             {
+                builder.Append(
+                $"    /// <summary>\r\n");
+                builder.Append(
+                    $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value, \r\n");
+
+                builder.Append(
+                    $"    /// converted as a <see cref=\"System.DateTime\" /> in UTC.\r\n");
+                builder.Append(
+                    $"    /// </summary>\r\n");
+
                 var nullable = member.IsNullable ? "?" : "";
                 builder.Append(
                     $"    [JsonIgnore]\r\n");
                 builder.Append(
-                    $"    public DateTime{nullable} {csharpMemberName}AsDateTime => {csharpMemberName}.ToDateTimeFromUnix();\r\n");
+                    $"    public DateTime{nullable} {csharpMemberName}AsUtcDateTime => {csharpMemberName}.ToDateTimeFromUnix();\r\n");
             }
         }
 

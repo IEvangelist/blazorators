@@ -109,9 +109,9 @@ internal sealed partial class LibDomParser
         return cSharpObject;
     }
 
-    internal CSharpExtensionObject? ToExtensionObject(string typeScriptTypeDeclaration)
+    internal CSharpTopLevelObject? ToTopLevelObject(string typeScriptTypeDeclaration)
     {
-        CSharpExtensionObject? extensionObject = null;
+        CSharpTopLevelObject? topLevelObject = null;
 
         var lineTokens = typeScriptTypeDeclaration.Split(new[] { '\n' });
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -121,7 +121,7 @@ internal sealed partial class LibDomParser
                 var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
                 if (typeName is not null)
                 {
-                    extensionObject = new(typeName);
+                    topLevelObject = new(typeName);
                     continue;
                 }
                 else
@@ -130,7 +130,7 @@ internal sealed partial class LibDomParser
                 }
             }
 
-            if (extensionObject is null)
+            if (topLevelObject is null)
             {
                 break;
             }
@@ -162,12 +162,15 @@ internal sealed partial class LibDomParser
                     ParseParameters(
                         methodName,
                         parameters,
-                        obj => extensionObject.DependentTypes![obj.TypeName] = obj);
+                        obj => topLevelObject.DependentTypes![obj.TypeName] = obj);
 
                 CSharpMethod cSharpMethod =
-                    new(methodName, CleanseReturnType(returnType), parameterDefinitions, javaScriptMethod);
+                    new(methodName,
+                    CleanseReturnType(returnType),
+                    parameterDefinitions,
+                    javaScriptMethod);
 
-                extensionObject.Methods!.Add(cSharpMethod);
+                topLevelObject.Methods!.Add(cSharpMethod);
 
                 continue;
             }
@@ -187,8 +190,13 @@ internal sealed partial class LibDomParser
 
                 name = name.Replace("?", "").Replace("readonly ", "");
 
-                CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
-                extensionObject.Properties!.Add(cSharpProperty);
+                CSharpProperty cSharpProperty =
+                    new(name,
+                    type,
+                    isNullable,
+                    isReadonly);
+
+                topLevelObject.Properties!.Add(cSharpProperty);
 
                 var mappedType = cSharpProperty.MappedTypeName;
 
@@ -201,7 +209,7 @@ internal sealed partial class LibDomParser
                     var obj = ToObject(typeScriptDefinitionText);
                     if (obj is not null)
                     {
-                        extensionObject.DependentTypes![obj.TypeName] = obj;
+                        topLevelObject.DependentTypes![obj.TypeName] = obj;
                     }
                 }
 
@@ -209,7 +217,7 @@ internal sealed partial class LibDomParser
             }
         }
 
-        return extensionObject;
+        return topLevelObject;
     }
 
     internal CSharpAction? ToAction(string typeScriptTypeDeclaration)

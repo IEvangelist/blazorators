@@ -4,7 +4,7 @@ The [`Blazor.Geolocation.WebAssembly`](https://www.nuget.org/packages/Blazor.Geo
 
 ## Get started
 
-After the NuGet package is added as a reference, call the `AddGeolocationServices` method to register the `IGeolocation` service type.
+After the NuGet package is added as a reference, call the `AddGeolocationServices` method to register the `IGeolocationService` service type.
 
 ```csharp
 using Microsoft.AspNetCore.Components.Web;
@@ -25,7 +25,7 @@ builder.Services.AddGeolocationServices();
 await builder.Build().RunAsync();
 ```
 
-Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IGeolocation` type. The interface takes the following shape:
+Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IGeolocationService` type. The interface takes the following shape:
 
 ```csharp
 #nullable enable
@@ -34,7 +34,7 @@ namespace Microsoft.JSInterop;
 /// <summary>
 /// Source generated interface definition of the <c>Geolocation</c> type.
 /// </summary>
-public interface IGeolocation
+public interface IGeolocationService
 {
 	/// <summary>
 	/// Source generated implementation of <c>window.navigator.geolocation.clearWatch</c>.

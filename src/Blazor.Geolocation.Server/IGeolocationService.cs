@@ -8,6 +8,8 @@ namespace Microsoft.JSInterop;
     Implementation = "window.navigator.geolocation",
     HostingModel = BlazorHostingModel.Server,
     Url = "https://developer.mozilla.org/docs/Web/API/Geolocation")]
-internal static partial class AsynchronousGeolocationExtensions
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public partial interface IGeolocationService
+#pragma warning restore CS1591 // The XML comments are source generated
 {
 }

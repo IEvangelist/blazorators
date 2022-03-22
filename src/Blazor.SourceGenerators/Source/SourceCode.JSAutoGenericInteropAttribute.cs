@@ -36,7 +36,7 @@ public class JSAutoGenericInteropAttribute : JSAutoInteropAttribute
     /// <code>
     /// new[]
     /// {
-    ///     ""getItem"",      // Serializes the return type of getItem as TResult
+    ///     ""getItem"",      // Serializes the return type of getItem as TValue
     ///     ""setItem:value"" // Serializes the value parameter of the setItem TValue
     /// }
     /// </code>

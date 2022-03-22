@@ -43,37 +43,10 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
             return;
         }
 
-        foreach (var (options, classDeclaration, attribute) in receiver.ClassDeclarations)
+        foreach (var (options, classDeclaration, attribute) in receiver.InterfaceDeclarations)
         {
-            if (options.TypeName is null)
+            if (options is null || IsDiaganostic(options, context, attribute))
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptors.TypeNameRequiredDiagnostic,
-                        attribute.GetLocation()));
-
-                continue;
-            }
-
-            if (options.Implementation is null)
-            {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptors.PathFromWindowRequiredDiagnostic,
-                        attribute.GetLocation()));
-
-                continue;
-            }
-
-            if (options.SupportsGenerics &&
-                context.Compilation.ReferencedAssemblyNames.Any(ai =>
-                ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)) is false)
-            {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptors.MissingBlazorSerializationPackageReferenceDiagnostic,
-                        attribute.GetLocation()));
-
                 continue;
             }
 
@@ -85,12 +58,12 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 
             var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
             var symbol = model.GetDeclaredSymbol(classDeclaration);
-            if (symbol is not ITypeSymbol typeSymbol || !typeSymbol.IsStatic)
+            if (symbol is not ITypeSymbol typeSymbol || typeSymbol.IsStatic)
             {
                 continue;
             }
 
-            var result = _libDomParser.ParseStaticType(options.TypeName!);
+            var result = _libDomParser.ParseTargetType(options.TypeName!);
             if (result.Status == ParserResultStatus.SuccessfullyParsed &&
                 result.Value is not null)
             {
@@ -112,27 +85,19 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                         _ => null
                     };
 
-                // Source generate the internal extension methods
-                context.AddSource(
-                    typeSymbol.Name.ToGeneratedFileName(),
-                    SourceText.From(
-                        staticObject.ToStaticPartialClassString(
-                            options,
-                            classDeclaration.Identifier.ValueText,
-                            namespaceString),
-                        Encoding.UTF8));
+                var @interface =
+                    options.TypeName.ToInterfaceName();
+                var implementation =
+                    options.Implementation.ToImplementationName();
 
                 // Source generate the public interface
                 context.AddSource(
-                    $"I{options.TypeName}".ToGeneratedFileName(),
+                    $"{@interface}".ToGeneratedFileName(),
                     SourceText.From(
                         staticObject.ToInterfaceString(
                             options,
                             namespaceString),
                         Encoding.UTF8));
-
-                var implementation =
-                    options.Implementation.ToImplementationName();
 
                 // Source generate the internal implementation
                 context.AddSource(
@@ -145,7 +110,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                 
                 // Source generate the service collection DI extension
                 context.AddSource(
-                    $"{implementation}ServiceCollectionExtensions".ToGeneratedFileName(),
+                    $"{options.Implementation.ToImplementationName(false)}ServiceCollectionExtensions".ToGeneratedFileName(),
                     SourceText.From(
                         staticObject.ToServiceCollectionExtensions(
                             options,
@@ -153,5 +118,42 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                         Encoding.UTF8));
             }
         }
+    }
+
+    static bool IsDiaganostic(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
+    {
+        if (options.TypeName is null)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    Descriptors.TypeNameRequiredDiagnostic,
+                    attribute.GetLocation()));
+
+            return true;
+        }
+
+        if (options.Implementation is null)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    Descriptors.PathFromWindowRequiredDiagnostic,
+                    attribute.GetLocation()));
+
+            return true;
+        }
+
+        if (options.SupportsGenerics &&
+            context.Compilation.ReferencedAssemblyNames.Any(ai =>
+            ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)) is false)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    Descriptors.MissingBlazorSerializationPackageReferenceDiagnostic,
+                    attribute.GetLocation()));
+
+            return true;
+        }
+
+        return false;
     }
 }

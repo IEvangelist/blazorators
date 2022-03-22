@@ -66,7 +66,7 @@ public class MediaKeySystemConfiguration
     watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): number;
 }";
         var sut = new LibDomParser();
-        var actual = sut.ToExtensionObject(text);
+        var actual = sut.ToTopLevelObject(text);
 
         Assert.NotNull(actual);
 

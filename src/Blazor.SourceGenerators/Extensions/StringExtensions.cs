@@ -13,9 +13,21 @@ static class StringExtensions
 
     internal static string ToGeneratedFileName(this string name) => $"{name}.g.cs";
 
-    internal static string ToImplementationName(this string pathFromWindow) =>
-        (pathFromWindow.Contains(".")
-            ? pathFromWindow.Substring(pathFromWindow.LastIndexOf(".") + 1)
-            : pathFromWindow)
-        .CapitalizeFirstLetter();
+    internal static string ToImplementationName(this string implementation, bool isService = true)
+    {
+        var impl = (implementation.Contains(".")
+            ? implementation.Substring(implementation.LastIndexOf(".") + 1)
+            : implementation).CapitalizeFirstLetter();
+
+        return $"{impl}{(isService ? "Service" : "")}";
+    }
+
+    internal static string ToInterfaceName(this string typeName, bool isService = true)
+    {
+        var type = (typeName.Contains(".")
+            ? typeName.Substring(typeName.LastIndexOf(".") + 1)
+            : typeName).CapitalizeFirstLetter();
+
+        return $"I{type}{(isService ? "Service" : "")}";
+    }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.Builders;
+
 namespace Blazor.SourceGenerators.Extensions;
 
 internal static class CSharpMethodExtensions
@@ -53,8 +55,8 @@ internal static class CSharpMethodExtensions
                 method.IsReturnTypeNullable ? "?" : "";
 
             return options.IsWebAssembly
-                ? ($"TResult{nullable}", primitiveType)
-                : ($"ValueTask<TResult{nullable}>", primitiveType);
+                ? ($"{MethodBuilderDetails.GenericTypeValue}{nullable}", primitiveType)
+                : ($"ValueTask<{MethodBuilderDetails.GenericTypeValue}{nullable}>", primitiveType);
         }
 
         if (options.IsWebAssembly)

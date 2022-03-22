@@ -17,8 +17,8 @@
 /// </param>
 internal sealed record GeneratorOptions(
     bool SupportsGenerics,
-    string? TypeName = null,
-    string? Implementation = null,
+    string TypeName = null!,
+    string Implementation = null!,
     bool OnlyGeneratePureJS = false,
     string? Url = null,
     string[]? GenericMethodDescriptors = null,

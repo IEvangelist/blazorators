@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators;
 
-record class ClassDeclarationDetails(
+record class InterfaceDeclarationDetails(
     GeneratorOptions Options,
-    ClassDeclarationSyntax ClassDeclaration,
+    InterfaceDeclarationSyntax InterfaceDeclaration,
     AttributeSyntax InteropAttribute);

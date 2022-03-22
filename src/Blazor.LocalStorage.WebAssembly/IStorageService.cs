@@ -3,9 +3,6 @@
 
 namespace Microsoft.JSInterop;
 
-/// <summary>
-/// Source generated extension methods on the <see cref="IJSInProcessRuntime"/> implementation.
-/// </summary>
 [JSAutoGenericInterop(
     TypeName = "Storage",
     Implementation = "window.localStorage",
@@ -15,6 +12,8 @@ namespace Microsoft.JSInterop;
         "getItem",
         "setItem:value"
     })]
-internal static partial class SynchronousLocalStorageExtensions
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public partial interface IStorageService
+#pragma warning restore CS1591 // The XML comments are source generated
 {
 }

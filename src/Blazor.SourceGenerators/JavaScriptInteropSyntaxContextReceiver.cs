@@ -7,14 +7,14 @@ internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
 {
     internal static ISyntaxContextReceiver Create() => new JavaScriptInteropSyntaxContextReceiver();
 
-    public HashSet<ClassDeclarationDetails> ClassDeclarations { get; } = new();
+    public HashSet<InterfaceDeclarationDetails> InterfaceDeclarations { get; } = new();
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
-        if (context.Node is ClassDeclarationSyntax classDeclaration &&
-            classDeclaration.AttributeLists.Count > 0)
+        if (context.Node is InterfaceDeclarationSyntax interfaceDeclaration &&
+            interfaceDeclaration.AttributeLists.Count > 0)
         {
-            foreach (var attributeListSyntax in classDeclaration.AttributeLists)
+            foreach (var attributeListSyntax in interfaceDeclaration.AttributeLists)
             {
                 foreach (var attributeSyntax in attributeListSyntax.Attributes)
                 {
@@ -27,10 +27,10 @@ internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
 
                     if (isAutoInterop || isAutoGenericInterop)
                     {
-                        ClassDeclarations.Add(
+                        InterfaceDeclarations.Add(
                             new(
                                 Options: attributeSyntax.GetGeneratorOptions(isAutoGenericInterop),
-                                ClassDeclaration: classDeclaration,
+                                InterfaceDeclaration: interfaceDeclaration,
                                 InteropAttribute: attributeSyntax));
                     }
                 }

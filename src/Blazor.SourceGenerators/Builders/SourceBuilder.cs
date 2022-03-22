@@ -17,12 +17,16 @@ internal sealed class SourceBuilder
     private Indentation _indentation = new(0);
     private string? _implementationName;
     private string? _interfaceName;
+    private bool _isService;
 
     internal int IndentationLevel => _indentation.Level;
-    internal string ImplementationName => _implementationName ??= _options.Implementation!.ToImplementationName();
-    internal string InterfaceName => _interfaceName ??= $"I{_options.TypeName}";
+    internal string ImplementationName => _implementationName ??=
+        $"{_options.Implementation.ToImplementationName(_isService)}";
+    internal string InterfaceName => _interfaceName ??=
+        _options.TypeName.ToInterfaceName(_isService);
 
-    internal SourceBuilder(GeneratorOptions options) => _options = options;
+    internal SourceBuilder(GeneratorOptions options, bool isService = true) =>
+        (_options, _isService) = (options, isService);
 
     internal SourceBuilder AppendCopyRightHeader()
     {
@@ -64,20 +68,12 @@ internal sealed class SourceBuilder
         return this;
     }
 
-    internal SourceBuilder AppendStaticPartialClassDeclaration(
-        string className, string? accessModifier)
-    {
-        _builder.Append($"{accessModifier ?? "internal"} static partial class {className}{_newLine}");
-
-        return this;
-    }
-
     internal SourceBuilder AppendPublicInterfaceDeclaration()
     {
         _builder.Append($"/// <summary>{_newLine}");
         _builder.Append($"/// Source generated interface definition of the <c>{_options.TypeName}</c> type.{_newLine}");
         _builder.Append($"/// </summary>{_newLine}");
-        _builder.Append($"public interface I{_options.TypeName}{_newLine}");
+        _builder.Append($"public partial interface {InterfaceName}{_newLine}");
 
         return this;
     }
@@ -85,7 +81,7 @@ internal sealed class SourceBuilder
     internal SourceBuilder AppendInternalImplementationDeclaration()
     {
         _builder.Append($"/// <inheritdoc />{_newLine}");
-        _builder.Append($"internal class {ImplementationName} : {InterfaceName}{_newLine}");
+        _builder.Append($"internal sealed class {ImplementationName} : {InterfaceName}{_newLine}");
 
         return this;
     }

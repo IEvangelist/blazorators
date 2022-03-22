@@ -18,14 +18,9 @@ internal readonly record struct MethodBuilderDetails(
     string? GenericTypeArgs)
 {
     /// <summary>
-    /// A value representing the generic return type, <c>"TResult"</c>.
+    /// A value representing the generic return type, <c>"TValue"</c>.
     /// </summary>
-    internal const string GenericReturnType = "TResult";
-
-    /// <summary>
-    /// A value representing the generic return type, <c>"TArg"</c>.
-    /// </summary>
-    internal const string GenericArgumentType = "TArg";
+    internal static readonly string GenericTypeValue = "TValue";
 
     /// <summary>
     /// A value representing the generic component type, <c>"TComponent"</c>.
@@ -44,8 +39,8 @@ internal readonly record struct MethodBuilderDetails(
         var containsGenericParameters =
             method.ParameterDefinitions.Any(p => p.IsGenericParameter(method.RawName, options));
         var genericTypeArgs = isGenericReturnType
-            ? ToGenericTypeArgument(GenericReturnType)
-            : containsGenericParameters ? ToGenericTypeArgument(GenericArgumentType) : null;
+            ? ToGenericTypeArgument(GenericTypeValue)
+            : containsGenericParameters ? ToGenericTypeArgument(GenericTypeValue) : null;
         var fullyQualifiedJavaScriptIdentifier = method.JavaScriptMethodDependency?.InvokableMethodName;
         fullyQualifiedJavaScriptIdentifier ??=
             options.Implementation is not null

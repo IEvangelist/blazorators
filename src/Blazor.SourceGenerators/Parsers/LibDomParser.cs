@@ -7,9 +7,9 @@ internal sealed partial class LibDomParser
 {
     private readonly LibDomReader _reader = new();
 
-    public ParserResult<CSharpExtensionObject> ParseStaticType(string typeName)
+    public ParserResult<CSharpTopLevelObject> ParseTargetType(string typeName)
     {
-        ParserResult<CSharpExtensionObject> result = new(ParserResultStatus.Unknown);
+        ParserResult<CSharpTopLevelObject> result = new(ParserResultStatus.Unknown);
 
         if (_reader.TryGetDeclaration(typeName, out var typeScriptDefinitionText) &&
             typeScriptDefinitionText is not null)
@@ -19,7 +19,7 @@ internal sealed partial class LibDomParser
                 result = result with
                 {
                     Status = ParserResultStatus.SuccessfullyParsed,
-                    Value = ToExtensionObject(typeScriptDefinitionText)
+                    Value = ToTopLevelObject(typeScriptDefinitionText)
                 };
             }
             catch (Exception ex)

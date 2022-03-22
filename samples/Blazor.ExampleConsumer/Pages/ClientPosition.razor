@@ -1,6 +1,6 @@
 ﻿@page "/geolocation"
 
-@inject IGeolocation Geolocation
+@inject IGeolocationService Geolocation
 
 <PageTitle>Geolocation</PageTitle>
 <h1>
@@ -15,7 +15,7 @@
     {
         <span>: 
             <code>
-                @(_position.TimestampAsDateTime.ToLocalTime().ToString())
+                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
             </code>
         </span>
     }
@@ -37,30 +37,29 @@
 }
 
 @code {
-    const string GeolocationOptionsKey = "geolocation-options";
     readonly JsonSerializerOptions _opts = new()
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
-
     readonly PositionOptions _options = new()
     {
         EnableHighAccuracy = true,
         MaximumAge = 0,
         Timeout = 15_000
     };
+
     GeolocationPosition? _position;
     GeolocationPositionError? _positionError;
     bool _isLoading = true;
 
     protected override void OnInitialized() =>
         Geolocation.GetCurrentPosition(
-            this,
-            nameof(OnPositionRecieved),
-            nameof(OnPositionError),
-            _options);
+            component: this,
+            onSuccessCallbackMethodName: nameof(OnPositionRecieved),
+            onErrorCallbackMethodName: nameof(OnPositionError),
+            options: _options);
 
     [JSInvokable]
     public void OnPositionRecieved(GeolocationPosition position)

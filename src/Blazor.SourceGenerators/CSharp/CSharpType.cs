@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.Builders;
+
 namespace Blazor.SourceGenerators.CSharp;
 
 internal record CSharpType(
@@ -53,8 +55,8 @@ internal record CSharpType(
         if (isGenericType)
         {
             return IsNullable
-                ? $"TArg? {ToArgumentString()}"
-                : $"TArg {ToArgumentString()}";
+                ? $"{MethodBuilderDetails.GenericTypeValue}? {ToArgumentString()}"
+                : $"{MethodBuilderDetails.GenericTypeValue} {ToArgumentString()}";
         }
 
         var isCallback = ActionDeclation is not null;

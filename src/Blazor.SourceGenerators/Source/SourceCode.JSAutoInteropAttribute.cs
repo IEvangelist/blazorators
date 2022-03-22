@@ -21,7 +21,10 @@ static partial class SourceCode
 /// </code>
 /// This will source generate all the extension methods for the IJSInProcessRuntime type for the localStorage APIs.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+[AttributeUsage(
+    AttributeTargets.Interface,
+    Inherited = false,
+    AllowMultiple = false)]
 public class JSAutoInteropAttribute : Attribute
 {
     /// <summary>

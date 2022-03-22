@@ -3,15 +3,14 @@
 
 namespace Microsoft.JSInterop;
 
-/// <summary>
-/// Source generated extension methods on the <see cref="IJSRuntime"/> implementation.
-/// </summary>
 [JSAutoInterop(
     TypeName = "Storage",
     Implementation = "window.localStorage",
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
-internal static partial class AsynchronousLocalStorageExtensions
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public partial interface IStorageService
+#pragma warning restore CS1591 // The XML comments are source generated
 {
 }
