@@ -1,0 +1,19 @@
+﻿@inject IJSInProcessRuntime JavaScript
+
+<div id="map" style="width: 100%; height: 45vh;"></div>
+
+@code {
+    [Parameter, EditorRequired]
+    public GeolocationPosition Position { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        if (Position is null or { Coords: null })
+        {
+            return;
+        }
+
+        JavaScript.InvokeVoid(
+            "app.loadMap", "map", Position.Coords.Latitude, Position.Coords.Longitude);
+    }
+}

@@ -34,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Serialization", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.WebAssembly", "src\Blazor.Geolocation.WebAssembly\Blazor.Geolocation.WebAssembly.csproj", "{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Geolocation.Server", "src\Blazor.Geolocation.Server\Blazor.Geolocation.Server.csproj", "{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.Server", "src\Blazor.Geolocation.Server\Blazor.Geolocation.Server.csproj", "{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
