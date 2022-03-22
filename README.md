@@ -74,44 +74,44 @@ namespace Microsoft.JSInterop;
 /// </summary>
 public partial interface IStorageService
 {
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.length</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
-	/// </summary>
-	double Length
-	{
-		get;
-	}
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.length</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
+    /// </summary>
+    double Length
+    {
+        get;
+    }
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.clear</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/clear"></a>
-	/// </summary>
-	void Clear();
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.clear</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/clear"></a>
+    /// </summary>
+    void Clear();
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.getItem</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/getItem"></a>
-	/// </summary>
-	TValue? GetItem<TValue>(string key, JsonSerializerOptions? options = null);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.getItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/getItem"></a>
+    /// </summary>
+    TValue? GetItem<TValue>(string key, JsonSerializerOptions? options = null);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.key</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/key"></a>
-	/// </summary>
-	string? Key(double index);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.key</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/key"></a>
+    /// </summary>
+    string? Key(double index);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.removeItem</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/removeItem"></a>
-	/// </summary>
-	void RemoveItem(string key);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.removeItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/removeItem"></a>
+    /// </summary>
+    void RemoveItem(string key);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.setItem</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/setItem"></a>
-	/// </summary>
-	void SetItem<TValue>(string key, TValue value, JsonSerializerOptions? options = null);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.setItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/setItem"></a>
+    /// </summary>
+    void SetItem<TValue>(string key, TValue value, JsonSerializerOptions? options = null);
 }
 ```
 
@@ -140,54 +140,54 @@ namespace Microsoft.JSInterop;
 /// <inheritdoc />
 internal sealed class LocalStorageService : IStorageService
 {
-	private readonly IJSInProcessRuntime _javaScript = null;
+    private readonly IJSInProcessRuntime _javaScript = null;
 
-	/// <inheritdoc cref="P:Microsoft.JSInterop.IStorageService.Length" />
-	double IStorageService.Length => _javaScript.Invoke<double>("eval", new object[1]
-	{
-		"window.localStorage.length"
-	});
+    /// <inheritdoc cref="P:Microsoft.JSInterop.IStorageService.Length" />
+    double IStorageService.Length => _javaScript.Invoke<double>("eval", new object[1]
+    {
+        "window.localStorage.length"
+    });
 
-	public LocalStorageService(IJSInProcessRuntime javaScript)
-	{
-		_javaScript = javaScript;
-	}
+    public LocalStorageService(IJSInProcessRuntime javaScript)
+    {
+        _javaScript = javaScript;
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.Clear" />
-	void IStorageService.Clear()
-	{
-		_javaScript.InvokeVoid("window.localStorage.clear");
-	}
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.Clear" />
+    void IStorageService.Clear()
+    {
+        _javaScript.InvokeVoid("window.localStorage.clear");
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.GetItem``1(System.String,System.Text.Json.JsonSerializerOptions)" />
-	TValue? IStorageService.GetItem<TValue>(string key, JsonSerializerOptions? options)
-	{
-		return _javaScript.Invoke<string>("window.localStorage.getItem", new object[1]
-		{
-			key
-		}).FromJson<TValue>(options);
-	}
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.GetItem``1(System.String,System.Text.Json.JsonSerializerOptions)" />
+    TValue? IStorageService.GetItem<TValue>(string key, JsonSerializerOptions? options)
+    {
+        return _javaScript.Invoke<string>("window.localStorage.getItem", new object[1]
+        {
+            key
+        }).FromJson<TValue>(options);
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.Key(System.Double)" />
-	string? IStorageService.Key(double index)
-	{
-		return _javaScript.Invoke<string>("window.localStorage.key", new object[1]
-		{
-			index
-		});
-	}
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.Key(System.Double)" />
+    string? IStorageService.Key(double index)
+    {
+        return _javaScript.Invoke<string>("window.localStorage.key", new object[1]
+        {
+            index
+        });
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.RemoveItem(System.String)" />
-	void IStorageService.RemoveItem(string key)
-	{
-		_javaScript.InvokeVoid("window.localStorage.removeItem", key);
-	}
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.RemoveItem(System.String)" />
+    void IStorageService.RemoveItem(string key)
+    {
+        _javaScript.InvokeVoid("window.localStorage.removeItem", key);
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.SetItem``1(System.String,``0,System.Text.Json.JsonSerializerOptions)" />
-	void IStorageService.SetItem<TValue>(string key, TValue value, JsonSerializerOptions? options)
-	{
-		_javaScript.InvokeVoid("window.localStorage.setItem", key, value.ToJson<TValue>(options));
-	}
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IStorageService.SetItem``1(System.String,``0,System.Text.Json.JsonSerializerOptions)" />
+    void IStorageService.SetItem<TValue>(string key, TValue value, JsonSerializerOptions? options)
+    {
+        _javaScript.InvokeVoid("window.localStorage.setItem", key, value.ToJson<TValue>(options));
+    }
 }
 ```
 
@@ -250,44 +250,44 @@ namespace Microsoft.JSInterop;
 
 public partial interface IStorageService
 {
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.length</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
-	/// </summary>
-	ValueTask<double> Length
-	{
-		get;
-	}
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.length</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
+    /// </summary>
+    ValueTask<double> Length
+    {
+        get;
+    }
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.clear</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/clear"></a>
-	/// </summary>
-	ValueTask ClearAsync();
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.clear</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/clear"></a>
+    /// </summary>
+    ValueTask ClearAsync();
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.getItem</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/getItem"></a>
-	/// </summary>
-	ValueTask<string?> GetItemAsync(string key);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.getItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/getItem"></a>
+    /// </summary>
+    ValueTask<string?> GetItemAsync(string key);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.key</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/key"></a>
-	/// </summary>
-	ValueTask<string?> KeyAsync(double index);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.key</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/key"></a>
+    /// </summary>
+    ValueTask<string?> KeyAsync(double index);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.removeItem</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/removeItem"></a>
-	/// </summary>
-	ValueTask RemoveItemAsync(string key);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.removeItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/removeItem"></a>
+    /// </summary>
+    ValueTask RemoveItemAsync(string key);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.localStorage.setItem</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Storage/setItem"></a>
-	/// </summary>
-	ValueTask SetItemAsync(string key, string value);
+    /// <summary>
+    /// Source generated implementation of <c>window.localStorage.setItem</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/setItem"></a>
+    /// </summary>
+    ValueTask SetItemAsync(string key, string value);
 }
 ```
 
@@ -356,36 +356,36 @@ namespace Microsoft.JSInterop;
 
 public partial interface IGeolocationService
 {
-	/// <summary>
-	/// Source generated implementation of <c>window.navigator.geolocation.clearWatch</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/clearWatch"></a>
-	/// </summary>
-	void ClearWatch(double watchId);
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.geolocation.clearWatch</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/clearWatch"></a>
+    /// </summary>
+    void ClearWatch(double watchId);
 
-	/// <summary>
-	/// Source generated implementation of <c>window.navigator.geolocation.getCurrentPosition</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/getCurrentPosition"></a>
-	/// </summary>
-	/// <param name="component">The calling Razor (or Blazor) component.</param>
-	/// <param name="onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}"</c>.</param>
-	/// <param name="onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}"</c>.</param>
-	/// <param name="options">The <c>PositionOptions</c> value.</param>
-	void GetCurrentPosition<TComponent>(
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.geolocation.getCurrentPosition</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/getCurrentPosition"></a>
+    /// </summary>
+    /// <param name="component">The calling Razor (or Blazor) component.</param>
+    /// <param name="onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}"</c>.</param>
+    /// <param name="onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}"</c>.</param>
+    /// <param name="options">The <c>PositionOptions</c> value.</param>
+    void GetCurrentPosition<TComponent>(
         TComponent component,
         string onSuccessCallbackMethodName,
         string? onErrorCallbackMethodName = null,
         PositionOptions? options = null)
         where TComponent : class;
 
-	/// <summary>
-	/// Source generated implementation of <c>window.navigator.geolocation.watchPosition</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/watchPosition"></a>
-	/// </summary>
-	/// <param name="component">The calling Razor (or Blazor) component.</param>
-	/// <param name="onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}"</c>.</param>
-	/// <param name="onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}"</c>.</param>
-	/// <param name="options">The <c>PositionOptions</c> value.</param>
-	double WatchPosition<TComponent>(
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.geolocation.watchPosition</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/watchPosition"></a>
+    /// </summary>
+    /// <param name="component">The calling Razor (or Blazor) component.</param>
+    /// <param name="onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}"</c>.</param>
+    /// <param name="onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}"</c>.</param>
+    /// <param name="options">The <c>PositionOptions</c> value.</param>
+    double WatchPosition<TComponent>(
         TComponent component, 
         string onSuccessCallbackMethodName, 
         string? onErrorCallbackMethodName = null, 
@@ -409,44 +409,44 @@ namespace Microsoft.JSInterop;
 /// <inheritdoc />
 internal sealed class GeolocationService : IGeolocationService
 {
-	private readonly IJSInProcessRuntime _javaScript = null;
+    private readonly IJSInProcessRuntime _javaScript = null;
 
-	public GeolocationService(IJSInProcessRuntime javaScript)
-	{
-		_javaScript = javaScript;
-	}
+    public GeolocationService(IJSInProcessRuntime javaScript)
+    {
+        _javaScript = javaScript;
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IGeolocationService.ClearWatch(System.Double)" />
-	void IGeolocationService.ClearWatch(double watchId)
-	{
-		_javaScript.InvokeVoid("window.navigator.geolocation.clearWatch", watchId);
-	}
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IGeolocationService.ClearWatch(System.Double)" />
+    void IGeolocationService.ClearWatch(double watchId)
+    {
+        _javaScript.InvokeVoid("window.navigator.geolocation.clearWatch", watchId);
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IGeolocationService.GetCurrentPosition``1(``0,System.String,System.String,Microsoft.JSInterop.PositionOptions)" />
-	void IGeolocationService.GetCurrentPosition<TComponent>(
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IGeolocationService.GetCurrentPosition``1(``0,System.String,System.String,Microsoft.JSInterop.PositionOptions)" />
+    void IGeolocationService.GetCurrentPosition<TComponent>(
         TComponent component, 
         string onSuccessCallbackMethodName, 
         string? onErrorCallbackMethodName, 
         PositionOptions? options)
-	{
-		_javaScript.InvokeVoid("blazorators.getCurrentPosition", DotNetObjectReference.Create<TComponent>(component), onSuccessCallbackMethodName, onErrorCallbackMethodName, options);
-	}
+    {
+        _javaScript.InvokeVoid("blazorators.getCurrentPosition", DotNetObjectReference.Create<TComponent>(component), onSuccessCallbackMethodName, onErrorCallbackMethodName, options);
+    }
 
-	/// <inheritdoc cref="M:Microsoft.JSInterop.IGeolocationService.WatchPosition``1(``0,System.String,System.String,Microsoft.JSInterop.PositionOptions)" />
-	double IGeolocationService.WatchPosition<TComponent>(
+    /// <inheritdoc cref="M:Microsoft.JSInterop.IGeolocationService.WatchPosition``1(``0,System.String,System.String,Microsoft.JSInterop.PositionOptions)" />
+    double IGeolocationService.WatchPosition<TComponent>(
         TComponent component, 
         string onSuccessCallbackMethodName, 
         string? onErrorCallbackMethodName, 
         PositionOptions? options)
-	{
-		return _javaScript.Invoke<double>("blazorators.watchPosition", new object[4]
-		{
-			DotNetObjectReference.Create<TComponent>(component),
-			onSuccessCallbackMethodName,
-			onErrorCallbackMethodName,
-			options
-		});
-	}
+    {
+        return _javaScript.Invoke<double>("blazorators.watchPosition", new object[4]
+        {
+            DotNetObjectReference.Create<TComponent>(component),
+            onSuccessCallbackMethodName,
+            onErrorCallbackMethodName,
+            options
+        });
+    }
 }
 ```
 
@@ -460,32 +460,32 @@ namespace Microsoft.JSInterop;
 /// </summary>
 public class GeolocationPosition
 {
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPosition.coords</c> value.
-	/// </summary>
-	[JsonPropertyName("coords")]
-	public GeolocationCoordinates Coords
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPosition.coords</c> value.
+    /// </summary>
+    [JsonPropertyName("coords")]
+    public GeolocationCoordinates Coords
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPosition.timestamp</c> value.
-	/// </summary>
-	[JsonPropertyName("timestamp")]
-	public long Timestamp
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPosition.timestamp</c> value.
+    /// </summary>
+    [JsonPropertyName("timestamp")]
+    public long Timestamp
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPosition.timestamp</c> value, 
-	/// converted as a <see cref="T:System.DateTime" /> in UTC.
-	/// </summary>
-	[JsonIgnore]
-	public DateTime TimestampAsUtcDateTime => Timestamp.ToDateTimeFromUnix();
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPosition.timestamp</c> value, 
+    /// converted as a <see cref="T:System.DateTime" /> in UTC.
+    /// </summary>
+    [JsonIgnore]
+    public DateTime TimestampAsUtcDateTime => Timestamp.ToDateTimeFromUnix();
 }
 
 /// <summary>
@@ -493,75 +493,75 @@ public class GeolocationPosition
 /// </summary>
 public class GeolocationCoordinates
 {
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.accuracy</c> value.
-	/// </summary>
-	[JsonPropertyName("accuracy")]
-	public double Accuracy
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.accuracy</c> value.
+    /// </summary>
+    [JsonPropertyName("accuracy")]
+    public double Accuracy
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.altitude</c> value.
-	/// </summary>
-	[JsonPropertyName("altitude")]
-	public double? Altitude
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.altitude</c> value.
+    /// </summary>
+    [JsonPropertyName("altitude")]
+    public double? Altitude
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.altitudeAccuracy</c> value.
-	/// </summary>
-	[JsonPropertyName("altitudeAccuracy")]
-	public double? AltitudeAccuracy
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.altitudeAccuracy</c> value.
+    /// </summary>
+    [JsonPropertyName("altitudeAccuracy")]
+    public double? AltitudeAccuracy
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.heading</c> value.
-	/// </summary>
-	[JsonPropertyName("heading")]
-	public double? Heading
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.heading</c> value.
+    /// </summary>
+    [JsonPropertyName("heading")]
+    public double? Heading
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.latitude</c> value.
-	/// </summary>
-	[JsonPropertyName("latitude")]
-	public double Latitude
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.latitude</c> value.
+    /// </summary>
+    [JsonPropertyName("latitude")]
+    public double Latitude
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.longitude</c> value.
-	/// </summary>
-	[JsonPropertyName("longitude")]
-	public double Longitude
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.longitude</c> value.
+    /// </summary>
+    [JsonPropertyName("longitude")]
+    public double Longitude
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationCoordinates.speed</c> value.
-	/// </summary>
-	[JsonPropertyName("speed")]
-	public double? Speed
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationCoordinates.speed</c> value.
+    /// </summary>
+    [JsonPropertyName("speed")]
+    public double? Speed
+    {
+        get;
+        set;
+    }
 }
 
 /// <summary>
@@ -569,55 +569,55 @@ public class GeolocationCoordinates
 /// </summary>
 public class GeolocationPositionError
 {
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPositionError.code</c> value.
-	/// </summary>
-	[JsonPropertyName("code")]
-	public double Code
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPositionError.code</c> value.
+    /// </summary>
+    [JsonPropertyName("code")]
+    public double Code
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPositionError.message</c> value.
-	/// </summary>
-	[JsonPropertyName("message")]
-	public string Message
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPositionError.message</c> value.
+    /// </summary>
+    [JsonPropertyName("message")]
+    public string Message
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPositionError.PERMISSION_DENIED</c> value.
-	/// </summary>
-	[JsonPropertyName("PERMISSION_DENIED")]
-	public double PERMISSION_DENIED
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPositionError.PERMISSION_DENIED</c> value.
+    /// </summary>
+    [JsonPropertyName("PERMISSION_DENIED")]
+    public double PERMISSION_DENIED
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPositionError.POSITION_UNAVAILABLE</c> value.
-	/// </summary>
-	[JsonPropertyName("POSITION_UNAVAILABLE")]
-	public double POSITION_UNAVAILABLE
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPositionError.POSITION_UNAVAILABLE</c> value.
+    /// </summary>
+    [JsonPropertyName("POSITION_UNAVAILABLE")]
+    public double POSITION_UNAVAILABLE
+    {
+        get;
+        set;
+    }
 
-	/// <summary>
-	/// Source-generated property representing the <c>GeolocationPositionError.TIMEOUT</c> value.
-	/// </summary>
-	[JsonPropertyName("TIMEOUT")]
-	public double TIMEOUT
-	{
-		get;
-		set;
-	}
+    /// <summary>
+    /// Source-generated property representing the <c>GeolocationPositionError.TIMEOUT</c> value.
+    /// </summary>
+    [JsonPropertyName("TIMEOUT")]
+    public double TIMEOUT
+    {
+        get;
+        set;
+    }
 }
 
 // Additional models omitted for brevity...
