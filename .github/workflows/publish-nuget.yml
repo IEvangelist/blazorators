@@ -34,8 +34,8 @@ jobs:
         dotnet restore ./src/Blazor.Serialization/Blazor.Serialization.csproj
         dotnet restore ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
         dotnet restore ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj
-        dotnet restore ./src/Blazor.SessionStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
-        dotnet restore ./src/Blazor.SessionStorage.Server/Blazor.LocalStorage.Server.csproj
+        dotnet restore ./src/Blazor.SessionStorage.WebAssembly/Blazor.SessionStorage.WebAssembly.csproj
+        dotnet restore ./src/Blazor.SessionStorage.Server/Blazor.SessionStorage.Server.csproj
         dotnet restore ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj
         dotnet restore ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj
       
@@ -45,8 +45,8 @@ jobs:
         dotnet build ./src/Blazor.Serialization/Blazor.Serialization.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
-        dotnet build ./src/Blazor.SessionStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
-        dotnet build ./src/Blazor.SessionStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.SessionStorage.WebAssembly/Blazor.SessionStorage.WebAssembly.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.SessionStorage.Server/Blazor.SessionStorage.Server.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj --configuration Release --no-restore
 
@@ -59,8 +59,8 @@ jobs:
         dotnet pack ./src/Blazor.Serialization/Blazor.Serialization.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
-        dotnet pack ./src/Blazor.SessionStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
-        dotnet pack ./src/Blazor.SessionStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
+        dotnet pack ./src/Blazor.SessionStorage.WebAssembly/Blazor.SessionStorage.WebAssembly.csproj --output packages
+        dotnet pack ./src/Blazor.SessionStorage.Server/Blazor.SessionStorage.Server.csproj --output packages
         dotnet pack ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --output packages
         dotnet pack ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj --output packages
 
