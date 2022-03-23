@@ -17,16 +17,18 @@ A C# source generator that creates extensions methods on the Blazor WebAssembly 
 |--|--|--|
 | [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SourceGenerators.svg?style=flat)](https://www.nuget.org/packages/Blazor.SourceGenerators) | Core source generator library. |
 | [`Blazor.Serialization`](https://www.nuget.org/packages/Blazor.Serialization) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Serialization.svg?style=flat)](https://www.nuget.org/packages/Blazor.Serialization) | Common serialization library, required in some scenarios when using generics. |
-| [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | Blazor WebAssembly class library exposing DI-ready `IStorage` type for the `localStorage` implementation (relies on `IJSInProcessRuntime`). |
-| [`Blazor.LocalStorage.Server`](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | Blazor Server class library exposing DI-ready `IStorage` type for the `localStorage` implementation (relies on `IJSRuntime`) |
-| [`Blazor.Geolocation.WebAssembly`](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly) | Razor class library exposing DI-ready `IGeolocation` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSInProcessRuntime`). |
-| [`Blazor.Geolocation.Server`](https://www.nuget.org/packages/Blazor.Geolocation.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.Server) | Razor class library exposing DI-ready `IGeolocation` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSRuntime`). |
+| [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) | Blazor WebAssembly class library exposing DI-ready `IStorageService` type for the `localStorage` implementation (relies on `IJSInProcessRuntime`). |
+| [`Blazor.LocalStorage.Server`](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | Blazor Server class library exposing DI-ready `IStorageService` type for the `localStorage` implementation (relies on `IJSRuntime`) |
+| [`Blazor.SessionStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.SessionStorage.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SessionStorage.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.SessionStorage.WebAssembly) | Blazor WebAssembly class library exposing DI-ready `IStorageService` type for the `sessionStorage` implementation (relies on `IJSInProcessRuntime`). |
+| [`Blazor.SessionStorage.Server`](https://www.nuget.org/packages/Blazor.SessionStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SessionStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.SessionStorage.Server) | Blazor Server class library exposing DI-ready `IStorageService` type for the `sessionStorage` implementation (relies on `IJSRuntime`) |
+| [`Blazor.Geolocation.WebAssembly`](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.WebAssembly.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly) | Razor class library exposing DI-ready `IGeolocationService` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSInProcessRuntime`). |
+| [`Blazor.Geolocation.Server`](https://www.nuget.org/packages/Blazor.Geolocation.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.Server) | Razor class library exposing DI-ready `IGeolocationService` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSRuntime`). |
 
 ## Using the `Blazor.SourceGenerators` package 📦
 
 As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) Web API.
 
-Consider the _SynchronousLocalStorageExtensions.cs_ C# file:
+Consider the IStorageService.cs_ C# file:
 
 ```csharp
 // Copyright (c) David Pine. All rights reserved.
@@ -43,9 +45,7 @@ namespace Microsoft.JSInterop;
         "getItem",
         "setItem:value"
     })]
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial interface IStorageService
-#pragma warning restore CS1591 // The XML comments are source generated
 {
 }
 ```
@@ -60,7 +60,7 @@ This code designates itself into the `Microsoft.JSInterop` namespace, making the
 > The generic method descriptors syntax is:
 > `"methodName"` for generic return type and `"methodName:parameterName"` for generic parameter type.
 
-The file needs to define an interface and it needs to be `partial`, for example; `public partial interface`. Decorating the class with the `JSAutoInterop` (or `JSAutoGenericInterop) attribute will source generate the following C# code, as shown in the source generated `IStorageService.g.cs`:
+The file needs to define an interface and it needs to be `partial`, for example; `public partial interface`. Decorating the class with the `JSAutoInterop` (or `JSAutoGenericInterop) attribute will source generate the following C# code, as shown in the source generated `IStorageServiceService.g.cs`:
 
 ```csharp
 using Blazor.Serialization.Extensions;
@@ -72,7 +72,7 @@ namespace Microsoft.JSInterop;
 /// <summary>
 /// Source generated interface definition of the <c>Storage</c> type.
 /// </summary>
-public partial interface IStorageService
+public partial interface IStorageServiceService
 {
     /// <summary>
     /// Source generated implementation of <c>window.localStorage.length</c>.
@@ -119,7 +119,7 @@ These internal extension methods rely on the `IJSInProcessRuntime` to perform Ja
 
 - `IStorageService.g.cs`: The interface for the corresponding `Storage` Web API surface area.
 - `LocalStorgeService.g.cs`: The `internal` implementation of the `IStorageService` interface.
-- `LocalStorageServiceCollectionExtensions.g.cs`: Extension methods to add the `IStorage` service to the dependency injection `IServiceCollection`.
+- `LocalStorageServiceCollectionExtensions.g.cs`: Extension methods to add the `IStorageService` service to the dependency injection `IServiceCollection`.
 
 Here is the source generated `LocalStorageService` implementation:
 
@@ -202,17 +202,17 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class LocalStorageServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the <see cref="IStorage" /> service to the service collection.
+    /// Adds the <see cref="IStorageService" /> service to the service collection.
     /// </summary>
     public static IServiceCollection AddLocalStorageServices(
         this IServiceCollection services) =>
         services.AddSingleton<IJSInProcessRuntime>(serviceProvider =>
             (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
-            .AddSingleton<IStorage, LocalStorage>();
+            .AddSingleton<IStorageService, LocalStorageService>();
 }
 ```
 
-Putting this all together, the `Blazor.LocalStorage.WebAssembly` NuGet package is actually only 20 lines of code, and it generates full DI-ready services with JavaScript interop.
+Putting this all together, the `Blazor.LocalStorage.WebAssembly` NuGet package is actually less than 15 lines of code, and it generates full DI-ready services with JavaScript interop.
 
 The `Blazor.LocalStorage.Server` package, generates extensions on the `IJSRuntime` type.
 
@@ -228,9 +228,7 @@ namespace Microsoft.JSInterop;
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public partial interface IStorageService
-#pragma warning restore CS1591 // The XML comments are source generated
+public partial interface IStorageServiceService
 {
 }
 ```
@@ -248,7 +246,7 @@ using System.Threading.Tasks;
 #nullable enable
 namespace Microsoft.JSInterop;
 
-public partial interface IStorageService
+public partial interface IStorageServiceService
 {
     /// <summary>
     /// Source generated implementation of <c>window.localStorage.length</c>.
@@ -339,9 +337,7 @@ namespace Microsoft.JSInterop;
     TypeName = "Geolocation",
     Implementation = "window.navigator.geolocation",
     Url = "https://developer.mozilla.org/docs/Web/API/Geolocation")]
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial interface IGeolocationService
-#pragma warning restore CS1591 // The XML comments are source generated
 {
 }
 ```

@@ -31,18 +31,22 @@ jobs:
     - name: Restore dependencies
       run: |
         dotnet restore ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj
+        dotnet restore ./src/Blazor.Serialization/Blazor.Serialization.csproj
         dotnet restore ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
         dotnet restore ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj
-        dotnet restore ./src/Blazor.Serialization/Blazor.Serialization.csproj
+        dotnet restore ./src/Blazor.SessionStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj
+        dotnet restore ./src/Blazor.SessionStorage.Server/Blazor.LocalStorage.Server.csproj
         dotnet restore ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj
         dotnet restore ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj
       
     - name: Build
       run: |
         dotnet build ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.Serialization/Blazor.Serialization.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
-        dotnet build ./src/Blazor.Serialization/Blazor.Serialization.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.SessionStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --configuration Release --no-restore
+        dotnet build ./src/Blazor.SessionStorage.Server/Blazor.LocalStorage.Server.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --configuration Release --no-restore
         dotnet build ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj --configuration Release --no-restore
 
@@ -52,9 +56,11 @@ jobs:
     - name: Pack
       run: |
         dotnet pack ./src/Blazor.SourceGenerators/Blazor.SourceGenerators.csproj --output packages
+        dotnet pack ./src/Blazor.Serialization/Blazor.Serialization.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
         dotnet pack ./src/Blazor.LocalStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
-        dotnet pack ./src/Blazor.Serialization/Blazor.Serialization.csproj --output packages
+        dotnet pack ./src/Blazor.SessionStorage.WebAssembly/Blazor.LocalStorage.WebAssembly.csproj --output packages
+        dotnet pack ./src/Blazor.SessionStorage.Server/Blazor.LocalStorage.Server.csproj --output packages
         dotnet pack ./src/Blazor.Geolocation.WebAssembly/Blazor.Geolocation.WebAssembly.csproj --output packages
         dotnet pack ./src/Blazor.Geolocation.Server/Blazor.Geolocation.Server.csproj --output packages
 
@@ -66,6 +72,12 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Blazor.SourceGenerators.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload serialization package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.Serialization.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/
 
     - name: Upload localStorage WebAssembly package
@@ -80,10 +92,16 @@ jobs:
         name: Blazor.LocalStorage.Server.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/
 
-    - name: Upload serialization package
+    - name: Upload sessionStorage WebAssembly package
       uses: actions/upload-artifact@v2
       with:
-        name: Blazor.Serialization.${{ steps.regex-match.outputs.match }}.nupkg
+        name: Blazor.SessionStorage.WebAssembly.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/
+
+    - name: Upload sessionStorage Server package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Blazor.SessionStorage.Server.${{ steps.regex-match.outputs.match }}.nupkg
         path: packages/
 
     - name: Upload geolocation WebAssembly package
