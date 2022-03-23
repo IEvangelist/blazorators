@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Blazor.ExampleConsumer</title>
+    <title>Blazorators Demo</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
@@ -12,7 +12,21 @@
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+    <a id="gitlink" target="_blank"
+       href="https://github.com/IEvangelist/blazorators">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="http://aral.github.io/fork-me-on-github-retina-ribbons/fork-me-right-cerulean@2x.png"
+             alt="Fork me on GitHub">
+    </a>
+    
+    <div id="app">
+        <div class="d-flex vh-100 align-items-center justify-content-center">
+            <div class="d-flex display-4 mt-5 fw-bold justify-content-center align-items-center">
+                <strong class="p-5">🤖 Loading...</strong>
+                <div class="spinner-grow ms-auto" role="status" aria-hidden="true"></div>
+            </div>
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.

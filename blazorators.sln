@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 		.github\workflows\pr-validation.yml = .github\workflows\pr-validation.yml
 		.github\workflows\publish-nuget.yml = .github\workflows\publish-nuget.yml
+		.github\workflows\publish-to-gh-pages.yml = .github\workflows\publish-to-gh-pages.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
