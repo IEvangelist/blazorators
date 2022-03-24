@@ -1,0 +1,74 @@
+﻿@page "/sandbox"
+
+@inject IJSInProcessRuntime JavaScript
+
+<h1>🎭 Sandbox</h1>
+<pre class="bg-dark text-info fs-4 p-4">
+    <code>
+        @(_position?.ToJson(_opts) ?? _positionError?.ToJson(_opts))
+    </code>
+</pre>
+
+@code {
+    readonly JsonSerializerOptions _opts = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+    private GeolocationPosition _position = null!;
+    private GeolocationPositionError _positionError = null!;
+
+    protected override void OnInitialized()
+    {
+        var service = new DelegatingService(JavaScript);
+        service.GetCurrentGeolocation(
+            position =>
+            {
+                _position = position;
+                StateHasChanged();
+            },
+            positionError =>
+            {
+                _positionError = positionError;
+                StateHasChanged();
+            });
+    }
+
+    class DelegatingService
+    {
+        private readonly IJSInProcessRuntime _javaScript;
+
+        private Action<GeolocationPosition>? _onSuccess;
+        private Action<GeolocationPositionError>? _onError;
+
+        public DelegatingService(IJSInProcessRuntime javaScript) =>
+            _javaScript = javaScript;
+
+        public void GetCurrentGeolocation(
+            Action<GeolocationPosition> onSuccess,
+            Action<GeolocationPositionError>? onError)
+        {
+            _onSuccess = onSuccess;
+            _onError = onError;
+
+            _javaScript.InvokeVoid(
+                "blazorators.getCurrentPosition",
+                DotNetObjectReference.Create(this),
+                nameof(OnSuccess),
+                nameof(OnError));
+        }
+
+        [JSInvokable]
+        public void OnSuccess(GeolocationPosition position)
+        {
+            _onSuccess?.Invoke(position);
+        }
+
+        [JSInvokable]
+        public void OnError(GeolocationPositionError positionError)
+        {
+            _onError?.Invoke(positionError);
+        }
+    }
+}

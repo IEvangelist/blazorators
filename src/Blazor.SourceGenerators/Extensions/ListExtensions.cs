@@ -21,4 +21,5 @@ readonly record struct Interation(
 {
     internal bool IsFirst => Index is 0;
     internal bool IsLast => Index == Count - 1;
+    internal bool HasMore => Index + 1 < Count;
 }

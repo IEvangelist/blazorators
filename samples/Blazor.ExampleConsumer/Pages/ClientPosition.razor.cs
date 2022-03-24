@@ -14,7 +14,7 @@ public sealed partial class ClientPosition
     readonly PositionOptions _options = new()
     {
         EnableHighAccuracy = true,
-        MaximumAge = 0,
+        MaximumAge = null,
         Timeout = 15_000
     };
 
