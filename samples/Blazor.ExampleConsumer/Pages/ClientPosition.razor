@@ -21,6 +21,11 @@
     }
 </h1>
 
+@if (_isLoading)
+{
+    <p>This page demonstrates the source generated <code>Blazor.Geolocation.WebAssembly</code> package.</p>
+}
+
 @{
     var (bgClass, json) = (_position, _positionError) switch
     {

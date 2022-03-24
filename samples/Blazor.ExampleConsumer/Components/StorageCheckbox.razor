@@ -1,0 +1,29 @@
+﻿@inject IStorageService LocalStorage
+
+<label class="ps-2 selectable flex-fill" for="@Item.Id">
+    <input type="checkbox" class="form-check-input" value=@Item.IsCompleted
+        id="@Item.Id" @onchange=@OnIsCompletedChanged />
+    <span class="ps-3">@Item.Task</span>
+</label>
+@if (EndContent is not null)
+{
+    @EndContent
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public TodoItem Item { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment EndContent { get; set; } = null!;
+
+    void OnIsCompletedChanged(ChangeEventArgs args)
+    {
+        if (bool.TryParse(args?.Value?.ToString(), out var isCompleted))
+        {
+            LocalStorage.SetItem(
+                Item.Id,
+                Item = Item with { IsCompleted = isCompleted });
+        }
+    }
+}

@@ -1,0 +1,42 @@
+﻿@page "/todos"
+
+<PageTitle>Tasks</PageTitle>
+
+<h1>Local Storage</h1>
+<p>This page demonstrates the source generated <code>Blazor.LocalStorage.WebAssembly</code> package.</p>
+
+<div class="card col-6">
+    <div class="card-body p-5">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="form-outline flex-fill">
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-lg" 
+                        @bind=_todoValue
+                        @onkeyup="@OnKeyUp"
+                        autocomplete="off"
+                        placeholder="New task..." />
+                    <button type="button" class="btn btn-primary"
+                        @onclick="AddNewTodo">Add</button>
+                    </div>                
+            </div>            
+        </div>
+        @if (_todos is { Count: > 0 })
+        {
+            <ul class="list-group mb-0 pt-5">
+                @foreach (var todo in _todos)
+                {
+                    <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded bg-light">
+                        <StorageCheckbox Item=@todo>
+                            <EndContent>
+                                <button class="btn btn-sm btn-danger" type="button" 
+                                @onclick=@(_ => Delete(todo))>
+                                    <span class="oi oi-trash"></span>
+                                </button>
+                            </EndContent>
+                        </StorageCheckbox>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

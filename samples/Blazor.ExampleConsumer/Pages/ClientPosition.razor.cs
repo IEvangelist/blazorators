@@ -3,7 +3,7 @@
 
 namespace Blazor.ExampleConsumer.Pages;
 
-public partial class ClientPosition
+public sealed partial class ClientPosition
 {
     readonly JsonSerializerOptions _opts = new()
     {

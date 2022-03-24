@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		.github\workflows\build-validation.yml = .github\workflows\build-validation.yml
 		LICENSE = LICENSE
+		logo-large.png = logo-large.png
+		logo.png = logo.png
 		.github\workflows\pr-validation.yml = .github\workflows\pr-validation.yml
 		.github\workflows\publish-nuget.yml = .github\workflows\publish-nuget.yml
 		.github\workflows\publish-to-gh-pages.yml = .github\workflows\publish-to-gh-pages.yml
@@ -37,9 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.WebAssem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.Server", "src\Blazor.Geolocation.Server\Blazor.Geolocation.Server.csproj", "{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.SessionStorage.WebAssembly", "src\Blazor.SessionStorage.WebAssembly\Blazor.SessionStorage.WebAssembly.csproj", "{B8FF9EFA-D8DA-43AB-8056-991FFDB609D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SessionStorage.WebAssembly", "src\Blazor.SessionStorage.WebAssembly\Blazor.SessionStorage.WebAssembly.csproj", "{B8FF9EFA-D8DA-43AB-8056-991FFDB609D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.SessionStorage.Server", "src\Blazor.SessionStorage.Server\Blazor.SessionStorage.Server.csproj", "{F54C9271-5C28-498D-9081-59EAA22FEC69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SessionStorage.Server", "src\Blazor.SessionStorage.Server\Blazor.SessionStorage.Server.csproj", "{F54C9271-5C28-498D-9081-59EAA22FEC69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
