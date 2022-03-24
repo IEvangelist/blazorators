@@ -13,11 +13,15 @@
     }
     @if (_position is not null)
     {
-        <span>: 
+        <span class="pe-1">: 
             <code>
                 @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
             </code>
         </span>
+        <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
+            rel="noopener noreferrer nofollow">
+            <span class="oi oi-external-link"></span>
+        </a>
     }
 </h1>
 

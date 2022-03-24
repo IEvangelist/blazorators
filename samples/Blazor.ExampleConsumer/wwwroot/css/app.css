@@ -34,6 +34,13 @@ a, .btn-link {
     color: red;
 }
 
+@media (max-width: 992px) {
+    #gitlink {
+        display: none;
+        user-select: none;
+    }
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
