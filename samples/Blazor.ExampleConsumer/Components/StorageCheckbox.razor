@@ -1,7 +1,9 @@
 ﻿@inject IStorageService LocalStorage
 
 <label class="ps-2 selectable flex-fill" for="@Item.Id">
-    <input type="checkbox" class="form-check-input" value=@Item.IsCompleted
+    <input type="checkbox" class="form-check-input"
+        value=@Item.IsCompleted
+        checked=@Item.IsCompleted
         id="@Item.Id" @onchange=@OnIsCompletedChanged />
     <span class="ps-3">@Item.Task</span>
 </label>

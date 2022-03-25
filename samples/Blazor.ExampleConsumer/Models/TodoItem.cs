@@ -13,6 +13,5 @@ public record class TodoItem(
     public string Id => $"{IdPrefix}{GetHashCode()}";
 
     public override int GetHashCode() =>
-    ((EqualityComparer<Type>.Default.GetHashCode(typeof(TodoItem)) * -1521134295) +
-        EqualityComparer<string>.Default.GetHashCode(Task)) * -1521134295;
+        EqualityComparer<string>.Default.GetHashCode(Task) * -1521134295;
 }

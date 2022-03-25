@@ -17,12 +17,17 @@ public sealed partial class TodoList
     [Inject]
     public NavigationManager Nav { get; set; } = null!;
 
-    protected override void OnInitialized() =>
-        _todos = GetTaskItemKeys()
+    protected override void OnInitialized()
+    {
+        var todos = GetTaskItemKeys()
             .Where(key => key.StartsWith(TodoItem.IdPrefix))
             .Select(key => LocalStorage.GetItem<TodoItem>(key))
             .Where(todo => todo is not null)
             .ToList()!;
+
+        _todos = todos;
+    }
+        
 
     IEnumerable<string> GetTaskItemKeys()
     {
