@@ -1,13 +1,34 @@
 ﻿@page "/sandbox"
 
-@inject IJSInProcessRuntime JavaScript
+@inject IGeolocationService Geolocation
 
-<h1>🎭 Sandbox</h1>
+<h1>
+    🎭 Sandbox
+    @if (_isLoading)
+    {
+        <span class="spinner-border text-light" style="border-width: .12em;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </span>
+    }
+    @if (_position is not null)
+    {
+        <span class="pe-1">: 
+            <code>
+                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
+            </code>
+        </span>
+        <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
+            rel="noopener noreferrer nofollow">
+            <span class="oi oi-external-link"></span>
+        </a>
+    }
+</h1>
 <pre class="bg-dark text-info fs-4 p-4">
     <code>
         @(_position?.ToJson(_opts) ?? _positionError?.ToJson(_opts))
     </code>
 </pre>
+<BingMap Position=@_position />
 
 @code {
     readonly JsonSerializerOptions _opts = new()
@@ -16,13 +37,12 @@
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
-    private GeolocationPosition _position = null!;
-    private GeolocationPositionError _positionError = null!;
+    bool _isLoading => _position is null && _positionError is null;
+    GeolocationPosition _position = null!;
+    GeolocationPositionError _positionError = null!;
 
-    protected override void OnInitialized()
-    {
-        var service = new DelegatingService(JavaScript);
-        service.GetCurrentGeolocation(
+    protected override void OnInitialized() =>
+        Geolocation.GetCurrentPosition(
             position =>
             {
                 _position = position;
@@ -33,42 +53,4 @@
                 _positionError = positionError;
                 StateHasChanged();
             });
-    }
-
-    class DelegatingService
-    {
-        private readonly IJSInProcessRuntime _javaScript;
-
-        private Action<GeolocationPosition>? _onSuccess;
-        private Action<GeolocationPositionError>? _onError;
-
-        public DelegatingService(IJSInProcessRuntime javaScript) =>
-            _javaScript = javaScript;
-
-        public void GetCurrentGeolocation(
-            Action<GeolocationPosition> onSuccess,
-            Action<GeolocationPositionError>? onError)
-        {
-            _onSuccess = onSuccess;
-            _onError = onError;
-
-            _javaScript.InvokeVoid(
-                "blazorators.getCurrentPosition",
-                DotNetObjectReference.Create(this),
-                nameof(OnSuccess),
-                nameof(OnError));
-        }
-
-        [JSInvokable]
-        public void OnSuccess(GeolocationPosition position)
-        {
-            _onSuccess?.Invoke(position);
-        }
-
-        [JSInvokable]
-        public void OnError(GeolocationPositionError positionError)
-        {
-            _onError?.Invoke(positionError);
-        }
-    }
 }
