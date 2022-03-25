@@ -19,6 +19,9 @@ internal sealed class SourceBuilder
     private string? _interfaceName;
     private bool _isService;
 
+    internal ISet<string>? Fields { get; private set; }
+    internal ISet<string>? Methods { get; private set; }
+
     internal int IndentationLevel => _indentation.Level;
     internal string ImplementationName => _implementationName ??=
         $"{_options.Implementation.ToImplementationName(_isService)}";
@@ -247,6 +250,77 @@ internal sealed class SourceBuilder
     internal SourceBuilder IncreaseIndentation()
     {
         IncreaseIndentationImpl(true);
+
+        return this;
+    }
+
+    internal SourceBuilder AppendConditionalDelegateFields(List<CSharpMethod>? methods)
+    {
+        if (methods is { Count: > 0 })
+        {
+            foreach (var group in
+                methods.SelectMany(m => m.ParameterDefinitions)
+                    .Where(param => param.ActionDeclation is not null)
+                    .GroupBy(param => param.RawName))
+            {
+                var param = group.First();
+                var keys =
+                    param.ActionDeclation!.ParameterDefinitions.Select(p => p.RawTypeName);
+
+                var fieldName = $"_{param.RawName}";
+                Fields ??= new HashSet<string>();
+                Fields.Add(fieldName);
+
+                AppendRaw($"private Action<{string.Join(", ", keys)}>? {fieldName};");
+            }
+
+            AppendLine();
+        }
+
+        return this;
+    }
+
+    internal SourceBuilder AppendConditionalDelegateCallbackMethods(List<CSharpMethod>? methods)
+    {
+        if (methods is { Count: > 0 })
+        {
+            var level = IndentationLevel;
+
+            foreach (var group in
+                methods.SelectMany(m => m.ParameterDefinitions)
+                    .Where(param => param.ActionDeclation is not null)
+                    .GroupBy(param => param.RawName))
+            {
+                var param = group.First();
+                var methodName = $"On{param.RawName.CapitalizeFirstLetter()}";
+                Methods ??= new HashSet<string>();
+                if (Methods.Add(methodName))
+                {
+                    var fieldName = $"_{param.RawName}";
+
+                    AppendRaw("[JSInvokable]");
+                    AppendRaw($"public void {methodName}(", postIncreaseIndentation: true);
+                    var args = new List<string>();
+                    foreach (var (interation, p) in param.ActionDeclation!.ParameterDefinitions!.Select())
+                    {
+                        args.Add(p.RawName);
+                        AppendRaw($"{p.RawTypeName} {p.RawName}", appendNewLine: false);
+                        if (interation.HasMore)
+                        {
+                            AppendRaw(",");
+                        }
+                        else
+                        {
+                            AppendRaw(") =>", postIncreaseIndentation: true);
+                            AppendRaw($"{fieldName}?.Invoke({string.Join(", ", args)});");
+                        }
+                    }
+                }
+            }
+
+            AppendLine();
+            ResetIndentiationTo(level);
+        }
 
         return this;
     }

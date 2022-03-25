@@ -1,6 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Linq;
 using Blazor.SourceGenerators.Builders;
 
 namespace Blazor.SourceGenerators.CSharp;
@@ -141,6 +142,39 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                 {
                     builder.AppendRaw(") where TComponent : class;", appendNewLine: true, omitIndentation: true);
                 }
+
+                builder.AppendTripleSlashMethodComments(details.Method)
+                    .AppendRaw(
+                        $"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}(",
+                        postIncreaseIndentation: true);
+
+                if (method.ParameterDefinitions.Count > 0)
+                {
+                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+                    {
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                        if (pi.IsLast)
+                        {
+                            builder.AppendRaw($"{parameter.ToActionString(isGenericType)});")
+                                .AppendLine();
+                        }
+                        else
+                        {
+                            if (pi.IsFirst)
+                            {
+                                builder.AppendLine();
+                            }
+
+                            builder.AppendRaw($"{parameter.ToActionString(isGenericType)},");
+                        }
+                    }
+
+                    builder.DecreaseIndentation();
+                }
+                else
+                {
+                    builder.AppendRaw(");", appendNewLine: true, omitIndentation: true);
+                }
             }
         }
 
@@ -183,9 +217,12 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             .AppendInternalImplementationDeclaration()
             .AppendOpeningCurlyBrace()
             .IncreaseIndentation()
+            .AppendConditionalDelegateFields(Methods)
             .AppendImplementationCtor();
 
         var methodLevel = builder.IndentationLevel;
+
+        builder.AppendConditionalDelegateCallbackMethods(Methods);
 
         // Methods
         foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
@@ -338,6 +375,80 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                         else
                         {
                             builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)},");
+                        }
+                    }
+
+                    builder.DecreaseIndentation();
+                }
+
+                builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
+                    .AppendRaw(
+                        $"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}(",
+                        postIncreaseIndentation: true);
+
+                if (method.ParameterDefinitions.Count > 0)
+                {
+                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+                    {
+                        if (pi.IsLast)
+                        {
+                            builder.AppendRaw($"{parameter.ToActionString(false, true)})");
+                            builder.AppendOpeningCurlyBrace();
+                        }
+                        else
+                        {
+                            builder.AppendRaw($"{parameter.ToActionString(false, true)},");
+                        }
+                    }
+
+                    foreach (var parameter in method.ParameterDefinitions)
+                    {
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                        var arg = parameter.ToArgumentString(isGenericType, true);
+                        var fieldName =
+                            builder.Fields.FirstOrDefault(field => field.EndsWith(parameter.RawName));
+
+                        if (fieldName is null) continue;
+                        builder.AppendRaw($"{fieldName} = {arg};");
+                    }
+
+                    if (details.IsVoid)
+                    {
+                        var returnExpression = options.IsWebAssembly ? "" : "return ";
+                        builder.AppendRaw($"{returnExpression}_javaScript.InvokeVoid{details.Suffix}(");
+                    }
+                    else
+                    {
+                        builder.AppendRaw($"return _javaScript.Invoke{details.Suffix}<{details.BareType}>(");
+                    }
+
+                    builder.IncreaseIndentation()
+                        .AppendRaw($"\"{details.FullyQualifiedJavaScriptIdentifier}\",");
+
+                    // Write method body / expression, and arguments to javaScript.Invoke*
+                    foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
+                    {
+                        if (ai.IsFirst)
+                        {
+                            builder.AppendRaw($"DotNetObjectReference.Create(this),");
+                        }
+
+                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                        var arg = parameter.ToArgumentString(isGenericType, true);
+                        var methodName =
+                            builder.Methods.FirstOrDefault(
+                                method => method.EndsWith(arg.Substring(2)));
+                        var argExpression = methodName is not null ? $"nameof({methodName})" : arg;
+                        if (ai.IsLast)
+                        {
+                            builder.AppendRaw($"{argExpression});");
+                            builder.AppendClosingCurlyBrace();
+
+                            if (!index.IsLast) builder.AppendLine();
+                        }
+                        else
+                        {
+                            builder.AppendRaw($"{argExpression},");
                         }
                     }
 

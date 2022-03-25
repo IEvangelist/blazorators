@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Blazor.SourceGenerators.Builders;
+using Blazor.SourceGenerators.Extensions;
 
 namespace Blazor.SourceGenerators.CSharp;
 
@@ -67,24 +68,35 @@ internal record CSharpType(
                 : RawTypeName;
 
         var parameterName = ToArgumentString();
-
-        if (overrideNullability)
-        {
-            return IsNullable
-                ? $"{typeName}? {parameterName}"
-                : $"{typeName} {parameterName}";
-        }
+        var parameterDefault = overrideNullability ? "" : " = null";
 
         return IsNullable
-            ? $"{typeName}? {parameterName} = null"
+            ? $"{typeName}? {parameterName}{parameterDefault}"
             : $"{typeName} {parameterName}";
     }
 
-    public string ToArgumentString(bool toJson = false)
+    public string ToActionString(bool isGenericType = false, bool overrideNullability = false)
+    {
+        if (ActionDeclation is not null)
+        {
+            var parameterName = ToArgumentString(asDelegate: true);
+            var dependentTypes = ActionDeclation.DependentTypes.Keys;
+            var parameterDefault = overrideNullability ? "" : " = null";
+
+            return IsNullable
+                ? $"Action<{string.Join(", ", dependentTypes)}>? {parameterName}{parameterDefault}"
+                : $"Action<{string.Join(", ", dependentTypes)}> {parameterName}";
+        }
+
+        return ToParameterString(isGenericType, overrideNullability);
+    }
+
+    public string ToArgumentString(bool toJson = false, bool asDelegate = false)
     {
         var isCallback = ActionDeclation is not null;
+        var suffix = asDelegate ? "" : "MethodName";
         var parameterName = isCallback
-            ? $"on{RawName.CapitalizeFirstLetter()}MethodName"
+            ? $"on{RawName.CapitalizeFirstLetter()}{suffix}"
             : RawName.LowerCaseFirstLetter();
 
         return toJson
