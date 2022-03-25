@@ -30,12 +30,9 @@ jobs:
         dotnet-version: 6.0.x
         include-prerelease: true
 
-    - name: Install dependencies
-      run: |
-        dotnet restore
     - name: Build
       run: |
-        dotnet build --configuration Release --no-restore
+        dotnet build --no-incremental --disable-parallel --configuration Release
     - name: Test
       run: |
         dotnet test --no-restore --verbosity normal
