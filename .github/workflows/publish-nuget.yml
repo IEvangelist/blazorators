@@ -1,4 +1,4 @@
-name: publish nuget matrix
+name: publish nuget
 on:
   push:
     tags:
@@ -58,13 +58,17 @@ jobs:
     - name: Build ${{ matrix.project }}
       run: |
         dotnet build ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --no-restore
+    
+    - name: Pack ${{ matrix.project }}
+      run: |
+        dotnet pack ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --output packages
 
     - name: Upload ${{ matrix.project }}
-      uses: ./.github/workflows/upload-package
+      uses: actions/upload-artifact@v2
       with:
-        version: ${{ steps.regex-match.outputs.match }}
-        project-name: ${{ matrix.project }}
-    
+        name: ${{ matrix.project }}.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/*.nupkg
+      
     - name: Publish ${{ matrix.project }} package
       run: |
         nuget push **\${{ matrix.project }}.*.nupkg -Source 'https://api.nuget.org/v3/index.json' -NoSymbols -NonInteractive -ApiKey ${{secrets.NUGET_API_KEY}}
