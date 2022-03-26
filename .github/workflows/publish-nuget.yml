@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - 1.*
+  workflow_dispatch:
 
 jobs:
   test:
@@ -60,11 +61,11 @@ jobs:
         dotnet build ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --no-restore
 
     - name: Upload ${{ matrix.project }}
-      uses: ./.github/workflows/upload-package
+      uses: actions/upload-artifact@v2
       with:
-        version: ${{ steps.regex-match.outputs.match }}
-        project-name: ${{ matrix.project }}
-    
+        name: Blazor.SourceGenerators.${{ steps.regex-match.outputs.match }}.nupkg
+        path: packages/Blazor.SourceGenerators.${{ steps.regex-match.outputs.match }}.nupkg
+      
     - name: Publish ${{ matrix.project }} package
       run: |
         nuget push **\${{ matrix.project }}.*.nupkg -Source 'https://api.nuget.org/v3/index.json' -NoSymbols -NonInteractive -ApiKey ${{secrets.NUGET_API_KEY}}
