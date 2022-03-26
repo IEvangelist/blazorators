@@ -58,11 +58,11 @@ jobs:
       
     - name: Build ${{ matrix.project }}
       run: |
-        dotnet build ./src/${{ matri.project }}/${{ matrix.project }}.csproj --configuration Release --no-restore
+        dotnet build ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --no-restore
     
     - name: Pack ${{ matrix.project }}
       run: |
-        dotnet pack ./src/${{ matri.project }}/${{ matrix.project }}.csproj --output packages
+        dotnet pack ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --output packages
 
     - name: Upload ${{ matrix.project }}
       uses: actions/upload-artifact@v2
