@@ -30,6 +30,8 @@ jobs:
         - Blazor.SessionStorage.Server
         - Blazor.Geolocation.WebAssembly
         - Blazor.Geolocation.Server
+        - Blazor.SpeechSynthesis.WebAssembly
+        - Blazor.SpeechSynthesis.Server
     steps:
     
     - name: Print tag ref

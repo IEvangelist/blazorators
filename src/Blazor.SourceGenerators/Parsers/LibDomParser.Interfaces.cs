@@ -15,7 +15,10 @@ internal sealed partial class LibDomParser
             if (index == 0)
             {
                 var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
-                var subclass = ExtendsTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
+
+                // Ignore event targets for now.
+                var seg = segment.Replace(" extends EventTarget", "");
+                var subclass = ExtendsTypeNameRegex.GetMatchGroupValue(seg, "TypeName");
                 if (typeName is not null)
                 {
                     cSharpObject = new(typeName, subclass);
@@ -61,9 +64,9 @@ internal sealed partial class LibDomParser
                         parameters,
                         obj => cSharpObject.DependentTypes![obj.TypeName] = obj);
 
-                CSharpMethod cSharpMethod =
-                    new(methodName, CleanseReturnType(returnType), parameterDefinitions, javaScriptMethod);
 
+                var cSharpMethod =
+                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod);
                 cSharpObject.Methods[cSharpMethod.RawName] = cSharpMethod;
 
                 continue;
@@ -80,7 +83,7 @@ internal sealed partial class LibDomParser
                 }
 
                 var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?");
+                var isNullable = name.EndsWith("?") || type.Contains("| null");
 
                 name = name.Replace("?", "").Replace("readonly ", "");
 
@@ -164,11 +167,8 @@ internal sealed partial class LibDomParser
                         parameters,
                         obj => topLevelObject.DependentTypes![obj.TypeName] = obj);
 
-                CSharpMethod cSharpMethod =
-                    new(methodName,
-                    CleanseReturnType(returnType),
-                    parameterDefinitions,
-                    javaScriptMethod);
+                var cSharpMethod =
+                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod);
 
                 topLevelObject.Methods!.Add(cSharpMethod);
 
@@ -186,7 +186,7 @@ internal sealed partial class LibDomParser
                 }
 
                 var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?");
+                var isNullable = name.EndsWith("?") || type.Contains("| null");
 
                 name = name.Replace("?", "").Replace("readonly ", "");
 
@@ -218,6 +218,34 @@ internal sealed partial class LibDomParser
         }
 
         return topLevelObject;
+    }
+
+    private CSharpMethod ToMethod(
+        string methodName,
+        string returnType,
+        List<CSharpType> parameterDefinitions,
+        JavaScriptMethod? javaScriptMethod)
+    {
+        var methodReturnType = CleanseReturnType(returnType);
+        CSharpMethod cSharpMethod =
+            new(methodName,
+            methodReturnType,
+            parameterDefinitions,
+            javaScriptMethod);
+
+        var nonArrayMethodReturnType = methodReturnType.Replace("[]", "");
+        if (!TypeMap.PrimitiveTypes.IsPrimitiveType(nonArrayMethodReturnType) &&
+            _reader.TryGetDeclaration(nonArrayMethodReturnType, out var typeScriptDefinitionText) &&
+            typeScriptDefinitionText is not null)
+        {
+            var dependentType = ToObject(typeScriptDefinitionText);
+            if (dependentType is not null)
+            {
+                cSharpMethod.DependentTypes![nonArrayMethodReturnType] = dependentType;
+            }
+        }
+
+        return cSharpMethod;
     }
 
     internal CSharpAction? ToAction(string typeScriptTypeDeclaration)
@@ -364,7 +392,23 @@ internal sealed partial class LibDomParser
         string line, out Match? match)
     {
         match = TypeScriptMethodRegex.Match(line);
-        return match.Success;
+        var isSuccess = match.Success;
+        if (isSuccess)
+        {
+            var methodName = match.GetGroupValue("MethodName");
+            if (methodName is "addEventListener" or "removeEventListener")
+            {
+                return false;
+            }
+
+            var returnType = match.GetGroupValue("ReturnType");
+            if (returnType?.Contains("this") ?? false)
+            {
+                return false;
+            }
+        }
+
+        return isSuccess;
     }
 
     internal static bool IsProperty(
@@ -372,7 +416,23 @@ internal sealed partial class LibDomParser
         out Match? match)
     {
         match = TypeScriptPropertyRegex.Match(line);
-        return match.Success;
+        var isSuccess = match.Success;
+        if (isSuccess)
+        {
+            var name = match.GetGroupValue("Name");
+            if ((name is "addEventListener" or "removeEventListener") ||
+                (name is not null && name.Contains("this")))
+            {
+                return false;
+            }
+
+            if (match.GetGroupValue("Type") is "void")
+            {
+                return false;
+            }
+        }
+
+        return isSuccess;
     }
 }
 

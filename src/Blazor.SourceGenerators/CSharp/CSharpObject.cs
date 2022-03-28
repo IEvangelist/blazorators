@@ -78,7 +78,7 @@ internal record CSharpObject(
             var typeName = member.MappedTypeName;
             var nullableExpression = member.IsNullable && !typeName.EndsWith("?") ? "?" : "";
             var trivia = member.IsArray ? "[]" : "";
-            var statementTerminator = member.IsNullable ? " = default!;" : "";
+            var statementTerminator = member.IsNullable || typeName is "string" ? " = default!;" : "";
             var csharpMemberName = memberName.CapitalizeFirstLetter();
 
             builder.Append(

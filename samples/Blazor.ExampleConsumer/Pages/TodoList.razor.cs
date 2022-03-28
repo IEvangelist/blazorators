@@ -23,9 +23,9 @@ public sealed partial class TodoList
             .Where(key => key.StartsWith(TodoItem.IdPrefix))
             .Select(key => LocalStorage.GetItem<TodoItem>(key))
             .Where(todo => todo is not null)
-            .ToList()!;
+            .ToList() ?? new();
 
-        _todos = todos;
+        _todos = todos!;
     }
         
 

@@ -26,6 +26,12 @@ internal record CSharpProperty(
                         .Replace("ReadonlyArray<", "")
                         .Replace(">", "");
                 }
+
+                if (IsNullable)
+                {
+                    mappedTypeName = mappedTypeName
+                        .Replace("| null", "");
+                }
             }
 
             return mappedTypeName;

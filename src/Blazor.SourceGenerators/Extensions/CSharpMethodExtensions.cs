@@ -75,7 +75,7 @@ internal static class CSharpMethodExtensions
                 ? $"ValueTask<{primitiveType}>"
                     : method.IsVoid
                         ? "ValueTask"
-                        : method.RawReturnTypeName;
+                        : $"ValueTask<{method.RawReturnTypeName}>";
 
             return (returnType, primitiveType);
         }

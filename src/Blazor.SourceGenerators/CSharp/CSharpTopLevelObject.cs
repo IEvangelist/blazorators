@@ -406,7 +406,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                         var isGenericType = parameter.IsGenericParameter(method.RawName, options);
                         var arg = parameter.ToArgumentString(isGenericType, true);
                         var fieldName =
-                            builder.Fields.FirstOrDefault(field => field.EndsWith(parameter.RawName));
+                            builder.Fields?.FirstOrDefault(field => field.EndsWith(parameter.RawName));
 
                         if (fieldName is null) continue;
                         builder.AppendRaw($"{fieldName} = {arg};");
@@ -436,7 +436,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                         var isGenericType = parameter.IsGenericParameter(method.RawName, options);
                         var arg = parameter.ToArgumentString(isGenericType, true);
                         var methodName =
-                            builder.Methods.FirstOrDefault(
+                            builder.Methods?.FirstOrDefault(
                                 method => method.EndsWith(arg.Substring(2)));
                         var argExpression = methodName is not null ? $"nameof({methodName})" : arg;
                         if (ai.IsLast)

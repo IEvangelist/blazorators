@@ -17,7 +17,10 @@ internal record CSharpMethod(
 
     public bool IsVoid => RawReturnTypeName == "void";
 
-    public Dictionary<string, CSharpObject> DependentTypes
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; }
+        = new(StringComparer.OrdinalIgnoreCase);
+
+    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
     {
         get
         {
@@ -41,10 +44,9 @@ internal record CSharpMethod(
                 }
             }
 
-            return dependentTypes;
+            return dependentTypes.Select(kvp => (kvp.Key, kvp.Value))
+                .Concat(this.GetAllDependencies())
+                .ToImmutableHashSet();
         }
     }
-
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
-        this.GetAllDependencies().ToImmutableHashSet();
 }
