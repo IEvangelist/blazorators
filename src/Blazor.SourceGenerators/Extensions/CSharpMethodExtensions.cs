@@ -7,6 +7,14 @@ namespace Blazor.SourceGenerators.Extensions;
 
 internal static class CSharpMethodExtensions
 {
+    internal static bool IsJavaScriptOverride(this CSharpMethod method, GeneratorOptions options)
+    {
+        var methodName = method.RawName.LowerCaseFirstLetter();
+        return options?.PureJavaScriptOverrides
+            ?.Any(overriddenMethodName => overriddenMethodName == methodName)
+            ?? false;
+    }
+
     internal static bool IsGenericReturnType(this CSharpMethod method, GeneratorOptions options) =>
         options.GenericMethodDescriptors
             ?.Any(descriptor =>
@@ -59,7 +67,8 @@ internal static class CSharpMethodExtensions
                 : ($"ValueTask<{MethodBuilderDetails.GenericTypeValue}{nullable}>", primitiveType);
         }
 
-        if (options.IsWebAssembly)
+        var isJavaScriptOverride = method.IsJavaScriptOverride(options);
+        if (options.IsWebAssembly && !isJavaScriptOverride)
         {
             var returnType = isPrimitiveType
                 ? primitiveType

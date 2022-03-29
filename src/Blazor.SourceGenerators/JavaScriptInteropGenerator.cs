@@ -45,7 +45,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 
         foreach (var (options, classDeclaration, attribute) in receiver.InterfaceDeclarations)
         {
-            if (options is null || IsDiaganostic(options, context, attribute))
+            if (options is null || IsDiaganosticError(options, context, attribute))
             {
                 continue;
             }
@@ -120,7 +120,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
     }
 
-    static bool IsDiaganostic(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
+    static bool IsDiaganosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
     {
         if (options.TypeName is null)
         {

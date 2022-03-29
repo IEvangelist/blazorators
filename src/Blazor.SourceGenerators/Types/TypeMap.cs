@@ -29,7 +29,8 @@ internal static class TypeMap
             };
 
         internal bool IsPrimitiveType(string typeScriptType) =>
-            _primitiveTypeMap.ContainsKey(typeScriptType);
+            _primitiveTypeMap.ContainsKey(typeScriptType) ||
+            _primitiveTypeMap.Values.Any(value => value == typeScriptType);
 
         internal string this[string typeScriptType] =>
             _primitiveTypeMap.TryGetValue(typeScriptType, out var csharpType) ? csharpType : typeScriptType;

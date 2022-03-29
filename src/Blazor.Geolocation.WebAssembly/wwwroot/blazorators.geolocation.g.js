@@ -1,4 +1,5 @@
-// TODO: Consider source-generating this too.
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
 const onSuccess = (dotnetObj, successMethodName, position) => {
     // HACK: Blazor isn't correctly deserializing these.
@@ -53,7 +54,9 @@ const watchPosition = (
         options);
 }
 
-window.blazorators = {
-    getCurrentPosition,
-    watchPosition
-};
+window.blazorators = Object.assign({}, window.blazorators, {
+    geolocation: {
+        getCurrentPosition,
+        watchPosition
+    }
+});

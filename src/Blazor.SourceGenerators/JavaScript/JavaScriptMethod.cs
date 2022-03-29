@@ -12,10 +12,12 @@ namespace Blazor.SourceGenerators.JavaScript;
 /// the <paramref name="JavaScriptApiMethodName"/>
 /// the method is not considered pure.</param>
 /// <param name="ParameterDefinitions">The optional listing of method parameters.</param>
+/// <param name="IsBiDirectionalJavaScript">A value indicating whether the JavaScript is bi-directional.</param>
 internal sealed record JavaScriptMethod(
     string JavaScriptApiMethodName,
     string? InvokableMethodName = null,
-    List<CSharpType>? ParameterDefinitions = null)
+    List<CSharpType>? ParameterDefinitions = null,
+    bool IsBiDirectionalJavaScript = false)
 {
     /// <summary>
     /// A "pure" JavaScript method is one that

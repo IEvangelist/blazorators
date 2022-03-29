@@ -12,10 +12,13 @@ internal record CSharpMethod(
     public bool IsPureJavaScriptInvocation =>
         JavaScriptMethodDependency is { IsPure: true };
 
+    public bool IsNotBiDirectionalJavaScript =>
+        JavaScriptMethodDependency is { IsBiDirectionalJavaScript: false };
+
     public bool IsReturnTypeNullable =>
         RawReturnTypeName.Contains("null");
 
-    public bool IsVoid => RawReturnTypeName == "void";
+    public bool IsVoid => RawReturnTypeName is "void";
 
     public Dictionary<string, CSharpObject> DependentTypes { get; init; }
         = new(StringComparer.OrdinalIgnoreCase);

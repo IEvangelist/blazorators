@@ -1,4 +1,5 @@
-// TODO: Consider source-generating this too.
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
 const onSuccess = (dotnetObj, successMethodName, position) => {
     // HACK: Blazor isn't correctly deserializing these.
@@ -15,7 +16,7 @@ const onSuccess = (dotnetObj, successMethodName, position) => {
             Speed: position.coords.speed
         }
     };
-    dotnetObj.invokeMethodAsync(successMethodName, result);
+    dotnetObj.invokeMethod(successMethodName, result);
     dotnetObj.dispose();
 };
 
@@ -27,7 +28,7 @@ const onError = (dotnetObj, errorMethodName, error) => {
         POSITION_UNAVAILABLE: error.POSITION_UNAVAILABLE,
         TIMEOUT: error.TIMEOUT
     };
-    dotnetObj.invokeMethodAsync(errorMethodName, result);
+    dotnetObj.invokeMethod(errorMethodName, result);
     dotnetObj.dispose();
 };
 
@@ -53,7 +54,9 @@ const watchPosition = (
         options);
 }
 
-window.blazorators = {
-    getCurrentPosition,
-    watchPosition
-};
+window.blazorators = Object.assign({}, window.blazorators, {
+    geolocation: {
+        getCurrentPosition,
+        watchPosition
+    }
+});

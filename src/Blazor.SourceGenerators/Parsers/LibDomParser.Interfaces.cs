@@ -60,6 +60,7 @@ internal sealed partial class LibDomParser
 
                 var (parameterDefinitions, javaScriptMethod) =
                     ParseParameters(
+                        cSharpObject.TypeName,
                         methodName,
                         parameters,
                         obj => cSharpObject.DependentTypes![obj.TypeName] = obj);
@@ -163,6 +164,7 @@ internal sealed partial class LibDomParser
 
                 var (parameterDefinitions, javaScriptMethod) =
                     ParseParameters(
+                        topLevelObject.RawTypeName,
                         methodName,
                         parameters,
                         obj => topLevelObject.DependentTypes![obj.TypeName] = obj);
@@ -299,6 +301,7 @@ internal sealed partial class LibDomParser
                 var (parameterDefinitions, _) =
                     ParseParameters(
                         cSharpAction.RawName,
+                        cSharpAction.RawName,
                         parameters,
                         obj => cSharpAction.DependentTypes![obj.TypeName] = obj);
 
@@ -323,6 +326,7 @@ internal sealed partial class LibDomParser
     }
 
     internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
+        string typeName,
         string rawName,
         string parametersString,
         Action<CSharpObject> appendDependentType)
@@ -353,12 +357,16 @@ internal sealed partial class LibDomParser
             {
                 javaScriptMethod = javaScriptMethod with
                 {
-                    InvokableMethodName = $"blazorators.{rawName}"
+                    InvokableMethodName = $"blazorators.{typeName.LowerCaseFirstLetter()}.{rawName}"
                 };
 
                 if (parameterType.EndsWith("Callback"))
                 {
                     action = ToAction(typeScriptDefinitionText);
+                    javaScriptMethod = javaScriptMethod with
+                    {
+                        IsBiDirectionalJavaScript = true
+                    };
                 }
                 else
                 {

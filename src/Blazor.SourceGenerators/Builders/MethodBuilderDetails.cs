@@ -50,6 +50,18 @@ internal readonly record struct MethodBuilderDetails(
             ? ("", "IJSInProcessRuntime")
             : ("Async", "IJSRuntime");
 
+        if (method.IsJavaScriptOverride(options) && options.Implementation is not null)
+        {
+            var impl =
+                options.Implementation.Substring(
+                    options.Implementation.LastIndexOf(".") + 1);
+
+            fullyQualifiedJavaScriptIdentifier =
+                $"blazorators.{impl}.{method.RawName}";
+
+            suffix = "Async";
+        }
+
         var (returnType, bareType) = method.GetMethodTypes(options, isGenericReturnType, isPrimitiveType);
 
         return new MethodBuilderDetails(

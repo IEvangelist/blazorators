@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -62,10 +62,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj"
-                          OutputItemType="Analyzer"
-                          SetTargetFramework="TargetFramework=netstandard2.0"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Blazor.Serialization\Blazor.Serialization.csproj" />
+        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup Label="Files">

@@ -10,6 +10,7 @@
 /// <param name="OnlyGeneratePureJS">Whether to generate only pure JavaScript functions that do not require callbacks. For example, <c>Geolocation.clearWatch</c> is consider pure, but <c>Geolocation.watchPosition</c> is not.</param>
 /// <param name="Url">The optional URL to the corresponding API.</param>
 /// <param name="GenericMethodDescriptors">The optional generic method descriptors value from the parsed <c>JSAutoGenericInteropAttribute.GenericMethodDescriptors</c>.</param>
+/// <param name="PureJavaScriptOverrides">Overrides pure JavaScript calls. A custom impl must exist.</param>
 /// <param name="IsWebAssembly">
 /// A value indicating whether to generate targeting WASM:
 /// When <c>true</c>: Synchronous extensions are generated on the <c>IJSInProcessRuntime</c> type.
@@ -22,4 +23,5 @@ internal sealed record GeneratorOptions(
     bool OnlyGeneratePureJS = false,
     string? Url = null,
     string[]? GenericMethodDescriptors = null,
+    string[]? PureJavaScriptOverrides = null,
     bool IsWebAssembly = true);

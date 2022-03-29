@@ -1,7 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Linq;
 using Blazor.SourceGenerators.Builders;
 
 namespace Blazor.SourceGenerators.CSharp;
@@ -58,7 +57,13 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);
 
-            if (method.IsPureJavaScriptInvocation)
+            var isJavaScriptOverride = method.IsJavaScriptOverride(options);
+            var isPureNonBiDirectionalOrOverriddenJS =
+                method.IsPureJavaScriptInvocation ||
+                method.IsNotBiDirectionalJavaScript ||
+                isJavaScriptOverride;
+
+            if (isPureNonBiDirectionalOrOverriddenJS)
             {
                 builder.AppendTripleSlashMethodComments(details.Method)
                     .AppendRaw(
@@ -230,7 +235,13 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);
 
-            if (method.IsPureJavaScriptInvocation)
+            var isJavaScriptOverride = method.IsJavaScriptOverride(options);
+            var isPureNonBiDirectionalOrOverriddenJS =
+                method.IsPureJavaScriptInvocation ||
+                method.IsNotBiDirectionalJavaScript ||
+                isJavaScriptOverride;
+
+            if (isPureNonBiDirectionalOrOverriddenJS)
             {
                 var memberName = $"{details.CSharpMethodName}{details.Suffix}";
                 builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)

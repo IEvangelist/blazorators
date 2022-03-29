@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SessionStorage.Serve
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis.WebAssembly", "src\Blazor.SpeechSynthesis.WebAssembly\Blazor.SpeechSynthesis.WebAssembly.csproj", "{35E7A636-C28A-40FC-99F3-CE6A5F3C49BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.SpeechSynthesis.Server", "src\Blazor.SpeechSynthesis.Server\Blazor.SpeechSynthesis.Server.csproj", "{CC36EFCE-CB59-4541-9E1E-2DBE5D1C290E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis.Server", "src\Blazor.SpeechSynthesis.Server\Blazor.SpeechSynthesis.Server.csproj", "{CC36EFCE-CB59-4541-9E1E-2DBE5D1C290E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

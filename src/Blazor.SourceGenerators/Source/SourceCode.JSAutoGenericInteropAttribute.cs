@@ -42,6 +42,18 @@ public class JSAutoGenericInteropAttribute : JSAutoInteropAttribute
     /// </code>
     /// </summary>
     public string[] GenericMethodDescriptors { get; set; } = null!;
+
+    /// <summary>
+    /// The overrides that define which APIs to override (only applicable for pure JavaScript).
+    /// For example:
+    /// <code>
+    /// new[]
+    /// {
+    ///     ""getVoices"",  // A pure JS method with by this name will have a custom impl.
+    /// }
+    /// </code>
+    /// </summary>
+    public string[] PureJavaScriptOverrides { get; set; } = null!;
 }
 ";
 }

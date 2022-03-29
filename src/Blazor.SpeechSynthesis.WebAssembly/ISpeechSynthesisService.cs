@@ -3,13 +3,15 @@
 
 namespace Microsoft.JSInterop;
 
-/// <summary>
-/// </summary>
-[JSAutoInterop(
+[JSAutoGenericInterop(
     TypeName = "SpeechSynthesis",
     Implementation = "window.speechSynthesis",
+    Url = "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
     OnlyGeneratePureJS = true,
-    Url = "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis")]
+    PureJavaScriptOverrides = new[]
+    {
+        "getVoices"
+    })]
 public partial interface ISpeechSynthesisService
 {
 }
