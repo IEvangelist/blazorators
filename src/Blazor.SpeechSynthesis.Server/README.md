@@ -78,3 +78,11 @@ public partial interface ISpeechSynthesisService
     ValueTask<bool> Speaking { get; }
 }
 ```
+
+### Add JavaScript dependency
+
+In the *_Host.cshtml* file, add the following:
+
+```html
+<script src="_content/Blazor.SpeechSynthesis.Server/blazorators.speechSynthesis.g.js"></script>
+```

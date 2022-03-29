@@ -81,3 +81,11 @@ public interface IGeolocationService
         where TComponent : class;
 }
 ```
+
+### Add JavaScript dependency
+
+In the _index.html_ file, add the following:
+
+```html
+<script src="_content/Blazor.Geolocation.WebAssembly/blazorators.geolocation.g.js"></script>
+```
