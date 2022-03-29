@@ -11,7 +11,10 @@ const loadMap = (mapId, latitude, longitude) => {
             supportedMapTypes: [
                 Microsoft.Maps.MapTypeId.road,
                 Microsoft.Maps.MapTypeId.aerial,
-                Microsoft.Maps.MapTypeId.canvasLight
+                Microsoft.Maps.MapTypeId.canvasLight,
+                Microsoft.Maps.MapTypeId.canvasDark,
+                Microsoft.Maps.MapTypeId.birdseye,
+                Microsoft.Maps.MapTypeId.streetside
             ]
         });
         _map.setView({ zoom: 18 });
