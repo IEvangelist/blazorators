@@ -3,7 +3,7 @@
 
 namespace Blazor.ExampleConsumer.Pages;
 
-public partial class ReadToMe
+public sealed partial class ReadToMe : IDisposable
 {
     string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor.";
     SpeechSynthesisVoice[] _voices = Array.Empty<SpeechSynthesisVoice>();
@@ -25,7 +25,27 @@ public partial class ReadToMe
     [Inject]
     public ISpeechSynthesisService SpeechSynthesis { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync() => await RefreshVoicesAsync();
+    [Inject]
+    public IStorageService LocalStorage { get; set; } = null!;
+
+    [Inject]
+    public NavigationManager Nav { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshVoicesAsync();
+        
+        if (LocalStorage.GetItem<string>("preferred-voice")
+            is { Length: > 0 } voice)
+        {
+            _selectedVoice = voice;
+        }
+        if (LocalStorage.GetItem<double>("preferred-speed")
+            is double speed && speed > 0)
+        {
+            _voiceSpeed = speed;
+        }
+    }
 
     async Task RefreshVoicesAsync() => _voices = await SpeechSynthesis.GetVoicesAsync();
 
@@ -36,4 +56,10 @@ public partial class ReadToMe
             ? speed : 1.5;
 
     void Speak() => SpeechSynthesis.Speak(Utterance);
+
+    public void Dispose()
+    {
+        LocalStorage.SetItem("preferred-voice", _selectedVoice);
+        LocalStorage.SetItem("preferred-speed", _voiceSpeed);
+    }
 }
