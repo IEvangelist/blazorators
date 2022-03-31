@@ -87,6 +87,7 @@ internal sealed partial class LibDomParser
                 var isNullable = name.EndsWith("?") || type.Contains("| null");
 
                 name = name.Replace("?", "").Replace("readonly ", "");
+                type = TryGetPrimitiveType(type);
 
                 CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
                 cSharpObject.Properties[cSharpProperty.RawName] = cSharpProperty;
@@ -191,6 +192,7 @@ internal sealed partial class LibDomParser
                 var isNullable = name.EndsWith("?") || type.Contains("| null");
 
                 name = name.Replace("?", "").Replace("readonly ", "");
+                type = TryGetPrimitiveType(type);
 
                 CSharpProperty cSharpProperty =
                     new(name,
@@ -220,6 +222,32 @@ internal sealed partial class LibDomParser
         }
 
         return topLevelObject;
+    }
+
+    private string TryGetPrimitiveType(string type)
+    {
+        if (!TypeMap.PrimitiveTypes.IsPrimitiveType(type) &&
+            _reader.TryGetTypeAlias(type, out var typeAliasLine) &&
+            typeAliasLine is not null)
+        {
+            if (typeAliasLine.Replace(";", "").Split('=')
+                is { Length: 2 } split)
+            {
+                if (split[1].Trim().Split('|')
+                    is { Length: > 0 } values &&
+                    values.Select(v => v.Trim())?.ToList()
+                    is { Count: > 0 } list)
+                {
+                    var isStringAlias = list.All(v => v.StartsWith("\"") && v.EndsWith("\""));
+                    if (isStringAlias)
+                    {
+                        type = "string";
+                    }
+                }
+            }
+        }
+
+        return type;
     }
 
     private CSharpMethod ToMethod(

@@ -4,7 +4,7 @@
 
 <p>This page demonstrates the source generated <code>Blazor.SpeechSynthesis.WebAssembly</code> package.</p>
 
-<div class="input-group w-50 mb-3">
+<div class="input-group w-75 mb-3">
     <select class="form-select" aria-label="Voice selection"
         @bind="_selectedVoice" disabled=@(_voices?.Any() is false)>
         @foreach (var voice in _voices)
@@ -18,7 +18,7 @@
     </button>
 </div>
 
-<div class="input-group mb-3 w-50">
+<div class="input-group mb-3 w-75">
     <label for="range" class="form-label">Voice speed: @_voiceSpeed</label>
     <input type="range" min="@_voiceSpeeds.Min()" max="@_voiceSpeeds.Max()"
         step=".25" class="form-range" id="range" list="speeds"

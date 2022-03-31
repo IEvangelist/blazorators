@@ -44,9 +44,14 @@ public class LibDomReaderTests
     timeout?: number;
 }",
             };
+
+            yield return new object[]
+            {
+                "ConnectionType",
+                @"type ConnectionType = ""bluetooth"" | ""cellular"" | ""ethernet"" | ""mixed"" | ""none"" | ""other"" | ""unknown"" | ""wifi""",
+            };
         }
     }
-
 
     [
         Theory,
@@ -56,6 +61,32 @@ public class LibDomReaderTests
     {
         var sut = new LibDomReader();
         var result = sut.TryGetDeclaration(typeName, out var actual);
+
+        Assert.True(result);
+        Assert.NotNull(actual);
+        Assert.Equal(expected.NormalizeNewlines(), actual.NormalizeNewlines());
+    }
+
+    public static IEnumerable<object[]> TryGetTypeAliasInput
+    {
+        get
+        {
+            yield return new object[]
+            {
+                "ConnectionType",
+                @"type ConnectionType = ""bluetooth"" | ""cellular"" | ""ethernet"" | ""mixed"" | ""none"" | ""other"" | ""unknown"" | ""wifi"";",
+            };
+        }
+    }
+
+    [
+        Theory,
+        MemberData(nameof(TryGetTypeAliasInput))
+    ]
+    public void TryGetTypeAliasReturnsCorrectly(string typeAlias, string expected)
+    {
+        var sut = new LibDomReader();
+        var result = sut.TryGetTypeAlias(typeAlias, out var actual);
 
         Assert.True(result);
         Assert.NotNull(actual);

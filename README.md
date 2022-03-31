@@ -722,6 +722,13 @@ public sealed partial class ConsumingComponent
 
 <!-- TODO: Add mermaid sequence diagram here -->
 
+## Future work
+
+- https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer
+- https://developer.mozilla.org/en-US/docs/Web/API/WakeLock
+- https://developer.mozilla.org/en-US/docs/Web/API/Navigator/hid
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
+
 ## Known limitations ⚠️
 
 At the time of writing, only pure JavaScript interop is supported. It is a stretch goal to add the following (currently missing) features:

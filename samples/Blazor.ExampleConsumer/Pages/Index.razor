@@ -1,9 +1,12 @@
 ﻿@page "/"
+@inject INetworkInformationService NetworkInformationService
 
 <PageTitle>Index</PageTitle>
 
 <h1>Hi friends! 🤓</h1>
 
 <p>This sample app shows how to consume the source-generated projects of #blazorators.</p>
+
+@NetworkInformationService.Type
 
 <RepositoryPrompt Title="GitHub: IEvangelist/blazorators" />

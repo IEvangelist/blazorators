@@ -32,6 +32,8 @@ jobs:
         - Blazor.Geolocation.Server
         - Blazor.SpeechSynthesis.WebAssembly
         - Blazor.SpeechSynthesis.Server
+        - Blazor.NetworkInformation.WebAssembly
+        - Blazor.NetworkInformation.Server
     steps:
     
     - name: Print tag ref

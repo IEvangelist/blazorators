@@ -29,12 +29,15 @@ public sealed partial class ReadToMe : IDisposable
     public IStorageService LocalStorage { get; set; } = null!;
 
     [Inject]
-    public NavigationManager Nav { get; set; } = null!;
+    public IJSInProcessRuntime JavaScript { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
         await RefreshVoicesAsync();
-        
+
+        JavaScript.InvokeVoid(
+            "app.onVoicesChanged", this, nameof(RefreshVoicesAsync));
+
         if (LocalStorage.GetItem<string>("preferred-voice")
             is { Length: > 0 } voice)
         {
@@ -61,5 +64,7 @@ public sealed partial class ReadToMe : IDisposable
     {
         LocalStorage.SetItem("preferred-voice", _selectedVoice);
         LocalStorage.SetItem("preferred-speed", _voiceSpeed);
+
+        JavaScript.InvokeVoid("app.unsubscribeVoicesChanged");
     }
 }

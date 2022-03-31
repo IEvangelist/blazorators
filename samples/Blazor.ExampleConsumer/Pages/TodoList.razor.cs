@@ -14,9 +14,6 @@ public sealed partial class TodoList
     [Inject]
     public IStorageService LocalStorage { get; set; } = null!;
 
-    [Inject]
-    public NavigationManager Nav { get; set; } = null!;
-
     protected override void OnInitialized()
     {
         var todos = GetTaskItemKeys()

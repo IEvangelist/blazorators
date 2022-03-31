@@ -16,6 +16,13 @@ internal static class SharedRegex
     public static readonly Regex ExtendsTypeNameRegex =
         new("(?:extends )(?'TypeName'\\S+)");
 
+    public static readonly Regex TypeRegex =
+        new("^(?'type'type.*?)$",
+            RegexOptions.Singleline | RegexOptions.Multiline);
+
+    public static readonly Regex TypeNameRegex =
+        new("(?:type )(?'TypeName'\\S+)");
+
     /// <summary>
     /// Given a string value of <c>"clearWatch(watchId: number): void;"</c>, the
     /// following capture groups would be present:
