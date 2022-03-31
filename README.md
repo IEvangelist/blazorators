@@ -3,8 +3,6 @@
 
 > Thank you for perusing my Blazor C# Source Generators repository. I'd really appreciate a ⭐ if you find this interesting.
 
-<!-- TODO: Create separate README.md files specific to the NuGet packages. -->
-
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
