@@ -32,10 +32,10 @@ A C# source generator that creates fully functioning Blazor JavaScript interop c
 
 | NuGet package | NuGet version | Description |
 |--|--|--|
-| [`Blazor.LocalStorage.Server`](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage.Server) | Blazor Server class library exposing DI-ready `IStorageService` type for the `localStorage` implementation (relies on `IJSRuntime`) |
-| [`Blazor.SessionStorage.Server`](https://www.nuget.org/packages/Blazor.SessionStorage.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SessionStorage.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.SessionStorage.Server) | Blazor Server class library exposing DI-ready `IStorageService` type for the `sessionStorage` implementation (relies on `IJSRuntime`) |
-| [`Blazor.Geolocation.Server`](https://www.nuget.org/packages/Blazor.Geolocation.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation.Server) | Razor class library exposing DI-ready `IGeolocationService` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSRuntime`). |
-| [`Blazor.SpeechSynthesis.Server`](https://www.nuget.org/packages/Blazor.SpeechSynthesis.Server) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SpeechSynthesis.Server.svg?style=flat)](https://www.nuget.org/packages/Blazor.SpeechSynthesis.Server) | Razor class library exposing DI-ready `ISpeechSynthesisService` type for the `speechSynthesis` implementation (relies on `IJSRuntime`). |
+| [`Blazor.LocalStorage`](https://www.nuget.org/packages/Blazor.LocalStorage) | [![NuGet](https://img.shields.io/nuget/v/Blazor.LocalStorage.svg?style=flat)](https://www.nuget.org/packages/Blazor.LocalStorage) | Blazor Server class library exposing DI-ready `IStorageService` type for the `localStorage` implementation (relies on `IJSRuntime`) |
+| [`Blazor.SessionStorage`](https://www.nuget.org/packages/Blazor.SessionStorage) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SessionStorage.svg?style=flat)](https://www.nuget.org/packages/Blazor.SessionStorage) | Blazor Server class library exposing DI-ready `IStorageService` type for the `sessionStorage` implementation (relies on `IJSRuntime`) |
+| [`Blazor.Geolocation`](https://www.nuget.org/packages/Blazor.Geolocation) | [![NuGet](https://img.shields.io/nuget/v/Blazor.Geolocation.svg?style=flat)](https://www.nuget.org/packages/Blazor.Geolocation) | Razor class library exposing DI-ready `IGeolocationService` type (and dependent callback types) for the `geolocation` implementation (relies on `IJSRuntime`). |
+| [`Blazor.SpeechSynthesis`](https://www.nuget.org/packages/Blazor.SpeechSynthesis) | [![NuGet](https://img.shields.io/nuget/v/Blazor.SpeechSynthesis.svg?style=flat)](https://www.nuget.org/packages/Blazor.SpeechSynthesis) | Razor class library exposing DI-ready `ISpeechSynthesisService` type for the `speechSynthesis` implementation (relies on `IJSRuntime`). |
 
 > Targets the `IJSRuntime` type.
 
@@ -229,7 +229,7 @@ public static class LocalStorageServiceCollectionExtensions
 
 Putting this all together, the `Blazor.LocalStorage.WebAssembly` NuGet package is actually less than 15 lines of code, and it generates full DI-ready services with JavaScript interop.
 
-The `Blazor.LocalStorage.Server` package, generates extensions on the `IJSRuntime` type.
+The `Blazor.LocalStorage` package, generates extensions on the `IJSRuntime` type.
 
 ```csharp
 // Copyright (c) David Pine. All rights reserved.

@@ -17,9 +17,9 @@
         <FileVersion>$(ClientVersion)</FileVersion>
         <Authors>David Pine</Authors>
         <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
-        <AssemblyName>Blazor.Geolocation.Server</AssemblyName>
+        <AssemblyName>Blazor.Geolocation</AssemblyName>
         <Title>A C# source-generated Razor class library implementation of the native browser's geolocation API available as a DI-ready service.</Title>
-        <PackageId>Blazor.Geolocation.Server</PackageId>
+        <PackageId>Blazor.Geolocation</PackageId>
         <PackageTags>dotnet;dotnetcore;csharp;blazor;server;wasm;generators;sourcegen;roslyn;</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
         <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
@@ -33,7 +33,7 @@
         <DebugType>embedded</DebugType>
         <IncludeSymbols>false</IncludeSymbols>
         <IncludeSource>false</IncludeSource>
-        <RootNamespace>Blazor.Geolocation.Server</RootNamespace>
+        <RootNamespace>Blazor.Geolocation</RootNamespace>
         <NoWarn>NU5125;NU5039;</NoWarn>
         <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
         <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>

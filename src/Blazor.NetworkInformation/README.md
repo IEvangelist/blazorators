@@ -1,6 +1,6 @@
 ﻿# Blazorators: The Source Generated `NetworkInformation` JavaScript Interop library for Blazor Server
 
-The [`Blazor.NetworkInformation.Server`](https://www.nuget.org/packages/Blazor.NetworkInformation.Server) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `INetworkInformation` interface specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) Web API.
+The [`Blazor.NetworkInformation`](https://www.nuget.org/packages/Blazor.NetworkInformation) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `INetworkInformation` interface specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) Web API.
 
 ## Get started
 

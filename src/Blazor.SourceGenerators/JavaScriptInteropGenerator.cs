@@ -67,16 +67,6 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
             if (result.Status == ParserResultStatus.SuccessfullyParsed &&
                 result.Value is not null)
             {
-                var staticObject = result.Value;
-                foreach (var (type, dependentObj) in
-                    staticObject.AllDependentTypes.Where(
-                        t => !t.Object.IsActionParameter))
-                {
-                    context.AddSource(type.ToGeneratedFileName(),
-                        SourceText.From(dependentObj.ToString(),
-                        Encoding.UTF8));
-                }
-
                 var namespaceString =
                     (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
                     {
@@ -84,38 +74,16 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                         (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
                         _ => null
                     };
-
                 var @interface =
                     options.TypeName.ToInterfaceName();
                 var implementation =
                     options.Implementation.ToImplementationName();
 
-                // Source generate the public interface
-                context.AddSource(
-                    $"{@interface}".ToGeneratedFileName(),
-                    SourceText.From(
-                        staticObject.ToInterfaceString(
-                            options,
-                            namespaceString),
-                        Encoding.UTF8));
-
-                // Source generate the internal implementation
-                context.AddSource(
-                    $"{implementation}".ToGeneratedFileName(),
-                    SourceText.From(
-                        staticObject.ToImplementationString(
-                            options,
-                            namespaceString),
-                        Encoding.UTF8));
-                
-                // Source generate the service collection DI extension
-                context.AddSource(
-                    $"{options.Implementation.ToImplementationName(false)}ServiceCollectionExtensions".ToGeneratedFileName(),
-                    SourceText.From(
-                        staticObject.ToServiceCollectionExtensions(
-                            options,
-                            implementation),
-                        Encoding.UTF8));
+                var topLevelObject = result.Value;
+                context.AddDependentTypesSource(topLevelObject)
+                    .AddInterfaceSource(topLevelObject, @interface, options, namespaceString)
+                    .AddImplementationSource(topLevelObject, implementation, options, namespaceString)
+                    .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, options);
             }
         }
     }

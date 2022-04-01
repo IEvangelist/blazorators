@@ -1,6 +1,6 @@
 ﻿# Blazorators: The Source Generated `speechSynthesis` JavaScript Interop library for Blazor Server
 
-The [`Blazor.SpeechSynthesis.Server`](https://www.nuget.org/packages/Blazor.SpeechSynthesis.Server) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `ISpeechSynthesis` interface specific to Blazor WebAssembly and the [`speechSynthesis`](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis) Web API.
+The [`Blazor.SpeechSynthesis`](https://www.nuget.org/packages/Blazor.SpeechSynthesis) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `ISpeechSynthesis` interface specific to Blazor WebAssembly and the [`speechSynthesis`](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis) Web API.
 
 ## Get started
 
@@ -84,5 +84,5 @@ public partial interface ISpeechSynthesisService
 In the *_Host.cshtml* file, add the following:
 
 ```html
-<script src="_content/Blazor.SpeechSynthesis.Server/blazorators.speechSynthesis.g.js"></script>
+<script src="_content/Blazor.SpeechSynthesis/blazorators.speechSynthesis.g.js"></script>
 ```

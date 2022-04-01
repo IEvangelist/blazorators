@@ -31,25 +31,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.ExampleConsumer", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.LocalStorage.WebAssembly", "src\Blazor.LocalStorage.WebAssembly\Blazor.LocalStorage.WebAssembly.csproj", "{2F4EE253-7D56-4853-ADA7-4F2F6280C2D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.LocalStorage.Server", "src\Blazor.LocalStorage.Server\Blazor.LocalStorage.Server.csproj", "{9AA2BB50-9F1A-43D0-BB6B-C3C4E9765BE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.LocalStorage", "src\Blazor.LocalStorage\Blazor.LocalStorage.csproj", "{9AA2BB50-9F1A-43D0-BB6B-C3C4E9765BE1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Serialization", "src\Blazor.Serialization\Blazor.Serialization.csproj", "{5E4658A7-4751-4F85-A558-12B8EBCA2BCA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.WebAssembly", "src\Blazor.Geolocation.WebAssembly\Blazor.Geolocation.WebAssembly.csproj", "{0BAC9703-45EE-4E9E-A0F0-556F02FCB901}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation.Server", "src\Blazor.Geolocation.Server\Blazor.Geolocation.Server.csproj", "{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Geolocation", "src\Blazor.Geolocation\Blazor.Geolocation.csproj", "{A9F3FE17-EF4C-44B8-B265-7D7DBAA42F84}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SessionStorage.WebAssembly", "src\Blazor.SessionStorage.WebAssembly\Blazor.SessionStorage.WebAssembly.csproj", "{B8FF9EFA-D8DA-43AB-8056-991FFDB609D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SessionStorage.Server", "src\Blazor.SessionStorage.Server\Blazor.SessionStorage.Server.csproj", "{F54C9271-5C28-498D-9081-59EAA22FEC69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SessionStorage", "src\Blazor.SessionStorage\Blazor.SessionStorage.csproj", "{F54C9271-5C28-498D-9081-59EAA22FEC69}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis.WebAssembly", "src\Blazor.SpeechSynthesis.WebAssembly\Blazor.SpeechSynthesis.WebAssembly.csproj", "{35E7A636-C28A-40FC-99F3-CE6A5F3C49BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis.Server", "src\Blazor.SpeechSynthesis.Server\Blazor.SpeechSynthesis.Server.csproj", "{CC36EFCE-CB59-4541-9E1E-2DBE5D1C290E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis", "src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj", "{CC36EFCE-CB59-4541-9E1E-2DBE5D1C290E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.NetworkInformation.WebAssembly", "src\Blazor.NetworkInformation.WebAssembly\Blazor.NetworkInformation.WebAssembly.csproj", "{7E54CECD-B480-4D7D-8B60-C58734001548}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.NetworkInformation.Server", "src\Blazor.NetworkInformation.Server\Blazor.NetworkInformation.Server.csproj", "{0F00310B-C02A-499A-A88E-E8C7D49562E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.NetworkInformation", "src\Blazor.NetworkInformation\Blazor.NetworkInformation.csproj", "{0F00310B-C02A-499A-A88E-E8C7D49562E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

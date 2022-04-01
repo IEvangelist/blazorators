@@ -12,6 +12,6 @@ It's consumed by the following NuGet packages:
 
 - 📦 [Blazor.LocalStorage.WebAssembly](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly)
 - 📦 [Blazor.Geolocation.WebAssembly](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly)
-- 📦 [Blazor.Geolocation.Server](https://www.nuget.org/packages/Blazor.Geolocation.Server)
+- 📦 [Blazor.Geolocation](https://www.nuget.org/packages/Blazor.Geolocation)
 
 ![Blazorators Logo](https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png)

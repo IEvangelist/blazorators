@@ -25,15 +25,15 @@ jobs:
         - Blazor.SourceGenerators
         - Blazor.Serialization
         - Blazor.LocalStorage.WebAssembly
-        - Blazor.LocalStorage.Server
+        - Blazor.LocalStorage
         - Blazor.SessionStorage.WebAssembly
-        - Blazor.SessionStorage.Server
+        - Blazor.SessionStorage
         - Blazor.Geolocation.WebAssembly
-        - Blazor.Geolocation.Server
+        - Blazor.Geolocation
         - Blazor.SpeechSynthesis.WebAssembly
-        - Blazor.SpeechSynthesis.Server
+        - Blazor.SpeechSynthesis
         - Blazor.NetworkInformation.WebAssembly
-        - Blazor.NetworkInformation.Server
+        - Blazor.NetworkInformation
     steps:
     
     - name: Print tag ref
