@@ -1,7 +1,7 @@
 <img src="https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png" align="right"></img>
 # Blazorators: Blazor C# Source Generators
 
-> Thank you for perusing my Blazor C# Source Generators repository. I'd really appreciate a ⭐ if you find this interesting.
+> Thank you for perusing my Blazor C# Source Generator repository. I'd really appreciate a ⭐ if you find this interesting.
 
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
