@@ -7,12 +7,11 @@
   "linkerEnabled": true,
   "resources": {
     "assembly": {
-      "Blazor.ExampleConsumer.dll": "sha256-GdEi4\/Fk5zbEGo6fu0+IKpL2vupJdAOEBvt8VHZAsLI=",
-      "Blazor.Geolocation.WebAssembly.dll": "sha256-Uf6ImsvxWvdMJRoTVdBg3BG9OXdUJnHRVAbax+fR4cc=",
-      "Blazor.LocalStorage.WebAssembly.dll": "sha256-2w8NuxAvu1T0PAzthGyuqsFUYQMisvayJfZ49dnoOgg=",
-      "Blazor.NetworkInformation.WebAssembly.dll": "sha256-ibnDju05b3la2RYYflnDhWICNXS9QshiSl4xpYcZMyg=",
-      "Blazor.Serialization.dll": "sha256-fiQ7VTUq00DOY7exYhltXi\/0v4\/TPWR5fZyjPixtJqg=",
-      "Blazor.SpeechSynthesis.WebAssembly.dll": "sha256-qQE8vP1abp9Q5m9r6Jpjk+sszQcuoNKKkd7WwfoAfBw=",
+      "Blazor.ExampleConsumer.dll": "sha256-vlORLrLnQiYDuTwni\/\/7uM4jIYEJFpfhMA6yq+7lRck=",
+      "Blazor.Geolocation.WebAssembly.dll": "sha256-zstgPYrU85c4W6MSb\/YTgLlams9itnpDhaLmeU8zWtg=",
+      "Blazor.LocalStorage.WebAssembly.dll": "sha256-70\/I0VUhSs4lPe3ZzkaYEzed4Dctu\/tuK2BNu4wUk38=",
+      "Blazor.Serialization.dll": "sha256-C5E2agr7IEYYnWUYO\/t4JCnGvORAS\/WwgXD4R7JV4Vs=",
+      "Blazor.SpeechSynthesis.WebAssembly.dll": "sha256-6ijVKfpefsbcaYlvhGfxOSSCXloWkDFiao559bVPL1Q=",
       "Microsoft.AspNetCore.Components.dll": "sha256-KZLHOccLrp3DXVga6ymdWo3+WyuowXc7Q55RQ2A+vGw=",
       "Microsoft.AspNetCore.Components.Web.dll": "sha256-Q3tLiEf2oY9opzwbqULoPdA5ww5zquP0xSk6U5QTBDQ=",
       "Microsoft.AspNetCore.Components.WebAssembly.dll": "sha256-yUU\/mWWa82QWVsGQj6w\/j4ja+GJcNtYn9qS4hbsDCPU=",
