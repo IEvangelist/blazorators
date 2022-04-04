@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
-        <Description>Source generated JavaScript interop for the browser's sessionStorage API compatible with Blazor Server.</Description>
+        <Description>Source generated JavaScript interop for the browser's sessionStorage API compatible with Blazor.</Description>
         <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
         <NeutralLanguage>en-US</NeutralLanguage>
         <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
@@ -17,9 +17,9 @@
         <FileVersion>$(ClientVersion)</FileVersion>
         <Authors>David Pine</Authors>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <AssemblyName>Blazor.SessionStorage.Server</AssemblyName>
+        <AssemblyName>Blazor.SessionStorage</AssemblyName>
         <Title>A C# source-generated class library implementation of the native browser's sessionStorage API available as IJSRuntime extension methods.</Title>
-        <PackageId>Blazor.SessionStorage.Server</PackageId>
+        <PackageId>Blazor.SessionStorage</PackageId>
         <PackageTags>dotnet;dotnetcore;csharp;blazor;generators;sourcegen;roslyn;</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
         <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
@@ -33,7 +33,7 @@
         <DebugType>embedded</DebugType>
         <IncludeSymbols>false</IncludeSymbols>
         <IncludeSource>false</IncludeSource>
-        <RootNamespace>Blazor.SessionStorage.Server</RootNamespace>
+        <RootNamespace>Blazor.SessionStorage</RootNamespace>
         <NoWarn>NU5125;NU5039</NoWarn>
         <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
         <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
