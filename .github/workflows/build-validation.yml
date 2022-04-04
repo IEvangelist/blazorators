@@ -56,6 +56,14 @@ jobs:
     needs: build
 
     steps:    
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET 6.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+        include-prerelease: true
+
     - name: Run tests
       run: |
         dotnet test ./tests/Blazor.SourceGenerators.Tests/Blazor.SourceGenerators.Tests.csproj --verbosity normal
