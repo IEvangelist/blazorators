@@ -32,6 +32,6 @@ const loadMap = (mapId, latitude, longitude) => {
     }
 };
 
-window.app = {
-    loadMap
-};
+window.app = Object.assign({}, window.app, {
+    loadMap  
+});

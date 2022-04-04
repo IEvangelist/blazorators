@@ -53,9 +53,21 @@ const getVoices = () => {
     });
 };
 
+const onVoicesChanged = (assemblyName, callbackMethodName, key) => {
+    speechSynthesis.onvoiceschanged = () => {
+        DotNet.invokeMethodAsync(assemblyName, callbackMethodName, key);
+    };
+};
+
+const unsubscribeVoicesChanged = () => {
+    speechSynthesis.onvoiceschanged = null;
+};
+
 window.blazorators = Object.assign({}, window.blazorators, {
     speechSynthesis: {
         speak,
-        getVoices
+        getVoices,
+        onVoicesChanged,
+        unsubscribeVoicesChanged
     }
 });
