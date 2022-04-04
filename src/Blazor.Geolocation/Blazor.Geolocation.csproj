@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Description>Source generated JavaScript interop for the browser's geolocation API compatible with Blazor Server.</Description>
+        <Description>Source generated JavaScript interop for the browser's geolocation API compatible with Blazor.</Description>
         <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
         <NeutralLanguage>en-US</NeutralLanguage>
         <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>

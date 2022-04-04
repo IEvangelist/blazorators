@@ -2,17 +2,19 @@
 // Licensed under the MIT License.
 
 using System.Runtime.CompilerServices;
+using Humanizer;
 
 namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class ReadToMe : IDisposable
 {
-    string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor.";
+    string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor. JavaScript interoperability is possible by parsing TypeScript type declarations and using this metadata to output corresponding C# types.";
     SpeechSynthesisVoice[] _voices = Array.Empty<SpeechSynthesisVoice>();
     readonly IList<double> _voiceSpeeds =
         Enumerable.Range(0, 12).Select(i => (i + 1) * .25).ToList();
     double _voiceSpeed = 1.5;
     string? _selectedVoice;
+    string? _elapsedTimeMessage = null;
 
     SpeechSynthesisUtterance Utterance => new()
     {
@@ -52,12 +54,11 @@ public sealed partial class ReadToMe : IDisposable
         }
     }
 
-    async Task GetVoicesAsync([CallerMemberName] string caller = "")
+    async Task GetVoicesAsync()
     {
-        Logger.LogInformation(
-            "{MethodName} called from: {Caller}.", nameof(GetVoicesAsync), caller);
-        
         _voices = await SpeechSynthesis.GetVoicesAsync();
+
+        StateHasChanged();
     }
 
     void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
@@ -66,7 +67,13 @@ public sealed partial class ReadToMe : IDisposable
         _voiceSpeed = double.TryParse(args.Value?.ToString() ?? "1.5", out var speed)
             ? speed : 1.5;
 
-    void Speak() => SpeechSynthesis.Speak(Utterance);
+    void Speak() => SpeechSynthesis.SpeakWithCallback(Utterance, elapsedTime =>
+    {
+        _elapsedTimeMessage =
+            $"Read aloud in {TimeSpan.FromMilliseconds(elapsedTime).Humanize()}.";
+
+        StateHasChanged();
+    });
 
     public void Dispose()
     {

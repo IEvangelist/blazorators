@@ -11,30 +11,49 @@ namespace Microsoft.JSInterop;
 public static class SpeechSynthesisServiceExtensions
 {
     readonly static ConcurrentDictionary<Guid, Func<Task>> s_callbackRegistry = new();
+    readonly static ConcurrentDictionary<string, Action<double>> s_utteranceEndedCallbackRegistry = new();
 
     /// <summary>
-    /// Removes the subscription, assigns <c>speechSynthesis.onvoiceschanged</c> to <c>null</c>.
+    /// This extension wraps the <see cref="ISpeechSynthesisService.Speak(SpeechSynthesisUtterance)" />
+    /// functionality, and exposes the native <c>onend</c> callback. When the utterance is done being read back,
+    /// the elapsed time in milliseconds is returned.
     /// </summary>
-    /// <param name="service">
-    /// The current <paramref name="service"/> instance to unsubscribe the
-    /// <c>speechSynthesis.onvoiceschanged</c> callback from.
-    /// </param>
-    /// <exception cref="InvalidOperationException">
-    /// When the <paramref name="service"/> instance doesn't support the event
-    /// callback, this error is thrown.
-    /// </exception>
-    public static void UnsubscribeFromVoicesChanged(
-        this ISpeechSynthesisService service)
+    /// <param name="service"></param>
+    /// <param name="utterance"></param>
+    /// <param name="onUtteranceEnded"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static void SpeakWithCallback(
+        this ISpeechSynthesisService service,
+        SpeechSynthesisUtterance utterance,
+        Action<double> onUtteranceEnded)
     {
         if (service is SpeechSynthesisService and { _javaScript: { } } svc)
         {
-            svc._javaScript.InvokeVoid(
-                "blazorators.speechSynthesis.unsubscribeVoicesChanged");
+            s_utteranceEndedCallbackRegistry[utterance.Text] = onUtteranceEnded;
+            service.Speak(utterance);
         }
         else
         {
             throw new InvalidOperationException(
                 "SpeechSynthesisService is not available.");
+        }
+    }
+
+    /// <summary>
+    /// The callback that is invoked from the <c>blazorators.speechSynthesis.speak</c> when the utterance is read.
+    /// </summary>
+    /// <param name="text">The text from the utterance that was read.</param>
+    /// <param name="elapsedTimeSpokenInMilliseconds">
+    /// The elapsed time in milliseconds that it took to read the utterance.
+    /// </param>
+    [JSInvokable(nameof(OnUtteranceEnded))]
+    public static void OnUtteranceEnded(
+        string text, double elapsedTimeSpokenInMilliseconds)
+    {
+        if (s_utteranceEndedCallbackRegistry.TryRemove(
+            text, out var callback))
+        {
+            callback.Invoke(elapsedTimeSpokenInMilliseconds);
         }
     }
 
@@ -78,13 +97,39 @@ public static class SpeechSynthesisServiceExtensions
     /// The <see cref="JSInvokableAttribute"/> callback.
     /// </summary>
     /// <param name="guid">The identifier that flows through the interop pipeline.</param>
-    [JSInvokable]
+    [JSInvokable(nameof(VoicesChangedAsync))]
     public static async Task VoicesChangedAsync(string guid)
     {
         if (Guid.TryParse(guid, out var key) &&
             s_callbackRegistry.TryRemove(key, out var callback))
         {
             await callback.Invoke().ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Removes the subscription, assigns <c>speechSynthesis.onvoiceschanged</c> to <c>null</c>.
+    /// </summary>
+    /// <param name="service">
+    /// The current <paramref name="service"/> instance to unsubscribe the
+    /// <c>speechSynthesis.onvoiceschanged</c> callback from.
+    /// </param>
+    /// <exception cref="InvalidOperationException">
+    /// When the <paramref name="service"/> instance doesn't support the event
+    /// callback, this error is thrown.
+    /// </exception>
+    public static void UnsubscribeFromVoicesChanged(
+        this ISpeechSynthesisService service)
+    {
+        if (service is SpeechSynthesisService and { _javaScript: { } } svc)
+        {
+            svc._javaScript.InvokeVoid(
+                "blazorators.speechSynthesis.unsubscribeVoicesChanged");
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                "SpeechSynthesisService is not available.");
         }
     }
 }

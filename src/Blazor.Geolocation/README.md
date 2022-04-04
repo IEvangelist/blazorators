@@ -1,4 +1,4 @@
-﻿# Blazorators: The Source Generated `geolocation` JavaScript Interop library for Blazor Server
+﻿# Blazorators: The Source Generated `geolocation` JavaScript Interop library for Blazor
 
 The [`Blazor.Geolocation`](https://www.nuget.org/packages/Blazor.Geolocation) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IGeolocation` interface specific to Blazor WebAssembly and the [`geolocation`](https://developer.mozilla.org/docs/Web/API/Geolocation) Web API.
 

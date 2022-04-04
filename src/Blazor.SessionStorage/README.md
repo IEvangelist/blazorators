@@ -1,4 +1,4 @@
-﻿# Blazorators: The Source Generated `sessionStorage` JavaScript Interop library for Blazor Server
+﻿# Blazorators: The Source Generated `sessionStorage` JavaScript Interop library for Blazor
 
 The [`Blazor.SessionStorage`](https://www.nuget.org/packages/Blazor.SessionStorage) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IStorageService` interface specific to Blazor WebAssembly and the [`sessionStorage`](https://developer.mozilla.org/docs/Web/API/Window/sessionStorage) Web API.
 

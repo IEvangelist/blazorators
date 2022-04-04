@@ -1,4 +1,4 @@
-﻿# Blazorators: The Source Generated `speechSynthesis` JavaScript Interop library for Blazor Server
+﻿# Blazorators: The Source Generated `speechSynthesis` JavaScript Interop library for Blazor
 
 The [`Blazor.SpeechSynthesis`](https://www.nuget.org/packages/Blazor.SpeechSynthesis) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `ISpeechSynthesis` interface specific to Blazor WebAssembly and the [`speechSynthesis`](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis) Web API.
 
@@ -27,7 +27,7 @@ app.MapFallbackToPage("/_Host");
 app.Run();
 ```
 
-Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IStorageService` type. The interface takes the following shape:
+Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `ISpeechSynthesisService` type. The interface takes the following shape:
 
 ```csharp
 using System.Threading.Tasks;

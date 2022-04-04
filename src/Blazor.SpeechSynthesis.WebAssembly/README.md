@@ -4,7 +4,7 @@ The [`Blazor.SpeechSynthesis.WebAssembly`](https://www.nuget.org/packages/Blazor
 
 ## Get started
 
-After the NuGet package is added as a reference, call the `AddSpeechSynthesisServices` method to register the `IStorageService` service type.
+After the NuGet package is added as a reference, call the `AddSpeechSynthesisServices` method to register the `ISpeechSynthesisService` type.
 
 ```csharp
 using Microsoft.AspNetCore.Components.Web;
@@ -25,7 +25,7 @@ builder.Services.AddSpeechSynthesisServices();
 await builder.Build().RunAsync();
 ```
 
-Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IStorageService` type. The interface takes the following shape:
+Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `ISpeechSynthesisService` type. The interface takes the following shape:
 
 ```csharp
 using Blazor.Serialization.Extensions;

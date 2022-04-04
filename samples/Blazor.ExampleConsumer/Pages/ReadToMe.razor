@@ -13,7 +13,7 @@
         }
     </select>
     <button class="btn btn-primary" type="button" 
-        title="Refresh voices?" @onclick=@(_ => GetVoicesAsync("ClientButtonClickHandler"))>
+        title="Refresh voices?" @onclick=@GetVoicesAsync>
         <span class="oi oi-reload"></span>
     </button>
 </div>
@@ -33,11 +33,25 @@
 </div>
 
 <div class="mb-3 w-75">
-    <label for="text" class="form-label">Text-to-speech</label>
+    <label for="text" class="form-label">
+        Text-to-speech @(_elapsedTimeMessage is { Length: > 0 } ? $"({_elapsedTimeMessage})" : "")
+    </label>
     <textarea class="form-control" id="text"
-        @oninput=@OnTextChanged rows="3" value=@_text></textarea>
+        @oninput=@OnTextChanged rows="3" value=@_text>
+    </textarea>
 </div>
 
-<button type="button" class="btn btn-lg btn-primary" @onclick=@Speak>
-    Speak
-</button>
+<div class="btn-group btn-group-lg">
+    <button type="button" class="btn btn-lg btn-primary" @onclick=@Speak>
+        Speak
+    </button>
+    <button type="button" class="btn btn-lg btn-warning" title="Pause" @onclick=@SpeechSynthesis.Pause>
+        <span class="oi oi-media-pause"></span>
+    </button>
+    <button type="button" class="btn btn-lg btn-info"title="Play" @onclick=@SpeechSynthesis.Resume>
+        <span class="oi oi-media-play"></span>
+    </button>
+    <button type="button" class="btn btn-lg btn-danger" title="Stop" @onclick=@SpeechSynthesis.Cancel>
+        <span class="oi oi-media-stop"></span>
+    </button>
+</div>
