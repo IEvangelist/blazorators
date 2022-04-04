@@ -3,6 +3,7 @@
 
 namespace Microsoft.JSInterop;
 
+/// <summary></summary>
 [JSAutoGenericInterop(
     TypeName = "Storage",
     Implementation = "window.sessionStorage",
@@ -12,6 +13,6 @@ namespace Microsoft.JSInterop;
         "getItem",
         "setItem:value"
     })]
-public partial interface IStorageService
+public partial interface ISessionStorageService
 {
 }

@@ -7,8 +7,7 @@ namespace Microsoft.JSInterop;
 [JSAutoInterop(
     TypeName = "NetworkInformation",
     Implementation = "window.navigator.connection",
-    HostingModel = BlazorHostingModel.Server,
-    Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
-public partial interface INetworkInformationService
+    Url = "https://developer.mozilla.org/docs/Web/API/Navigator/connection")]
+public partial interface IConnectionService
 {
 }

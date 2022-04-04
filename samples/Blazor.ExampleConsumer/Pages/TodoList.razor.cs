@@ -12,7 +12,7 @@ public sealed partial class TodoList
     string? _todoValue;
 
     [Inject]
-    public IStorageService LocalStorage { get; set; } = null!;
+    public ILocalStorageService LocalStorage { get; set; } = null!;
 
     protected override void OnInitialized()
     {

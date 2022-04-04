@@ -75,7 +75,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                         _ => null
                     };
                 var @interface =
-                    options.TypeName.ToInterfaceName();
+                    options.Implementation.ToInterfaceName();
                 var implementation =
                     options.Implementation.ToImplementationName();
 

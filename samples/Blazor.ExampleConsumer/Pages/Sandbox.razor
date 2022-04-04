@@ -1,12 +1,11 @@
 ﻿@page "/sandbox"
-
-@inject IGeolocationService Geolocation
+@inject IGeolocationService GeolocationService
 
 <h1>
     🎭 Sandbox
     @if (_isLoading)
     {
-        <span class="spinner-border text-light" style="border-width: .12em;" role="status">
+        <span class="spinner-border text-primary" style="border-width: .12em;" role="status">
             <span class="visually-hidden">Loading...</span>
         </span>
     }
@@ -25,24 +24,27 @@
 </h1>
 <pre class="bg-dark text-info fs-4 p-4">
     <code>
-        @(_position?.ToJson(_opts) ?? _positionError?.ToJson(_opts))
+        @{
+            var opts = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+        }
+        @(_position?.ToJson(opts) ?? _positionError?.ToJson(opts))
     </code>
 </pre>
 <BingMap Position=@_position />
 
 @code {
-    readonly JsonSerializerOptions _opts = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
     bool _isLoading => _position is null && _positionError is null;
-    GeolocationPosition _position = null!;
-    GeolocationPositionError _positionError = null!;
+    
+    GeolocationPosition? _position;
+    GeolocationPositionError? _positionError;
 
     protected override void OnInitialized() =>
-        Geolocation.GetCurrentPosition(
+        GeolocationService.GetCurrentPosition(
             position =>
             {
                 _position = position;

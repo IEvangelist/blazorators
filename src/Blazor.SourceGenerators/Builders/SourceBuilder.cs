@@ -26,7 +26,7 @@ internal sealed class SourceBuilder
     internal string ImplementationName => _implementationName ??=
         $"{_options.Implementation.ToImplementationName(_isService)}";
     internal string InterfaceName => _interfaceName ??=
-        _options.TypeName.ToInterfaceName(_isService);
+        _options.Implementation.ToInterfaceName(_isService);
 
     internal SourceBuilder(GeneratorOptions options, bool isService = true) =>
         (_options, _isService) = (options, isService);
@@ -95,7 +95,7 @@ internal sealed class SourceBuilder
             ? "IJSInProcessRuntime"
             : "IJSRuntime";
 
-        _builder.Append($"{_indentation}private readonly {javaScriptRuntime} _javaScript = null!;{_twoNewLines}");
+        _builder.Append($"{_indentation}internal readonly {javaScriptRuntime} _javaScript = null!;{_twoNewLines}");
         _builder.Append($"{_indentation}public {ImplementationName}({javaScriptRuntime} javaScript) =>{_newLine}");
 
         IncreaseIndentation();

@@ -72,4 +72,8 @@
         <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
+
 </Project>

@@ -506,7 +506,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             "
             : "services";
 
-        var @interface = options.TypeName.ToInterfaceName();
+        var @interface = options.Implementation.ToInterfaceName();
         var nonService = options.Implementation.ToImplementationName(false);
         var extensions = $@"// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License:

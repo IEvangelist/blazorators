@@ -13,7 +13,7 @@
         }
     </select>
     <button class="btn btn-primary" type="button" 
-        title="Refresh voices?" @onclick=@RefreshVoicesAsync>
+        title="Refresh voices?" @onclick=@(_ => GetVoicesAsync("ClientButtonClickHandler"))>
         <span class="oi oi-reload"></span>
     </button>
 </div>

@@ -3,12 +3,13 @@
 
 namespace Microsoft.JSInterop;
 
+/// <summary></summary>
 [JSAutoInterop(
     TypeName = "Storage",
-    Implementation = "window.sessionStorage",
+    Implementation = "window.localStorage",
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
-    Url = "https://developer.mozilla.org/docs/Web/API/Window/sessionStorage")]
-public partial interface IStorageService
+    Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
+public partial interface ILocalStorageService
 {
 }

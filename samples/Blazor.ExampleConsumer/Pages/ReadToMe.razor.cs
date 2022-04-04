@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Runtime.CompilerServices;
+
 namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class ReadToMe : IDisposable
@@ -26,17 +28,17 @@ public sealed partial class ReadToMe : IDisposable
     public ISpeechSynthesisService SpeechSynthesis { get; set; } = null!;
 
     [Inject]
-    public IStorageService LocalStorage { get; set; } = null!;
+    public ILocalStorageService LocalStorage { get; set; } = null!;
 
     [Inject]
-    public IJSInProcessRuntime JavaScript { get; set; } = null!;
+    public ILogger<ReadToMe> Logger { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        await RefreshVoicesAsync();
+        await GetVoicesAsync();
 
-        JavaScript.InvokeVoid(
-            "app.onVoicesChanged", this, nameof(RefreshVoicesAsync));
+        SpeechSynthesis.OnVoicesChanged(
+            async () => await GetVoicesAsync());
 
         if (LocalStorage.GetItem<string>("preferred-voice")
             is { Length: > 0 } voice)
@@ -50,7 +52,13 @@ public sealed partial class ReadToMe : IDisposable
         }
     }
 
-    async Task RefreshVoicesAsync() => _voices = await SpeechSynthesis.GetVoicesAsync();
+    async Task GetVoicesAsync([CallerMemberName] string caller = "")
+    {
+        Logger.LogInformation(
+            "{MethodName} called from: {Caller}.", nameof(GetVoicesAsync), caller);
+        
+        _voices = await SpeechSynthesis.GetVoicesAsync();
+    }
 
     void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
 
@@ -65,6 +73,6 @@ public sealed partial class ReadToMe : IDisposable
         LocalStorage.SetItem("preferred-voice", _selectedVoice);
         LocalStorage.SetItem("preferred-speed", _voiceSpeed);
 
-        JavaScript.InvokeVoid("app.unsubscribeVoicesChanged");
+        SpeechSynthesis.UnsubscribeFromVoicesChanged();
     }
 }

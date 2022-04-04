@@ -22,11 +22,11 @@ static class StringExtensions
         return $"{impl}{(isService ? "Service" : "")}";
     }
 
-    internal static string ToInterfaceName(this string typeName, bool isService = true)
+    internal static string ToInterfaceName(this string implementation, bool isService = true)
     {
-        var type = (typeName.Contains(".")
-            ? typeName.Substring(typeName.LastIndexOf(".") + 1)
-            : typeName).CapitalizeFirstLetter();
+        var type = (implementation.Contains(".")
+            ? implementation.Substring(implementation.LastIndexOf(".") + 1)
+            : implementation).CapitalizeFirstLetter();
 
         return $"I{type}{(isService ? "Service" : "")}";
     }

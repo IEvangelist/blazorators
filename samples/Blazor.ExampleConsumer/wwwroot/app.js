@@ -32,18 +32,6 @@ const loadMap = (mapId, latitude, longitude) => {
     }
 };
 
-const onVoicesChanged = (dotnetObj, callbackMethodName) => {
-    speechSynthesis.onvoiceschanged = () => {
-        dotnetObj.invokeMethod(callbackMethodName);
-    };
-};
-
-const unsubscribeVoicesChanged = () => {
-    speechSynthesis.onvoiceschanged = null;
-};
-
 window.app = Object.assign({}, window.app, {
-    loadMap,
-    onVoicesChanged,
-    unsubscribeVoicesChanged    
+    loadMap  
 });
