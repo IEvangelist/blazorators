@@ -29,8 +29,6 @@ jobs:
         - Blazor.Geolocation
         - Blazor.SpeechSynthesis.WebAssembly
         - Blazor.SpeechSynthesis
-        - Blazor.NetworkInformation.WebAssembly
-        - Blazor.NetworkInformation
     steps:
     - uses: actions/checkout@v2
 

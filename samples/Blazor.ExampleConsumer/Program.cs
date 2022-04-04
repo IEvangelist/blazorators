@@ -15,6 +15,5 @@ builder.Services.AddScoped(
 builder.Services.AddLocalStorageServices();
 builder.Services.AddGeolocationServices();
 builder.Services.AddSpeechSynthesisServices();
-builder.Services.AddConnectionServices();
 
 await builder.Build().RunAsync();
