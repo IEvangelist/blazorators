@@ -2,7 +2,7 @@ name: publish nuget
 on:
   push:
     tags:
-      - 1.*
+      - 2.*
 
 jobs:
   test:
