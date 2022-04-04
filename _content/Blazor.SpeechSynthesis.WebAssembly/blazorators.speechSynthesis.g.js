@@ -4,6 +4,7 @@
 const speak = (argument) => {
     if (argument) {
         const utterance = new SpeechSynthesisUtterance();
+
         // Manually map values from the argument, as we cannot
         // instantiate objects from JSON.
         Object.entries(argument).forEach(entry => {
@@ -20,6 +21,14 @@ const speak = (argument) => {
                 }
             }
         });
+
+        utterance.onend = e => {
+            DotNet.invokeMethod(
+                "Blazor.SpeechSynthesis.WebAssembly",
+                "OnUtteranceEnded",
+                utterance.text,
+                e.elapsedTime);
+        };
 
         window.speechSynthesis.speak(utterance);
     }
