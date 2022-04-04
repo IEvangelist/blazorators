@@ -41,7 +41,7 @@ public class MediaKeySystemConfiguration
     /// Source-generated property representing the <c>MediaKeySystemConfiguration.distinctiveIdentifier</c> value.
     /// </summary>
     [JsonPropertyName(""distinctiveIdentifier"")]
-    public MediaKeysRequirement? DistinctiveIdentifier { get; set; } = default!;
+    public string? DistinctiveIdentifier { get; set; } = default!;
     /// <summary>
     /// Source-generated property representing the <c>MediaKeySystemConfiguration.initDataTypes</c> value.
     /// </summary>
@@ -56,7 +56,7 @@ public class MediaKeySystemConfiguration
     /// Source-generated property representing the <c>MediaKeySystemConfiguration.persistentState</c> value.
     /// </summary>
     [JsonPropertyName(""persistentState"")]
-    public MediaKeysRequirement? PersistentState { get; set; } = default!;
+    public string? PersistentState { get; set; } = default!;
     /// <summary>
     /// Source-generated property representing the <c>MediaKeySystemConfiguration.sessionTypes</c> value.
     /// </summary>

@@ -11,23 +11,5 @@ on:
 
 jobs:
   validate:
-    name: build-${{matrix.os}}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 6.0.x
-        include-prerelease: true
-
-    - name: Build
-      run: |
-        dotnet build --no-incremental --disable-parallel --configuration Release
-    - name: Test
-      run: |
-        dotnet test --no-restore --verbosity normal
+    name: validate
+    uses: ./.github/workflows/build-validation.yml

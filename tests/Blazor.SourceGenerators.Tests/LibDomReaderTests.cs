@@ -44,12 +44,6 @@ public class LibDomReaderTests
     timeout?: number;
 }",
             };
-
-            yield return new object[]
-            {
-                "ConnectionType",
-                @"type ConnectionType = ""bluetooth"" | ""cellular"" | ""ethernet"" | ""mixed"" | ""none"" | ""other"" | ""unknown"" | ""wifi""",
-            };
         }
     }
 
