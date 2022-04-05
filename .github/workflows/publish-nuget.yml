@@ -32,6 +32,8 @@ jobs:
         - Blazor.Geolocation
         - Blazor.SpeechSynthesis.WebAssembly
         - Blazor.SpeechSynthesis
+        - Blazor.SpeechRecognition.WebAssembly
+        - Blazor.SpeechRecognition
     steps:
     
     - name: Print tag ref

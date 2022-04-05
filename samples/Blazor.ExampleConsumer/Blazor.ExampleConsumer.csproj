@@ -20,6 +20,7 @@
       <ProjectReference Include="..\..\src\Blazor.Geolocation.WebAssembly\Blazor.Geolocation.WebAssembly.csproj" />
       <ProjectReference Include="..\..\src\Blazor.LocalStorage.WebAssembly\Blazor.LocalStorage.WebAssembly.csproj" />
       <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
+      <ProjectReference Include="..\..\src\Blazor.SpeechRecognition.WebAssembly\Blazor.SpeechRecognition.WebAssembly.csproj" />
       <ProjectReference Include="..\..\src\Blazor.SpeechSynthesis.WebAssembly\Blazor.SpeechSynthesis.WebAssembly.csproj" />
     </ItemGroup>
 

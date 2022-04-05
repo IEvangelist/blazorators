@@ -29,6 +29,8 @@ jobs:
         - Blazor.Geolocation
         - Blazor.SpeechSynthesis.WebAssembly
         - Blazor.SpeechSynthesis
+        - Blazor.SpeechRecognition.WebAssembly
+        - Blazor.SpeechRecognition
     steps:
     - uses: actions/checkout@v2
 

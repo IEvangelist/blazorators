@@ -31,18 +31,8 @@
 }
 
 @{
-    var (bgClass, json) = (_position, _positionError) switch
-    {
-        (null, { }) => ("bg-danger", _positionError.ToJson(_opts)),
-        ({ }, null) => ("bg-dark", _position.ToJson(_opts)),
-        _ => ("", null)
-    };
-    if (bgClass is not "" && json is not null)
-    {
-        <pre class="@bgClass text-info fs-4 p-4"> 
-            <code>@json</code>
-        </pre>
-    }
+    <Code Value=@_position T=GeolocationPosition IsError=false />
+    <Code Value=@_positionError T=GeolocationPositionError IsError=true />
 
     <BingMap Position=@_position />
 }

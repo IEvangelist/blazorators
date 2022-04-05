@@ -22,19 +22,10 @@
         </a>
     }
 </h1>
-<pre class="bg-dark text-info fs-4 p-4">
-    <code>
-        @{
-            var opts = new JsonSerializerOptions()
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-        }
-        @(_position?.ToJson(opts) ?? _positionError?.ToJson(opts))
-    </code>
-</pre>
+
+<Code Value=@_position T=GeolocationPosition IsError=false />
+<Code Value=@_positionError T=GeolocationPositionError IsError=true />
+
 <BingMap Position=@_position />
 
 @code {

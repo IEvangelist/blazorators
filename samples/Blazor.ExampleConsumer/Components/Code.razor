@@ -1,0 +1,28 @@
+﻿@typeparam T where T : class
+
+@if (Value is not null)
+{
+    <pre class="bg-dark @(_textClass) fs-4 p-4">
+        <code>
+            @{
+                var opts = new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                };
+            }
+            @Value?.ToJson(opts)
+        </code>
+    </pre>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public T? Value { get; set; } = default!;
+
+    [Parameter]
+    public bool IsError { get; set; }
+
+    string _textClass => IsError ? "text-warning" : "text-info";
+}

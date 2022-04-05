@@ -4,7 +4,7 @@ The [`Blazor.LocalStorage`](https://www.nuget.org/packages/Blazor.LocalStorage) 
 
 ## Get started
 
-After the NuGet package is added as a reference, call the `AddLocalStorageServices` method to register the `IStorageService` service type.
+After the NuGet package is added as a reference, call the `AddLocalStorageServices` method to register the `ILocalStorageService` service type.
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +27,7 @@ app.MapFallbackToPage("/_Host");
 app.Run();
 ```
 
-Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IStorageService` type. The interface takes the following shape:
+Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `ILocalStorageService` type. The interface takes the following shape:
 
 ```csharp
 using Blazor.Serialization.Extensions;
@@ -39,7 +39,7 @@ namespace Microsoft.JSInterop;
 /// <summary>
 /// Source generated interface definition of the <c>Storage</c> type.
 /// </summary>
-public interface IStorageService
+public interface ILocalStorageService
 {
     /// <summary>
     /// Source generated implementation of <c>window.localStorage.clear</c>.
