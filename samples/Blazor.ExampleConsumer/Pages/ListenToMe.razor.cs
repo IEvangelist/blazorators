@@ -5,8 +5,9 @@ namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class ListenToMe : IAsyncDisposable
 {
+    IDisposable? _recognitionSubscription;
     bool _isRecognizingSpeech = false;
-    SpeechRecognitionErrorEvent? _errorEvent;
+    SpeechRecognitionErrorEvent? _errorEvent;    
     string? _transcript;
 
     [Inject]
@@ -29,7 +30,9 @@ public sealed partial class ListenToMe : IAsyncDisposable
         else
         {
             var bcp47Tag = CurrentUICulture.Name;
-            SpeechRecognition.RecognizeSpeech(
+
+            _recognitionSubscription?.Dispose();
+            _recognitionSubscription = SpeechRecognition.RecognizeSpeech(
                 bcp47Tag,
                 OnRecognized,
                 OnError,
@@ -72,5 +75,7 @@ public sealed partial class ListenToMe : IAsyncDisposable
         {
             await SpeechRecognition.DisposeAsync();
         }
+
+        _recognitionSubscription?.Dispose();
     }
 }

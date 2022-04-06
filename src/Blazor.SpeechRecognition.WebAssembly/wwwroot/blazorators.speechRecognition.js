@@ -3,7 +3,7 @@
 /**
  * Cancels any active speech recognition session, 
  * considered best practice to properly clean up.
- * @param {any} isAborted
+ * @param {boolean} isAborted
  */
 export const cancelSpeechRecognition = (isAborted) => {
     if (_recognition !== null) {
@@ -21,7 +21,7 @@ export const cancelSpeechRecognition = (isAborted) => {
  * all the callbacks for the given dotnetObj in context.
  * @param {any} dotnetObj
  * @param {string} lang The BCP47 tag for the language.
- * @param {string} key The used for round-trip verification and read-reciepts.
+ * @param {string} key Used for round-trip verification and callback-receipts.
  * @param {string} onResultMethodName The callback to call for incremental recognition results.
  * @param {string | null} onErrorMethodName The optional callback to call in the event of an recognition error.
  * @param {string | null} onStartMethodName The optional callback to call when recognition started.
@@ -74,7 +74,6 @@ export const recognizeSpeech =
         _recognition.start();
     };
 
-// Prevent client from speaking when user closes tab or window.
 window.addEventListener('beforeunload', _ => {
     cancelSpeechRecognition(true);
 });

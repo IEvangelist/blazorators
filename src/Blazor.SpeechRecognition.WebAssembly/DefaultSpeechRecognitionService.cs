@@ -14,10 +14,9 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
 
     SpeechRecognitionSubject? _speechRecognition;
     IJSInProcessObjectReference? _speechRecognitionModule;
-
+    
     public DefaultSpeechRecognitionService(
-        IJSInProcessRuntime javaScript) =>
-        _javaScript = javaScript;        
+        IJSInProcessRuntime javaScript) => _javaScript = javaScript;        
 
     void InitializeSpeechRecognitionSubject()
     {
@@ -55,24 +54,6 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
         _speechRecognitionModule?.InvokeVoid(
             InteropMethodIdentifiers.JavaScript.CancelSpeechRecognition,
             isAborted);
-
-    /// <inheritdoc />
-    void ISpeechRecognitionService.RecognizeSpeech<TComponent>(
-        TComponent component,
-        string language,
-        string onResultCallbackMethodName,
-        string? onStartCallbackMethodName,
-        string? onEndCallbackMethodName,
-        string? onErrorCallbackMethodName) =>
-        _speechRecognitionModule?.InvokeVoid(
-            InteropMethodIdentifiers.JavaScript.RecognizeSpeech,
-            DotNetObjectReference.Create<TComponent>(component),
-            language,
-            Guid.Empty,
-            onResultCallbackMethodName,
-            onErrorCallbackMethodName,
-            onStartCallbackMethodName,
-            onEndCallbackMethodName);
 
     /// <inheritdoc />
     IDisposable ISpeechRecognitionService.RecognizeSpeech(

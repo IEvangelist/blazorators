@@ -52,37 +52,6 @@ public interface ISpeechRecognitionService : IAsyncDisposable
     void CancelSpeechRecognition(bool isAborted);
 
     /// <summary>
-    /// Starts the speech recognition process. Callbacks will be invoked on
-    /// the <paramref name="component"/> for the given method names.
-    /// </summary>
-    /// <typeparam name="TComponent">The consuming component (or object).</typeparam>
-    /// <param name="component">The calling Razor (or Blazor) component.</param>
-    /// <param name="language">The BCP47 language tag.</param>
-    /// <param name="onResultCallbackMethodName">
-    /// Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the
-    /// following <see cref="Action{String, SpeechRecognitionResult}"/> signature.
-    /// </param>
-    /// <param name="onErrorCallbackMethodName">
-    /// Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the
-    /// following <see cref="Action{String, SpeechRecognitionErrorEvent}"/> signature.
-    /// </param>
-    /// <param name="onStartCallbackMethodName">
-    /// Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the
-    /// following <see cref="Action{String}"/>.
-    /// </param>
-    /// <param name="onEndCallbackMethodName">
-    /// Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the
-    /// following <see cref="Action{String}"/> signature.
-    /// </param>
-    void RecognizeSpeech<TComponent>(
-        TComponent component,
-        string language,
-        string onResultCallbackMethodName,
-        string? onErrorCallbackMethodName = null,
-        string? onStartCallbackMethodName = null,
-        string? onEndCallbackMethodName = null) where TComponent : class;
-
-    /// <summary>
     /// Starts the speech recognition process. Returns an <see cref="IDisposable"/>
     /// that acts as the subscription. The various callbacks are invoked as they occur,
     /// and will continue to fire until the subscription is disposed of.

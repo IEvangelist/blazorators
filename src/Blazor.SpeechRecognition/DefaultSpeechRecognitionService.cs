@@ -58,30 +58,6 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     }
 
     /// <inheritdoc />
-    async Task ISpeechRecognitionService.RecognizeSpeechAsync<TComponent>(
-        TComponent component,
-        string language,
-        string onResultCallbackMethodName,
-        string? onStartCallbackMethodName,
-        string? onEndCallbackMethodName,
-        string? onErrorCallbackMethodName)
-    {
-        var module = await _speechRecognitionModule.Value;
-        if (module is not null)
-        {
-            await module.InvokeVoidAsync(
-                InteropMethodIdentifiers.JavaScript.RecognizeSpeech,
-                DotNetObjectReference.Create<TComponent>(component),
-                language,
-                Guid.Empty,
-                onResultCallbackMethodName,
-                onErrorCallbackMethodName,
-                onStartCallbackMethodName,
-                onEndCallbackMethodName);
-        }
-    }
-
-    /// <inheritdoc />
     async Task<IDisposable> ISpeechRecognitionService.RecognizeSpeechAsync(
         string language,
         Func<string, Task> onRecognized,
