@@ -14,7 +14,7 @@ public class LibDomReaderTests
     {
         var stopwatch = Stopwatch.StartNew();
 
-        var sut = new LibDomReader();
+        var sut = TypeDeclarationReader.Default;
         _ = sut.TryGetDeclaration("foo", out var _);
 
         stopwatch.Stop();
@@ -53,7 +53,7 @@ public class LibDomReaderTests
     ]
     public void TryGetDeclarationReturnsCorrectly(string typeName, string expected)
     {
-        var sut = new LibDomReader();
+        var sut = TypeDeclarationReader.Default;
         var result = sut.TryGetDeclaration(typeName, out var actual);
 
         Assert.True(result);
@@ -79,7 +79,7 @@ public class LibDomReaderTests
     ]
     public void TryGetTypeAliasReturnsCorrectly(string typeAlias, string expected)
     {
-        var sut = new LibDomReader();
+        var sut = TypeDeclarationReader.Default;
         var result = sut.TryGetTypeAlias(typeAlias, out var actual);
 
         Assert.True(result);

@@ -3,9 +3,17 @@
 
 namespace Blazor.SourceGenerators.Parsers;
 
-internal sealed partial class LibDomParser
+internal sealed partial class TypeDeclarationParser
 {
-    private readonly LibDomReader _reader = new();
+    static readonly Lazy<TypeDeclarationParser> s_defaultParser =
+        new(
+            valueFactory: () => new TypeDeclarationParser(TypeDeclarationReader.Default));
+
+    readonly TypeDeclarationReader _reader;
+    
+    internal static TypeDeclarationParser Default => s_defaultParser.Value;
+
+    internal TypeDeclarationParser(TypeDeclarationReader reader) => _reader = reader;
 
     public ParserResult<CSharpTopLevelObject> ParseTargetType(string typeName)
     {

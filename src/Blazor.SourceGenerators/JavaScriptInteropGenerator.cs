@@ -6,7 +6,6 @@ namespace Blazor.SourceGenerators;
 [Generator]
 internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 {
-    private readonly LibDomParser _libDomParser = new();
     private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd = new()
     {
         (nameof(RecordCompat).ToGeneratedFileName(), RecordCompat),
@@ -63,27 +62,30 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                 continue;
             }
 
-            var result = _libDomParser.ParseTargetType(options.TypeName!);
-            if (result.Status == ParserResultStatus.SuccessfullyParsed &&
-                result.Value is not null)
+            foreach (var parser in options.Parsers)
             {
-                var namespaceString =
-                    (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
-                    {
-                        (string { Length: > 0 } containingNamespace, _) => containingNamespace,
-                        (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
-                        _ => null
-                    };
-                var @interface =
-                    options.Implementation.ToInterfaceName();
-                var implementation =
-                    options.Implementation.ToImplementationName();
+                var result = parser.ParseTargetType(options.TypeName!);
+                if (result.Status == ParserResultStatus.SuccessfullyParsed &&
+                    result.Value is not null)
+                {
+                    var namespaceString =
+                        (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
+                        {
+                            (string { Length: > 0 } containingNamespace, _) => containingNamespace,
+                            (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
+                            _ => null
+                        };
+                    var @interface =
+                        options.Implementation.ToInterfaceName();
+                    var implementation =
+                        options.Implementation.ToImplementationName();
 
-                var topLevelObject = result.Value;
-                context.AddDependentTypesSource(topLevelObject)
-                    .AddInterfaceSource(topLevelObject, @interface, options, namespaceString)
-                    .AddImplementationSource(topLevelObject, implementation, options, namespaceString)
-                    .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, options);
+                    var topLevelObject = result.Value;
+                    context.AddDependentTypesSource(topLevelObject)
+                        .AddInterfaceSource(topLevelObject, @interface, options, namespaceString)
+                        .AddImplementationSource(topLevelObject, implementation, options, namespaceString)
+                        .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, options);
+                }
             }
         }
     }

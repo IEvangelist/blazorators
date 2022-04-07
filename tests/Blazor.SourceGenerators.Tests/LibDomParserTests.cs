@@ -11,7 +11,7 @@ public class LibDomParserTests
     [Fact]
     public void ParseStaticObjectCorrectly()
     {
-        var sut = new LibDomParser();
+        var sut = TypeDeclarationParser.Default;
         var parserResult = sut.ParseTargetType("Geolocation");
 
         Assert.Equal(ParserResultStatus.SuccessfullyParsed, parserResult.Status);

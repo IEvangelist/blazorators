@@ -11,6 +11,7 @@
 /// <param name="Url">The optional URL to the corresponding API.</param>
 /// <param name="GenericMethodDescriptors">The optional generic method descriptors value from the parsed <c>JSAutoGenericInteropAttribute.GenericMethodDescriptors</c>.</param>
 /// <param name="PureJavaScriptOverrides">Overrides pure JavaScript calls. A custom impl must exist.</param>
+/// <param name="TypeDeclarationSources">An optional array of TypeScript type declarations sources. Valid values are URLs or file paths.</param>
 /// <param name="IsWebAssembly">
 /// A value indicating whether to generate targeting WASM:
 /// When <c>true</c>: Synchronous extensions are generated on the <c>IJSInProcessRuntime</c> type.
@@ -24,4 +25,32 @@ internal sealed record GeneratorOptions(
     string? Url = null,
     string[]? GenericMethodDescriptors = null,
     string[]? PureJavaScriptOverrides = null,
-    bool IsWebAssembly = true);
+    string[]? TypeDeclarationSources = null,
+    bool IsWebAssembly = true)
+{
+    ISet<TypeDeclarationParser>? _parsers;
+
+    /// <summary>
+    /// Get <see cref="GeneratorOptions"/> instance maps its
+    /// <see cref="TypeDeclarationSources"/> into a set of parsers.
+    /// When <see cref="TypeDeclarationSources"/> is null, or empty,
+    /// the default lib.dom.d.ts parser is used.
+    /// </summary>
+    internal ISet<TypeDeclarationParser> Parsers
+    {
+        get
+        {
+            _parsers ??= new HashSet<TypeDeclarationParser>();
+
+            foreach (var source in
+                TypeDeclarationSources?.Select(TypeDeclarationReader.Factory)
+                    ?.Select(reader => new TypeDeclarationParser(reader))
+                    ?? new[] { TypeDeclarationParser.Default })
+            {
+                _parsers.Add(source);
+            }
+
+            return _parsers;
+        }
+    }
+}

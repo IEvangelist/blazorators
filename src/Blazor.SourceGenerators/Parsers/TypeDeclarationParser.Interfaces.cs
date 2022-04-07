@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.Parsers;
 
-internal sealed partial class LibDomParser
+internal sealed partial class TypeDeclarationParser
 {
     internal CSharpObject? ToObject(string typeScriptTypeDeclaration)
     {

@@ -58,6 +58,11 @@ public class JSAutoInteropAttribute : Attribute
     /// The optional URL to the corresponding API.
     /// </summary>
     public string? Url { get; set; }
+
+    /// <summary>
+    /// An optional array of TypeScript type declarations sources. Valid values are URLs or file paths.
+    /// </summary>
+    public string[]? TypeDeclarationSources { get; set; }
 }
 ";
 }

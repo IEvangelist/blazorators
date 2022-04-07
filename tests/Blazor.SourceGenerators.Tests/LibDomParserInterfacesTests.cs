@@ -20,7 +20,7 @@ public class LibDomParserInterfacesTests
     sessionTypes?: string[];
     videoCapabilities?: MediaKeySystemMediaCapability[];
 }";
-        var sut = new LibDomParser();
+        var sut = TypeDeclarationParser.Default;
         var actual = sut.ToObject(text);
         var expected = @"#nullable enable
 using System.Text.Json.Serialization;
@@ -88,7 +88,7 @@ public class MediaKeySystemConfiguration
     getCurrentPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): void;
     watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): number;
 }";
-        var sut = new LibDomParser();
+        var sut = TypeDeclarationParser.Default;
         var actual = sut.ToTopLevelObject(text);
 
         Assert.NotNull(actual);

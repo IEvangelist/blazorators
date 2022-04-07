@@ -3,13 +3,16 @@
 
 namespace Microsoft.JSInterop;
 
-/// <summary></summary>
 [JSAutoInterop(
     TypeName = "Storage",
     Implementation = "window.localStorage",
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
-    Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
+    Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
+    TypeDeclarationSources = new[]
+    {
+        "https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts"
+    })]
 public partial interface ILocalStorageService
 {
 }
