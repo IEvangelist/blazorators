@@ -26,6 +26,17 @@
         "ideas",
         "test"
       ]
+    },
+    {
+      "login": "robertmclaws",
+      "name": "Robert McLaws",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1657085?v=4",
+      "profile": "https://nimbleapps.cloud",
+      "contributions": [
+        "code",
+        "bug",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
