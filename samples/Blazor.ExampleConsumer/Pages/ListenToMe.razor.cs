@@ -1,10 +1,14 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.JSInterop;
+
 namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class ListenToMe : IAsyncDisposable
 {
+    const string TranscriptKey = "listen-to-me-page-transcript";
+
     IDisposable? _recognitionSubscription;
     bool _isRecognizingSpeech = false;
     SpeechRecognitionErrorEvent? _errorEvent;    
@@ -12,6 +16,12 @@ public sealed partial class ListenToMe : IAsyncDisposable
 
     [Inject]
     public ISpeechRecognitionService SpeechRecognition { get; set; } = null!;
+
+    [Inject]
+    public ISessionStorageService SessionStorage { get; set; } = null!;
+
+    protected override void OnInitialized() =>
+        _transcript = SessionStorage.GetItem<string>(TranscriptKey);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -66,6 +76,8 @@ public sealed partial class ListenToMe : IAsyncDisposable
             null => transcript,
             _ => $"{_transcript.Trim()} {transcript}".Trim()
         };
+
+        SessionStorage.SetItem(TranscriptKey, _transcript);
         StateHasChanged();
     }
 

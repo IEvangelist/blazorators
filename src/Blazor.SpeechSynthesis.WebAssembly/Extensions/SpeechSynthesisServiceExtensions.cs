@@ -18,11 +18,11 @@ public static class SpeechSynthesisServiceExtensions
     /// functionality, and exposes the native <c>onend</c> callback. When the utterance is done being read back,
     /// the elapsed time in milliseconds is returned.
     /// </summary>
-    /// <param name="service"></param>
-    /// <param name="utterance"></param>
-    /// <param name="onUtteranceEnded"></param>
-    /// <exception cref="InvalidOperationException"></exception>
-    public static void SpeakWithCallback(
+    /// <exception cref="InvalidOperationException">
+    /// When the <paramref name="service"/> instance doesn't support the event
+    /// callback, this error is thrown.
+    /// </exception>
+    public static void Speak(
         this ISpeechSynthesisService service,
         SpeechSynthesisUtterance utterance,
         Action<double> onUtteranceEnded)

@@ -7,6 +7,10 @@ namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class ReadToMe : IDisposable
 {
+    const string PreferredVoiceKey = "preferred-voice";
+    const string PreferredSpeedKey = "preferred-speed";
+    const string TextKey = "read-to-me-text";
+
     string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor. JavaScript interoperability is possible by parsing TypeScript type declarations and using this metadata to output corresponding C# types.";
     SpeechSynthesisVoice[] _voices = Array.Empty<SpeechSynthesisVoice>();
     readonly IList<double> _voiceSpeeds =
@@ -32,6 +36,9 @@ public sealed partial class ReadToMe : IDisposable
     public ILocalStorageService LocalStorage { get; set; } = null!;
 
     [Inject]
+    public ISessionStorageService SessionStorage { get; set; } = null!;
+
+    [Inject]
     public ILogger<ReadToMe> Logger { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
@@ -41,15 +48,20 @@ public sealed partial class ReadToMe : IDisposable
         SpeechSynthesis.OnVoicesChanged(
             async () => await GetVoicesAsync());
 
-        if (LocalStorage.GetItem<string>("preferred-voice")
+        if (LocalStorage.GetItem<string>(PreferredVoiceKey)
             is { Length: > 0 } voice)
         {
             _selectedVoice = voice;
         }
-        if (LocalStorage.GetItem<double>("preferred-speed")
+        if (LocalStorage.GetItem<double>(PreferredSpeedKey)
             is double speed && speed > 0)
         {
             _voiceSpeed = speed;
+        }
+        if (SessionStorage.GetItem<string>(TextKey)
+            is { Length: > 0} text)
+        {
+            _text = text;
         }
     }
 
@@ -66,18 +78,21 @@ public sealed partial class ReadToMe : IDisposable
         _voiceSpeed = double.TryParse(args.Value?.ToString() ?? "1.5", out var speed)
             ? speed : 1.5;
 
-    void Speak() => SpeechSynthesis.SpeakWithCallback(Utterance, elapsedTime =>
-    {
-        _elapsedTimeMessage =
-            $"Read aloud in {TimeSpan.FromMilliseconds(elapsedTime).Humanize()}.";
+    void Speak() => SpeechSynthesis.Speak(
+        Utterance,
+        elapsedTime =>
+        {
+            _elapsedTimeMessage =
+                $"Read aloud in {TimeSpan.FromMilliseconds(elapsedTime).Humanize()}.";
 
-        StateHasChanged();
-    });
+            StateHasChanged();
+        });
 
     public void Dispose()
     {
-        LocalStorage.SetItem("preferred-voice", _selectedVoice);
-        LocalStorage.SetItem("preferred-speed", _voiceSpeed);
+        LocalStorage.SetItem(PreferredVoiceKey, _selectedVoice);
+        LocalStorage.SetItem(PreferredSpeedKey, _voiceSpeed);
+        SessionStorage.SetItem(TextKey, _text);
 
         SpeechSynthesis.UnsubscribeFromVoicesChanged();
     }
