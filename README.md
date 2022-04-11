@@ -5,7 +5,7 @@
 
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A C# source generator that creates fully functioning Blazor JavaScript interop code, targeting either the `IJSInProcessRuntime` or `IJSRuntime` types. This library provides several NuGet packages:
@@ -762,6 +762,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.cnblogs.com/weihanli"><img src="https://avatars.githubusercontent.com/u/7604648?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Weihan Li</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=WeihanLi" title="Code">💻</a></td>
     <td align="center"><a href="https://www.microsoft.com"><img src="https://avatars.githubusercontent.com/u/7679720?v=4?s=100" width="100px;" alt=""/><br /><sub><b>David Pine</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=IEvangelist" title="Code">💻</a> <a href="#design-IEvangelist" title="Design">🎨</a> <a href="https://github.com/IEvangelist/blazorators/pulls?q=is%3Apr+reviewed-by%3AIEvangelist" title="Reviewed Pull Requests">👀</a> <a href="#ideas-IEvangelist" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=IEvangelist" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://nimbleapps.cloud"><img src="https://avatars.githubusercontent.com/u/1657085?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Robert McLaws</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=robertmclaws" title="Code">💻</a> <a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Arobertmclaws" title="Bug reports">🐛</a> <a href="#ideas-robertmclaws" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http://colinsalmcorner.com"><img src="https://avatars.githubusercontent.com/u/1932561?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Colin Dembovsky</b></sub></a><br /><a href="#infra-colindembovsky" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#platform-colindembovsky" title="Packaging/porting to new platform">📦</a></td>
   </tr>
 </table>
 

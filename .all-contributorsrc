@@ -37,6 +37,16 @@
         "bug",
         "ideas"
       ]
+    },
+    {
+      "login": "colindembovsky",
+      "name": "Colin Dembovsky",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1932561?v=4",
+      "profile": "http://colinsalmcorner.com",
+      "contributions": [
+        "infra",
+        "platform"
+      ]
     }
   ],
   "contributorsPerLine": 7,
