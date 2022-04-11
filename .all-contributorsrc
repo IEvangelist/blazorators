@@ -47,6 +47,15 @@
         "infra",
         "platform"
       ]
+    },
+    {
+      "login": "TanayParikh",
+      "name": "Tanay Parikh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14852843?v=4",
+      "profile": "http://tanayparikh.com",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
