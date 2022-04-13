@@ -3,7 +3,6 @@
 
 namespace Microsoft.JSInterop;
 
-/// <summary></summary>
 [JSAutoGenericInterop(
     TypeName = "Storage",
     Implementation = "window.localStorage",

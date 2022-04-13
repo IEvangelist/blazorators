@@ -18,34 +18,30 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     {
         if (_speechRecognition is not null)
         {
-            if (this is ISpeechRecognitionService svc)
-            {
-                svc.CancelSpeechRecognition(false);
-            }
-
+            CancelSpeechRecognition(false);
             _speechRecognition.Dispose();
         }
 
-        _speechRecognition = SpeechRecognitionSubject.Create(
+        _speechRecognition = SpeechRecognitionSubject.Factory(
             _callbackRegistry.InvokeOnRecognized);
     }
 
     /// <inheritdoc />
-    async Task ISpeechRecognitionService.InitializeModuleAsync() =>
+    public async Task InitializeModuleAsync() =>
         _speechRecognitionModule =
             await _javaScript.InvokeAsync<IJSInProcessObjectReference>(
                 "import",
                 "./_content/Blazor.SpeechRecognition.WebAssembly/blazorators.speechRecognition.js");
 
     /// <inheritdoc />
-    void ISpeechRecognitionService.CancelSpeechRecognition(
+    public void CancelSpeechRecognition(
         bool isAborted) =>
         _speechRecognitionModule?.InvokeVoid(
-            InteropMethodIdentifiers.JavaScript.CancelSpeechRecognition,
+            JavaScriptInteropMethodIdentifiers.CancelSpeechRecognition,
             isAborted);
 
     /// <inheritdoc />
-    IDisposable ISpeechRecognitionService.RecognizeSpeech(
+    public IDisposable RecognizeSpeech(
         string language,
         Action<string> onRecognized,
         Action<SpeechRecognitionErrorEvent>? onError,
@@ -61,7 +57,7 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
         _callbackRegistry.RegisterOnEnded(key, onEnded);
 
         _speechRecognitionModule?.InvokeVoid(
-            InteropMethodIdentifiers.JavaScript.RecognizeSpeech,
+            JavaScriptInteropMethodIdentifiers.RecognizeSpeech,
             DotNetObjectReference.Create(this),
             language,
             key,

@@ -11,11 +11,7 @@ internal sealed class SpeechRecognitionCallbackRegistry
     readonly ConcurrentDictionary<Guid, Action> _onEndedCallbackRegistry = new();
 
     internal void RegisterOnRecognized(
-        Guid key, Action<string> callback)
-    {
-        if (callback is not null)
-            _onResultCallbackRegistry[key] = callback;
-    }
+        Guid key, Action<string> callback) => _onResultCallbackRegistry[key] = callback;
 
     internal void RegisterOnError(
         Guid key, Action<SpeechRecognitionErrorEvent>? callback)
@@ -63,14 +59,10 @@ internal sealed class SpeechRecognitionCallbackRegistry
     static void OnInvokeCallback<T>(
         string key,
         ConcurrentDictionary<Guid, T> callbackRegistry,
-        Action<T?> action)
+        Action<T?> handleCallback)
     {
-        if (key is null or { Length: 0 })
-        {
-            return;
-        }
-
-        if (callbackRegistry is null or { Count: 0 })
+        if (key is null or { Length: 0 } ||
+            callbackRegistry is null or { Count: 0 })
         {
             return;
         }
@@ -78,7 +70,7 @@ internal sealed class SpeechRecognitionCallbackRegistry
         if (Guid.TryParse(key, out var guid) &&
             callbackRegistry.TryRemove(guid, out var callback))
         {
-            action?.Invoke(callback);
+            handleCallback?.Invoke(callback);
         }
     }
 }

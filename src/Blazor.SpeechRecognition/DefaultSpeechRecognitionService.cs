@@ -9,30 +9,26 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     readonly ConcurrentDictionary<Guid, Func<Task>> _onEndedCallbackRegistry = new();
     readonly ConcurrentDictionary<Guid, Func<SpeechRecognitionErrorEvent, Task>> _onErrorCallbackRegistry = new();
     readonly ConcurrentDictionary<Guid, Func<string, Task>> _onResultCallbackRegistry = new();
-
+    readonly Lazy<Task<IJSObjectReference>> _speechRecognitionModule;
     SpeechRecognitionSubject? _speechRecognition;
-    Lazy<Task<IJSObjectReference>> _speechRecognitionModule;
 
     public DefaultSpeechRecognitionService(
         IJSRuntime javaScript) =>
         _speechRecognitionModule =
             new(() => javaScript.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./_content/Blazor.SpeechRecognition.WebAssembly/blazorators.speechRecognition.js").AsTask());
+                "./_content/Blazor.SpeechRecognition.WebAssembly/blazorators.speechRecognition.js")
+                .AsTask());
 
     async ValueTask InitializeSpeechRecognitionSubjectAsync()
     {
         if (_speechRecognition is not null)
         {
-            if (this is ISpeechRecognitionService svc)
-            {
-                await svc.CancelSpeechRecognitionAsync(false);
-            }
-
+            await CancelSpeechRecognitionAsync(false);
             _speechRecognition.Dispose();
         }
 
-        _speechRecognition = SpeechRecognitionSubject.Create(
+        _speechRecognition = SpeechRecognitionSubject.Factory(
             async (key, speechRecognition) =>
             {
                 if (Guid.TryParse(key, out var guid) &&
@@ -45,20 +41,19 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     }
 
     /// <inheritdoc />
-    async Task ISpeechRecognitionService.CancelSpeechRecognitionAsync(
-        bool isAborted)
+    public async Task CancelSpeechRecognitionAsync(bool isAborted)
     {
         var module = await _speechRecognitionModule.Value;
         if (module is not null)
         {
             await module.InvokeVoidAsync(
-                InteropMethodIdentifiers.JavaScript.CancelSpeechRecognition,
+                JavaScriptInteropMethodIdentifiers.CancelSpeechRecognition,
                 isAborted);
         }
     }
 
     /// <inheritdoc />
-    async Task<IDisposable> ISpeechRecognitionService.RecognizeSpeechAsync(
+    public async Task<IDisposable> RecognizeSpeechAsync(
         string language,
         Func<string, Task> onRecognized,
         Func<SpeechRecognitionErrorEvent, Task>? onError,
@@ -80,7 +75,7 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
             _onResultCallbackRegistry[key] = onRecognized;
         
             await module.InvokeVoidAsync(
-                InteropMethodIdentifiers.JavaScript.RecognizeSpeech,
+                JavaScriptInteropMethodIdentifiers.RecognizeSpeech,
                 DotNetObjectReference.Create(this),
                 language,
                 key,

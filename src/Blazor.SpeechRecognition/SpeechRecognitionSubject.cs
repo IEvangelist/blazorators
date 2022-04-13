@@ -28,7 +28,7 @@ internal sealed class SpeechRecognitionSubject : IDisposable
             .Subscribe();
     }
 
-    internal static SpeechRecognitionSubject Create(
+    internal static SpeechRecognitionSubject Factory(
         Func<string, string, Task> observer) => new(observer);
 
     internal void RecognitionReceived(

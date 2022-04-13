@@ -25,7 +25,7 @@ internal sealed class SpeechRecognitionSubject : IDisposable
                     _observer(tuple.Key, tuple.SpeechRecognition));
     }
 
-    internal static SpeechRecognitionSubject Create(
+    internal static SpeechRecognitionSubject Factory(
         Action<string, string> observer) => new(observer);
 
     internal void RecognitionReceived(

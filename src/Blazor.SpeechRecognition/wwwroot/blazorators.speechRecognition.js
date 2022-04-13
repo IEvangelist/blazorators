@@ -65,7 +65,11 @@ export const recognizeSpeech =
                 }
             }
             if (isFinal) {
-                const punctuation = transcript.endsWith('.') ? '' : '.';
+                const punctuation =
+                    transcript.endsWith('.') ||
+                        transcript.endsWith('?') ||
+                        transcript.endsWith('!')
+                        ? '' : '.';
                 transcript =
                     `${transcript.replace(/\S/, str => str.toLocaleUpperCase())}${punctuation}`;
             }
