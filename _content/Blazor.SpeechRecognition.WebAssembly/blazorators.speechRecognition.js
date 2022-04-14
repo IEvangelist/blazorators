@@ -36,7 +36,18 @@ export const recognizeSpeech =
 
         cancelSpeechRecognition(true);
 
-        _recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+        let recognitionImplementation = null;
+        if (typeof (SpeechRecognition) !== "undefined" && recognitionImplementation == null)
+            recognitionImplementation = SpeechRecognition;
+        if (typeof (webkitSpeechRecognition) !== "undefined" && recognitionImplementation == null)
+            recognitionImplementation = webkitSpeechRecognition;
+
+        if (recognitionImplementation == null) {
+            dotnetObj.invokeMethodAsync(onErrorMethodName, key, { "error": "Not supported", "message": "This browser does not support any known SpeechRecognition method."});
+            return;
+        }
+
+        _recognition = new recognitionImplementation();
         _recognition.continuous = true;
         _recognition.interimResults = true;
         _recognition.lang = lang;
