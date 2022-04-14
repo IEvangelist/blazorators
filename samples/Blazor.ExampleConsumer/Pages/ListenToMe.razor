@@ -15,7 +15,12 @@
 <Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
 
 <button type="button" class="btn btn-lg btn-primary"
-    @onclick=@OnRecognizeSpeechClick>
+        @onclick=@OnRecognizeSpeechClick>
+    @if (_errorEvent != null)
+    {
+        <p class="alert-danger">@_errorEvent.Error</p>
+        <p class="alert-danger">@_errorEvent.Message</p>
+    }
     @if (_isRecognizingSpeech)
     {
         <span class="oi oi-media-stop"></span>

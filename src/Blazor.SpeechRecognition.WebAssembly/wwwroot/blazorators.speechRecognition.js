@@ -35,6 +35,8 @@ export const recognizeSpeech =
         }
 
         cancelSpeechRecognition(true);
+        debugger;
+
         let recognitionImplementation = null;
         if (typeof (SpeechRecognition) !== "undefined" && recognitionImplementation == null)
             recognitionImplementation = SpeechRecognition;
