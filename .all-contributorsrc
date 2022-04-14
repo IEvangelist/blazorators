@@ -56,6 +56,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "taori",
+      "name": "Andreas Müller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5545184?v=4",
+      "profile": "https://github.com/taori",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
