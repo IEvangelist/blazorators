@@ -481,7 +481,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, details.CSharpPropertyName)
                 .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} =>", postIncreaseIndentation: true)
                 .AppendRaw($"_javaScript.Invoke{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
-                .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");                
+                .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");
 
             if (!index.IsLast)
             {
@@ -508,6 +508,10 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
 
         var @interface = options.Implementation.ToInterfaceName();
         var nonService = options.Implementation.ToImplementationName(false);
+        var serviceLifetime = options.IsWebAssembly
+            ? "Singleton"
+            : "Scoped";
+
         var extensions = $@"// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License:
 // https://github.com/IEvangelist/blazorators/blob/main/LICENSE
@@ -525,7 +529,7 @@ public static class {nonService}ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection Add{nonService}Services(
         this IServiceCollection services) =>
-        {addExpression}.AddSingleton<{@interface}, {implementation}>();
+        {addExpression}.Add{serviceLifetime}<{@interface}, {implementation}>();
 }}
 ";
 
