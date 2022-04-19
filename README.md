@@ -8,6 +8,10 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+## Stats
+
+![Alt](https://repobeats.axiom.co/api/embed/6d5b98efd6598a4482f1fa6391fbe651a06f77d9.svg "Repobeats analytics image")
+
 A C# source generator that creates fully functioning Blazor JavaScript interop code, targeting either the `IJSInProcessRuntime` or `IJSRuntime` types. This library provides several NuGet packages:
 
 **Core libraries**
