@@ -38,7 +38,8 @@ internal sealed class SpeechRecognitionCallbackRegistry
         string key, string transcript) =>
         OnInvokeCallback(
             key, _onResultCallbackRegistry,
-            callback => callback?.Invoke(transcript));
+            callback => callback?.Invoke(transcript),
+            remove: false);
 
     internal void InvokeOnError(
         string key, SpeechRecognitionErrorEvent error) =>
@@ -59,7 +60,8 @@ internal sealed class SpeechRecognitionCallbackRegistry
     static void OnInvokeCallback<T>(
         string key,
         ConcurrentDictionary<Guid, T> callbackRegistry,
-        Action<T?> handleCallback)
+        Action<T?> handleCallback,
+        bool remove = true)
     {
         if (key is null or { Length: 0 } ||
             callbackRegistry is null or { Count: 0 })
@@ -67,10 +69,16 @@ internal sealed class SpeechRecognitionCallbackRegistry
             return;
         }
 
-        if (Guid.TryParse(key, out var guid) &&
-            callbackRegistry.TryRemove(guid, out var callback))
+        if (Guid.TryParse(key, out var guid))
         {
-            handleCallback?.Invoke(callback);
+            if (remove && callbackRegistry.TryRemove(guid, out var callback))
+            {
+                handleCallback?.Invoke(callback);
+            }
+            else if (!remove && callbackRegistry.TryGetValue(guid, out callback))
+            {
+                handleCallback?.Invoke(callback);
+            }
         }
     }
 }

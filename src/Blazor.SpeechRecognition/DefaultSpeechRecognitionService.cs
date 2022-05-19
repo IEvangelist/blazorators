@@ -117,7 +117,8 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     static Task OnInvokeCallbackAsync<T>(
         string key,
         ConcurrentDictionary<Guid, T> callbackRegistry,
-        Func<T, Task> handleCallback)
+        Func<T, Task> handleCallback,
+        bool remove = true)
     {
         if (key is null or { Length: 0 })
         {
@@ -130,10 +131,16 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
         }
 
         if (handleCallback is not null &&
-            Guid.TryParse(key, out var guid) &&
-            callbackRegistry.TryRemove(guid, out var callback))
+            Guid.TryParse(key, out var guid))
         {
-            return handleCallback.Invoke(callback);
+            if (remove && callbackRegistry.TryRemove(guid, out var callback))
+            {
+                handleCallback?.Invoke(callback);
+            }
+            else if (!remove && callbackRegistry.TryGetValue(guid, out callback))
+            {
+                handleCallback?.Invoke(callback);
+            }
         }
 
         return Task.CompletedTask;
