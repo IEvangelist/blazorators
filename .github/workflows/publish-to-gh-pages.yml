@@ -4,11 +4,21 @@ on:
     branches: [ main ]
     paths:
       - 'samples/**'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'The reason for running the workflow'
+        required: true
+        default: 'Manual run'
 jobs:
   deploy-to-github-pages:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: 'Print manual run reason'
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        echo 'Reason: ${{ github.event.inputs.reason }}'
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
