@@ -4,7 +4,7 @@
 //[JSAutoInterop(
 //    TypeName = "Permissions",
 //    Implementation = "window.navigator.permissions",
-//    Url = "https://developer.mozilla.org/en-US/docs/Web/API/Navigator/permissions")]
+//    Url = "https://developer.mozilla.org/docs/Web/API/Navigator/permissions")]
 public partial interface IPermissionsService
 {
 }

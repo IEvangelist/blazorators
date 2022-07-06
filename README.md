@@ -45,7 +45,7 @@ A C# source generator that creates fully functioning Blazor JavaScript interop c
 
 ## Using the `Blazor.SourceGenerators` package 📦
 
-As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) Web API.
+As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) Web API.
 
 Consider the _IStorageService.cs_ C# file:
 
@@ -728,10 +728,10 @@ public sealed partial class ConsumingComponent
 
 ## Future work
 
-- https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer
-- https://developer.mozilla.org/en-US/docs/Web/API/WakeLock
-- https://developer.mozilla.org/en-US/docs/Web/API/Navigator/hid
-- https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
+- https://developer.mozilla.org/docs/Web/API/CredentialsContainer
+- https://developer.mozilla.org/docs/Web/API/WakeLock
+- https://developer.mozilla.org/docs/Web/API/Navigator/hid
+- https://developer.mozilla.org/docs/Web/API/Web_Crypto_API
 
 ## Known limitations ⚠️
 

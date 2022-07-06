@@ -6,7 +6,7 @@ namespace Microsoft.JSInterop;
 [JSAutoGenericInterop(
     TypeName = "SpeechSynthesis",
     Implementation = "window.speechSynthesis",
-    Url = "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
+    Url = "https://developer.mozilla.org/docs/Web/API/SpeechSynthesis",
     OnlyGeneratePureJS = true,
     PureJavaScriptOverrides = new[]
     {

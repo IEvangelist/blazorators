@@ -14,7 +14,7 @@ static partial class SourceCode
 ///    TypeName = ""Storage"",
 ///    Implementation = ""window.localStorage"",
 ///    HostingModel = BlazorHostingModel.WebAssembly,
-///    Url = ""https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage"")]
+///    Url = ""https://developer.mozilla.org/docs/Web/API/Window/localStorage"")]
 /// public static partial LocalStorageExtensions
 /// {
 /// }

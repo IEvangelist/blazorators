@@ -7,7 +7,7 @@ namespace Microsoft.JSInterop;
     TypeName = "SpeechSynthesis",
     Implementation = "window.speechSynthesis",
     HostingModel = BlazorHostingModel.Server,
-    Url = "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
+    Url = "https://developer.mozilla.org/docs/Web/API/SpeechSynthesis",
     OnlyGeneratePureJS = true,
     PureJavaScriptOverrides = new[]
     {
