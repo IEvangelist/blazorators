@@ -5,77 +5,69 @@ namespace Microsoft.JSInterop;
 
 internal sealed class SpeechRecognitionCallbackRegistry
 {
-    readonly ConcurrentDictionary<Guid, Action<string>> _onResultCallbackRegistry = new();
-    readonly ConcurrentDictionary<Guid, Action<SpeechRecognitionErrorEvent>> _onErrorCallbackRegistry = new();
-    readonly ConcurrentDictionary<Guid, Action> _onStartedCallbackRegistry = new();
-    readonly ConcurrentDictionary<Guid, Action> _onEndedCallbackRegistry = new();
+    readonly ConcurrentDictionary<Guid, Action<string>> _onResultCallbackRegister = new();
+    readonly ConcurrentDictionary<Guid, Action<SpeechRecognitionErrorEvent>> _onErrorCallbackRegister = new();
+    readonly ConcurrentDictionary<Guid, Action> _onStartedCallbackRegister = new();
+    readonly ConcurrentDictionary<Guid, Action> _onEndedCallbackRegister = new();
 
     internal void RegisterOnRecognized(
-        Guid key, Action<string> callback) => _onResultCallbackRegistry[key] = callback;
+        Guid key, Action<string> callback) =>
+        _onResultCallbackRegister[key] = callback;
 
     internal void RegisterOnError(
-        Guid key, Action<SpeechRecognitionErrorEvent>? callback)
-    {
-        if (callback is not null)
-            _onErrorCallbackRegistry[key] = callback;
-    }
+        Guid key, Action<SpeechRecognitionErrorEvent> callback) =>
+        _onErrorCallbackRegister[key] = callback;
 
     internal void RegisterOnStarted(
-        Guid key, Action? callback)
-    {
-        if (callback is not null)
-            _onStartedCallbackRegistry[key] = callback;
-    }
+        Guid key, Action callback) =>
+        _onStartedCallbackRegister[key] = callback;
 
     internal void RegisterOnEnded(
-        Guid key, Action? callback)
-    {
-        if (callback is not null)
-            _onEndedCallbackRegistry[key] = callback;
-    }
+        Guid key, Action callback) =>
+        _onEndedCallbackRegister[key] = callback;
 
     internal void InvokeOnRecognized(
         string key, string transcript) =>
         OnInvokeCallback(
-            key, _onResultCallbackRegistry,
+            key, _onResultCallbackRegister,
             callback => callback?.Invoke(transcript),
             remove: false);
 
     internal void InvokeOnError(
         string key, SpeechRecognitionErrorEvent error) =>
         OnInvokeCallback(
-            key, _onErrorCallbackRegistry,
+            key, _onErrorCallbackRegister,
             callback => callback?.Invoke(error));
 
     internal void InvokeOnStarted(string key) =>
         OnInvokeCallback(
-            key, _onStartedCallbackRegistry,
+            key, _onStartedCallbackRegister,
             callback => callback?.Invoke());
 
     internal void InvokeOnEnded(string key) =>
         OnInvokeCallback(
-            key, _onEndedCallbackRegistry,
+            key, _onEndedCallbackRegister,
             callback => callback?.Invoke());
 
     static void OnInvokeCallback<T>(
         string key,
-        ConcurrentDictionary<Guid, T> callbackRegistry,
+        ConcurrentDictionary<Guid, T> callbackRegister,
         Action<T?> handleCallback,
         bool remove = true)
     {
         if (key is null or { Length: 0 } ||
-            callbackRegistry is null or { Count: 0 })
+            callbackRegister is null or { Count: 0 })
         {
             return;
         }
 
         if (Guid.TryParse(key, out var guid))
         {
-            if (remove && callbackRegistry.TryRemove(guid, out var callback))
+            if (remove && callbackRegister.TryRemove(guid, out var callback))
             {
                 handleCallback?.Invoke(callback);
             }
-            else if (!remove && callbackRegistry.TryGetValue(guid, out callback))
+            else if (!remove && callbackRegister.TryGetValue(guid, out callback))
             {
                 handleCallback?.Invoke(callback);
             }

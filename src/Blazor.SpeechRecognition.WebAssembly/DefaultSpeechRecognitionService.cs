@@ -52,9 +52,13 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
 
         var key = Guid.NewGuid();
         _callbackRegistry.RegisterOnRecognized(key, onRecognized);
-        _callbackRegistry.RegisterOnError(key, onError);
-        _callbackRegistry.RegisterOnStarted(key, onStarted);
-        _callbackRegistry.RegisterOnEnded(key, onEnded);
+
+        if (onError is not null)
+            _callbackRegistry.RegisterOnError(key, onError);
+        if (onStarted is not null)
+            _callbackRegistry.RegisterOnStarted(key, onStarted);
+        if (onEnded is not null)
+            _callbackRegistry.RegisterOnEnded(key, onEnded);
 
         _speechRecognitionModule?.InvokeVoid(
             JavaScriptInteropMethodIdentifiers.RecognizeSpeech,
