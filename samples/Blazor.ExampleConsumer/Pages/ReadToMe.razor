@@ -7,13 +7,13 @@
 <div class="input-group w-75 mb-3">
     <select class="form-select" aria-label="Voice selection"
         @bind="_selectedVoice" disabled=@(_voices?.Any() is false)>
-        @foreach (var voice in _voices)
+        @foreach (var voice in _voices ?? Array.Empty<SpeechSynthesisVoice>())
         {
             <option value="@voice.Name">@voice.Name</option>
         }
     </select>
     <button class="btn btn-primary" type="button" 
-        title="Refresh voices?" @onclick=@GetVoicesAsync>
+        title="Refresh voices?" @onclick=@(async () => await GetVoicesAsync())>
         <span class="oi oi-reload"></span>
     </button>
 </div>

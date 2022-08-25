@@ -44,9 +44,7 @@ public sealed partial class ReadToMe : IDisposable
     protected override async Task OnInitializedAsync()
     {
         await GetVoicesAsync();
-
-        SpeechSynthesis.OnVoicesChanged(
-            async () => await GetVoicesAsync());
+        SpeechSynthesis.OnVoicesChanged(() => GetVoicesAsync(true));
 
         if (LocalStorage.GetItem<string>(PreferredVoiceKey)
             is { Length: > 0 } voice)
@@ -59,17 +57,19 @@ public sealed partial class ReadToMe : IDisposable
             _voiceSpeed = speed;
         }
         if (SessionStorage.GetItem<string>(TextKey)
-            is { Length: > 0} text)
+            is { Length: > 0 } text)
         {
             _text = text;
         }
     }
 
-    async Task GetVoicesAsync()
+    async Task GetVoicesAsync(bool isFromCallback = false)
     {
         _voices = await SpeechSynthesis.GetVoicesAsync();
-
-        StateHasChanged();
+        if (_voices is { } && isFromCallback)
+        {
+            StateHasChanged();
+        }
     }
 
     void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
@@ -88,7 +88,7 @@ public sealed partial class ReadToMe : IDisposable
             StateHasChanged();
         });
 
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         LocalStorage.SetItem(PreferredVoiceKey, _selectedVoice);
         LocalStorage.SetItem(PreferredSpeedKey, _voiceSpeed);
