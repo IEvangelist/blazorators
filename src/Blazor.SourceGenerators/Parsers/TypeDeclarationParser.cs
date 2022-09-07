@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.Parsers;
@@ -10,7 +10,7 @@ internal sealed partial class TypeDeclarationParser
             valueFactory: () => new TypeDeclarationParser(TypeDeclarationReader.Default));
 
     readonly TypeDeclarationReader _reader;
-    
+
     internal static TypeDeclarationParser Default => s_defaultParser.Value;
 
     internal TypeDeclarationParser(TypeDeclarationReader reader) => _reader = reader;

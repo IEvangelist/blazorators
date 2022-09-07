@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.Extensions;
@@ -17,7 +17,7 @@ internal static class GeneratorExecutionContextExtensions
                 SourceText.From(dependentObj.ToString(),
                 Encoding.UTF8));
         }
-        
+
         return context;
     }
 

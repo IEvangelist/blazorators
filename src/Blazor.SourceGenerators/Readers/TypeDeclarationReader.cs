@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.Readers;
@@ -33,7 +33,7 @@ internal sealed partial class TypeDeclarationReader
     IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
     {
         ConcurrentDictionary<string, string> map = new();
-            
+
         try
         {
             if (typeDeclarations is { Length: > 0 })

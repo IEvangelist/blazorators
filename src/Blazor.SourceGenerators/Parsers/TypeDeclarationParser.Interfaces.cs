@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.Parsers;
@@ -345,13 +345,11 @@ internal sealed partial class TypeDeclarationParser
         return cSharpAction;
     }
 
-    internal static string CleanseReturnType(string returnType)
-    {
+    internal static string CleanseReturnType(string returnType) =>
         // Example inputs:
         // 1) ": void;"
         // 2) ": string | null;"
-        return returnType.Replace(":", "").Replace(";", "").Trim();
-    }
+        returnType.Replace(":", "").Replace(";", "").Trim();
 
     internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
         string typeName,

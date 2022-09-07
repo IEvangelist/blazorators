@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 using System.Diagnostics;
@@ -18,6 +18,7 @@ internal sealed class SourceBuilder
     private Indentation _indentation = new(0);
     private string? _implementationName;
     private string? _interfaceName;
+    private readonly bool _isService;
 
     internal ISet<string>? Fields { get; private set; }
     internal ISet<string>? Methods { get; private set; }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators;
@@ -12,7 +12,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
         (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
-    };    
+    };
 
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -44,7 +44,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 
         foreach (var (options, classDeclaration, attribute) in receiver.InterfaceDeclarations)
         {
-            if (options is null || IsDiaganosticError(options, context, attribute))
+            if (options is null || IsDiagnosticError(options, context, attribute))
             {
                 continue;
             }
@@ -90,7 +90,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
     }
 
-    static bool IsDiaganosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
+    static bool IsDiagnosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
     {
         if (options.TypeName is null)
         {
