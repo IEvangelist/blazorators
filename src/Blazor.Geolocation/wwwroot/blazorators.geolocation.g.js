@@ -16,7 +16,7 @@ const onSuccess = (dotnetObj, successMethodName, position) => {
             Speed: position.coords.speed
         }
     };
-    dotnetObj.invokeMethod(successMethodName, result);
+    dotnetObj.invokeMethodAsync(successMethodName, result);
     dotnetObj.dispose();
 };
 
@@ -28,7 +28,7 @@ const onError = (dotnetObj, errorMethodName, error) => {
         POSITION_UNAVAILABLE: error.POSITION_UNAVAILABLE,
         TIMEOUT: error.TIMEOUT
     };
-    dotnetObj.invokeMethod(errorMethodName, result);
+    dotnetObj.invokeMethodAsync(errorMethodName, result);
     dotnetObj.dispose();
 };
 
@@ -37,22 +37,22 @@ const getCurrentPosition = (
     successMethodName,
     errorMethodName,
     options) => {
-    navigator.geolocation.getCurrentPosition(
-        position => onSuccess(dotnetObj, successMethodName, position),
-        error => onError(dotnetObj, errorMethodName, error),
-        options);
-}
+        navigator.geolocation.getCurrentPosition(
+            position => onSuccess(dotnetObj, successMethodName, position),
+            error => onError(dotnetObj, errorMethodName, error),
+            options);
+    }
 
 const watchPosition = (
     dotnetObj,
     successMethodName,
     errorMethodName,
     options) => {
-    return navigator.geolocation.watchPosition(
-        position => onSuccess(dotnetObj, successMethodName, position),
-        error => onError(dotnetObj, errorMethodName, error),
-        options);
-}
+        return navigator.geolocation.watchPosition(
+            position => onSuccess(dotnetObj, successMethodName, position),
+            error => onError(dotnetObj, errorMethodName, error),
+            options);
+    }
 
 window.blazorators = Object.assign({}, window.blazorators, {
     geolocation: {
