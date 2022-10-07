@@ -5,7 +5,7 @@
 
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!--
@@ -764,14 +764,17 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://www.cnblogs.com/weihanli"><img src="https://avatars.githubusercontent.com/u/7604648?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Weihan Li</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=WeihanLi" title="Code">💻</a></td>
-    <td align="center"><a href="https://www.microsoft.com"><img src="https://avatars.githubusercontent.com/u/7679720?v=4?s=100" width="100px;" alt=""/><br /><sub><b>David Pine</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=IEvangelist" title="Code">💻</a> <a href="#design-IEvangelist" title="Design">🎨</a> <a href="https://github.com/IEvangelist/blazorators/pulls?q=is%3Apr+reviewed-by%3AIEvangelist" title="Reviewed Pull Requests">👀</a> <a href="#ideas-IEvangelist" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=IEvangelist" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://nimbleapps.cloud"><img src="https://avatars.githubusercontent.com/u/1657085?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Robert McLaws</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=robertmclaws" title="Code">💻</a> <a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Arobertmclaws" title="Bug reports">🐛</a> <a href="#ideas-robertmclaws" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="http://colinsalmcorner.com"><img src="https://avatars.githubusercontent.com/u/1932561?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Colin Dembovsky</b></sub></a><br /><a href="#infra-colindembovsky" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#platform-colindembovsky" title="Packaging/porting to new platform">📦</a></td>
-    <td align="center"><a href="http://tanayparikh.com"><img src="https://avatars.githubusercontent.com/u/14852843?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tanay Parikh</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=TanayParikh" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/taori"><img src="https://avatars.githubusercontent.com/u/5545184?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andreas Müller</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Ataori" title="Bug reports">🐛</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=taori" title="Code">💻</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center"><a href="https://www.cnblogs.com/weihanli"><img src="https://avatars.githubusercontent.com/u/7604648?v=4?s=100" width="100px;" alt="Weihan Li"/><br /><sub><b>Weihan Li</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=WeihanLi" title="Code">💻</a></td>
+      <td align="center"><a href="https://www.microsoft.com"><img src="https://avatars.githubusercontent.com/u/7679720?v=4?s=100" width="100px;" alt="David Pine"/><br /><sub><b>David Pine</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=IEvangelist" title="Code">💻</a> <a href="#design-IEvangelist" title="Design">🎨</a> <a href="https://github.com/IEvangelist/blazorators/pulls?q=is%3Apr+reviewed-by%3AIEvangelist" title="Reviewed Pull Requests">👀</a> <a href="#ideas-IEvangelist" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=IEvangelist" title="Tests">⚠️</a></td>
+      <td align="center"><a href="https://nimbleapps.cloud"><img src="https://avatars.githubusercontent.com/u/1657085?v=4?s=100" width="100px;" alt="Robert McLaws"/><br /><sub><b>Robert McLaws</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=robertmclaws" title="Code">💻</a> <a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Arobertmclaws" title="Bug reports">🐛</a> <a href="#ideas-robertmclaws" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center"><a href="http://colinsalmcorner.com"><img src="https://avatars.githubusercontent.com/u/1932561?v=4?s=100" width="100px;" alt="Colin Dembovsky"/><br /><sub><b>Colin Dembovsky</b></sub></a><br /><a href="#infra-colindembovsky" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#platform-colindembovsky" title="Packaging/porting to new platform">📦</a></td>
+      <td align="center"><a href="http://tanayparikh.com"><img src="https://avatars.githubusercontent.com/u/14852843?v=4?s=100" width="100px;" alt="Tanay Parikh"/><br /><sub><b>Tanay Parikh</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=TanayParikh" title="Documentation">📖</a></td>
+      <td align="center"><a href="https://github.com/taori"><img src="https://avatars.githubusercontent.com/u/5545184?v=4?s=100" width="100px;" alt="Andreas Müller"/><br /><sub><b>Andreas Müller</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Ataori" title="Bug reports">🐛</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=taori" title="Code">💻</a></td>
+      <td align="center"><a href="https://www.mahmudx.com"><img src="https://avatars.githubusercontent.com/u/16564582?v=4?s=100" width="100px;" alt="Mahmudul Hasan"/><br /><sub><b>Mahmudul Hasan</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=MahmudX" title="Code">💻</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->
