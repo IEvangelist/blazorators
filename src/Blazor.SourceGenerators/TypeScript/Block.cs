@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class Block : Statement, IBlockOrExpression
 {
-    internal Block() => ((INode)this).Kind = CommentKind.Block;
+    internal Block() => ((INode)this).Kind = SyntaxKind.Block;
 
     internal NodeArray<IStatement> Statements { get; set; } = default!;
     internal bool MultiLine { get; set; }

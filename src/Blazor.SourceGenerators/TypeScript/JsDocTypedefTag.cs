@@ -5,13 +5,13 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocTypedefTag : Node, IJsDocTag, IDeclaration
 {
-    internal JsDocTypedefTag() => ((INode)this).Kind = CommentKind.JsDocTypedefTag;
+    internal JsDocTypedefTag() => ((INode)this).Kind = SyntaxKind.JsDocTypedefTag;
 
-    internal INode FullName { get; set; } = default!;
-    internal JsDocTypeExpression TypeExpression { get; set; } = default!;
+    internal INode? FullName { get; set; }
+    internal JsDocTypeExpression? TypeExpression { get; set; } = default!;
     internal JsDocTypeLiteral JsDocTypeLiteral { get; set; } = default!;
     object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
+    INode? IDeclaration.Name { get; set; }
     AtToken IJsDocTag.AtToken { get; set; } = default!;
     Identifier IJsDocTag.TagName { get; set; } = default!;
     string IJsDocTag.Comment { get; set; } = default!;

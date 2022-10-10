@@ -11,39 +11,46 @@ internal sealed class JsDocParser
     internal JsDocParser(Parser parser) => Parser = parser;
 
     private Scanner Scanner => Parser.Scanner;
-    private string SourceText => Parser.SourceText;
+    private string? SourceText => Parser.SourceText;
     private SyntaxKind CurrentToken { get => Parser.CurrentToken; set => Parser.CurrentToken = value; }
     private bool ParseErrorBeforeNextFinishedNode { get => Parser.ParseErrorBeforeNextFinishedNode; set => Parser.ParseErrorBeforeNextFinishedNode = value; }
-    private List<Diagnostic> ParseDiagnostics { get => Parser.ParseDiagnostics; set => Parser.ParseDiagnostics = value; }
-    #region parserMethods
+    private List<Diagnostic>? ParseDiagnostics { get => Parser.ParseDiagnostics; set => Parser.ParseDiagnostics = value; }
 
     private void ClearState() => Parser.ClearState();
     private void FixupParentReferences(INode rootNode) => Parser.FixupParentReferences(rootNode);
-    private void ParseErrorAtCurrentToken(DiagnosticMessage message, object? arg0 = null) => Parser.ParseErrorAtCurrentToken(message, arg0);
-    private void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object? arg0 = null) => Parser.ParseErrorAtPosition(start, length, message, arg0);
+    private void ParseErrorAtCurrentToken(DiagnosticMessage? message, object? arg0 = null) => Parser.ParseErrorAtCurrentToken(message, arg0);
+    private void ParseErrorAtPosition(int start, int length, DiagnosticMessage? message, object? arg0 = null) => Parser.ParseErrorAtPosition(start, length, message, arg0);
     private SyntaxKind Token => Parser.Token;
     private SyntaxKind NextToken => Parser.NextToken;
     private T TryParse<T>(Func<T> callback) => Parser.TryParse(callback);
     private bool ParseExpected(SyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
-    private bool ParseOptional(SyntaxKind t) => Parser.ParseOptional(t);
-    private INode? ParseOptionalToken<T>(SyntaxKind t) where T : Node => Parser.ParseOptionalToken<T>(t);
-    private T ParseTokenNode<T>() where T : Node => Parser.ParseTokenNode<T>(Token);
-    private NodeArray<T> CreateList<T>(T[]? elements = null, int? pos = null) => Parser.CreateList(elements, pos);
+    private bool ParseOptional(SyntaxKind kind) => Parser.ParseOptional(kind);
+    private INode? ParseOptionalToken<T>(SyntaxKind kind) where T : Node, new() => Parser.ParseOptionalToken<T>(kind);
+    private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token);
+    private NodeArray<T?> CreateList<T>(T[]? elements = null, int? pos = null) where T : Node, new() => Parser.CreateList<T>(elements, pos);
     private T FinishNode<T>(T node, int? end = null) where T : Node => Parser.FinishNode(node, end);
     private Identifier ParseIdentifierName() => Parser.ParseIdentifierName();
     private NodeArray<T> ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool? considerSemicolonAsDelimiter = null) where T : INode => Parser.ParseDelimitedList(kind, parseElement, considerSemicolonAsDelimiter);
     private TypeLiteralNode ParseTypeLiteral() => Parser.ParseTypeLiteral();
     private IExpression ParseExpression() => Parser.ParseExpression();
-    #endregion
 
     internal bool IsJsDocType() => Token switch
     {
-        SyntaxKind.AsteriskToken or SyntaxKind.QuestionToken or SyntaxKind.OpenParenToken or SyntaxKind.OpenBracketToken or SyntaxKind.ExclamationToken or SyntaxKind.OpenBraceToken or SyntaxKind.FunctionKeyword or SyntaxKind.DotDotDotToken or SyntaxKind.NewKeyword or SyntaxKind.ThisKeyword => true,
+        SyntaxKind.AsteriskToken or
+        SyntaxKind.QuestionToken or
+        SyntaxKind.OpenParenToken or
+        SyntaxKind.OpenBracketToken or
+        SyntaxKind.ExclamationToken or
+        SyntaxKind.OpenBraceToken or
+        SyntaxKind.FunctionKeyword or
+        SyntaxKind.DotDotDotToken or
+        SyntaxKind.NewKeyword or
+        SyntaxKind.ThisKeyword => true,
         _ => TokenIsIdentifierOrKeyword(Token),
     };
 
-
-    internal static (JsDocTypeExpression res, List<Diagnostic> diagnostics) ParseJsDocTypeExpressionForTests(string content, int? start, int? length)
+    internal static (JsDocTypeExpression res, List<Diagnostic>? diagnostics) ParseJsDocTypeExpressionForTests(
+        string content, int? start, int? length)
     {
         var dp = new JsDocParser(new Parser());
         dp.Parser.InitializeState(content, ScriptTarget.Latest, null, ScriptKind.Js);
@@ -61,7 +68,6 @@ internal sealed class JsDocParser
 
         return (jsDocTypeExpression, diagnostics);
     }
-
 
     internal JsDocTypeExpression ParseJsDocTypeExpression()
     {
@@ -84,76 +90,53 @@ internal sealed class JsDocParser
     internal IJsDocType ParseJsDocTopLevelType()
     {
         var type = ParseJsDocType();
-        if (Token == SyntaxKind.BarToken)
+        if (Token is SyntaxKind.BarToken)
         {
             var unionType = new JsDocUnionType { Types = ParseJsDocTypeList(type) };
-
-
             type = FinishNode(unionType);
         }
-        if (Token == SyntaxKind.EqualsToken)
+
+        if (Token is SyntaxKind.EqualsToken)
         {
             var optionalType = new JsDocOptionalType();
 
-            NextToken;
-
+            _ = NextToken;
             optionalType.Type = type;
-
             type = FinishNode(optionalType);
         }
 
-
         return type;
     }
-
 
     internal IJsDocType ParseJsDocType()
     {
         var type = ParseBasicTypeExpression();
         while (true)
         {
-            if (Token == SyntaxKind.OpenBracketToken)
+            if (Token is SyntaxKind.OpenBracketToken)
             {
                 var arrayType = new JsDocArrayType { ElementType = type };
-
-
-
-                NextToken;
-
+                _ = NextToken;
                 ParseExpected(SyntaxKind.CloseBracketToken);
-
-
                 type = FinishNode(arrayType);
             }
-            else
-        if (Token == SyntaxKind.QuestionToken)
+            else if (Token is SyntaxKind.QuestionToken)
             {
                 var nullableType = new JsDocNullableType { Type = type };
-
-
-
-                NextToken;
-
+                _ = NextToken;
                 type = FinishNode(nullableType);
             }
-            else
-        if (Token == SyntaxKind.ExclamationToken)
+            else if (Token is SyntaxKind.ExclamationToken)
             {
                 var nonNullableType = new JsDocNonNullableType { Type = type };
-
-
-
-                NextToken;
-
+                _ = NextToken;
                 type = FinishNode(nonNullableType);
             }
             else
             {
-
                 break;
             }
         }
-
 
         return type;
     }
@@ -171,301 +154,242 @@ internal sealed class JsDocParser
         SyntaxKind.DotDotDotToken => ParseJsDocVariadicType(),
         SyntaxKind.NewKeyword => ParseJsDocConstructorType(),
         SyntaxKind.ThisKeyword => ParseJsDocThisType(),
-        SyntaxKind.AnyKeyword or SyntaxKind.StringKeyword or SyntaxKind.NumberKeyword or SyntaxKind.BooleanKeyword or SyntaxKind.SymbolKeyword or SyntaxKind.VoidKeyword or SyntaxKind.NullKeyword or SyntaxKind.UndefinedKeyword or SyntaxKind.NeverKeyword or SyntaxKind.ObjectKeyword => ParseTokenNode<JsDocType>(),
-        SyntaxKind.StringLiteral or SyntaxKind.NumericLiteral or SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword => ParseJsDocLiteralType(),
+        SyntaxKind.AnyKeyword or
+        SyntaxKind.StringKeyword or
+        SyntaxKind.NumberKeyword or
+        SyntaxKind.BooleanKeyword or
+        SyntaxKind.SymbolKeyword or
+        SyntaxKind.VoidKeyword or
+        SyntaxKind.NullKeyword or
+        SyntaxKind.UndefinedKeyword or
+        SyntaxKind.NeverKeyword or
+        SyntaxKind.ObjectKeyword => ParseTokenNode<JsDocType>(),
+        SyntaxKind.StringLiteral or
+        SyntaxKind.NumericLiteral or
+        SyntaxKind.TrueKeyword or
+        SyntaxKind.FalseKeyword => ParseJsDocLiteralType(),
         _ => ParseJsDocTypeReference(),
     };
-
 
     internal JsDocThisType ParseJsDocThisType()
     {
         var result = new JsDocThisType();
-
-        NextToken;
-
+        _ = NextToken;
         ParseExpected(SyntaxKind.ColonToken);
-
         result.Type = ParseJsDocType();
 
         return FinishNode(result);
     }
-
 
     internal JsDocConstructorType ParseJsDocConstructorType()
     {
         var result = new JsDocConstructorType();
-
-        NextToken;
-
+        _ = NextToken;
         ParseExpected(SyntaxKind.ColonToken);
-
         result.Type = ParseJsDocType();
 
         return FinishNode(result);
     }
-
 
     internal JsDocVariadicType ParseJsDocVariadicType()
     {
         var result = new JsDocVariadicType();
-
-        NextToken;
-
+        _ = NextToken;
         result.Type = ParseJsDocType();
 
         return FinishNode(result);
     }
 
-
     internal JsDocFunctionType ParseJsDocFunctionType()
     {
         var result = new JsDocFunctionType();
-
-        NextToken;
-
+        _ = NextToken;
 
         ParseExpected(SyntaxKind.OpenParenToken);
 
-        result.Parameters = Parser.ParseDelimitedList(ParsingContext.JSDocFunctionParameters, ParseJsDocParameter);
+        var declaration = result as ISignatureDeclaration;
+        declaration.Parameters = Parser.ParseDelimitedList(
+            ParsingContext.JSDocFunctionParameters, ParseJsDocParameter);
 
-        CheckForTrailingComma(result.Parameters);
-
+        CheckForTrailingComma(declaration.Parameters);
         ParseExpected(SyntaxKind.CloseParenToken);
-        if (Token == SyntaxKind.ColonToken)
+
+        if (Token is SyntaxKind.ColonToken)
         {
-
-            NextToken;
-
-            result.Type = ParseJsDocType();
+            _ = NextToken;
+            declaration.Type = ParseJsDocType();
         }
-
 
         return FinishNode(result);
     }
 
-
     internal ParameterDeclaration ParseJsDocParameter()
     {
-        var parameter = new ParameterDeclaration { Type = ParseJsDocType() };
+        var parameter = new ParameterDeclaration();
+        var declaration = parameter as IVariableLikeDeclaration;
+        declaration.Type = ParseJsDocType();
 
         if (ParseOptional(SyntaxKind.EqualsToken))
         {
-
-            parameter.QuestionToken = new QuestionToken { };
+            declaration.QuestionToken = new QuestionToken();
         }
 
         return FinishNode(parameter);
     }
 
-
     internal JsDocTypeReference ParseJsDocTypeReference()
     {
-        var result = new JsDocTypeReference { Name = Parser.ParseSimplePropertyName() as Identifier };
-
-        if (Token == SyntaxKind.LessThanToken)
+        var result = new JsDocTypeReference
         {
+            Name = Parser.ParseSimplePropertyName() as Identifier
+        };
 
+        if (Token is SyntaxKind.LessThanToken)
+        {
             result.TypeArguments = ParseTypeArguments();
         }
         else
         {
             while (ParseOptional(SyntaxKind.DotToken))
             {
-                if (Token == SyntaxKind.LessThanToken)
+                if (Token is SyntaxKind.LessThanToken)
                 {
-
                     result.TypeArguments = ParseTypeArguments();
-
                     break;
                 }
-                else
+                else if (result.Name is not null)
                 {
-
                     result.Name = ParseQualifiedName(result.Name);
                 }
             }
         }
 
-
-
         return FinishNode(result);
     }
 
-
     internal NodeArray<IJsDocType> ParseTypeArguments()
     {
-
-        NextToken;
-        var typeArguments = ParseDelimitedList(ParsingContext.JSDocTypeArguments, ParseJsDocType);
+        _ = NextToken;
+        var typeArguments = ParseDelimitedList(
+            ParsingContext.JSDocTypeArguments, ParseJsDocType);
 
         CheckForTrailingComma(typeArguments);
-
         CheckForEmptyTypeArgumentList(typeArguments);
-
         ParseExpected(SyntaxKind.GreaterThanToken);
-
 
         return typeArguments;
     }
 
-
     internal void CheckForEmptyTypeArgumentList<T>(NodeArray<T> typeArguments)
     {
-        if (!ParseDiagnostics.Any() && typeArguments != null && !typeArguments.Any())
+        if (!ParseDiagnostics.Any() && typeArguments != null && !typeArguments.Any() &&
+            typeArguments is ITextRange textRange && !string.IsNullOrWhiteSpace(SourceText))
         {
-            var start = (typeArguments.Pos ?? 0) - "<".Length;
-            var end = SkipTriviaM(SourceText, (int)typeArguments.End) + ">".Length;
+            var start = (textRange.Pos ?? 0) - "<".Length;
+            var end = SkipTriviaM(SourceText!, textRange.End ?? 0) + ">".Length;
 
             ParseErrorAtPosition(start, end - start, Diagnostics.Type_argument_list_cannot_be_empty);
         }
     }
 
-
-    internal QualifiedName ParseQualifiedName(IEntityName left)
-    {
-        var result = new QualifiedName
+    internal QualifiedName ParseQualifiedName(IEntityName left) =>
+        FinishNode(new QualifiedName
         {
             Left = left,
             Right = ParseIdentifierName()
-        };
+        });
 
-
-
-
-        return FinishNode(result);
-    }
-
-
-    internal JsDocRecordType ParseJsDocRecordType()
-    {
-        var result = new JsDocRecordType { Literal = ParseTypeLiteral() };
-
-
-        return FinishNode(result);
-    }
-
+    internal JsDocRecordType ParseJsDocRecordType() =>
+        FinishNode(new JsDocRecordType { Literal = ParseTypeLiteral() });
 
     internal JsDocNonNullableType ParseJsDocNonNullableType()
     {
         var result = new JsDocNonNullableType();
-
-        NextToken;
-
+        _ = NextToken;
         result.Type = ParseJsDocType();
 
         return FinishNode(result);
     }
 
-
     internal JsDocTupleType ParseJsDocTupleType()
     {
         var result = new JsDocTupleType();
-
-        NextToken;
-
-        result.Types = ParseDelimitedList(ParsingContext.JSDocTupleTypes, ParseJsDocType);
+        _ = NextToken;
+        result.Types = ParseDelimitedList(
+            ParsingContext.JSDocTupleTypes, ParseJsDocType);
 
         CheckForTrailingComma(result.Types);
-
         ParseExpected(SyntaxKind.CloseBracketToken);
-
 
         return FinishNode(result);
     }
 
-
     internal void CheckForTrailingComma<T>(NodeArray<T> list)
     {
-        if (Parser.ParseDiagnostics.Count == 0 && list.HasTrailingComma)
+        if (Parser.ParseDiagnostics?.Count == 0 && list.HasTrailingComma && list is ITextRange range)
         {
-            var start = list.End - ",".Length;
-
-            Parser.ParseErrorAtPosition((int)start, ",".Length, Diagnostics.Trailing_comma_not_allowed);
+            var start = range.End.GetValueOrDefault() - ",".Length;
+            Parser.ParseErrorAtPosition(
+                start, ",".Length, Diagnostics.Trailing_comma_not_allowed);
         }
     }
-
 
     internal JsDocUnionType ParseJsDocUnionType()
     {
         var result = new JsDocUnionType();
-
-        NextToken;
-
+        _ = NextToken;
         result.Types = ParseJsDocTypeList(ParseJsDocType());
-
-
         ParseExpected(SyntaxKind.CloseParenToken);
-
 
         return FinishNode(result);
     }
 
-
     internal NodeArray<IJsDocType> ParseJsDocTypeList(IJsDocType firstType)
     {
-
-        var types = Parser.CreateList<IJsDocType>();
-        types.Add(firstType);
-        types.Pos = firstType.Pos;
+        var types = new NodeArray<IJsDocType>
+        {
+            firstType
+        };
+        var range = types as ITextRange;
+        range.Pos = firstType.Pos;
         while (ParseOptional(SyntaxKind.BarToken))
         {
-
             types.Add(ParseJsDocType());
         }
-
-
-        types.End = Scanner.StartPos;
+        range.End = Scanner.StartPos;
 
         return types;
     }
 
-
     internal JsDocAllType ParseJsDocAllType()
     {
         var result = new JsDocAllType();
-
-        NextToken;
-
-        return FinishNode(result);
-    }
-
-
-    internal JsDocLiteralType ParseJsDocLiteralType()
-    {
-        var result = new JsDocLiteralType { Literal = Parser.ParseLiteralTypeNode() };
-
+        _ = NextToken;
 
         return FinishNode(result);
     }
 
+    internal JsDocLiteralType ParseJsDocLiteralType() =>
+        FinishNode(new JsDocLiteralType { Literal = Parser.ParseLiteralTypeNode() });
 
     internal JsDocType ParseJsDocUnknownOrNullableType()
     {
         var pos = Scanner.StartPos;
 
-        NextToken;
-        if (Token == SyntaxKind.CommaToken ||
-                            Token == SyntaxKind.CloseBraceToken ||
-                            Token == SyntaxKind.CloseParenToken ||
-                            Token == SyntaxKind.GreaterThanToken ||
-                            Token == SyntaxKind.EqualsToken ||
-                            Token == SyntaxKind.BarToken)
-        {
-            var result = new JsDocUnknownType();
+        _ = NextToken;
 
-            return FinishNode(result);
-        }
-        else
-        {
-            var result = new JsDocNullableType { Type = ParseJsDocType() };
-
-
-            return FinishNode(result);
-        }
+        return Token is SyntaxKind.CommaToken or
+            SyntaxKind.CloseBraceToken or
+            SyntaxKind.CloseParenToken or
+            SyntaxKind.GreaterThanToken or
+            SyntaxKind.EqualsToken or
+            SyntaxKind.BarToken
+                ? FinishNode(new JsDocUnknownType())
+                : FinishNode(new JsDocNullableType { Type = ParseJsDocType() });
     }
 
 
-    internal Tuple<JsDoc, List<Diagnostic>>? ParseIsolatedJsDocComment(string content, int start, int length)
+    internal Tuple<JsDoc, List<Diagnostic>?>? ParseIsolatedJsDocComment(string content, int start, int length)
     {
         Parser ??= new Parser();
         Parser.InitializeState(content, ScriptTarget.Latest, null, ScriptKind.Js);
@@ -476,230 +400,174 @@ internal sealed class JsDocParser
 
         ClearState();
 
-
         return jsDoc != null ? Tuple.Create(jsDoc, diagnostics) : null;
     }
 
 
-    internal JsDoc ParseJsDocComment(INode parent, int? start, int? length)
+    internal JsDoc? ParseJsDocComment(INode parent, int? start, int? length)
     {
         var saveToken = CurrentToken;
-        var saveParseDiagnosticsLength = Parser.ParseDiagnostics.Count;
+        var saveParseDiagnosticsLength = Parser.ParseDiagnostics?.Count ?? 0;
         var saveParseErrorBeforeNextFinishedNode = ParseErrorBeforeNextFinishedNode;
         var comment = ParseJsDocCommentWorker(start, length);
-        if (comment != null)
+        if (comment is INode node)
         {
-
-            comment.Parent = parent;
+            node.Parent = parent;
         }
 
-
         CurrentToken = saveToken;
-
         ParseDiagnostics = ParseDiagnostics.Take(saveParseDiagnosticsLength).ToList();
-
         ParseErrorBeforeNextFinishedNode = saveParseErrorBeforeNextFinishedNode;
-
 
         return comment;
     }
 
-
-    internal JsDoc ParseJsDocCommentWorker(int? start = null, int? length = null)
+    internal JsDoc? ParseJsDocCommentWorker(int? start = null, int? length = null)
     {
-        var content = Parser.SourceText;
+        var content = Parser.SourceText ?? "";
 
         start ??= 0;
-        var end = length == null ? content.Length : start + length;
-
+        var end = length is null ? content.Length : start + length;
         length = end - start;
 
         NodeArray<IJsDocTag> tags = new();
         List<string> comments = new();
-        JsDoc result = null;
+        JsDoc? result = null;
         if (!IsJsDocStart(content, (int)start))
         {
-
             return result;
         }
 
-
         Scanner.ScanRange(start + 3, (length ?? 0) - 5, () =>
-       {
-           var advanceToken = true;
-           var state = JSDocState.SawAsterisk;
-           int? margin = null;
-           var indent = start - Math.Max(content.LastIndexOf('\n', (int)start), 0) + 4;
+        {
+            var advanceToken = true;
+            var state = JSDocState.SawAsterisk;
+            int? margin = null;
+            var indent = start - Math.Max(content.LastIndexOf('\n', (int)start), 0) + 4;
 
+            NextJsDocToken();
+            while (Token is SyntaxKind.WhitespaceTrivia)
+            {
+                NextJsDocToken();
+            }
 
-           NextJsDocToken();
-           while (Token == SyntaxKind.WhitespaceTrivia)
-           {
+            if (Token is SyntaxKind.NewLineTrivia)
+            {
+                state = JSDocState.BeginningOfLine;
+                indent = 0;
 
-               NextJsDocToken();
-           }
-           if (Token == SyntaxKind.NewLineTrivia)
-           {
+                NextJsDocToken();
+            }
 
-               state = JSDocState.BeginningOfLine;
+            while (Token is not SyntaxKind.EndOfFileToken)
+            {
+                switch (Token)
+                {
+                    case SyntaxKind.AtToken:
+                        if (state is JSDocState.BeginningOfLine || state is JSDocState.SawAsterisk)
+                        {
+                            RemoveTrailingNewlines(comments);
+                            ParseTag(indent.GetValueOrDefault());
 
-               indent = 0;
+                            state = JSDocState.BeginningOfLine;
+                            advanceToken = false;
+                            margin = null;
+                            indent++;
+                        }
+                        else
+                        {
+                            PushComment(Scanner.TokenText);
+                        }
+                        break;
+                    case SyntaxKind.NewLineTrivia:
+                        comments.Add(Scanner.TokenText);
+                        state = JSDocState.BeginningOfLine;
+                        indent = 0;
+                        break;
+                    case SyntaxKind.AsteriskToken:
+                        var asterisk = Scanner.TokenText;
+                        if (state is JSDocState.SawAsterisk || state is JSDocState.SavingComments)
+                        {
+                            state = JSDocState.SavingComments;
+                            PushComment(asterisk);
+                        }
+                        else
+                        {
+                            state = JSDocState.SawAsterisk;
+                            indent += asterisk.Length;
+                        }
+                        break;
+                    case SyntaxKind.Identifier:
+                        PushComment(Scanner.TokenText);
+                        state = JSDocState.SavingComments;
+                        break;
+                    case SyntaxKind.WhitespaceTrivia:
+                        var whitespace = Scanner.TokenText;
+                        if (state is JSDocState.SavingComments)
+                        {
+                            comments.Add(whitespace);
+                        }
+                        else if (margin != null && (indent ?? 0) + whitespace.Length > margin)
+                        {
+                            comments.Add(whitespace.Slice((int)margin - (indent ?? 0) - 1));
+                        }
+                        indent += whitespace.Length;
+                        break;
+                    case SyntaxKind.EndOfFileToken:
+                        break;
+                    default:
+                        state = JSDocState.SavingComments;
+                        PushComment(Scanner.TokenText);
+                        break;
+                }
 
-               NextJsDocToken();
-           }
-           while (Token != SyntaxKind.EndOfFileToken)
-           {
-               switch (Token)
-               {
-                   case SyntaxKind.AtToken:
-                       if (state == JSDocState.BeginningOfLine || state == JSDocState.SawAsterisk)
-                       {
+                if (advanceToken)
+                {
+                    NextJsDocToken();
+                }
+                else
+                {
+                    advanceToken = true;
+                }
+            }
 
-                           RemoveTrailingNewlines(comments);
+            RemoveLeadingNewlines(comments);
+            RemoveTrailingNewlines(comments);
 
-                           ParseTag((int)indent);
+            result = CreateJsDocComment();
+            return result;
 
-                           state = JSDocState.BeginningOfLine;
-
-                           advanceToken = false;
-
-                           margin = null;
-
-                           indent++;
-                       }
-                       else
-                       {
-
-                           PushComment(Scanner.TokenText);
-                       }
-
-                       break;
-                   case SyntaxKind.NewLineTrivia:
-
-                       comments.Add(Scanner.TokenText);
-
-                       state = JSDocState.BeginningOfLine;
-
-                       indent = 0;
-
-                       break;
-                   case SyntaxKind.AsteriskToken:
-                       var asterisk = Scanner.TokenText;
-                       if (state == JSDocState.SawAsterisk || state == JSDocState.SavingComments)
-                       {
-
-                           state = JSDocState.SavingComments;
-
-                           PushComment(asterisk);
-                       }
-                       else
-                       {
-
-                           state = JSDocState.SawAsterisk;
-
-                           indent += asterisk.Length;
-                       }
-
-                       break;
-                   case SyntaxKind.Identifier:
-
-                       PushComment(Scanner.TokenText);
-
-                       state = JSDocState.SavingComments;
-
-                       break;
-                   case SyntaxKind.WhitespaceTrivia:
-                       var whitespace = Scanner.TokenText;
-                       if (state == JSDocState.SavingComments)
-                       {
-
-                           comments.Add(whitespace);
-                       }
-                       else
-                       if (margin != null && (indent ?? 0) + whitespace.Length > margin)
-                       {
-
-                           comments.Add(whitespace.Slice((int)margin - (indent ?? 0) - 1));
-                       }
-
-                       indent += whitespace.Length;
-
-                       break;
-                   case SyntaxKind.EndOfFileToken:
-
-                       break;
-                   default:
-
-                       state = JSDocState.SavingComments;
-
-                       PushComment(Scanner.TokenText);
-
-                       break;
-               }
-               if (advanceToken)
-               {
-
-                   NextJsDocToken();
-               }
-               else
-               {
-
-                   advanceToken = true;
-               }
-           }
-
-           RemoveLeadingNewlines(comments);
-
-           RemoveTrailingNewlines(comments);
-
-           result = CreateJsDocComment();
-           return result;
-           void PushComment(string text)
-           {
-               margin ??= indent;
-
-               comments.Add(text);
-
-               indent += text.Length;
-           }
-       }
-);
+            void PushComment(string text)
+            {
+                margin ??= indent;
+                comments.Add(text);
+                indent += text.Length;
+            }
+        });
 
         return result;
 
-
-
-
-
-
-        void RemoveLeadingNewlines(List<string> comments3)
+        static void RemoveLeadingNewlines(List<string> comments)
         {
-            while (comments3.Any() && (comments3[0] == "\n" || comments3[0] == "\r"))
+            while (comments.Any() && (comments[0] == "\n" || comments[0] == "\r"))
             {
-
-                comments3 = comments3.Skip(1).ToList();
+                comments = comments.Skip(1).ToList();
             }
         }
 
-
-        void RemoveTrailingNewlines(List<string> comments2)
+        static void RemoveTrailingNewlines(List<string> comments)
         {
-            while (comments2.Any() && (comments2[comments2.Count() - 1] == "\n" || comments2[comments2.Count() - 1] == "\r"))
+            while (comments.Any() && (comments[comments.Count - 1] == "\n" || comments[comments.Count - 1] == "\r"))
             {
-
-                comments2.Pop();
+                comments.Pop();
             }
         }
 
-
-        bool IsJsDocStart(string content2, int start2)
-        {
-
-            return content2.CharCodeAt(start2) == CharacterCode.Slash &&
-                content2.CharCodeAt(start2 + 1) == CharacterCode.Asterisk &&
-                content2.CharCodeAt(start2 + 2) == CharacterCode.Asterisk &&
-                content2.CharCodeAt(start2 + 3) != CharacterCode.Asterisk;
-        }
+        static bool IsJsDocStart(string content2, int start2) =>
+            content2.CharCodeAt(start2) == CharacterCode.Slash &&
+            content2.CharCodeAt(start2 + 1) == CharacterCode.Asterisk &&
+            content2.CharCodeAt(start2 + 2) == CharacterCode.Asterisk &&
+            content2.CharCodeAt(start2 + 3) != CharacterCode.Asterisk;
 
 
         JsDoc CreateJsDocComment()
@@ -710,39 +578,35 @@ internal sealed class JsDocParser
                 Comment = comments.Any() ? string.Join("", comments) : null
             };
 
-
-
             return FinishNode(result2, end);
         }
 
 
         void SkipWhitespace()
         {
-            while (Token == SyntaxKind.WhitespaceTrivia || Token == SyntaxKind.NewLineTrivia)
+            while (Token is SyntaxKind.WhitespaceTrivia or SyntaxKind.NewLineTrivia)
             {
-
                 NextJsDocToken();
             }
         }
 
-
         void ParseTag(int indent)
         {
-            var atToken = new AtToken { End = Scanner.TextPos };
+            var atToken = new AtToken();
+            var textRange = atToken as ITextRange;
+            textRange.End = Scanner.TextPos;
 
             NextJsDocToken();
             var tagName = ParseJsDocIdentifierName();
 
             SkipWhitespace();
-            if (tagName == null)
+            if (tagName is null)
             {
-
                 return;
             }
-            IJsDocTag tag = null;
-            if (tagName != null)
-            {
-                tag = tagName.Text switch
+
+            var tag = tagName != null
+                ? tagName.Text switch
                 {
                     "augments" => ParseAugmentsTag(atToken, tagName),
                     "param" => ParseParamTag(atToken, tagName),
@@ -751,16 +615,11 @@ internal sealed class JsDocParser
                     "type" => ParseTypeTag(atToken, tagName),
                     "typedef" => ParseTypedefTag(atToken, tagName),
                     _ => ParseUnknownTag(atToken, tagName),
-                };
-            }
-            else
-            {
+                }
+                : ParseUnknownTag(atToken, null);
 
-                tag = ParseUnknownTag(atToken, tagName);
-            }
-            if (tag == null)
+            if (tag is null)
             {
-
                 return;
             }
 
@@ -773,29 +632,23 @@ internal sealed class JsDocParser
             List<string> comments2 = new();
             var state = JSDocState.SawAsterisk;
             int? margin = null;
-            while (Token != SyntaxKind.AtToken && Token != SyntaxKind.EndOfFileToken)
+            while (Token is not SyntaxKind.AtToken && Token is not SyntaxKind.EndOfFileToken)
             {
                 switch (Token)
                 {
                     case SyntaxKind.NewLineTrivia:
                         if (state >= JSDocState.SawAsterisk)
                         {
-
                             state = JSDocState.BeginningOfLine;
-
                             comments2.Add(Scanner.TokenText);
                         }
-
                         indent = 0;
-
                         break;
                     case SyntaxKind.AtToken:
-
                         break;
                     case SyntaxKind.WhitespaceTrivia:
-                        if (state == JSDocState.SavingComments)
+                        if (state is JSDocState.SavingComments)
                         {
-
                             PushComment(Scanner.TokenText);
                         }
                         else
@@ -803,22 +656,16 @@ internal sealed class JsDocParser
                             var whitespace = Scanner.TokenText;
                             if (margin != null && indent + whitespace.Length > margin)
                             {
-
                                 comments2.Add(whitespace.Slice((int)margin - indent - 1));
                             }
-
                             indent += whitespace.Length;
                         }
-
                         break;
                     case SyntaxKind.AsteriskToken:
-                        if (state == JSDocState.BeginningOfLine)
+                        if (state is JSDocState.BeginningOfLine)
                         {
-
                             state = JSDocState.SawAsterisk;
-
                             indent += Scanner.TokenText.Length;
-
                             break;
                         }
                         goto caseLabel5;
@@ -826,138 +673,111 @@ internal sealed class JsDocParser
 
 caseLabel5: state = JSDocState.SavingComments;
                         PushComment(Scanner.TokenText);
-
                         break;
                 }
-                if (Token == SyntaxKind.AtToken)
-                {
 
+                if (Token is SyntaxKind.AtToken)
+                {
                     break;
                 }
 
                 NextJsDocToken();
             }
 
-
             RemoveLeadingNewlines(comments2);
-
             RemoveTrailingNewlines(comments2);
 
             return comments2;
+
             void PushComment(string text)
             {
                 margin ??= indent;
-
                 comments2.Add(text);
-
                 indent += text.Length;
             }
         }
 
-
-
-
-
-        JsDocTag ParseUnknownTag(AtToken atToken, Identifier tagName)
+        JsDocTag ParseUnknownTag(AtToken atToken, Identifier? tagName)
         {
-            var result2 = new JsDocTag
+            var result2 = new JsDocTag();
+            var jsDocTag = result2 as IJsDocTag;
+            jsDocTag.AtToken = atToken;
+            if (tagName is not null)
             {
-                AtToken = atToken,
-                TagName = tagName
-            };
-
-
+                jsDocTag.TagName = tagName;
+            }
 
             return FinishNode(result2);
         }
 
-
         void AddTag(IJsDocTag tag, List<string> comments2)
         {
-
             tag.Comment = string.Join("", comments2);
-            if (tags == null)
+            if (tags is null)
             {
-
-                tags = Parser.CreateList<IJsDocTag>();
-                tags.Pos = tag.Pos;
-
+                tags = new NodeArray<IJsDocTag>();
+                var textRange = tags as ITextRange;
+                textRange.Pos = tag.Pos;
             }
             else
             {
-
                 tags.Add(tag);
             }
 
-            tags.End = tag.End;
+            var range = tags as ITextRange;
+            range.End = tag.End;
         }
 
-
-        JsDocTypeExpression TryParseTypeExpression()
-        {
-
-            return TryParse(() =>
+        JsDocTypeExpression? TryParseTypeExpression() =>
+            TryParse(() =>
             {
                 SkipWhitespace();
-                return Token != SyntaxKind.OpenBraceToken ? null : ParseJsDocTypeExpression();
+                return Token is not SyntaxKind.OpenBraceToken ? null : ParseJsDocTypeExpression();
             });
-        }
-
 
         JsDocParameterTag? ParseParamTag(AtToken atToken, Identifier tagName)
         {
             var typeExpression = TryParseTypeExpression();
 
             SkipWhitespace();
-            Identifier name = null;
+            Identifier? name = null;
             var isBracketed = false;
-            if ((OpenBracketToken)ParseOptionalToken<OpenBracketToken>(SyntaxKind.OpenBracketToken) != null)
+
+            if (ParseOptionalToken<OpenBracketToken>(SyntaxKind.OpenBracketToken) is not null)
             {
-
                 name = ParseJsDocIdentifierName();
-
                 SkipWhitespace();
-
                 isBracketed = true;
-                if ((EqualsToken)ParseOptionalToken<EqualsToken>(SyntaxKind.EqualsToken) != null)
+                if (ParseOptionalToken<EqualsToken>(SyntaxKind.EqualsToken) is not null)
                 {
-
                     ParseExpression();
                 }
 
-
                 ParseExpected(SyntaxKind.CloseBracketToken);
             }
-            else
-        if (TokenIsIdentifierOrKeyword(Token))
+            else if (TokenIsIdentifierOrKeyword(Token))
             {
-
                 name = ParseJsDocIdentifierName();
             }
-            if (name == null)
+
+            if (name is null)
             {
-
                 ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
-
                 return null;
             }
-            Identifier preName = null;
-            Identifier postName = null;
+            Identifier? preName = null;
+            Identifier? postName = null;
             if (typeExpression != null)
             {
-
                 postName = name;
             }
             else
             {
-
                 preName = name;
             }
             typeExpression ??= TryParseTypeExpression();
-            var result4 = new JsDocParameterTag
+            var docParamTag = new JsDocParameterTag
             {
-                AtToken = atToken,
-                TagName = tagName,
                 PreParameterName = preName,
                 TypeExpression = typeExpression,
                 PostParameterName = postName,
@@ -965,104 +785,85 @@ caseLabel5: state = JSDocState.SavingComments;
                 IsBracketed = isBracketed
             };
 
+            var tag = docParamTag as IJsDocTag;
+            tag.AtToken = atToken;
+            tag.TagName = tagName;
 
-
-
-
-
-
-
-            return FinishNode(result4);
+            return FinishNode(docParamTag);
         }
-
 
         JsDocReturnTag ParseReturnTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind == SyntaxKind.JsDocReturnTag))
+            if (tags.Any(t => t.Kind is SyntaxKind.JsDocReturnTag) && tagName is ITextRange range)
             {
-
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(
+                    range.Pos ?? 0,
+                    Scanner.TokenPos - (range.Pos ?? 0),
+                    Diagnostics._0_tag_already_specified, tagName.Text);
             }
-            var result5 = new JsDocReturnTag
-            {
-                AtToken = atToken,
-                TagName = tagName,
-                TypeExpression = TryParseTypeExpression()
-            };
 
+            var result = new JsDocReturnTag();
+            var returnTag = result as IJsDocTag;
+            returnTag.AtToken = atToken;
+            returnTag.TagName = tagName;
+            result.TypeExpression = TryParseTypeExpression();
 
-
-
-            return FinishNode(result5);
+            return FinishNode(result);
         }
-
 
         JsDocTypeTag ParseTypeTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind == SyntaxKind.JsDocTypeTag))
+            if (tags.Any(t => t.Kind is SyntaxKind.JsDocTypeTag) && tagName is ITextRange range)
             {
-
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(
+                    range.Pos ?? 0,
+                    Scanner.TokenPos - (range.Pos ?? 0),
+                    Diagnostics._0_tag_already_specified, tagName.Text);
             }
-            var result6 = new JsDocTypeTag
-            {
-                AtToken = atToken,
-                TagName = tagName,
-                TypeExpression = TryParseTypeExpression()
-            };
 
+            var result = new JsDocTypeTag();
+            var returnTag = result as IJsDocTag;
+            returnTag.AtToken = atToken;
+            returnTag.TagName = tagName;
+            result.TypeExpression = TryParseTypeExpression();
 
-
-
-            return FinishNode(result6);
+            return FinishNode(result);
         }
 
 
         JsDocPropertyTag? ParsePropertyTag(AtToken atToken, Identifier tagName)
         {
             var typeExpression = TryParseTypeExpression();
-
             SkipWhitespace();
             var name = ParseJsDocIdentifierName();
-
             SkipWhitespace();
-            if (name == null)
+            if (name is null)
             {
-
                 ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
-
                 return null;
             }
-            var result7 = new JsDocPropertyTag
-            {
-                AtToken = atToken,
-                TagName = tagName,
-                Name = name,
-                TypeExpression = typeExpression
-            };
 
+            var result = new JsDocPropertyTag();
+            var returnTag = result as IJsDocTag;
+            returnTag.AtToken = atToken;
+            returnTag.TagName = tagName;
+            var declaration = result as IDeclaration;
+            declaration.Name = name;
+            result.TypeExpression = typeExpression;
 
-
-
-
-            return FinishNode(result7);
+            return FinishNode(result);
         }
-
 
         JsDocAugmentsTag ParseAugmentsTag(AtToken atToken, Identifier tagName)
         {
             var typeExpression = TryParseTypeExpression();
-            var result8 = new JsDocAugmentsTag
-            {
-                AtToken = atToken,
-                TagName = tagName,
-                TypeExpression = typeExpression
-            };
+            var result = new JsDocAugmentsTag();
+            var returnTag = result as IJsDocTag;
+            returnTag.AtToken = atToken;
+            returnTag.TagName = tagName;
+            result.TypeExpression = typeExpression;
 
-
-
-
-            return FinishNode(result8);
+            return FinishNode(result);
         }
 
 
@@ -1073,22 +874,23 @@ caseLabel5: state = JSDocState.SavingComments;
             SkipWhitespace();
             var typedefTag = new JsDocTypedefTag
             {
-                AtToken = atToken,
-                TagName = tagName,
                 FullName = ParseJsDocTypeNameWithNamespace(0)
             };
+            var tag = typedefTag as IJsDocTag;
+            tag.AtToken = atToken;
+            tag.TagName = tagName;
+            var declaration = typedefTag as IDeclaration;
 
-
-
-            if (typedefTag.FullName != null)
+            if (typedefTag.FullName is not null)
             {
-                var rightNode = typedefTag.FullName;
-                while (true)
+                var rightNode = typedefTag.FullName as INode;
+                while (rightNode is not null)
                 {
-                    if (rightNode.Kind == SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body == null)
+                    if (rightNode.Kind is SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body is null)
                     {
-
-                        typedefTag.Name = rightNode.Kind == SyntaxKind.Identifier ? rightNode : (rightNode as JsDocTypedefTag)?.Name;
+                        declaration.Name = rightNode.Kind is SyntaxKind.Identifier
+                            ? rightNode
+                            : (rightNode as IDeclaration)?.Name;
 
                         break;
                     }
@@ -1100,17 +902,16 @@ caseLabel5: state = JSDocState.SavingComments;
             typedefTag.TypeExpression = typeExpression;
 
             SkipWhitespace();
-            if (typeExpression != null)
+            if (typeExpression is not null)
             {
-                if (typeExpression.Type.Kind == SyntaxKind.JsDocTypeReference)
+                if (typeExpression.Type.Kind is SyntaxKind.JsDocTypeReference)
                 {
                     var jsDocTypeReference = (JsDocTypeReference)typeExpression.Type;
-                    if (jsDocTypeReference.Name.Kind == SyntaxKind.Identifier)
+                    if (jsDocTypeReference.Name?.Kind is SyntaxKind.Identifier)
                     {
                         var name = jsDocTypeReference.Name as Identifier;
                         if (name?.Text == "Object")
                         {
-
                             typedefTag.JsDocTypeLiteral = ScanChildTags();
                         }
                     }
@@ -1119,10 +920,8 @@ caseLabel5: state = JSDocState.SavingComments;
             }
             else
             {
-
                 typedefTag.JsDocTypeLiteral = ScanChildTags();
             }
-
 
             return FinishNode(typedefTag);
         }
@@ -1135,81 +934,64 @@ caseLabel5: state = JSDocState.SavingComments;
             var canParseTag = true;
             var seenAsterisk = false;
             var parentTagTerminated = false;
-            while (Token != SyntaxKind.EndOfFileToken && !parentTagTerminated)
+            while (Token is not SyntaxKind.EndOfFileToken && !parentTagTerminated)
             {
-
                 NextJsDocToken();
                 switch (Token)
                 {
                     case SyntaxKind.AtToken:
                         if (canParseTag)
                         {
-
                             parentTagTerminated = !TryParseChildTag(jsDocTypeLiteral);
                             if (!parentTagTerminated)
                             {
-
                                 resumePos = Scanner.StartPos;
                             }
                         }
-
                         seenAsterisk = false;
-
                         break;
                     case SyntaxKind.NewLineTrivia:
-
                         resumePos = Scanner.StartPos - 1;
-
                         canParseTag = true;
-
                         seenAsterisk = false;
-
                         break;
                     case SyntaxKind.AsteriskToken:
                         if (seenAsterisk)
                         {
-
                             canParseTag = false;
                         }
-
                         seenAsterisk = true;
-
                         break;
                     case SyntaxKind.Identifier:
-
                         canParseTag = false;
-                        goto caseLabel5;
+                        break;
                     case SyntaxKind.EndOfFileToken:
-caseLabel5:
                         break;
                 }
             }
 
             Scanner.SetTextPos(resumePos);
-
             return FinishNode(jsDocTypeLiteral);
         }
 
-
-        INode ParseJsDocTypeNameWithNamespace(NodeFlags flags)
+        INode? ParseJsDocTypeNameWithNamespace(NodeFlags flags)
         {
             var pos = Scanner.TokenPos;
             var typeNameOrNamespaceName = ParseJsDocIdentifierName();
             if (typeNameOrNamespaceName != null && ParseOptional(SyntaxKind.DotToken))
             {
                 var jsDocNamespaceNode = new JsDocNamespaceDeclaration();
+                var declaration = jsDocNamespaceNode as IDeclaration;
 
-                jsDocNamespaceNode.Flags |= flags;
-
-                jsDocNamespaceNode.Name = typeNameOrNamespaceName;
-
+                declaration.Flags |= flags;
+                declaration.Name = typeNameOrNamespaceName;
                 jsDocNamespaceNode.Body = ParseJsDocTypeNameWithNamespace(NodeFlags.NestedNamespace);
 
                 return jsDocNamespaceNode;
             }
+
             if (typeNameOrNamespaceName != null && (flags & NodeFlags.NestedNamespace) != 0)
             {
-
                 typeNameOrNamespaceName.IsInJsDocNamespace = true;
             }
 
@@ -1219,104 +1001,97 @@ caseLabel5:
 
         bool TryParseChildTag(JsDocTypeLiteral parentTag)
         {
-            var atToken = new AtToken { End = Scanner.TextPos };
+            var atToken = new AtToken();
+            var range = atToken as ITextRange;
+            range.End = Scanner.TextPos;
 
             NextJsDocToken();
             var tagName = ParseJsDocIdentifierName();
 
             SkipWhitespace();
-            if (tagName == null)
+            if (tagName is null)
             {
-
                 return false;
             }
+
             switch (tagName.Text)
             {
                 case "type":
-                    if (parentTag.JsDocTypeTag != null)
+                    if (parentTag.JsDocTypeTag is not null)
                     {
-
                         return false;
                     }
-
                     parentTag.JsDocTypeTag = ParseTypeTag(atToken, tagName);
-
                     return true;
+
                 case "prop":
                 case "property":
                     var propertyTag = ParsePropertyTag(atToken, tagName);
-                    if (propertyTag != null)
+                    if (propertyTag is not null)
                     {
                         parentTag.JsDocPropertyTags ??= new NodeArray<JsDocPropertyTag>();
-
                         parentTag.JsDocPropertyTags.Add(propertyTag);
-
                         return true;
                     }
-
                     return false;
             }
 
             return false;
         }
 
-
         JsDocTemplateTag? ParseTemplateTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind == SyntaxKind.JsDocTemplateTag))
+            if (tags.Any(t => t.Kind is SyntaxKind.JsDocTemplateTag) &&
+                tagName is ITextRange range)
             {
-
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(
+                    range.Pos ?? 0,
+                    Scanner.TokenPos - (range.Pos ?? 0),
+                    Diagnostics._0_tag_already_specified, tagName.Text);
             }
             var typeParameters = CreateList<TypeParameterDeclaration>();
             while (true)
             {
                 var name = ParseJsDocIdentifierName();
-
                 SkipWhitespace();
-                if (name == null)
+                if (name is null)
                 {
-                    ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
-
+                    ParseErrorAtPosition(
+                        Scanner.StartPos, 0, Diagnostics.Identifier_expected);
                     return null;
                 }
-                var typeParameter = new TypeParameterDeclaration { Name = name };
-
+                var typeParameter = new TypeParameterDeclaration();
+                var declaration = typeParameter as IDeclaration;
+                declaration.Name = name;
 
                 FinishNode(typeParameter);
 
-
                 typeParameters.Add(typeParameter);
-                if (Token == SyntaxKind.CommaToken)
+                if (Token is SyntaxKind.CommaToken)
                 {
-
                     NextJsDocToken();
-
                     SkipWhitespace();
                 }
                 else
                 {
-
                     break;
                 }
             }
-            var result3 = new JsDocTemplateTag
+            var result = new JsDocTemplateTag
             {
-                AtToken = atToken,
-                TagName = tagName,
                 TypeParameters = typeParameters
             };
+            var tag = result as IJsDocTag;
+            tag.AtToken = atToken;
+            tag.TagName = tagName;
 
+            FinishNode(result);
 
+            var tpRange = typeParameters as ITextRange;
+            tpRange.End = tag.End;
 
-
-            FinishNode(result3);
-
-            typeParameters.End = result3.End;
-
-            return result3;
+            return result;
         }
-
 
         SyntaxKind NextJsDocToken()
         {
@@ -1324,34 +1099,24 @@ caseLabel5:
             return CurrentToken;
         }
 
-
-        Identifier ParseJsDocIdentifierName()
-        {
-
-            return CreateJsDocIdentifier(TokenIsIdentifierOrKeyword(Token));
-        }
-
+        Identifier? ParseJsDocIdentifierName() =>
+            CreateJsDocIdentifier(TokenIsIdentifierOrKeyword(Token));
 
         Identifier? CreateJsDocIdentifier(bool isIdentifier)
         {
             if (!isIdentifier)
             {
-
                 ParseErrorAtCurrentToken(Diagnostics.Identifier_expected);
-
                 return null;
             }
             var pos = Scanner.TokenPos;
             var end2 = Scanner.TextPos;
-            var result9 = new Identifier { Text = content.SubString(pos, end2) };
+            var result = new Identifier { Text = content!.SubString(pos, end2) };
 
-
-            FinishNode(result9, end2);
-
-
+            FinishNode(result, end2);
             NextJsDocToken();
 
-            return result9;
+            return result;
         }
     }
 }

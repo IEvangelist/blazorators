@@ -3,7 +3,7 @@
 
 internal class VariableStatement : Statement
 {
-    internal VariableStatement() => ((INode)this).Kind = CommentKind.VariableStatement;
+    internal VariableStatement() => ((INode)this).Kind = SyntaxKind.VariableStatement;
 
     internal IVariableDeclarationList DeclarationList { get; set; }
 }

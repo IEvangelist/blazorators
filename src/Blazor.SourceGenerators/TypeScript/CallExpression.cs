@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class CallExpression : Node, IMemberExpression, IDeclaration
 {
-    internal CallExpression() => ((INode)this).Kind = CommentKind.CallExpression;
+    internal CallExpression() => ((INode)this).Kind = SyntaxKind.CallExpression;
 
     object IMemberExpression.MemberExpressionBrand { get; set; } = default!;
     object ILeftHandSideExpression.LeftHandSideExpressionBrand { get; set; } = default!;

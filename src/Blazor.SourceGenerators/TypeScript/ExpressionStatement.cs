@@ -3,7 +3,7 @@
 
 internal class ExpressionStatement : Statement
 {
-    internal ExpressionStatement() => ((INode)this).Kind = CommentKind.ExpressionStatement;
+    internal ExpressionStatement() => ((INode)this).Kind = SyntaxKind.ExpressionStatement;
 
     internal IExpression Expression { get; set; }
 }

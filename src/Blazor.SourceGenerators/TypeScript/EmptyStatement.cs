@@ -3,5 +3,5 @@
 
 internal class EmptyStatement : Statement
 {
-    internal EmptyStatement() => ((INode)this).Kind = CommentKind.EmptyStatement;
+    internal EmptyStatement() => ((INode)this).Kind = SyntaxKind.EmptyStatement;
 }

@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class PropertyDeclaration : ClassElement, IVariableLikeDeclaration
 {
-    internal PropertyDeclaration() => ((INode)this).Kind = CommentKind.PropertyDeclaration;
+    internal PropertyDeclaration() => ((INode)this).Kind = SyntaxKind.PropertyDeclaration;
 
     internal QuestionToken QuestionToken { get; set; }
     internal ITypeNode Type { get; set; }

@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ArrowFunction : Node, IExpression, IFunctionLikeDeclaration
 {
-    internal ArrowFunction() => ((INode)this).Kind = CommentKind.ArrowFunction;
+    internal ArrowFunction() => ((INode)this).Kind = SyntaxKind.ArrowFunction;
 
     object IExpression.ExpressionBrand { get; set; } = default!;
     object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;

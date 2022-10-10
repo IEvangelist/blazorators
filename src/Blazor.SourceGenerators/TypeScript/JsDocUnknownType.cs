@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocUnknownType : JsDocType
 {
-    internal JsDocUnknownType() => ((INode)this).Kind = CommentKind.JsDocUnknownType;
+    internal JsDocUnknownType() => ((INode)this).Kind = SyntaxKind.JsDocUnknownType;
 }

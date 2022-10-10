@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IJsxChild : INode
+public interface IJsxChild : INode
 {
 }

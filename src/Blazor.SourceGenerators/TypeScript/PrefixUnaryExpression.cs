@@ -3,8 +3,8 @@
 
 internal class PrefixUnaryExpression : IncrementExpression
 {
-    internal PrefixUnaryExpression() => ((INode)this).Kind = CommentKind.PrefixUnaryExpression;
+    internal PrefixUnaryExpression() => ((INode)this).Kind = SyntaxKind.PrefixUnaryExpression;
 
-    internal CommentKind Operator { get; set; }
+    internal SyntaxKind Operator { get; set; }
     internal IExpression Operand { get; set; }
 }

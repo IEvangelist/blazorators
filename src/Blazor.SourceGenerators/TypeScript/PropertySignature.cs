@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class PropertySignature : TypeElement, IVariableLikeDeclaration
 {
-    internal PropertySignature() => ((INode)this).Kind = CommentKind.PropertySignature;
+    internal PropertySignature() => ((INode)this).Kind = SyntaxKind.PropertySignature;
 
     internal ITypeNode Type { get; set; }
     internal IExpression Initializer { get; set; }

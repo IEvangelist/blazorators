@@ -3,5 +3,5 @@
 
 internal class TemplateHead : LiteralLikeNode
 {
-    internal TemplateHead() => ((INode)this).Kind = CommentKind.TemplateHead;
+    internal TemplateHead() => ((INode)this).Kind = SyntaxKind.TemplateHead;
 }

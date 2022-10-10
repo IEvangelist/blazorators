@@ -3,7 +3,7 @@
 
 internal class SyntaxList : Node
 {
-    internal SyntaxList() => ((INode)this).Kind = CommentKind.SyntaxList;
+    internal SyntaxList() => ((INode)this).Kind = SyntaxKind.SyntaxList;
 
     internal Node[] _children { get; set; }
 }

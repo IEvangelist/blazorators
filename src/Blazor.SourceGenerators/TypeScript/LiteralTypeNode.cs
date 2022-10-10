@@ -3,7 +3,7 @@
 
 internal class LiteralTypeNode : TypeNode
 {
-    internal LiteralTypeNode() => ((INode)this).Kind = CommentKind.LiteralType;
+    internal LiteralTypeNode() => ((INode)this).Kind = SyntaxKind.LiteralType;
 
     internal IExpression Literal { get; set; }
 }

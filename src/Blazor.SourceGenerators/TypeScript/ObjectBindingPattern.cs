@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ObjectBindingPattern : Node, IBindingPattern
 {
-    internal ObjectBindingPattern() => ((INode)this).Kind = CommentKind.ObjectBindingPattern;
+    internal ObjectBindingPattern() => ((INode)this).Kind = SyntaxKind.ObjectBindingPattern;
 
     NodeArray<IArrayBindingElement> IBindingPattern.Elements { get; set; } = default!;
 }

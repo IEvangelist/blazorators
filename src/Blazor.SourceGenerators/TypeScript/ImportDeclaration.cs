@@ -3,7 +3,7 @@
 
 internal class ImportDeclaration : Statement
 {
-    internal ImportDeclaration() => ((INode)this).Kind = CommentKind.ImportDeclaration;
+    internal ImportDeclaration() => ((INode)this).Kind = SyntaxKind.ImportDeclaration;
 
     internal ImportClause ImportClause { get; set; }
     internal IExpression ModuleSpecifier { get; set; }

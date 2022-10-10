@@ -3,7 +3,7 @@
 
 internal class IndexedAccessTypeNode : TypeNode
 {
-    internal IndexedAccessTypeNode() => ((INode)this).Kind = CommentKind.IndexedAccessType;
+    internal IndexedAccessTypeNode() => ((INode)this).Kind = SyntaxKind.IndexedAccessType;
 
     internal ITypeNode ObjectType { get; set; }
     internal ITypeNode IndexType { get; set; }

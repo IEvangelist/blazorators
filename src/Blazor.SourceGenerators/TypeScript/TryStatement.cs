@@ -3,7 +3,7 @@
 
 internal class TryStatement : Statement
 {
-    internal TryStatement() => ((INode)this).Kind = CommentKind.TryStatement;
+    internal TryStatement() => ((INode)this).Kind = SyntaxKind.TryStatement;
 
     internal Block TryBlock { get; set; }
     internal CatchClause CatchClause { get; set; }

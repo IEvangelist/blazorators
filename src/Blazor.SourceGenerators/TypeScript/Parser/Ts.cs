@@ -27,7 +27,7 @@ internal sealed class Ts
                 return result;
             }
         }
-        
+
         return null;
     }
 

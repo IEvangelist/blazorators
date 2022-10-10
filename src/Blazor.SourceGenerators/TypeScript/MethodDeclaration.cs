@@ -9,7 +9,7 @@ internal sealed class MethodDeclaration : Declaration,
     IObjectLiteralElement,
     IObjectLiteralElementLike
 {
-    internal MethodDeclaration() => ((INode)this).Kind = CommentKind.MethodDeclaration;
+    internal MethodDeclaration() => ((INode)this).Kind = SyntaxKind.MethodDeclaration;
 
     object IClassElement.ClassElementBrand { get; set; } = default!;
     object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;

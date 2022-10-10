@@ -3,7 +3,7 @@
 
 internal class TaggedTemplateExpression : MemberExpression
 {
-    internal TaggedTemplateExpression() => ((INode)this).Kind = CommentKind.TaggedTemplateExpression;
+    internal TaggedTemplateExpression() => ((INode)this).Kind = SyntaxKind.TaggedTemplateExpression;
 
     internal IExpression Tag { get; set; } //LeftHandSideExpression
     internal Node Template { get; set; } //TemplateLiteral

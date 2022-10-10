@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ComputedPropertyName : Node, IPropertyName
 {
-    internal ComputedPropertyName() => ((INode)this).Kind = CommentKind.ComputedPropertyName;
+    internal ComputedPropertyName() => ((INode)this).Kind = SyntaxKind.ComputedPropertyName;
 
     internal IExpression Expression { get; set; }
 }

@@ -3,7 +3,7 @@
 
 internal class YieldExpression : Expression
 {
-    internal YieldExpression() => ((INode)this).Kind = CommentKind.YieldExpression;
+    internal YieldExpression() => ((INode)this).Kind = SyntaxKind.YieldExpression;
 
     internal AsteriskToken AsteriskToken { get; set; }
     internal IExpression Expression { get; set; }

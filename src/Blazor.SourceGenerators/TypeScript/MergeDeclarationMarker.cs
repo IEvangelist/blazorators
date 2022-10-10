@@ -3,5 +3,5 @@
 
 internal class MergeDeclarationMarker : Statement
 {
-    internal MergeDeclarationMarker() => ((INode)this).Kind = CommentKind.MergeDeclarationMarker;
+    internal MergeDeclarationMarker() => ((INode)this).Kind = SyntaxKind.MergeDeclarationMarker;
 }

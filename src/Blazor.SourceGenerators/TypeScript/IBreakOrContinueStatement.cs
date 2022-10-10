@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IBreakOrContinueStatement : IStatement
+public interface IBreakOrContinueStatement : IStatement
 {
     internal Identifier Label { get; set; }
 }

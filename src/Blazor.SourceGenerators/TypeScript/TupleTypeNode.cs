@@ -3,7 +3,7 @@
 
 internal class TupleTypeNode : TypeNode
 {
-    internal TupleTypeNode() => ((INode)this).Kind = CommentKind.TupleType;
+    internal TupleTypeNode() => ((INode)this).Kind = SyntaxKind.TupleType;
 
     internal NodeArray<ITypeNode> ElementTypes { get; set; }
 }

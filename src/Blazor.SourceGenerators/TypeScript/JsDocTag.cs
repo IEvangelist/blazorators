@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocTag : Node, IJsDocTag
 {
-    internal JsDocTag() => ((INode)this).Kind = CommentKind.JsDocTag;
+    internal JsDocTag() => ((INode)this).Kind = SyntaxKind.JsDocTag;
 
     AtToken IJsDocTag.AtToken { get; set; } = default!;
     Identifier IJsDocTag.TagName { get; set; } = default!;

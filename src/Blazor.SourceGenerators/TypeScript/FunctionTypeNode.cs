@@ -3,7 +3,7 @@
 
 internal class FunctionTypeNode : Node, ITypeNode, IFunctionOrConstructorTypeNode
 {
-    internal FunctionTypeNode() => ((INode)this).Kind = CommentKind.FunctionType;
+    internal FunctionTypeNode() => ((INode)this).Kind = SyntaxKind.FunctionType;
 
     object ITypeNode.TypeNodeBrand { get; set; } = default!;
     NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;

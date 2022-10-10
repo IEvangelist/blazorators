@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal interface ISymbol
+public interface ISymbol
 {
     SymbolFlags Flags { get; set; }
     string Name { get; set; }

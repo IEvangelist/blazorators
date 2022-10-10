@@ -62,10 +62,10 @@ internal sealed class Utilities
         INode node, string text)
     {
         var commentRanges =
-            node.Kind == SyntaxKind.Parameter ||
-            node.Kind == SyntaxKind.TypeParameter ||
-            node.Kind == SyntaxKind.FunctionExpression ||
-            node.Kind == SyntaxKind.ArrowFunction
+            node.Kind is SyntaxKind.Parameter ||
+            node.Kind is SyntaxKind.TypeParameter ||
+            node.Kind is SyntaxKind.FunctionExpression ||
+            node.Kind is SyntaxKind.ArrowFunction
                 ? GetTrailingCommentRanges(text, node.Pos ?? 0).Concat(GetLeadingCommentRanges(text, node.Pos ?? 0))
                 : GetLeadingCommentRangesOfNodeFromText(node, text);
 
@@ -148,7 +148,7 @@ internal sealed class Utilities
         {
             flags |= ModifierFlags.Export;
         }
-        
+
         node.ModifierFlagsCache = flags | ModifierFlags.HasComputedFlags;
 
         return flags;
@@ -172,40 +172,40 @@ internal sealed class Utilities
     };
 
     internal static bool IsLogicalOperator(SyntaxKind token) =>
-        token == SyntaxKind.BarBarToken ||
-        token == SyntaxKind.AmpersandAmpersandToken ||
-        token == SyntaxKind.ExclamationToken;
+        Token is SyntaxKind.BarBarToken ||
+        Token is SyntaxKind.AmpersandAmpersandToken ||
+        Token is SyntaxKind.ExclamationToken;
 
     internal static bool IsAssignmentOperator(SyntaxKind token) =>
         token >= SyntaxKind.FirstAssignment &&
         token <= SyntaxKind.LastAssignment;
 
     internal static bool IsLeftHandSideExpressionKind(SyntaxKind kind) =>
-        kind == SyntaxKind.PropertyAccessExpression ||
-        kind == SyntaxKind.ElementAccessExpression ||
-        kind == SyntaxKind.NewExpression ||
-        kind == SyntaxKind.CallExpression ||
-        kind == SyntaxKind.JsxElement ||
-        kind == SyntaxKind.JsxSelfClosingElement ||
-        kind == SyntaxKind.TaggedTemplateExpression ||
-        kind == SyntaxKind.ArrayLiteralExpression ||
-        kind == SyntaxKind.ParenthesizedExpression ||
-        kind == SyntaxKind.ObjectLiteralExpression ||
-        kind == SyntaxKind.ClassExpression ||
-        kind == SyntaxKind.FunctionExpression ||
-        kind == SyntaxKind.Identifier ||
-        kind == SyntaxKind.RegularExpressionLiteral ||
-        kind == SyntaxKind.NumericLiteral ||
-        kind == SyntaxKind.StringLiteral ||
-        kind == SyntaxKind.NoSubstitutionTemplateLiteral ||
-        kind == SyntaxKind.TemplateExpression ||
-        kind == SyntaxKind.FalseKeyword ||
-        kind == SyntaxKind.NullKeyword ||
-        kind == SyntaxKind.ThisKeyword ||
-        kind == SyntaxKind.TrueKeyword ||
-        kind == SyntaxKind.SuperKeyword ||
-        kind == SyntaxKind.NonNullExpression ||
-        kind == SyntaxKind.MetaProperty;
+        Kind is SyntaxKind.PropertyAccessExpression ||
+        Kind is SyntaxKind.ElementAccessExpression ||
+        Kind is SyntaxKind.NewExpression ||
+        Kind is SyntaxKind.CallExpression ||
+        Kind is SyntaxKind.JsxElement ||
+        Kind is SyntaxKind.JsxSelfClosingElement ||
+        Kind is SyntaxKind.TaggedTemplateExpression ||
+        Kind is SyntaxKind.ArrayLiteralExpression ||
+        Kind is SyntaxKind.ParenthesizedExpression ||
+        Kind is SyntaxKind.ObjectLiteralExpression ||
+        Kind is SyntaxKind.ClassExpression ||
+        Kind is SyntaxKind.FunctionExpression ||
+        Kind is SyntaxKind.Identifier ||
+        Kind is SyntaxKind.RegularExpressionLiteral ||
+        Kind is SyntaxKind.NumericLiteral ||
+        Kind is SyntaxKind.StringLiteral ||
+        Kind is SyntaxKind.NoSubstitutionTemplateLiteral ||
+        Kind is SyntaxKind.TemplateExpression ||
+        Kind is SyntaxKind.FalseKeyword ||
+        Kind is SyntaxKind.NullKeyword ||
+        Kind is SyntaxKind.ThisKeyword ||
+        Kind is SyntaxKind.TrueKeyword ||
+        Kind is SyntaxKind.SuperKeyword ||
+        Kind is SyntaxKind.NonNullExpression ||
+        Kind is SyntaxKind.MetaProperty;
 
     internal static bool IsLeftHandSideExpression(IExpression node) =>
         IsLeftHandSideExpressionKind(

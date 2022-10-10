@@ -3,5 +3,5 @@
 
 internal class SuperExpression : PrimaryExpression
 {
-    internal SuperExpression() => ((INode)this).Kind = CommentKind.SuperKeyword;
+    internal SuperExpression() => ((INode)this).Kind = SyntaxKind.SuperKeyword;
 }

@@ -3,7 +3,7 @@
 
 internal class VoidExpression : UnaryExpression
 {
-    internal VoidExpression() => ((INode)this).Kind = CommentKind.VoidExpression;
+    internal VoidExpression() => ((INode)this).Kind = SyntaxKind.VoidExpression;
 
     internal IExpression Expression { get; set; }
 }

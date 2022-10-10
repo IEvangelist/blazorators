@@ -3,7 +3,7 @@
 
 internal class TypeOfExpression : UnaryExpression
 {
-    internal TypeOfExpression() => ((INode)this).Kind = CommentKind.TypeOfExpression;
+    internal TypeOfExpression() => ((INode)this).Kind = SyntaxKind.TypeOfExpression;
 
     internal IExpression Expression { get; set; }
 }

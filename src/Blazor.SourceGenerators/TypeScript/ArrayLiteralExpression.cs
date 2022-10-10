@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ArrayLiteralExpression : PrimaryExpression
 {
-    internal ArrayLiteralExpression() => ((INode)this).Kind = CommentKind.ArrayLiteralExpression;
+    internal ArrayLiteralExpression() => ((INode)this).Kind = SyntaxKind.ArrayLiteralExpression;
 
     internal NodeArray<IExpression> Elements { get; set; } = default!;
     internal bool MultiLine { get; set; }

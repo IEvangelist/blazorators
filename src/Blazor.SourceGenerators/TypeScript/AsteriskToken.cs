@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class AsteriskToken : Token
 {
-    internal AsteriskToken() => ((INode)this).Kind = CommentKind.AsteriskToken;
+    internal AsteriskToken() => ((INode)this).Kind = SyntaxKind.AsteriskToken;
 }

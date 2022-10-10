@@ -3,7 +3,7 @@
 
 internal class EnumDeclaration : DeclarationStatement
 {
-    internal EnumDeclaration() => ((INode)this).Kind = CommentKind.EnumDeclaration;
+    internal EnumDeclaration() => ((INode)this).Kind = SyntaxKind.EnumDeclaration;
 
     internal NodeArray<EnumMember> Members { get; set; }
 }

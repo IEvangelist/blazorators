@@ -3,6 +3,6 @@
 
 internal class FlowArrayMutation : FlowNode
 {
-    internal Node Node { get; set; } // CallExpression | BinaryExpression
+    internal Node Node { get; set; }
     internal FlowNode Antecedent { get; set; }
 }

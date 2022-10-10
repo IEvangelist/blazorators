@@ -3,8 +3,8 @@
 
 internal class ExpressionWithTypeArguments : TypeNode
 {
-    internal ExpressionWithTypeArguments() => ((INode)this).Kind = CommentKind.ExpressionWithTypeArguments;
+    internal ExpressionWithTypeArguments() => ((INode)this).Kind = SyntaxKind.ExpressionWithTypeArguments;
 
-    internal /*LeftHandSideExpression*/IExpression Expression { get; set; }
+    internal IExpression Expression { get; set; }
     internal NodeArray<ITypeNode> TypeArguments { get; set; }
 }

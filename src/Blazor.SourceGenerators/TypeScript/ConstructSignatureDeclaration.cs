@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ConstructSignatureDeclaration : Declaration, ISignatureDeclaration, ITypeElement
 {
-    internal ConstructSignatureDeclaration() => ((INode)this).Kind = CommentKind.ConstructSignature;
+    internal ConstructSignatureDeclaration() => ((INode)this).Kind = SyntaxKind.ConstructSignature;
 
     NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
     NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;

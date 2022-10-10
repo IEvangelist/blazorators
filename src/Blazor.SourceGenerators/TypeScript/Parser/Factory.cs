@@ -7,9 +7,10 @@ internal static class Factory
 {
     internal static INode SkipPartiallyEmittedExpressions(INode node)
     {
-        while (node is { Kind: SyntaxKind.PartiallyEmittedExpression })
+        while (node is { Kind: SyntaxKind.PartiallyEmittedExpression } and
+            PartiallyEmittedExpression expression)
         {
-            node = ((PartiallyEmittedExpression)node).Expression;
+            node = expression.Expression;
         }
 
         return node;

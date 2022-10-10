@@ -3,7 +3,7 @@
 
 internal class EnumMember : Declaration
 {
-    internal EnumMember() => ((INode)this).Kind = CommentKind.EnumMember;
+    internal EnumMember() => ((INode)this).Kind = SyntaxKind.EnumMember;
 
     internal IExpression Initializer { get; set; }
 }

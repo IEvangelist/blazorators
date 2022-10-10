@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IJsxTagNameExpression : IExpression
+public interface IJsxTagNameExpression : IExpression
 {
 }

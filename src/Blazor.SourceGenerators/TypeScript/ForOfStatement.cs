@@ -3,7 +3,7 @@
 
 internal class ForOfStatement : IterationStatement
 {
-    internal ForOfStatement() => ((INode)this).Kind = CommentKind.ForOfStatement;
+    internal ForOfStatement() => ((INode)this).Kind = SyntaxKind.ForOfStatement;
 
     internal AwaitKeywordToken AwaitModifier { get; set; }
     internal /*ForInitializer*/IVariableDeclarationListOrExpression Initializer { get; set; }

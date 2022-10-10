@@ -3,5 +3,5 @@
 
 internal class NoSubstitutionTemplateLiteral : LiteralExpression
 {
-    internal NoSubstitutionTemplateLiteral() => ((INode)this).Kind = CommentKind.NoSubstitutionTemplateLiteral;
+    internal NoSubstitutionTemplateLiteral() => ((INode)this).Kind = SyntaxKind.NoSubstitutionTemplateLiteral;
 }

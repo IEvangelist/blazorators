@@ -3,5 +3,5 @@
 
 internal class OmittedExpression : Expression, IArrayBindingElement
 {
-    internal OmittedExpression() => ((INode)this).Kind = CommentKind.OmittedExpression;
+    internal OmittedExpression() => ((INode)this).Kind = SyntaxKind.OmittedExpression;
 }

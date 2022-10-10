@@ -3,7 +3,7 @@
 
 internal class DoStatement : IterationStatement
 {
-    internal DoStatement() => ((INode)this).Kind = CommentKind.DoStatement;
+    internal DoStatement() => ((INode)this).Kind = SyntaxKind.DoStatement;
 
     internal IExpression Expression { get; set; }
 }

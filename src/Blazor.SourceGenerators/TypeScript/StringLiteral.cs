@@ -3,7 +3,7 @@
 
 internal class StringLiteral : LiteralExpression, IPropertyName
 {
-    internal StringLiteral() => ((INode)this).Kind = CommentKind.StringLiteral;
+    internal StringLiteral() => ((INode)this).Kind = SyntaxKind.StringLiteral;
 
     internal Node TextSourceNode { get; set; } // Identifier | StringLiteral | NumericLiteral
 }

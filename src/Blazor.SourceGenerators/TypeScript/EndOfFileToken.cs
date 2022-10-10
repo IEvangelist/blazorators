@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class EndOfFileToken : Token
 {
-    internal EndOfFileToken() => ((INode)this).Kind = CommentKind.EndOfFileToken;
+    public EndOfFileToken() => ((INode)this).Kind = SyntaxKind.EndOfFileToken;
 }

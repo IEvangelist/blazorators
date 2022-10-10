@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IBlockLike : INode
+public interface IBlockLike : INode
 {
 }

@@ -3,8 +3,8 @@
 
 internal class HeritageClause : Node
 {
-    internal HeritageClause() => ((INode)this).Kind = CommentKind.HeritageClause;
+    internal HeritageClause() => ((INode)this).Kind = SyntaxKind.HeritageClause;
 
-    internal CommentKind Token { get; set; } = default!;
+    internal SyntaxKind Token { get; set; } = default!;
     internal NodeArray<ExpressionWithTypeArguments> Types { get; set; } = default!;
 }

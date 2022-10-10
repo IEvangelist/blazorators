@@ -3,7 +3,7 @@
 
 internal class NonNullExpression : /*LeftHandSideExpression*/MemberExpression
 {
-    internal NonNullExpression() => ((INode)this).Kind = CommentKind.NonNullExpression;
+    internal NonNullExpression() => ((INode)this).Kind = SyntaxKind.NonNullExpression;
 
     internal IExpression Expression { get; set; }
 }

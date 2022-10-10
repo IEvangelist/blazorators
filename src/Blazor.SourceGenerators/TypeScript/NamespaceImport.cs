@@ -3,5 +3,5 @@
 
 internal class NamespaceImport : Declaration, INamedImportBindings
 {
-    internal NamespaceImport() => ((INode)this).Kind = CommentKind.NamespaceImport;
+    internal NamespaceImport() => ((INode)this).Kind = SyntaxKind.NamespaceImport;
 }

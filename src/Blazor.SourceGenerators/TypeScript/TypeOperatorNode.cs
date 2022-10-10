@@ -3,7 +3,7 @@
 
 internal class TypeOperatorNode : ParenthesizedTypeNode
 {
-    internal TypeOperatorNode() => ((INode)this).Kind = CommentKind.TypeOperator;
+    internal TypeOperatorNode() => ((INode)this).Kind = SyntaxKind.TypeOperator;
 
-    internal CommentKind Operator { get; set; } = CommentKind.KeyOfKeyword;
+    internal SyntaxKind Operator { get; set; } = SyntaxKind.KeyOfKeyword;
 }

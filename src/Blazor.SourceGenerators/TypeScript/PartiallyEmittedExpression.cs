@@ -3,7 +3,7 @@
 
 internal class PartiallyEmittedExpression : LeftHandSideExpression
 {
-    internal PartiallyEmittedExpression() => ((INode)this).Kind = CommentKind.PartiallyEmittedExpression;
+    internal PartiallyEmittedExpression() => ((INode)this).Kind = SyntaxKind.PartiallyEmittedExpression;
 
     internal IExpression Expression { get; set; }
 }

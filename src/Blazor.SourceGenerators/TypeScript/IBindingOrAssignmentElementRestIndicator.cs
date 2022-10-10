@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IBindingOrAssignmentElementRestIndicator : INode
+public interface IBindingOrAssignmentElementRestIndicator : INode
 {
 }

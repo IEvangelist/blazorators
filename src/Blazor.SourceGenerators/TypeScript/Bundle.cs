@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class Bundle : Node
 {
-    internal Bundle() => ((INode)this).Kind = CommentKind.Bundle;
+    internal Bundle() => ((INode)this).Kind = SyntaxKind.Bundle;
 
     internal SourceFile[] SourceFiles { get; set; } = default!;
 }

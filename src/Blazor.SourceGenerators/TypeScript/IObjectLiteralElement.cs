@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IObjectLiteralElement : IDeclaration
+public interface IObjectLiteralElement : IDeclaration
 {
     object ObjectLiteralBrandBrand { get; set; }
 }

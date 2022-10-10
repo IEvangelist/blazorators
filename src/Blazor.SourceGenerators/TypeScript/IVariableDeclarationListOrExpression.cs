@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IVariableDeclarationListOrExpression : INode
+public interface IVariableDeclarationListOrExpression : INode
 {
 }

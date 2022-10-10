@@ -3,7 +3,7 @@
 
 internal class ForStatement : IterationStatement
 {
-    internal ForStatement() => ((INode)this).Kind = CommentKind.ForStatement;
+    internal ForStatement() => ((INode)this).Kind = SyntaxKind.ForStatement;
 
     internal /*ForInitializer*/IVariableDeclarationListOrExpression Initializer { get; set; }
     internal IExpression Condition { get; set; }

@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocVariadicType : JsDocType
 {
-    internal JsDocVariadicType() => ((INode)this).Kind = CommentKind.JsDocVariadicType;
+    internal JsDocVariadicType() => ((INode)this).Kind = SyntaxKind.JsDocVariadicType;
 
     internal IJsDocType Type { get; set; }
 }

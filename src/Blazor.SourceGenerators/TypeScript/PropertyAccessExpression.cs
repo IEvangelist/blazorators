@@ -3,7 +3,7 @@
 
 internal class PropertyAccessExpression : Node, IMemberExpression, IDeclaration, IJsxTagNameExpression
 {
-    internal PropertyAccessExpression() => ((INode)this).Kind = CommentKind.PropertyAccessExpression;
+    internal PropertyAccessExpression() => ((INode)this).Kind = SyntaxKind.PropertyAccessExpression;
 
     internal IExpression Expression { get; set; } //LeftHandSideExpression
     internal object DeclarationBrand { get; set; }

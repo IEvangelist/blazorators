@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ICallLikeExpression : INode
+public interface ICallLikeExpression : INode
 {
 }

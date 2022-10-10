@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ConstructorDeclaration : Declaration, IFunctionLikeDeclaration, IClassElement
 {
-    internal ConstructorDeclaration() => ((INode)this).Kind = CommentKind.Constructor;
+    internal ConstructorDeclaration() => ((INode)this).Kind = SyntaxKind.Constructor;
 
     object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
     AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;

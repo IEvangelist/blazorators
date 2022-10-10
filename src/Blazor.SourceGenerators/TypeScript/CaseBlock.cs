@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class CaseBlock : Node
 {
-    internal CaseBlock() => ((INode)this).Kind = CommentKind.CaseBlock;
+    internal CaseBlock() => ((INode)this).Kind = SyntaxKind.CaseBlock;
 
     internal NodeArray<ICaseOrDefaultClause> Clauses { get; set; } = default!;
 }

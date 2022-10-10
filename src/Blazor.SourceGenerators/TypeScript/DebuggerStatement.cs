@@ -3,5 +3,5 @@
 
 internal class DebuggerStatement : Statement
 {
-    internal DebuggerStatement() => ((INode)this).Kind = CommentKind.DebuggerStatement;
+    internal DebuggerStatement() => ((INode)this).Kind = SyntaxKind.DebuggerStatement;
 }

@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal interface ISymbolLinks
+public interface ISymbolLinks
 {
     Symbol Target { get; set; }
     TsType Type { get; set; }

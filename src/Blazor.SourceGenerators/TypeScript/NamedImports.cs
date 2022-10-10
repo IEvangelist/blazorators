@@ -3,7 +3,7 @@
 
 internal class NamedImports : Node, INamedImportsOrExports, INamedImportBindings
 {
-    internal NamedImports() => ((INode)this).Kind = CommentKind.NamedImports;
+    internal NamedImports() => ((INode)this).Kind = SyntaxKind.NamedImports;
 
     internal NodeArray<ImportSpecifier> Elements { get; set; }
 }

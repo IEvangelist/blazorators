@@ -3,7 +3,7 @@
 
 internal class ParenthesizedExpression : PrimaryExpression
 {
-    internal ParenthesizedExpression() => ((INode)this).Kind = CommentKind.ParenthesizedExpression;
+    internal ParenthesizedExpression() => ((INode)this).Kind = SyntaxKind.ParenthesizedExpression;
 
     internal IExpression Expression { get; set; }
 }

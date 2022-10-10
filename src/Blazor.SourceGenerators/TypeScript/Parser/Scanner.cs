@@ -166,7 +166,7 @@ internal sealed class Scanner
     internal string? TokenValue { get; private set; } = default!;
     internal bool HasExtendedUnicodeEscape { get; private set; }
     internal bool HasPrecedingLineBreak { get; private set; }
-    internal bool IsIdentifier => Token == SyntaxKind.Identifier || Token > SyntaxKind.LastReservedWord;
+    internal bool IsIdentifier => Token is SyntaxKind.Identifier || Token > SyntaxKind.LastReservedWord;
     internal bool IsReservedWord => Token >= SyntaxKind.FirstReservedWord && Token <= SyntaxKind.LastReservedWord;
     internal bool IsUnterminated { get; private set; }
 
@@ -545,7 +545,7 @@ linefeed: pos++;
         string text,
         int pos,
         bool trailing,
-        Func<(int pos, int end, CommentKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
+        Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
         T? state,
         U? initial = default)
     {
@@ -662,7 +662,7 @@ breakScan:
     internal U? ForEachLeadingCommentRange<T, U>(
         string text,
         int pos,
-        Func<(int pos, int end, CommentKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
+        Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
         T? state) =>
         IterateCommentRanges(reduce: false, text, pos, trailing: false, callback, state);
 
@@ -670,14 +670,14 @@ breakScan:
     internal U? ForEachTrailingCommentRange<T, U>(
         string text,
         int pos,
-        Func<(int pos, int end, CommentKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
+        Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
         T? state) =>
         IterateCommentRanges(reduce: false, text, pos, trailing: true, callback, state);
 
     internal static U? ReduceEachLeadingCommentRange<T, U>(
         string text,
         int pos,
-        Func<(int pos, int end, CommentKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
+        Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
         T? state,
         U? initial) =>
         IterateCommentRanges(reduce: true, text, pos, trailing: false, callback, state, initial);
@@ -685,14 +685,14 @@ breakScan:
     internal static U? ReduceEachTrailingCommentRange<T, U>(
         string text,
         int pos,
-        Func<(int pos, int end, CommentKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
+        Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T? state, U? memo), U> callback,
         T? state,
         U? initial) =>
         IterateCommentRanges(reduce: true, text, pos, trailing: true, callback, state, initial);
 
 
     internal static List<CommentRange> AppendCommentRange(
-        (int pos, int end, CommentKind kind, bool hasTrailingNewLine, object? state, List<CommentRange>? comments) callback)
+        (int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, object? state, List<CommentRange>? comments) callback)
     {
         callback.comments ??= new List<CommentRange>();
 
@@ -956,7 +956,7 @@ breakScan:
             }
             TextPos++;
         }
-        //Debug.assert(resultingToken != null);
+        //Debug.assert(resultingToken is not null);
         TokenValue = contents;
         return resultingToken;
     }
@@ -1745,7 +1745,7 @@ onethroughnine: TokenValue = ScanNumber();
 
     internal SyntaxKind ReScanSlashToken()
     {
-        if (Token == SyntaxKind.SlashToken || Token == SyntaxKind.SlashEqualsToken)
+        if (Token is SyntaxKind.SlashToken || Token is SyntaxKind.SlashEqualsToken)
         {
             var p = TokenPos + 1;
             var inEscape = false;
@@ -1810,7 +1810,7 @@ onethroughnine: TokenValue = ScanNumber();
 
     internal SyntaxKind ReScanTemplateToken()
     {
-        Debug.Assert(Token == SyntaxKind.CloseBraceToken, "'reScanTemplateToken' should only be called on a '}'");
+        Debug.Assert(Token is SyntaxKind.CloseBraceToken, "'reScanTemplateToken' should only be called on a '}'");
         TextPos = TokenPos;
         Token = ScanTemplateAndSetTokenValue();
         return Token;
@@ -2008,7 +2008,7 @@ onethroughnine: TokenValue = ScanNumber();
         var saveTokenValue = TokenValue;
         var savePrecedingLineBreak = HasPrecedingLineBreak;
         var result = callback();
-        if (result == null || (result is bool && Convert.ToBoolean(result) == false) || isLookahead)
+        if (result is null || (result is bool && Convert.ToBoolean(result) == false) || isLookahead)
         {
             TextPos = savePos;
             StartPos = saveStartPos;
@@ -2061,7 +2061,7 @@ onethroughnine: TokenValue = ScanNumber();
     internal void SetText(string newText, int? start = null, int? length = null)
     {
         _text = newText ?? "";
-        _end = length == null ? _text.Length : start.GetValueOrDefault() + (int)length;
+        _end = length is null ? _text.Length : start.GetValueOrDefault() + (int)length;
         SetTextPos(start ?? 0);
     }
 

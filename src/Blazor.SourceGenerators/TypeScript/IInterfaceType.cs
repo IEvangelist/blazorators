@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal interface IInterfaceType : IObjectType
+public interface IInterfaceType : IObjectType
 {
     internal TypeParameter[] TypeParameters { get; set; }
     internal TypeParameter[] OuterTypeParameters { get; set; }

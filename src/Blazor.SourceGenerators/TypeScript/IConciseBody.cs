@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IConciseBody : INode
+public interface IConciseBody : INode
 {
 }

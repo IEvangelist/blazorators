@@ -3,7 +3,7 @@
 
 internal class TypePredicateNode : TypeNode
 {
-    internal TypePredicateNode() => ((INode)this).Kind = CommentKind.TypePredicate;
+    internal TypePredicateNode() => ((INode)this).Kind = SyntaxKind.TypePredicate;
 
     internal Node ParameterName { get; set; } // Identifier | ThisTypeNode
     internal ITypeNode Type { get; set; }

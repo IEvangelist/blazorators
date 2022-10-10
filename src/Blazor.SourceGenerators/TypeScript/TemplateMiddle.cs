@@ -3,5 +3,5 @@
 
 internal class TemplateMiddle : LiteralLikeNode
 {
-    internal TemplateMiddle() => ((INode)this).Kind = CommentKind.TemplateMiddle;
+    internal TemplateMiddle() => ((INode)this).Kind = SyntaxKind.TemplateMiddle;
 }

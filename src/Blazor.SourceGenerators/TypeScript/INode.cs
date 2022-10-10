@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface INode : ITextRange
+public interface INode : ITextRange
 {
     internal SyntaxKind Kind { get; set; }
     internal NodeFlags Flags { get; set; }

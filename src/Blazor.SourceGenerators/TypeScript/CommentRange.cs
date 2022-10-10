@@ -6,5 +6,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 internal class CommentRange : TextRange
 {
     internal bool HasTrailingNewLine { get; set; }
-    internal CommentKind Kind { get; set; }
+    internal SyntaxKind Kind { get; set; }
 }

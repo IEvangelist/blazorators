@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocTemplateTag : JsDocTag
 {
-    internal JsDocTemplateTag() => ((INode)this).Kind = CommentKind.JsDocTemplateTag;
+    internal JsDocTemplateTag() => ((INode)this).Kind = SyntaxKind.JsDocTemplateTag;
 
-    internal NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
+    internal NodeArray<TypeParameterDeclaration?>? TypeParameters { get; set; }
 }

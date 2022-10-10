@@ -82,3 +82,6 @@ dotnet_naming_symbols.const_fields.applicable_accessibilities = *
 dotnet_naming_symbols.const_fields.required_modifiers = const
 
 dotnet_naming_rule.const_fields_use_pascal_casing.severity = error
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = suggestion

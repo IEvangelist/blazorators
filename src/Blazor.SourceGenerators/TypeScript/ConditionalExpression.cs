@@ -3,7 +3,7 @@
 
 internal class ConditionalExpression : Expression
 {
-    internal ConditionalExpression() => ((INode)this).Kind = CommentKind.ConditionalExpression;
+    internal ConditionalExpression() => ((INode)this).Kind = SyntaxKind.ConditionalExpression;
 
     internal IExpression Condition { get; set; }
     internal QuestionToken QuestionToken { get; set; }

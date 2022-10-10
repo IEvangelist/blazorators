@@ -3,5 +3,5 @@
 
 internal class NamespaceExportDeclaration : DeclarationStatement
 {
-    internal NamespaceExportDeclaration() => ((INode)this).Kind = CommentKind.NamespaceExportDeclaration;
+    internal NamespaceExportDeclaration() => ((INode)this).Kind = SyntaxKind.NamespaceExportDeclaration;
 }

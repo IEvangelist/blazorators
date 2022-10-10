@@ -9,9 +9,10 @@ internal static class Core
     private const char DirectorySeparator = '/';
     private const CharacterCode DirectorySeparatorCharCode = CharacterCode.Slash;
 
-    internal static int BinarySearch(int[] array, int value, Func<int, int, int>? comparer = null, int? offset = null)
+    internal static int BinarySearch(
+        int[] array, int value, Func<int, int, int>? comparer = null, int? offset = null)
     {
-        if (array == null || array.Length == 0)
+        if (array is null || array.Length == 0)
         {
             return -1;
         }
@@ -37,9 +38,10 @@ internal static class Core
         }
         return ~low;
     }
+
     internal static bool PositionIsSynthesized(int pos) =>
         // This is a fast way of testing the following conditions:
-        //  pos == null || pos == null || isNaN(pos) || pos < 0;
+        //  pos is null || pos is null || isNaN(pos) || pos < 0;
         !(pos >= 0);
 
     internal static ScriptKind EnsureScriptKind(string fileName, ScriptKind scriptKind)
@@ -53,6 +55,7 @@ internal static class Core
         var sk = scriptKind != ScriptKind.Unknown ? scriptKind : GetScriptKindFromFileName(fileName);
         return sk != ScriptKind.Unknown ? sk : ScriptKind.Ts;
     }
+
     internal static ScriptKind GetScriptKindFromFileName(string fileName) =>
         Path.GetExtension(fileName)?.ToLower() switch
         {
@@ -79,6 +82,7 @@ internal static class Core
             return root;
         }
     }
+
     internal static string NormalizeSlashes(string path) =>
         Regex.Replace(path, "/\\/ g", "/");
 

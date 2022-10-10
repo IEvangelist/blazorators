@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class SemicolonClassElement : ClassElement
 {
-    internal SemicolonClassElement() => ((INode)this).Kind = CommentKind.SemicolonClassElement;
+    internal SemicolonClassElement() => ((INode)this).Kind = SyntaxKind.SemicolonClassElement;
 }

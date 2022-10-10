@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ISourceAbstractSyntaxTree
+public interface ISourceAbstractSyntaxTree
 {
     internal ScriptTarget ScriptTarget { get; set; }
 

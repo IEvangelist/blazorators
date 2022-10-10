@@ -5,8 +5,8 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocTypeReference : JsDocType
 {
-    internal JsDocTypeReference() => ((INode)this).Kind = CommentKind.JsDocTypeReference;
+    internal JsDocTypeReference() => ((INode)this).Kind = SyntaxKind.JsDocTypeReference;
 
-    internal IEntityName Name { get; set; }
-    internal NodeArray<IJsDocType> TypeArguments { get; set; }
+    internal IEntityName? Name { get; set; }
+    internal NodeArray<IJsDocType> TypeArguments { get; set; } = default!;
 }

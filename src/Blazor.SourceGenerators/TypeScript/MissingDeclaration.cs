@@ -9,7 +9,7 @@ internal class MissingDeclaration : Node,
     IObjectLiteralElement,
     ITypeElement
 {
-    internal MissingDeclaration() => ((INode)this).Kind = CommentKind.MissingDeclaration;
+    internal MissingDeclaration() => ((INode)this).Kind = SyntaxKind.MissingDeclaration;
 
     object IDeclaration.DeclarationBrand { get; set; } = default!;
     INode IDeclaration.Name { get; set; } = default!;

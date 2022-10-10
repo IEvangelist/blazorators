@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class TypeParameterDeclaration : Declaration
 {
-    internal TypeParameterDeclaration() => ((INode)this).Kind = CommentKind.TypeParameter;
+    public TypeParameterDeclaration() => ((INode)this).Kind = SyntaxKind.TypeParameter;
 
     internal ITypeNode Constraint { get; set; }
     internal ITypeNode Default { get; set; }

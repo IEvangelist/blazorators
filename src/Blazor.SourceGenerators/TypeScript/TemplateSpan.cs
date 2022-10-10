@@ -3,7 +3,7 @@
 
 internal class TemplateSpan : Node
 {
-    internal TemplateSpan() => ((INode)this).Kind = CommentKind.TemplateSpan;
+    internal TemplateSpan() => ((INode)this).Kind = SyntaxKind.TemplateSpan;
 
     internal IExpression Expression { get; set; }
     internal ILiteralLikeNode Literal { get; set; } // TemplateMiddle | TemplateTail

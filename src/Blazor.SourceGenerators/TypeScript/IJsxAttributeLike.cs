@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IJsxAttributeLike : IObjectLiteralElement
+public interface IJsxAttributeLike : IObjectLiteralElement
 {
 }

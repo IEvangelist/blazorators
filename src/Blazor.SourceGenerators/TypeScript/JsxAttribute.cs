@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsxAttribute : ObjectLiteralElement
 {
-    internal JsxAttribute() => ((INode)this).Kind = CommentKind.JsxAttribute;
+    internal JsxAttribute() => ((INode)this).Kind = SyntaxKind.JsxAttribute;
 
     internal Node Initializer { get; set; }
 }

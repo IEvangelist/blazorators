@@ -3,7 +3,7 @@
 
 internal class TypeReferenceNode : TypeNode
 {
-    internal TypeReferenceNode() => ((INode)this).Kind = CommentKind.TypeReference;
+    internal TypeReferenceNode() => ((INode)this).Kind = SyntaxKind.TypeReference;
 
     internal IEntityName TypeName { get; set; }
     internal NodeArray<ITypeNode> TypeArguments { get; set; }

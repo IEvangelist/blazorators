@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IAssertionExpression : IExpression
+public interface IAssertionExpression : IExpression
 {
 }

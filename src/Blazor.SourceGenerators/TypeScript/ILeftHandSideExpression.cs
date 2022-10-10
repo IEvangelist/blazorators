@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ILeftHandSideExpression : IIncrementExpression
+public interface ILeftHandSideExpression : IIncrementExpression
 {
     internal object LeftHandSideExpressionBrand { get; set; }
 }

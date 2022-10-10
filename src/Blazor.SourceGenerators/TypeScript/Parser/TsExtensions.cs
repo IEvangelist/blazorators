@@ -8,8 +8,8 @@ internal static class StringExtensions
     internal static CharacterCode CharCodeAt(this string str, int pos) =>
         (CharacterCode)str[pos];
 
-    internal static string SubString(this string str, int start, int? end = null) => 
-        end == null ? str[start..] : str[start..(int)end];
+    internal static string SubString(this string str, int start, int? end = null) =>
+        end is null ? str[start..] : str[start..(int)end];
 
     internal static string[] Exec(this Regex regex, string text) =>
         regex.Match(text).Captures.Cast<string>().ToArray();

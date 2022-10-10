@@ -3,7 +3,7 @@
 
 internal class DeleteExpression : UnaryExpression
 {
-    internal DeleteExpression() => ((INode)this).Kind = CommentKind.DeleteExpression;
+    internal DeleteExpression() => ((INode)this).Kind = SyntaxKind.DeleteExpression;
 
     internal IExpression Expression { get; set; } = default!;
 }

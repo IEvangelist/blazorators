@@ -8,7 +8,7 @@ internal class IndexSignatureDeclaration : Declaration,
     IClassElement,
     ITypeElement
 {
-    internal IndexSignatureDeclaration() => ((INode)this).Kind = CommentKind.IndexSignature;
+    internal IndexSignatureDeclaration() => ((INode)this).Kind = SyntaxKind.IndexSignature;
 
     NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
     NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;

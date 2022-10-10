@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ITemplateLiteral : INode
+public interface ITemplateLiteral : INode
 {
 }

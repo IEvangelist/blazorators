@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IAccessorDeclaration :
+public interface IAccessorDeclaration :
     ISignatureDeclaration,
     IClassElement,
     IObjectLiteralElementLike

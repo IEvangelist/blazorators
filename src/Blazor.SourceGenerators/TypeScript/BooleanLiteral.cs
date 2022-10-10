@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class BooleanLiteral : Node, IPrimaryExpression, ITypeNode
 {
-    internal BooleanLiteral() => ((INode)this).Kind = CommentKind.BooleanKeyword;
+    internal BooleanLiteral() => ((INode)this).Kind = SyntaxKind.BooleanKeyword;
 
     object IPrimaryExpression.PrimaryExpressionBrand { get; set; } = default!;
     object IMemberExpression.MemberExpressionBrand { get; set; } = default!;

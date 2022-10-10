@@ -3,7 +3,7 @@
 
 internal class ThisExpression : Node, IPrimaryExpression, IKeywordTypeNode
 {
-    internal ThisExpression() => ((INode)this).Kind = CommentKind.ThisKeyword;
+    internal ThisExpression() => ((INode)this).Kind = SyntaxKind.ThisKeyword;
 
     internal object TypeNodeBrand { get; set; }
     internal object PrimaryExpressionBrand { get; set; }

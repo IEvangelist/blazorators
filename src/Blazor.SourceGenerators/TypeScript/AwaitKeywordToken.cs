@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class AwaitKeywordToken : Token
 {
-    internal AwaitKeywordToken() => ((INode)this).Kind = CommentKind.AwaitKeyword;
+    internal AwaitKeywordToken() => ((INode)this).Kind = SyntaxKind.AwaitKeyword;
 }

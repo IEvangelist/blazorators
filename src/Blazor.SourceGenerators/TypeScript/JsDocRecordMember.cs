@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocRecordMember : PropertySignature
 {
-    internal JsDocRecordMember() => ((INode)this).Kind = CommentKind.JsDocRecordMember;
+    internal JsDocRecordMember() => ((INode)this).Kind = SyntaxKind.JsDocRecordMember;
 }

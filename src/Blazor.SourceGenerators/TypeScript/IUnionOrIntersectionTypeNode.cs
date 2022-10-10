@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IUnionOrIntersectionTypeNode : ITypeNode
+public interface IUnionOrIntersectionTypeNode : ITypeNode
 {
     NodeArray<ITypeNode> Types { get; set; }
 }

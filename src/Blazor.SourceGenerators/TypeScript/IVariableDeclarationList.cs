@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IVariableDeclarationList : INode, IVariableDeclarationListOrExpression
+public interface IVariableDeclarationList : INode, IVariableDeclarationListOrExpression
 {
     NodeArray<VariableDeclaration> Declarations { get; set; }
 }

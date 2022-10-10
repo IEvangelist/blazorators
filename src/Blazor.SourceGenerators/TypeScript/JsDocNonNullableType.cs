@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocNonNullableType : JsDocType
 {
-    internal JsDocNonNullableType() => ((INode)this).Kind = CommentKind.JsDocNonNullableType;
+    internal JsDocNonNullableType() => ((INode)this).Kind = SyntaxKind.JsDocNonNullableType;
 
     internal IJsDocType Type { get; set; }
 }

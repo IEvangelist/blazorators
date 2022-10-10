@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IJsDocNamespaceBody : INode
+public interface IJsDocNamespaceBody : INode
 {
 }

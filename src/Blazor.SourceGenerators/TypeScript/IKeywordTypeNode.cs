@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IKeywordTypeNode : ITypeNode
+public interface IKeywordTypeNode : ITypeNode
 {
 }

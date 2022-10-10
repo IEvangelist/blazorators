@@ -3,7 +3,7 @@
 
 internal class ThrowStatement : Statement
 {
-    internal ThrowStatement() => ((INode)this).Kind = CommentKind.ThrowStatement;
+    internal ThrowStatement() => ((INode)this).Kind = SyntaxKind.ThrowStatement;
 
     internal IExpression Expression { get; set; }
 }

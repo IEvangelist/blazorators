@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ClassDeclaration : Node, IClassLikeDeclaration, IDeclarationStatement
 {
-    internal ClassDeclaration() => ((INode)this).Kind = CommentKind.ClassDeclaration;
+    internal ClassDeclaration() => ((INode)this).Kind = SyntaxKind.ClassDeclaration;
 
     INode IDeclaration.Name { get; set; } = default!;
     NodeArray<TypeParameterDeclaration> IClassLikeDeclaration.TypeParameters { get; set; } = default!;

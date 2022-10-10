@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class LabeledStatement : Statement
 {
-    internal LabeledStatement() => ((INode)this).Kind = CommentKind.LabeledStatement;
+    internal LabeledStatement() => ((INode)this).Kind = SyntaxKind.LabeledStatement;
 
     internal Identifier Label { get; set; }
     internal IStatement Statement { get; set; }

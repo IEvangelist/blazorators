@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ShorthandPropertyAssignment : ObjectLiteralElement, IObjectLiteralElementLike
 {
-    internal ShorthandPropertyAssignment() => ((INode)this).Kind = CommentKind.ShorthandPropertyAssignment;
+    internal ShorthandPropertyAssignment() => ((INode)this).Kind = SyntaxKind.ShorthandPropertyAssignment;
 
     internal QuestionToken QuestionToken { get; set; }
     internal Token EqualsToken { get; set; } // Token<SyntaxKind.EqualsToken>

@@ -3,5 +3,5 @@
 
 internal class ThisTypeNode : TypeNode
 {
-    internal ThisTypeNode() => ((INode)this).Kind = CommentKind.ThisType;
+    internal ThisTypeNode() => ((INode)this).Kind = SyntaxKind.ThisType;
 }

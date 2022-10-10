@@ -3,7 +3,7 @@
 
 internal class TypeAssertion : UnaryExpression
 {
-    internal TypeAssertion() => ((INode)this).Kind = CommentKind.TypeAssertionExpression;
+    internal TypeAssertion() => ((INode)this).Kind = SyntaxKind.TypeAssertionExpression;
 
     internal ITypeNode Type { get; set; }
     internal IExpression Expression { get; set; }

@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class MethodSignature : Declaration, ISignatureDeclaration, ITypeElement, IFunctionLikeDeclaration
 {
-    internal MethodSignature() => ((INode)this).Kind = CommentKind.MethodSignature;
+    internal MethodSignature() => ((INode)this).Kind = SyntaxKind.MethodSignature;
 
     NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
     NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;

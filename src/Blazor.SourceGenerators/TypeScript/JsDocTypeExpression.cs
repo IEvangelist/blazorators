@@ -4,7 +4,7 @@
 namespace Blazor.SourceGenerators.TypeScript;
 internal class JsDocTypeExpression : Node
 {
-    internal JsDocTypeExpression() => ((INode)this).Kind = CommentKind.JsDocTypeExpression;
+    internal JsDocTypeExpression() => ((INode)this).Kind = SyntaxKind.JsDocTypeExpression;
 
     internal IJsDocType Type { get; set; }
 }

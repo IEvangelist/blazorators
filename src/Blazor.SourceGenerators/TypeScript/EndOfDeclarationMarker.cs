@@ -3,5 +3,5 @@
 
 internal class EndOfDeclarationMarker : Statement
 {
-    internal EndOfDeclarationMarker() => ((INode)this).Kind = CommentKind.EndOfDeclarationMarker;
+    internal EndOfDeclarationMarker() => ((INode)this).Kind = SyntaxKind.EndOfDeclarationMarker;
 }

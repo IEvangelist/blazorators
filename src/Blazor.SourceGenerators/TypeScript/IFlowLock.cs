@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IFlowLock
+public interface IFlowLock
 {
     internal bool Locked { get; set; }
 }

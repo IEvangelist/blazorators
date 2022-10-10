@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsxElement : PrimaryExpression, IJsxChild
 {
-    internal JsxElement() => ((INode)this).Kind = CommentKind.JsxElement;
+    internal JsxElement() => ((INode)this).Kind = SyntaxKind.JsxElement;
 
     internal IExpression OpeningElement { get; set; } = default!;
     internal NodeArray<IJsxChild> JsxChildren { get; set; } = default!;

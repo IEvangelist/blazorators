@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ILiteralExpression : ILiteralLikeNode, IPrimaryExpression
+public interface ILiteralExpression : ILiteralLikeNode, IPrimaryExpression
 {
     internal object LiteralExpressionBrand { get; set; }
 }

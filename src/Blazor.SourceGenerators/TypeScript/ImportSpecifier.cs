@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ImportSpecifier : Declaration, ImportOrExportSpecifier
 {
-    internal ImportSpecifier() => ((INode)this).Kind = CommentKind.ImportSpecifier;
+    internal ImportSpecifier() => ((INode)this).Kind = SyntaxKind.ImportSpecifier;
 
     internal Identifier PropertyName { get; set; }
 }

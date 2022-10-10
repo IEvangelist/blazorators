@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ClassExpression : Node, IClassLikeDeclaration, IPrimaryExpression
 {
-    internal ClassExpression() => ((INode)this).Kind = CommentKind.ClassExpression;
+    internal ClassExpression() => ((INode)this).Kind = SyntaxKind.ClassExpression;
 
     NodeArray<TypeParameterDeclaration> IClassLikeDeclaration.TypeParameters { get; set; } = default!;
     NodeArray<HeritageClause> IClassLikeDeclaration.HeritageClauses { get; set; } = default!;

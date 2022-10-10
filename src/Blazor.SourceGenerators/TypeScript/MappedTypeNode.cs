@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class MappedTypeNode : Node, ITypeNode, IDeclaration
 {
-    internal MappedTypeNode() => ((INode)this).Kind = CommentKind.MappedType;
+    internal MappedTypeNode() => ((INode)this).Kind = SyntaxKind.MappedType;
 
     object ITypeNode.TypeNodeBrand { get; set; } = default!;
     object IDeclaration.DeclarationBrand { get; set; } = default!;

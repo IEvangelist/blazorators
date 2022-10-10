@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class CatchClause : Node
 {
-    internal CatchClause() => ((INode)this).Kind = CommentKind.CatchClause;
+    internal CatchClause() => ((INode)this).Kind = SyntaxKind.CatchClause;
 
     internal VariableDeclaration VariableDeclaration { get; set; } = default!;
     internal Block Block { get; set; } = default!;

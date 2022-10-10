@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IFunctionOrConstructorTypeNode : ISignatureDeclaration, ITypeNode
+public interface IFunctionOrConstructorTypeNode : ISignatureDeclaration, ITypeNode
 {
 }

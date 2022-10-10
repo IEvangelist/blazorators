@@ -3,7 +3,7 @@
 
 internal class ReturnStatement : Statement
 {
-    internal ReturnStatement() => ((INode)this).Kind = CommentKind.ReturnStatement;
+    internal ReturnStatement() => ((INode)this).Kind = SyntaxKind.ReturnStatement;
 
     internal IExpression Expression { get; set; }
 }

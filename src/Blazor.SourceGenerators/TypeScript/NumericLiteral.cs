@@ -3,5 +3,5 @@
 
 internal class NumericLiteral : LiteralExpression, IPropertyName
 {
-    internal NumericLiteral() => ((INode)this).Kind = CommentKind.NumericLiteral;
+    internal NumericLiteral() => ((INode)this).Kind = SyntaxKind.NumericLiteral;
 }

@@ -6,7 +6,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 internal class SetAccessorDeclaration : Declaration, IFunctionLikeDeclaration, IClassElement, IObjectLiteralElement,
     IAccessorDeclaration
 {
-    internal SetAccessorDeclaration() => ((INode)this).Kind = CommentKind.SetAccessor;
+    internal SetAccessorDeclaration() => ((INode)this).Kind = SyntaxKind.SetAccessor;
 
     internal object ClassElementBrand { get; set; }
     internal object FunctionLikeDeclarationBrand { get; set; }

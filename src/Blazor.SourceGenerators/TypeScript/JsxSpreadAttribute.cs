@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsxSpreadAttribute : ObjectLiteralElement
 {
-    internal JsxSpreadAttribute() => ((INode)this).Kind = CommentKind.JsxSpreadAttribute;
+    internal JsxSpreadAttribute() => ((INode)this).Kind = SyntaxKind.JsxSpreadAttribute;
 
     internal IExpression Expression { get; set; }
 }

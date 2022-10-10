@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocAllType : JsDocType
 {
-    internal JsDocAllType() => ((INode)this).Kind = CommentKind.JsDocAllType;
+    internal JsDocAllType() => ((INode)this).Kind = SyntaxKind.JsDocAllType;
 }

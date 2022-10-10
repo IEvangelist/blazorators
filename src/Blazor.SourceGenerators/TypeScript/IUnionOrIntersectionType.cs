@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal interface IUnionOrIntersectionType : IType
+public interface IUnionOrIntersectionType : IType
 {
     TsType[] Types { get; set; }
     SymbolTable PropertyCache { get; set; }

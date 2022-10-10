@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IDestructuringAssignment : INode
+public interface IDestructuringAssignment : INode
 {
 }

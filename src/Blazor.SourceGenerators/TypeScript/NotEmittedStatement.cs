@@ -3,5 +3,5 @@
 
 internal class NotEmittedStatement : Statement
 {
-    internal NotEmittedStatement() => ((INode)this).Kind = CommentKind.NotEmittedStatement;
+    internal NotEmittedStatement() => ((INode)this).Kind = SyntaxKind.NotEmittedStatement;
 }

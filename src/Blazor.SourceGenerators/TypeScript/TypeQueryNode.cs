@@ -3,7 +3,7 @@
 
 internal class TypeQueryNode : TypeNode
 {
-    internal TypeQueryNode() => ((INode)this).Kind = CommentKind.TypeQuery;
+    internal TypeQueryNode() => ((INode)this).Kind = SyntaxKind.TypeQuery;
 
     internal IEntityName ExprName { get; set; }
 }

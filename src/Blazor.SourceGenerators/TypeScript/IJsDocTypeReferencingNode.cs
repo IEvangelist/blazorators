@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IJsDocTypeReferencingNode : IJsDocType
+public interface IJsDocTypeReferencingNode : IJsDocType
 {
 }

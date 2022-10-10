@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IFlowNode
+public interface IFlowNode
 {
     internal FlowFlags Flags { get; set; }
     internal int Id { get; set; }

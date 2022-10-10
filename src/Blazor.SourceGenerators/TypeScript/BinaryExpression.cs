@@ -6,7 +6,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class BinaryExpression : Node, IExpression, IDeclaration
 {
-    internal BinaryExpression() => ((INode)this).Kind = CommentKind.BinaryExpression;
+    internal BinaryExpression() => ((INode)this).Kind = SyntaxKind.BinaryExpression;
 
     object IExpression.ExpressionBrand { get; set; } = default!;
     object IDeclaration.DeclarationBrand { get; set; } = default!;

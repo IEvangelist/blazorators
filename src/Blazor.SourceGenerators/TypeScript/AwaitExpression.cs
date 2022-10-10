@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class AwaitExpression : UnaryExpression
 {
-    internal AwaitExpression() => ((INode)this).Kind = CommentKind.AwaitExpression;
+    internal AwaitExpression() => ((INode)this).Kind = SyntaxKind.AwaitExpression;
 
     internal IExpression Expression { get; set; } = default!;
 }

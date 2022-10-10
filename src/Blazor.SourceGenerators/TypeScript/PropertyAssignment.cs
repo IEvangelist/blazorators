@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class PropertyAssignment : ObjectLiteralElement, IObjectLiteralElementLike, IVariableLikeDeclaration
 {
-    internal PropertyAssignment() => ((INode)this).Kind = CommentKind.PropertyAssignment;
+    internal PropertyAssignment() => ((INode)this).Kind = SyntaxKind.PropertyAssignment;
 
     internal QuestionToken QuestionToken { get; set; }
     internal IExpression Initializer { get; set; }

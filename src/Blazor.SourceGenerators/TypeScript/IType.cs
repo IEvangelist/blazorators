@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal interface IType
+public interface IType
 {
     internal TypeFlags Flags { get; set; }
     internal int Id { get; set; }

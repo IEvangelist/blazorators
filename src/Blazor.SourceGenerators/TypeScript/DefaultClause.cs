@@ -3,7 +3,7 @@
 
 internal class DefaultClause : Node, ICaseOrDefaultClause
 {
-    internal DefaultClause() => ((INode)this).Kind = CommentKind.DefaultClause;
+    internal DefaultClause() => ((INode)this).Kind = SyntaxKind.DefaultClause;
 
     internal NodeArray<IStatement> Statements { get; set; }
 }

@@ -3,5 +3,5 @@
 
 internal class RegularExpressionLiteral : LiteralExpression
 {
-    internal RegularExpressionLiteral() => ((INode)this).Kind = CommentKind.RegularExpressionLiteral;
+    internal RegularExpressionLiteral() => ((INode)this).Kind = SyntaxKind.RegularExpressionLiteral;
 }

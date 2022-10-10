@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IBindingPattern : INode
+public interface IBindingPattern : INode
 {
     internal NodeArray<IArrayBindingElement> Elements { get; set; }
 }

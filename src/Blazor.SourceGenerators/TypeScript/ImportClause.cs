@@ -3,7 +3,7 @@
 
 internal class ImportClause : Declaration
 {
-    internal ImportClause() => ((INode)this).Kind = CommentKind.ImportClause;
+    internal ImportClause() => ((INode)this).Kind = SyntaxKind.ImportClause;
 
     internal INamedImportBindings NamedBindings { get; set; }
 }

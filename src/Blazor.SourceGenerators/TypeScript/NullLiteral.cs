@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class NullLiteral : Node, IPrimaryExpression, ITypeNode
 {
-    internal NullLiteral() => ((INode)this).Kind = CommentKind.NullKeyword;
+    internal NullLiteral() => ((INode)this).Kind = SyntaxKind.NullKeyword;
 
     object IPrimaryExpression.PrimaryExpressionBrand { get; set; } = default!;
     object IMemberExpression.MemberExpressionBrand { get; set; } = default!;

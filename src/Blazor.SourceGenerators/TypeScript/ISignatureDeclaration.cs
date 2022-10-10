@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ISignatureDeclaration : IDeclaration
+public interface ISignatureDeclaration : IDeclaration
 {
     NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
     NodeArray<ParameterDeclaration> Parameters { get; set; }

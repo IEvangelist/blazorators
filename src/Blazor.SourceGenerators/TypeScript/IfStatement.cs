@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class IfStatement : Statement
 {
-    internal IfStatement() => ((INode)this).Kind = CommentKind.IfStatement;
+    internal IfStatement() => ((INode)this).Kind = SyntaxKind.IfStatement;
 
     internal IExpression Expression { get; set; }
     internal IStatement ThenStatement { get; set; }

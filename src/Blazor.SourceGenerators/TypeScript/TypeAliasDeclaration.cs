@@ -3,7 +3,7 @@
 
 internal class TypeAliasDeclaration : DeclarationStatement
 {
-    internal TypeAliasDeclaration() => ((INode)this).Kind = CommentKind.TypeAliasDeclaration;
+    internal TypeAliasDeclaration() => ((INode)this).Kind = SyntaxKind.TypeAliasDeclaration;
 
     internal NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
     internal ITypeNode Type { get; set; }

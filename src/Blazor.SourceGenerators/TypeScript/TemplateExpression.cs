@@ -3,7 +3,7 @@
 
 internal class TemplateExpression : PrimaryExpression
 {
-    internal TemplateExpression() => ((INode)this).Kind = CommentKind.TemplateExpression;
+    internal TemplateExpression() => ((INode)this).Kind = SyntaxKind.TemplateExpression;
 
     internal TemplateHead Head { get; set; }
     internal NodeArray<TemplateSpan> TemplateSpans { get; set; }

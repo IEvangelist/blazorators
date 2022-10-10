@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface ILiteralLikeNode : INode
+public interface ILiteralLikeNode : INode
 {
     internal string Text { get; set; }
     internal bool IsUnterminated { get; set; }

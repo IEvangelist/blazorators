@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class ConstructorTypeNode : Node, ITypeNode, IFunctionOrConstructorTypeNode
 {
-    internal ConstructorTypeNode() => ((INode)this).Kind = CommentKind.ConstructorType;
+    internal ConstructorTypeNode() => ((INode)this).Kind = SyntaxKind.ConstructorType;
 
     object ITypeNode.TypeNodeBrand { get; set; } = default!;
     NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;

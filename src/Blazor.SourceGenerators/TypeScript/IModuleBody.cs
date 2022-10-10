@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IModuleBody : INode
+public interface IModuleBody : INode
 {
 }

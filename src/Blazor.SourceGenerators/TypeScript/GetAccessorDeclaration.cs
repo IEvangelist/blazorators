@@ -9,7 +9,7 @@ internal class GetAccessorDeclaration : Declaration,
     IObjectLiteralElement,
     IAccessorDeclaration
 {
-    internal GetAccessorDeclaration() => ((INode)this).Kind = CommentKind.GetAccessor;
+    internal GetAccessorDeclaration() => ((INode)this).Kind = SyntaxKind.GetAccessor;
 
     object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
     AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;

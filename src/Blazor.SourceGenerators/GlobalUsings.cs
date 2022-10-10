@@ -15,7 +15,6 @@ global using Blazor.SourceGenerators.Readers;
 global using Blazor.SourceGenerators.Types;
 global using Blazor.SourceGenerators.TypeScript;
 global using Blazor.SourceGenerators.TypeScript.Parser;
-global using CommentKind = Blazor.SourceGenerators.TypeScript.SyntaxKind;
 global using Microsoft.CodeAnalysis;
 global using Microsoft.CodeAnalysis.CSharp;
 global using Microsoft.CodeAnalysis.CSharp.Syntax;

@@ -3,7 +3,7 @@
 
 internal class SwitchStatement : Statement
 {
-    internal SwitchStatement() => ((INode)this).Kind = CommentKind.SwitchStatement;
+    internal SwitchStatement() => ((INode)this).Kind = SyntaxKind.SwitchStatement;
 
     internal IExpression Expression { get; set; }
     internal CaseBlock CaseBlock { get; set; }

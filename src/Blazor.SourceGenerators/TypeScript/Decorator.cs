@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class Decorator : Node
 {
-    internal Decorator() => ((INode)this).Kind = CommentKind.Decorator;
+    internal Decorator() => ((INode)this).Kind = SyntaxKind.Decorator;
 
     internal /*LeftHandSideExpression*/IExpression Expression { get; set; }
 }

@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class AtToken : Token
 {
-    internal AtToken() => ((INode)this).Kind = CommentKind.AtToken;
+    internal AtToken() => ((INode)this).Kind = SyntaxKind.AtToken;
 }

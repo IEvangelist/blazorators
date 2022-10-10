@@ -3,7 +3,7 @@
 
 internal class UnionTypeNode : TypeNode, IUnionOrIntersectionTypeNode
 {
-    internal UnionTypeNode() => ((INode)this).Kind = CommentKind.UnionType;
+    internal UnionTypeNode() => ((INode)this).Kind = SyntaxKind.UnionType;
 
     internal NodeArray<ITypeNode> Types { get; set; }
 }

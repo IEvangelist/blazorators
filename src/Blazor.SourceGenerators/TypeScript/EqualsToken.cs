@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class EqualsToken : Token
 {
-    internal EqualsToken() => ((INode)this).Kind = CommentKind.EqualsToken;
+    public EqualsToken() => ((INode)this).Kind = SyntaxKind.EqualsToken;
 }

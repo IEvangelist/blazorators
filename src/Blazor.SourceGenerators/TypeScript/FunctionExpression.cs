@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class FunctionExpression : Node, IPrimaryExpression, IFunctionLikeDeclaration
 {
-    internal FunctionExpression() => ((INode)this).Kind = CommentKind.FunctionExpression;
+    internal FunctionExpression() => ((INode)this).Kind = SyntaxKind.FunctionExpression;
 
     public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; } = default!;
     public NodeArray<ParameterDeclaration> Parameters { get; set; } = default!;

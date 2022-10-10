@@ -3,5 +3,5 @@
 
 internal class ModuleBlock : Block
 {
-    internal ModuleBlock() => ((INode)this).Kind = CommentKind.ModuleBlock;
+    internal ModuleBlock() => ((INode)this).Kind = SyntaxKind.ModuleBlock;
 }

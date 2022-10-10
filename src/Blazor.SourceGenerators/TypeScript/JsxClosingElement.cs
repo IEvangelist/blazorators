@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsxClosingElement : Node
 {
-    internal JsxClosingElement() => ((INode)this).Kind = CommentKind.JsxClosingElement;
+    internal JsxClosingElement() => ((INode)this).Kind = SyntaxKind.JsxClosingElement;
 
     internal IJsxTagNameExpression TagName { get; set; } = default!;
 }

@@ -3,7 +3,7 @@
 
 internal class WhileStatement : IterationStatement
 {
-    internal WhileStatement() => ((INode)this).Kind = CommentKind.WhileStatement;
+    internal WhileStatement() => ((INode)this).Kind = SyntaxKind.WhileStatement;
 
     internal IExpression Expression { get; set; }
 }

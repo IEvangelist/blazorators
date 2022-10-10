@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IVariableLikeDeclaration : IDeclaration
+public interface IVariableLikeDeclaration : IDeclaration
 {
     IPropertyName PropertyName { get; set; }
     DotDotDotToken DotDotDotToken { get; set; }

@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IForInitializer : INode
+public interface IForInitializer : INode
 {
 }

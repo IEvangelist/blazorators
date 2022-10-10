@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class QualifiedName : Node, IEntityName
 {
-    internal QualifiedName() => ((INode)this).Kind = CommentKind.QualifiedName;
+    internal QualifiedName() => ((INode)this).Kind = SyntaxKind.QualifiedName;
 
     internal IEntityName Left { get; set; }
     internal Identifier Right { get; set; }

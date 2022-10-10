@@ -8,7 +8,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 /// </summary>
 internal class Node : TextRange, INode
 {
-    CommentKind INode.Kind { get; set; }
+    SyntaxKind INode.Kind { get; set; }
     NodeFlags INode.Flags { get; set; }
     ModifierFlags INode.ModifierFlagsCache { get; set; }
     TransformFlags INode.TransformFlags { get; set; }
@@ -75,7 +75,7 @@ internal class Node : TextRange, INode
             {
                 return null;
             }
-            
+
             n.AbstractSyntaxTree = ast;
 
             var nodeInterface = (INode)n;
@@ -88,7 +88,7 @@ internal class Node : TextRange, INode
 
             ((INode)this).Children.Add(n);
             n.MakeChildren(ast);
-            
+
             return null;
         });
     }

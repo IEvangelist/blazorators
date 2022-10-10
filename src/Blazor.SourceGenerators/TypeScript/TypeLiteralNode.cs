@@ -3,7 +3,7 @@
 
 internal class TypeLiteralNode : Node, ITypeNode, IDeclaration
 {
-    internal TypeLiteralNode() => ((INode)this).Kind = CommentKind.TypeLiteral;
+    internal TypeLiteralNode() => ((INode)this).Kind = SyntaxKind.TypeLiteral;
 
     internal NodeArray<ITypeElement> Members { get; set; }
     internal object DeclarationBrand { get; set; }

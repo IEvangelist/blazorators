@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IDeclaration : INode
+public interface IDeclaration : INode
 {
     internal object DeclarationBrand { get; set; }
     internal INode? Name { get; set; }

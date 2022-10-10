@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class VariableDeclaration : Declaration, IVariableLikeDeclaration
 {
-    internal VariableDeclaration() => ((INode)this).Kind = CommentKind.VariableDeclaration;
+    internal VariableDeclaration() => ((INode)this).Kind = SyntaxKind.VariableDeclaration;
 
     internal ITypeNode Type { get; set; }
     internal IExpression Initializer { get; set; }

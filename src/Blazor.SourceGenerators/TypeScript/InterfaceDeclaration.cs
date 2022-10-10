@@ -3,7 +3,7 @@
 
 internal class InterfaceDeclaration : DeclarationStatement
 {
-    internal InterfaceDeclaration() => ((INode)this).Kind = CommentKind.InterfaceDeclaration;
+    internal InterfaceDeclaration() => ((INode)this).Kind = SyntaxKind.InterfaceDeclaration;
 
     internal NodeArray<TypeParameterDeclaration> TypeParameters { get; set; } = default!;
     internal NodeArray<HeritageClause> HeritageClauses { get; set; } = default!;

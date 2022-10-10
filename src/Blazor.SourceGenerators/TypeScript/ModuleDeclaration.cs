@@ -3,7 +3,7 @@
 
 internal class ModuleDeclaration : DeclarationStatement
 {
-    internal ModuleDeclaration() => ((INode)this).Kind = CommentKind.ModuleDeclaration;
+    internal ModuleDeclaration() => ((INode)this).Kind = SyntaxKind.ModuleDeclaration;
 
-    internal /*ModuleDeclaration*/INode Body { get; set; } // ModuleBody | JSDocNamespaceDeclaration
+    internal INode? Body { get; set; }
 }

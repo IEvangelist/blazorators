@@ -5,11 +5,11 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocParameterTag : JsDocTag
 {
-    internal JsDocParameterTag() => ((INode)this).Kind = CommentKind.JsDocParameterTag;
+    internal JsDocParameterTag() => ((INode)this).Kind = SyntaxKind.JsDocParameterTag;
 
-    internal Identifier PreParameterName { get; set; }
-    internal JsDocTypeExpression TypeExpression { get; set; }
-    internal Identifier PostParameterName { get; set; }
-    internal Identifier ParameterName { get; set; }
+    internal Identifier? PreParameterName { get; set; }
+    internal JsDocTypeExpression? TypeExpression { get; set; }
+    internal Identifier? PostParameterName { get; set; }
+    internal Identifier? ParameterName { get; set; }
     internal bool IsBracketed { get; set; }
 }

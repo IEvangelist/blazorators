@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsDocLiteralType : JsDocType
 {
-    internal JsDocLiteralType() => ((INode)this).Kind = CommentKind.JsDocLiteralType;
+    internal JsDocLiteralType() => ((INode)this).Kind = SyntaxKind.JsDocLiteralType;
 
     internal LiteralTypeNode Literal { get; set; }
 }

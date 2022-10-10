@@ -3,7 +3,7 @@
 
 internal class ParenthesizedTypeNode : TypeNode
 {
-    internal ParenthesizedTypeNode() => ((INode)this).Kind = CommentKind.ParenthesizedType;
+    internal ParenthesizedTypeNode() => ((INode)this).Kind = SyntaxKind.ParenthesizedType;
 
     internal ITypeNode Type { get; set; }
 }

@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IBlockOrExpression : INode
+public interface IBlockOrExpression : INode
 {
 }

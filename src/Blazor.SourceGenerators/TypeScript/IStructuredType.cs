@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IStructuredType : IType
+public interface IStructuredType : IType
 {
 }

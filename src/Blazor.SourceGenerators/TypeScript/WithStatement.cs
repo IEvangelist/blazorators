@@ -3,7 +3,7 @@
 
 internal class WithStatement : Statement
 {
-    internal WithStatement() => ((INode)this).Kind = CommentKind.WithStatement;
+    internal WithStatement() => ((INode)this).Kind = SyntaxKind.WithStatement;
 
     internal IExpression Expression { get; set; }
     internal IStatement Statement { get; set; }

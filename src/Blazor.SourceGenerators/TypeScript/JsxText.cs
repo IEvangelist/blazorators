@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsxText : Node, IJsxChild
 {
-    internal JsxText() => ((INode)this).Kind = CommentKind.JsxText;
+    internal JsxText() => ((INode)this).Kind = SyntaxKind.JsxText;
 }

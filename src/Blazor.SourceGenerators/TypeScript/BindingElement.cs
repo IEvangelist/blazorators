@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class BindingElement : Declaration, IArrayBindingElement, IVariableLikeDeclaration
 {
-    internal BindingElement() => ((INode)this).Kind = CommentKind.BindingElement;
+    internal BindingElement() => ((INode)this).Kind = SyntaxKind.BindingElement;
 
     IPropertyName IVariableLikeDeclaration.PropertyName { get; set; } = default!;
 

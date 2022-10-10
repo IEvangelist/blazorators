@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IJsxOpeningLikeElement : IExpression
+public interface IJsxOpeningLikeElement : IExpression
 {
 }

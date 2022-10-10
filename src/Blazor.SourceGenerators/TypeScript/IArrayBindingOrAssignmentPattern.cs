@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal interface IArrayBindingOrAssignmentPattern : INode
+public interface IArrayBindingOrAssignmentPattern : INode
 {
 }

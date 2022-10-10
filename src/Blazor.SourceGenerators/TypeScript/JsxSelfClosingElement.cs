@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal class JsxSelfClosingElement : PrimaryExpression, IJsxChild
 {
-    internal JsxSelfClosingElement() => ((INode)this).Kind = CommentKind.JsxSelfClosingElement;
+    internal JsxSelfClosingElement() => ((INode)this).Kind = SyntaxKind.JsxSelfClosingElement;
 
     internal IJsxTagNameExpression TagName { get; set; }
     internal JsxAttributes Attributes { get; set; }
