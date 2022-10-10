@@ -67,8 +67,8 @@ public class LibDomReaderTests
         {
             yield return new object[]
             {
-                "ConnectionType",
-                @"type ConnectionType = ""bluetooth"" | ""cellular"" | ""ethernet"" | ""mixed"" | ""none"" | ""other"" | ""unknown"" | ""wifi"";",
+                "ClientTypes",
+                @"type ClientTypes = ""all"" | ""sharedworker"" | ""window"" | ""worker"";",
             };
         }
     }
