@@ -19,12 +19,14 @@ internal static class TypeMap
                 ["enum"] = "enum",
                 ["Date"] = "DateTime",
                 ["DOMTimeStamp"] = "long",
+                ["EpochTimeStamp"] = "long",
                 ["number | null"] = "double?",
                 ["string | null"] = "string?",
                 ["boolean | null"] = "bool?",
                 ["enum | null"] = "enum?",
                 ["Date | null"] = "DateTime?",
                 ["DOMTimeStamp | null"] = "long?",
+                ["EpochTimeStamp | null"] = "long?",
                 //["Array"] = "[]"
             };
 

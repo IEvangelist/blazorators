@@ -95,7 +95,8 @@ internal record CSharpObject(
                 $"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\r\n");
 
             // Add readonly property for converting DOMTimeStamp (long) to DateTime.
-            if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null")
+            if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null"
+                or "EpochTimeStamp" or "EpochTimeStamp | null")
             {
                 builder.Append(
                 $"    /// <summary>\r\n");

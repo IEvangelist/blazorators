@@ -37,22 +37,22 @@ const getCurrentPosition = (
     successMethodName,
     errorMethodName,
     options) => {
-        navigator.geolocation.getCurrentPosition(
-            position => onSuccess(dotnetObj, successMethodName, position),
-            error => onError(dotnetObj, errorMethodName, error),
-            options);
-    }
+    navigator.geolocation.getCurrentPosition(
+        position => onSuccess(dotnetObj, successMethodName, position),
+        error => onError(dotnetObj, errorMethodName, error),
+        options);
+}
 
 const watchPosition = (
     dotnetObj,
     successMethodName,
     errorMethodName,
     options) => {
-        return navigator.geolocation.watchPosition(
-            position => onSuccess(dotnetObj, successMethodName, position),
-            error => onError(dotnetObj, errorMethodName, error),
-            options);
-    }
+    return navigator.geolocation.watchPosition(
+        position => onSuccess(dotnetObj, successMethodName, position),
+        error => onError(dotnetObj, errorMethodName, error),
+        options);
+}
 
 window.blazorators = Object.assign({}, window.blazorators, {
     geolocation: {
