@@ -5,7 +5,7 @@
 
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!--
@@ -773,6 +773,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="http://tanayparikh.com"><img src="https://avatars.githubusercontent.com/u/14852843?v=4?s=100" width="100px;" alt="Tanay Parikh"/><br /><sub><b>Tanay Parikh</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=TanayParikh" title="Documentation">📖</a></td>
       <td align="center"><a href="https://github.com/taori"><img src="https://avatars.githubusercontent.com/u/5545184?v=4?s=100" width="100px;" alt="Andreas Müller"/><br /><sub><b>Andreas Müller</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Ataori" title="Bug reports">🐛</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=taori" title="Code">💻</a></td>
       <td align="center"><a href="https://www.mahmudx.com"><img src="https://avatars.githubusercontent.com/u/16564582?v=4?s=100" width="100px;" alt="Mahmudul Hasan"/><br /><sub><b>Mahmudul Hasan</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=MahmudX" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://github.com/fabiansanchez18"><img src="https://avatars.githubusercontent.com/u/106093861?v=4?s=100" width="100px;" alt="fabiansanchez18"/><br /><sub><b>fabiansanchez18</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Afabiansanchez18" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
