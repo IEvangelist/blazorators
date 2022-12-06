@@ -3,7 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-public class DotDotDotToken : Token
+public class TypeScriptDiagnostic
 {
-    public DotDotDotToken() => ((INode)this).Kind = TypeScriptSyntaxKind.DotDotDotToken;
 }

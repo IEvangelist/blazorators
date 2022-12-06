@@ -3,10 +3,10 @@
 
 public interface IType
 {
-    internal TypeFlags Flags { get; set; }
-    internal int Id { get; set; }
-    internal Symbol Symbol { get; set; }
-    internal IDestructuringPattern Pattern { get; set; }
-    internal Symbol AliasSymbol { get; set; }
-    internal TsType[] AliasTypeArguments { get; set; }
+    public TypeFlags Flags { get; set; }
+    public int Id { get; set; }
+    public Symbol Symbol { get; set; }
+    public IDestructuringPattern Pattern { get; set; }
+    public Symbol AliasSymbol { get; set; }
+    public TsType[] AliasTypeArguments { get; set; }
 }

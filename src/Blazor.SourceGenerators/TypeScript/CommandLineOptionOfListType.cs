@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class CommandLineOptionOfListType : CommandLineOptionBase
+public class CommandLineOptionOfListType : CommandLineOptionBase
 {
-    internal CommandLineOptionBase Element { get; set; } = default!;
+    public CommandLineOptionBase Element? { get; set; }
 }

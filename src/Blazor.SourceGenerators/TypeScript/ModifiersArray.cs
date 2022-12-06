@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ModifiersArray : NodeArray<Modifier>
+public class ModifiersArray : NodeArray<Modifier>
 {
 }

@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocUnknownTag : JsDocTag
+public class JsDocUnknownTag : JsDocTag
 {
 }

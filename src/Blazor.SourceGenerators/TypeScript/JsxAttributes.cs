@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsxAttributes : ObjectLiteralExpressionBase<ObjectLiteralElement>
+public class JsxAttributes : ObjectLiteralExpressionBase<ObjectLiteralElement>
 {
-    internal JsxAttributes() => ((INode)this).Kind = SyntaxKind.JsxAttributes;
+    public JsxAttributes() => ((INode)this).Kind = TypeScriptSyntaxKind.JsxAttributes;
 }

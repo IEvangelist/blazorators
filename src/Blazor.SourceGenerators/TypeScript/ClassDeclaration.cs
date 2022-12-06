@@ -3,14 +3,14 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ClassDeclaration : Node, IClassLikeDeclaration, IDeclarationStatement
+public class ClassDeclaration : Node, IClassLikeDeclaration, IDeclarationStatement
 {
-    internal ClassDeclaration() => ((INode)this).Kind = SyntaxKind.ClassDeclaration;
+    public ClassDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.ClassDeclaration;
 
-    INode IDeclaration.Name { get; set; } = default!;
-    NodeArray<TypeParameterDeclaration> IClassLikeDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<HeritageClause> IClassLikeDeclaration.HeritageClauses { get; set; } = default!;
-    NodeArray<IClassElement> IClassLikeDeclaration.Members { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    object IStatement.StatementBrand { get; set; } = default!;
+    INode? IDeclaration.Name? { get; set; }
+    NodeArray<TypeParameterDeclaration>? IClassLikeDeclaration.TypeParameters? { get; set; }
+    NodeArray<HeritageClause>? IClassLikeDeclaration.HeritageClauses? { get; set; }
+    NodeArray<IClassElement>? IClassLikeDeclaration.Members? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    object IStatement.StatementBrand? { get; set; }
 }

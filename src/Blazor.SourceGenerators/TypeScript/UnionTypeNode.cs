@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class UnionTypeNode : TypeNode, IUnionOrIntersectionTypeNode
+public class UnionTypeNode : TypeNode, IUnionOrIntersectionTypeNode
 {
-    internal UnionTypeNode() => ((INode)this).Kind = SyntaxKind.UnionType;
+    public UnionTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.UnionType;
 
-    internal NodeArray<ITypeNode> Types { get; set; }
+    public NodeArray<ITypeNode> Types { get; set; }
 }

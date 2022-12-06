@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class LiteralLikeNode : Node, ILiteralLikeNode
+public class LiteralLikeNode : Node, ILiteralLikeNode
 {
-    string ILiteralLikeNode.Text { get; set; } = default!;
+    string ILiteralLikeNode.Text? { get; set; }
     bool ILiteralLikeNode.IsUnterminated { get; set; }
     bool ILiteralLikeNode.HasExtendedUnicodeEscape { get; set; }
     bool ILiteralLikeNode.IsOctalLiteral { get; set; }

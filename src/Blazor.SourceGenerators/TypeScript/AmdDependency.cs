@@ -3,8 +3,8 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal sealed class AmdDependency
+public sealed class AmdDependency
 {
-    internal string Path { get; set; } = default!;
-    internal string Name { get; set; } = default!;
+    public string Path? { get; set; }
+    public string Name? { get; set; }
 }

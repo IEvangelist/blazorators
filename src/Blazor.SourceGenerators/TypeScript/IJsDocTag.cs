@@ -3,7 +3,7 @@
 
 public interface IJsDocTag : INode
 {
-    internal AtToken AtToken { get; set; }
-    internal Identifier TagName { get; set; }
-    internal string Comment { get; set; }
+    public AtToken? AtToken { get; set; }
+    public Identifier? TagName { get; set; }
+    public string? Comment { get; set; }
 }

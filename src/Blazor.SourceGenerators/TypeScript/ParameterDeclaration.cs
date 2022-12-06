@@ -3,13 +3,13 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ParameterDeclaration : Declaration, IVariableLikeDeclaration
+public class ParameterDeclaration : Declaration, IVariableLikeDeclaration
 {
-    internal ParameterDeclaration() => ((INode)this).Kind = SyntaxKind.Parameter;
+    public ParameterDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.Parameter;
 
-    IPropertyName IVariableLikeDeclaration.PropertyName { get; set; } = default!;
-    DotDotDotToken IVariableLikeDeclaration.DotDotDotToken { get; set; } = default!;
-    QuestionToken IVariableLikeDeclaration.QuestionToken { get; set; } = default!;
-    ITypeNode IVariableLikeDeclaration.Type { get; set; } = default!;
-    IExpression IVariableLikeDeclaration.Initializer { get; set; } = default!;
+    IPropertyName IVariableLikeDeclaration.PropertyName? { get; set; }
+    DotDotDotToken IVariableLikeDeclaration.DotDotDotToken? { get; set; }
+    QuestionToken IVariableLikeDeclaration.QuestionToken? { get; set; }
+    ITypeNode IVariableLikeDeclaration.Type? { get; set; }
+    IExpression IVariableLikeDeclaration.Initializer? { get; set; }
 }

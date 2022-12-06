@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class IdentifierTypePredicate : TypePredicateBase
+public class IdentifierTypePredicate : TypePredicateBase
 {
-    internal IdentifierTypePredicate() => ((INode)this).Kind = TypePredicateKind.Identifier;
+    public IdentifierTypePredicate() => ((INode)this).Kind = TypePredicateKind.Identifier;
 
-    internal string ParameterName { get; set; } = default!;
-    internal int ParameterIndex { get; set; }
+    public string ParameterName? { get; set; }
+    public int ParameterIndex { get; set; }
 }

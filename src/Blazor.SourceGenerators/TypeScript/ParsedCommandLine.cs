@@ -1,13 +1,13 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ParsedCommandLine
+public class ParsedCommandLine
 {
-    internal CompilerOptions Options { get; set; }
-    internal TypeAcquisition TypeAcquisition { get; set; }
-    internal string[] FileNames { get; set; }
-    internal object Raw { get; set; }
-    internal Diagnostic[] Errors { get; set; }
-    internal MapLike<WatchDirectoryFlags> WildcardDirectories { get; set; }
-    internal bool CompileOnSave { get; set; }
+    public CompilerOptions? Options { get; set; }
+    public TypeAcquisition? TypeAcquisition { get; set; }
+    public string[]? FileNames { get; set; }
+    public object? Raw { get; set; }
+    public TypeScriptDiagnostic[]? Errors { get; set; }
+    public MapLike<WatchDirectoryFlags>? WildcardDirectories { get; set; }
+    public bool CompileOnSave { get; set; }
 }

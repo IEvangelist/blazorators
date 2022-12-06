@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeInferences
+public class TypeInferences
 {
-    internal TsType[] Primary { get; set; }
-    internal TsType[] Secondary { get; set; }
-    internal bool TopLevel { get; set; }
-    internal bool IsFixed { get; set; }
+    public TsType[]? Primary { get; set; }
+    public TsType[]? Secondary { get; set; }
+    public bool TopLevel { get; set; }
+    public bool IsFixed { get; set; }
 }

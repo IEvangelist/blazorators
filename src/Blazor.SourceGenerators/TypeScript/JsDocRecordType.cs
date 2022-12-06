@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocRecordType : JsDocType
+public class JsDocRecordType : JsDocType
 {
-    internal JsDocRecordType() => ((INode)this).Kind = SyntaxKind.JsDocRecordType;
+    public JsDocRecordType() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocRecordType;
 
-    internal TypeLiteralNode Literal { get; set; }
+    public TypeLiteralNode Literal { get; set; }
 }

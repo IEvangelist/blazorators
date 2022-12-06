@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class FunctionLikeDeclaration : SignatureDeclaration, IFunctionLikeDeclaration
+public class FunctionLikeDeclaration : SignatureDeclaration, IFunctionLikeDeclaration
 {
-    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
-    AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;
-    QuestionToken IFunctionLikeDeclaration.QuestionToken { get; set; } = default!;
-    IBlockOrExpression IFunctionLikeDeclaration.Body { get; set; } = default!;
+    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand? { get; set; }
+    AsteriskToken IFunctionLikeDeclaration.AsteriskToken? { get; set; }
+    QuestionToken IFunctionLikeDeclaration.QuestionToken? { get; set; }
+    IBlockOrExpression IFunctionLikeDeclaration.Body? { get; set; }
 }

@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeReferenceNode : TypeNode
+public class TypeReferenceNode : TypeNode
 {
-    internal TypeReferenceNode() => ((INode)this).Kind = SyntaxKind.TypeReference;
+    public TypeReferenceNode() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeReference;
 
-    internal IEntityName TypeName { get; set; }
-    internal NodeArray<ITypeNode> TypeArguments { get; set; }
+    public IEntityName TypeName { get; set; }
+    public NodeArray<ITypeNode> TypeArguments { get; set; }
 }

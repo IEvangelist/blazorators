@@ -3,13 +3,13 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Identifier : PrimaryExpression, IJsxTagNameExpression, IEntityName, IPropertyName
+public class Identifier : PrimaryExpression, IJsxTagNameExpression, IEntityName, IPropertyName
 {
-    internal Identifier() => ((INode)this).Kind = SyntaxKind.Identifier;
+    public Identifier() => ((INode)this).Kind = TypeScriptSyntaxKind.Identifier;
 
-    internal string Text { get; set; } = default!;
-    internal SyntaxKind OriginalKeywordKind { get; set; }
-    internal GeneratedIdentifierKind AutoGenerateKind { get; set; }
-    internal int AutoGenerateId { get; set; }
-    internal bool IsInJsDocNamespace { get; set; }
+    public string Text? { get; set; }
+    public TypeScriptSyntaxKind OriginalKeywordKind { get; set; }
+    public GeneratedIdentifierKind AutoGenerateKind { get; set; }
+    public int AutoGenerateId { get; set; }
+    public bool IsInJsDocNamespace { get; set; }
 }

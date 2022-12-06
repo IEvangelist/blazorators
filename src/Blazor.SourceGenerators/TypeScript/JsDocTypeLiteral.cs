@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocTypeLiteral : JsDocType
+public class JsDocTypeLiteral : JsDocType
 {
-    internal JsDocTypeLiteral() => ((INode)this).Kind = SyntaxKind.JsDocTypeLiteral;
+    public JsDocTypeLiteral() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocTypeLiteral;
 
-    internal NodeArray<JsDocPropertyTag> JsDocPropertyTags { get; set; }
-    internal JsDocTypeTag JsDocTypeTag { get; set; }
+    public NodeArray<JsDocPropertyTag> JsDocPropertyTags { get; set; }
+    public JsDocTypeTag JsDocTypeTag { get; set; }
 }

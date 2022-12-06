@@ -5,8 +5,8 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface ILiteralLikeNode : INode
 {
-    internal string Text { get; set; }
-    internal bool IsUnterminated { get; set; }
-    internal bool HasExtendedUnicodeEscape { get; set; }
-    internal bool IsOctalLiteral { get; set; }
+    public string Text { get; set; }
+    public bool IsUnterminated { get; set; }
+    public bool HasExtendedUnicodeEscape { get; set; }
+    public bool IsOctalLiteral { get; set; }
 }

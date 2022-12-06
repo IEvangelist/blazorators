@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.TypeScript;
-internal class JsDocTypeExpression : Node
+public class JsDocTypeExpression : Node
 {
-    internal JsDocTypeExpression() => ((INode)this).Kind = SyntaxKind.JsDocTypeExpression;
+    public JsDocTypeExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocTypeExpression;
 
-    internal IJsDocType Type { get; set; }
+    public IJsDocType Type { get; set; }
 }

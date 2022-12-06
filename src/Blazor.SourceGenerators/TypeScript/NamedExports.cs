@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class NamedExports : Node, INamedImportsOrExports
+public class NamedExports : Node, INamedImportsOrExports
 {
-    internal NamedExports() => ((INode)this).Kind = SyntaxKind.NamedExports;
+    public NamedExports() => ((INode)this).Kind = TypeScriptSyntaxKind.NamedExports;
 
-    internal NodeArray<ExportSpecifier> Elements { get; set; }
+    public NodeArray<ExportSpecifier> Elements { get; set; }
 }

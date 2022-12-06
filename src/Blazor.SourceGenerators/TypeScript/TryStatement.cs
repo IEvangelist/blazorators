@@ -1,11 +1,11 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TryStatement : Statement
+public class TryStatement : Statement
 {
-    internal TryStatement() => ((INode)this).Kind = SyntaxKind.TryStatement;
+    public TryStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.TryStatement;
 
-    internal Block TryBlock { get; set; }
-    internal CatchClause CatchClause { get; set; }
-    internal Block FinallyBlock { get; set; }
+    public Block TryBlock { get; set; }
+    public CatchClause CatchClause { get; set; }
+    public Block FinallyBlock { get; set; }
 }

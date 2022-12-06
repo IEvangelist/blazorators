@@ -3,22 +3,22 @@
 
 namespace Blazor.SourceGenerators.TypeScript.Parser;
 
-internal static class StringExtensions
+public static class StringExtensions
 {
-    internal static CharacterCode CharCodeAt(this string str, int pos) =>
+    public static CharacterCode CharCodeAt(this string str, int pos) =>
         (CharacterCode)str[pos];
 
-    internal static string SubString(this string str, int start, int? end = null) =>
-        end is null ? str[start..] : str[start..(int)end];
+    public static string SubString(this string str, int start, int? end = null) =>
+        end is null ? str.Substring(start) : str.Substring(start, (int)end);
 
-    internal static string[] Exec(this Regex regex, string text) =>
+    public static string[] Exec(this Regex regex, string text) =>
         regex.Match(text).Captures.Cast<string>().ToArray();
 
-    internal static bool Test(this Regex r, string text) => r.IsMatch(text);
+    public static bool Test(this Regex r, string text) => r.IsMatch(text);
 
-    internal static void Pop<T>(this List<T> list) => list.RemoveAt(0);
+    public static void Pop<T>(this List<T> list) => list.RemoveAt(0);
 
-    internal static string Slice(this string str, int start, int end = int.MaxValue)
+    public static string Slice(this string str, int start, int end = int.MaxValue)
     {
         if (start < 0)
             start += str.Length;
@@ -27,10 +27,10 @@ internal static class StringExtensions
 
         start = Math.Min(Math.Max(start, 0), str.Length);
         end = Math.Min(Math.Max(end, 0), str.Length);
-        return end <= start ? string.Empty : str[start..end];
+        return end <= start ? string.Empty : str.Substring(start, end);
     }
 
-    internal static string FromCharCode(params int[] codes)
+    public static string FromCharCode(params int[] codes)
     {
         var sb = new StringBuilder();
         foreach (var c in codes)

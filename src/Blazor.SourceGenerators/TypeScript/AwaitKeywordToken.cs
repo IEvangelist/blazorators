@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class AwaitKeywordToken : Token
+public class AwaitKeywordToken : Token
 {
-    internal AwaitKeywordToken() => ((INode)this).Kind = SyntaxKind.AwaitKeyword;
+    public AwaitKeywordToken() => ((INode)this).Kind = TypeScriptSyntaxKind.AwaitKeyword;
 }

@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EvolvingArrayType : ObjectType
+public class EvolvingArrayType : ObjectType
 {
-    internal TsType ElementType { get; set; }
-    internal TsType FinalArrayType { get; set; }
+    public TsType? ElementType { get; set; }
+    public TsType? FinalArrayType { get; set; }
 }

@@ -3,22 +3,22 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class GetAccessorDeclaration : Declaration,
+public class GetAccessorDeclaration : Declaration,
     IFunctionLikeDeclaration,
     IClassElement,
     IObjectLiteralElement,
     IAccessorDeclaration
 {
-    internal GetAccessorDeclaration() => ((INode)this).Kind = SyntaxKind.GetAccessor;
+    public GetAccessorDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.GetAccessor;
 
-    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
-    AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;
-    QuestionToken IFunctionLikeDeclaration.QuestionToken { get; set; } = default!;
-    IBlockOrExpression IFunctionLikeDeclaration.Body { get; set; } = default!;
-    IBlockOrExpression IAccessorDeclaration.Body { get; set; } = default!;
-    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;
-    ITypeNode ISignatureDeclaration.Type { get; set; } = default!;
-    object IClassElement.ClassElementBrand { get; set; } = default!;
-    object IObjectLiteralElement.ObjectLiteralBrandBrand { get; set; } = default!;
+    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand? { get; set; }
+    AsteriskToken IFunctionLikeDeclaration.AsteriskToken? { get; set; }
+    QuestionToken IFunctionLikeDeclaration.QuestionToken? { get; set; }
+    IBlockOrExpression IFunctionLikeDeclaration.Body? { get; set; }
+    IBlockOrExpression IAccessorDeclaration.Body? { get; set; }
+    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters? { get; set; }
+    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters? { get; set; }
+    ITypeNode ISignatureDeclaration.Type? { get; set; }
+    object IClassElement.ClassElementBrand? { get; set; }
+    object IObjectLiteralElement.ObjectLiteralBrandBrand? { get; set; }
 }

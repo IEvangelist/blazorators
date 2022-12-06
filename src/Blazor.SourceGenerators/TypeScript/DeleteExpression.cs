@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class DeleteExpression : UnaryExpression
+public class DeleteExpression : UnaryExpression
 {
-    internal DeleteExpression() => ((INode)this).Kind = SyntaxKind.DeleteExpression;
+    public DeleteExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.DeleteExpression;
 
-    internal IExpression Expression { get; set; } = default!;
+    public IExpression Expression? { get; set; }
 }

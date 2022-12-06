@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class WithStatement : Statement
+public class WithStatement : Statement
 {
-    internal WithStatement() => ((INode)this).Kind = SyntaxKind.WithStatement;
+    public WithStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.WithStatement;
 
-    internal IExpression Expression { get; set; }
-    internal IStatement Statement { get; set; }
+    public IExpression Expression { get; set; }
+    public IStatement Statement { get; set; }
 }

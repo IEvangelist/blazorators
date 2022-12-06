@@ -4,9 +4,9 @@
 namespace Blazor.SourceGenerators.TypeScript;
 
 
-internal class JsDocTupleType : JsDocType
+public class JsDocTupleType : JsDocType
 {
-    internal JsDocTupleType() => ((INode)this).Kind = SyntaxKind.JsDocTupleType;
+    public JsDocTupleType() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocTupleType;
 
-    internal NodeArray<IJsDocType> Types { get; set; }
+    public NodeArray<IJsDocType> Types { get; set; }
 }

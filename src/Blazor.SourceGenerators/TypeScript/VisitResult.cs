@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class VisitResult : object
+public class VisitResult : object
 {
 }

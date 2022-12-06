@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class QuestionToken : Token
+public class QuestionToken : Token
 {
-    internal QuestionToken() => ((INode)this).Kind = SyntaxKind.QuestionToken;
+    public QuestionToken() => ((INode)this).Kind = TypeScriptSyntaxKind.QuestionToken;
 }

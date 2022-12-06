@@ -1,16 +1,16 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class CommandLineOptionBase
+public class CommandLineOptionBase
 {
-    internal string Name { get; set; }
-    internal object Type { get; set; } //  "string" | "number" | "boolean" | "object" | "list" | Map<number | string>
-    internal bool IsFilePath { get; set; }
-    internal string ShortName { get; set; }
-    internal DiagnosticMessage Description { get; set; }
-    internal DiagnosticMessage ParamType { get; set; }
-    internal bool IsTsConfigOnly { get; set; }
-    internal bool IsCommandLineOnly { get; set; }
-    internal bool ShowInSimplifiedHelpView { get; set; }
-    internal DiagnosticMessage Category { get; set; }
+    public string Name? { get; set; }
+    public object Type? { get; set; } //  "string" | "number" | "boolean" | "object" | "list" | Map<number | string>
+    public bool IsFilePath { get; set; }
+    public string ShortName? { get; set; }
+    //public DiagnosticMessage Description { get; set; }
+    //public DiagnosticMessage ParamType { get; set; }
+    public bool IsTsConfigOnly { get; set; }
+    public bool IsCommandLineOnly { get; set; }
+    public bool ShowInSimplifiedHelpView { get; set; }
+    //public DiagnosticMessage Category { get; set; }
 }

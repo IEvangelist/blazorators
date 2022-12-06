@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PostfixUnaryExpression : IncrementExpression
+public class PostfixUnaryExpression : IncrementExpression
 {
-    internal PostfixUnaryExpression() => ((INode)this).Kind = SyntaxKind.PostfixUnaryExpression;
+    public PostfixUnaryExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.PostfixUnaryExpression;
 
-    internal IExpression Operand { get; set; } = default!;
-    internal SyntaxKind Operator { get; set; } = default!;
+    public IExpression Operand? { get; set; }
+    public TypeScriptSyntaxKind Operator? { get; set; }
 }

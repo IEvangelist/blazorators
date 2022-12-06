@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class LiteralTypeNode : TypeNode
+public class LiteralTypeNode : TypeNode
 {
-    internal LiteralTypeNode() => ((INode)this).Kind = SyntaxKind.LiteralType;
+    public LiteralTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.LiteralType;
 
-    internal IExpression Literal { get; set; }
+    public IExpression Literal { get; set; }
 }

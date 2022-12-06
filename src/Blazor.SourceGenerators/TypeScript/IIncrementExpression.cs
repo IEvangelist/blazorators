@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IIncrementExpression : IUnaryExpression
 {
-    internal object IncrementExpressionBrand { get; set; }
+    public object? IncrementExpressionBrand { get; set; }
 }

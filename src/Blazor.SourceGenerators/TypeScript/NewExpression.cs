@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class NewExpression : CallExpression, IPrimaryExpression, IDeclaration
+public class NewExpression : CallExpression, IPrimaryExpression, IDeclaration
 {
-    internal NewExpression() => ((INode)this).Kind = SyntaxKind.NewExpression;
+    public NewExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.NewExpression;
 
-    object IPrimaryExpression.PrimaryExpressionBrand { get; set; } = default!;
+    object IPrimaryExpression.PrimaryExpressionBrand? { get; set; }
 }

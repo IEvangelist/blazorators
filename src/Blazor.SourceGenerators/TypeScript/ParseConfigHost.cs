@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ParseConfigHost
+public class ParseConfigHost
 {
-    internal bool UseCaseSensitiveFileNames { get; set; }
+    public bool UseCaseSensitiveFileNames { get; set; }
 }

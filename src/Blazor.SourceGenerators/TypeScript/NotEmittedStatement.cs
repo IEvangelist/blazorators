@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class NotEmittedStatement : Statement
+public class NotEmittedStatement : Statement
 {
-    internal NotEmittedStatement() => ((INode)this).Kind = SyntaxKind.NotEmittedStatement;
+    public NotEmittedStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.NotEmittedStatement;
 }

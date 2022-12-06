@@ -3,8 +3,8 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsFileExtensionInfo
+public class JsFileExtensionInfo
 {
-    internal string Extension { get; set; }
-    internal bool IsMixedContent { get; set; }
+    public string? Extension { get; set; }
+    public bool IsMixedContent { get; set; }
 }

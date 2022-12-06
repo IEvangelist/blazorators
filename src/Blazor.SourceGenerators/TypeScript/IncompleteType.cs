@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class IncompleteType
+public class IncompleteType
 {
-    internal TypeFlags Flags { get; set; }
-    internal TsType Type { get; set; }
+    public TypeFlags Flags { get; set; }
+    public TsType? Type { get; set; }
 }

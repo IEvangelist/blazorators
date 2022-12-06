@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class TransformerFactory<T>
+public class TransformerFactory<T>
 {
 }

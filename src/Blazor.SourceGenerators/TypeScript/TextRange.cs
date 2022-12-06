@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class TextRange : ITextRange
+public class TextRange : ITextRange
 {
     int? ITextRange.Pos { get; set; }
     int? ITextRange.End { get; set; }

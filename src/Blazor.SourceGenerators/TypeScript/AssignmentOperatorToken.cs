@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class AssignmentOperatorToken : Token
+public class AssignmentOperatorToken : Token
 {
 }

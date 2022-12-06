@@ -1,11 +1,11 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ForOfStatement : IterationStatement
+public class ForOfStatement : IterationStatement
 {
-    internal ForOfStatement() => ((INode)this).Kind = SyntaxKind.ForOfStatement;
+    public ForOfStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.ForOfStatement;
 
-    internal AwaitKeywordToken AwaitModifier { get; set; }
-    internal /*ForInitializer*/IVariableDeclarationListOrExpression Initializer { get; set; }
-    internal IExpression Expression { get; set; }
+    public AwaitKeywordToken AwaitModifier { get; set; }
+    public /*ForInitializer*/IVariableDeclarationListOrExpression Initializer { get; set; }
+    public IExpression Expression { get; set; }
 }

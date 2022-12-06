@@ -3,11 +3,11 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class IfStatement : Statement
+public class IfStatement : Statement
 {
-    internal IfStatement() => ((INode)this).Kind = SyntaxKind.IfStatement;
+    public IfStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.IfStatement;
 
-    internal IExpression Expression { get; set; }
-    internal IStatement ThenStatement { get; set; }
-    internal IStatement ElseStatement { get; set; }
+    public IExpression Expression { get; set; }
+    public IStatement ThenStatement { get; set; }
+    public IStatement ElseStatement { get; set; }
 }

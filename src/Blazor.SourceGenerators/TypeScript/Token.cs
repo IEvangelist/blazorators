@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Token : Node
+public class Token : Node
 {
 }

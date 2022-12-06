@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ExternalModuleReference : Node
+public class ExternalModuleReference : Node
 {
-    internal ExternalModuleReference() => ((INode)this).Kind = SyntaxKind.ExternalModuleReference;
+    public ExternalModuleReference() => ((INode)this).Kind = TypeScriptSyntaxKind.ExternalModuleReference;
 
-    internal IExpression Expression { get; set; }
+    public IExpression? Expression { get; set; }
 }

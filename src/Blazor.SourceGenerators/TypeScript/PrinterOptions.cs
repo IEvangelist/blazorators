@@ -1,12 +1,12 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PrinterOptions
+public class PrinterOptions
 {
-    internal ScriptTarget Target { get; set; }
-    internal bool RemoveComments { get; set; }
-    internal NewLineKind NewLine { get; set; }
-    internal bool SourceMap { get; set; }
-    internal bool InlineSourceMap { get; set; }
-    internal bool ExtendedDiagnostics { get; set; }
+    public ScriptTarget Target { get; set; }
+    public bool RemoveComments { get; set; }
+    public NewLineKind NewLine { get; set; }
+    public bool SourceMap { get; set; }
+    public bool InlineSourceMap { get; set; }
+    public bool ExtendedDiagnostics { get; set; }
 }

@@ -3,13 +3,13 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class PropertyDeclaration : ClassElement, IVariableLikeDeclaration
+public class PropertyDeclaration : ClassElement, IVariableLikeDeclaration
 {
-    internal PropertyDeclaration() => ((INode)this).Kind = SyntaxKind.PropertyDeclaration;
+    public PropertyDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.PropertyDeclaration;
 
-    internal QuestionToken QuestionToken { get; set; }
-    internal ITypeNode Type { get; set; }
-    internal IExpression Initializer { get; set; }
-    internal IPropertyName PropertyName { get; set; }
-    internal DotDotDotToken DotDotDotToken { get; set; }
+    public QuestionToken QuestionToken { get; set; }
+    public ITypeNode Type { get; set; }
+    public IExpression Initializer { get; set; }
+    public IPropertyName PropertyName { get; set; }
+    public DotDotDotToken DotDotDotToken { get; set; }
 }

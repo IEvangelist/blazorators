@@ -3,19 +3,19 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class MissingDeclaration : Node,
+public class MissingDeclaration : Node,
     IDeclarationStatement,
     IClassElement,
     IObjectLiteralElement,
     ITypeElement
 {
-    internal MissingDeclaration() => ((INode)this).Kind = SyntaxKind.MissingDeclaration;
+    public MissingDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.MissingDeclaration;
 
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
-    object IStatement.StatementBrand { get; set; } = default!;
-    object IClassElement.ClassElementBrand { get; set; } = default!;
-    object IObjectLiteralElement.ObjectLiteralBrandBrand { get; set; } = default!;
-    object ITypeElement.TypeElementBrand { get; set; } = default!;
-    QuestionToken ITypeElement.QuestionToken { get; set; } = default!;
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
+    object IStatement.StatementBrand? { get; set; }
+    object IClassElement.ClassElementBrand? { get; set; }
+    object IObjectLiteralElement.ObjectLiteralBrandBrand? { get; set; }
+    object ITypeElement.TypeElementBrand? { get; set; }
+    QuestionToken ITypeElement.QuestionToken? { get; set; }
 }

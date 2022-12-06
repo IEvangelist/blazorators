@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ExportSpecifier : Declaration, ImportOrExportSpecifier
+public class ExportSpecifier : Declaration, ImportOrExportSpecifier
 {
-    internal ExportSpecifier() => ((INode)this).Kind = SyntaxKind.ExportSpecifier;
+    public ExportSpecifier() => ((INode)this).Kind = TypeScriptSyntaxKind.ExportSpecifier;
 
-    Identifier ImportOrExportSpecifier.PropertyName { get; set; } = default!;
+    Identifier ImportOrExportSpecifier.PropertyName? { get; set; }
 }

@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class SymbolTable : Map
+public class SymbolTable : Map
 {
 }

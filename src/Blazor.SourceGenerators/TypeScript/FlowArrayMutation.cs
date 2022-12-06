@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class FlowArrayMutation : FlowNode
+public class FlowArrayMutation : FlowNode
 {
-    internal Node Node { get; set; }
-    internal FlowNode Antecedent { get; set; }
+    public Node? Node { get; set; }
+    public FlowNode? Antecedent { get; set; }
 }

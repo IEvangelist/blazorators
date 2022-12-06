@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class IndexedAccessTypeNode : TypeNode
+public class IndexedAccessTypeNode : TypeNode
 {
-    internal IndexedAccessTypeNode() => ((INode)this).Kind = SyntaxKind.IndexedAccessType;
+    public IndexedAccessTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.IndexedAccessType;
 
-    internal ITypeNode ObjectType { get; set; }
-    internal ITypeNode IndexType { get; set; }
+    public ITypeNode ObjectType { get; set; }
+    public ITypeNode IndexType { get; set; }
 }

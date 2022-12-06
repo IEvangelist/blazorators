@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ThisTypePredicate : TypePredicateBase
+public class ThisTypePredicate : TypePredicateBase
 {
-    internal ThisTypePredicate() => ((INode)this).Kind = TypePredicateKind.This;
+    public ThisTypePredicate() => ((INode)this).Kind = TypePredicateKind.This;
 }

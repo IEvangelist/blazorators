@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Expression : Node, IExpression
+public class Expression : Node, IExpression
 {
-    object IExpression.ExpressionBrand { get; set; } = default!;
+    object IExpression.ExpressionBrand? { get; set; }
 }

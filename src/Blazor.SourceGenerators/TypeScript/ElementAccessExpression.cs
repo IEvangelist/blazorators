@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ElementAccessExpression : MemberExpression
+public class ElementAccessExpression : MemberExpression
 {
-    internal ElementAccessExpression() => ((INode)this).Kind = SyntaxKind.ElementAccessExpression;
+    public ElementAccessExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.ElementAccessExpression;
 
-    internal IExpression Expression { get; set; } = default!;
-    internal IExpression ArgumentExpression { get; set; } = default!;
+    public IExpression Expression? { get; set; }
+    public IExpression ArgumentExpression? { get; set; }
 }

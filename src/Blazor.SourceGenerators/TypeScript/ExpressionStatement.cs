@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ExpressionStatement : Statement
+public class ExpressionStatement : Statement
 {
-    internal ExpressionStatement() => ((INode)this).Kind = SyntaxKind.ExpressionStatement;
+    public ExpressionStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.ExpressionStatement;
 
-    internal IExpression Expression { get; set; }
+    public IExpression? Expression { get; set; }
 }

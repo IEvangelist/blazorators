@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IBreakOrContinueStatement : IStatement
 {
-    internal Identifier Label { get; set; }
+    public Identifier Label { get; set; }
 }

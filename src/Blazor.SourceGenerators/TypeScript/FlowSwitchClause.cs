@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class FlowSwitchClause : FlowNode
+public class FlowSwitchClause : FlowNode
 {
-    internal SwitchStatement SwitchStatement { get; set; }
-    internal int ClauseStart { get; set; }
-    internal int ClauseEnd { get; set; }
-    internal FlowNode Antecedent { get; set; }
+    public SwitchStatement? SwitchStatement { get; set; }
+    public int ClauseStart { get; set; }
+    public int ClauseEnd { get; set; }
+    public FlowNode? Antecedent { get; set; }
 }

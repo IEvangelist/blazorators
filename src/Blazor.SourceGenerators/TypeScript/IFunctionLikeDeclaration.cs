@@ -5,8 +5,8 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IFunctionLikeDeclaration : ISignatureDeclaration
 {
-    internal object FunctionLikeDeclarationBrand { get; set; }
-    internal AsteriskToken AsteriskToken { get; set; }
-    internal QuestionToken QuestionToken { get; set; }
-    internal IBlockOrExpression Body { get; set; }
+    object? FunctionLikeDeclarationBrand { get; set; }
+    AsteriskToken? AsteriskToken { get; set; }
+    QuestionToken? QuestionToken { get; set; }
+    IBlockOrExpression? Body { get; set; }
 }

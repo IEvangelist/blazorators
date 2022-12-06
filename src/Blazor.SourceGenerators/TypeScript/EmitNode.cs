@@ -1,16 +1,16 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EmitNode
+public class EmitNode
 {
-    internal Node[] AnnotatedNodes { get; set; }
-    internal EmitFlags Flags { get; set; }
-    internal SynthesizedComment[] LeadingComments { get; set; }
-    internal SynthesizedComment[] TrailingComments { get; set; }
-    internal TextRange CommentRange { get; set; }
-    internal TextRange SourceMapRange { get; set; }
-    internal TextRange[] TokenSourceMapRanges { get; set; }
-    internal int ConstantValue { get; set; }
-    internal Identifier ExternalHelpersModuleName { get; set; }
-    internal EmitHelper[] Helpers { get; set; }
+    public Node[] AnnotatedNodes { get; set; } = Array.Empty<Node>();
+    public EmitFlags Flags { get; set; }
+    public SynthesizedComment[] LeadingComments { get; set; } = Array.Empty<SynthesizedComment>();
+    public SynthesizedComment[] TrailingComments { get; set; } = Array.Empty<SynthesizedComment>();
+    public TextRange? CommentRange { get; set; }
+    public TextRange? SourceMapRange { get; set; }
+    public TextRange[] TokenSourceMapRanges { get; set; } = Array.Empty<Node>();
+    public int ConstantValue { get; set; }
+    public Identifier? ExternalHelpersModuleName { get; set; }
+    public EmitHelper[] Helpers { get; set; } = Array.Empty<EmitHelper>();
 }

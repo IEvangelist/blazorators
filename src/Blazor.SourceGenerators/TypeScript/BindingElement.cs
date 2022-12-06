@@ -3,17 +3,17 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class BindingElement : Declaration, IArrayBindingElement, IVariableLikeDeclaration
+public class BindingElement : Declaration, IArrayBindingElement, IVariableLikeDeclaration
 {
-    internal BindingElement() => ((INode)this).Kind = SyntaxKind.BindingElement;
+    public BindingElement() => ((INode)this).Kind = TypeScriptSyntaxKind.BindingElement;
 
-    IPropertyName IVariableLikeDeclaration.PropertyName { get; set; } = default!;
+    IPropertyName IVariableLikeDeclaration.PropertyName? { get; set; }
 
-    DotDotDotToken IVariableLikeDeclaration.DotDotDotToken { get; set; } = default!;
+    DotDotDotToken IVariableLikeDeclaration.DotDotDotToken? { get; set; }
 
-    IExpression IVariableLikeDeclaration.Initializer { get; set; } = default!;
+    IExpression IVariableLikeDeclaration.Initializer? { get; set; }
 
-    QuestionToken IVariableLikeDeclaration.QuestionToken { get; set; } = default!;
+    QuestionToken IVariableLikeDeclaration.QuestionToken? { get; set; }
 
-    ITypeNode IVariableLikeDeclaration.Type { get; set; } = default!;
+    ITypeNode IVariableLikeDeclaration.Type? { get; set; }
 }

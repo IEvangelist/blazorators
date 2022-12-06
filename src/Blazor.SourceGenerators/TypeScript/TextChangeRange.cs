@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TextChangeRange
+public class TextChangeRange
 {
-    internal TextSpan Span { get; set; }
-    internal int NewLength { get; set; }
+    public TextSpan? Span { get; set; }
+    public int NewLength { get; set; }
 }

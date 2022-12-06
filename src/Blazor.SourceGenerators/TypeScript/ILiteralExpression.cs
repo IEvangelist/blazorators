@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface ILiteralExpression : ILiteralLikeNode, IPrimaryExpression
 {
-    internal object LiteralExpressionBrand { get; set; }
+    public object LiteralExpressionBrand { get; set; }
 }

@@ -3,6 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class MapLike<T> : List<T>
+public class MapLike<T> : List<T>
 {
+    public static MapLike<T> Empty => new();
 }

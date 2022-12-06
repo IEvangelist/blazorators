@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TaggedTemplateExpression : MemberExpression
+public class TaggedTemplateExpression : MemberExpression
 {
-    internal TaggedTemplateExpression() => ((INode)this).Kind = SyntaxKind.TaggedTemplateExpression;
+    public TaggedTemplateExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.TaggedTemplateExpression;
 
-    internal IExpression Tag { get; set; } //LeftHandSideExpression
-    internal Node Template { get; set; } //TemplateLiteral
+    public IExpression Tag { get; set; } //LeftHandSideExpression
+    public Node Template { get; set; } //TemplateLiteral
 }

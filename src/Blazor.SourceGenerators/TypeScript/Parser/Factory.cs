@@ -3,11 +3,11 @@
 
 namespace Blazor.SourceGenerators.TypeScript.Parser;
 
-internal static class Factory
+public static class Factory
 {
-    internal static INode SkipPartiallyEmittedExpressions(INode node)
+    public static INode SkipPartiallyEmittedExpressions(INode node)
     {
-        while (node is { Kind: SyntaxKind.PartiallyEmittedExpression } and
+        while (node is { Kind: TypeScriptSyntaxKind.PartiallyEmittedExpression } and
             PartiallyEmittedExpression expression)
         {
             node = expression.Expression;

@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ClassLikeDeclaration : Declaration, IClassLikeDeclaration
+public class ClassLikeDeclaration : Declaration, IClassLikeDeclaration
 {
-    NodeArray<TypeParameterDeclaration> IClassLikeDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<HeritageClause> IClassLikeDeclaration.HeritageClauses { get; set; } = default!;
-    NodeArray<IClassElement> IClassLikeDeclaration.Members { get; set; } = default!;
+    NodeArray<TypeParameterDeclaration>? IClassLikeDeclaration.TypeParameters? { get; set; }
+    NodeArray<HeritageClause>? IClassLikeDeclaration.HeritageClauses? { get; set; }
+    NodeArray<IClassElement>? IClassLikeDeclaration.Members? { get; set; }
 }

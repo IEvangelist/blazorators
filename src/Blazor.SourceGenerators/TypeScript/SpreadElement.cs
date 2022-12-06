@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class SpreadElement : Expression
+public class SpreadElement : Expression
 {
-    internal SpreadElement() => ((INode)this).Kind = SyntaxKind.SpreadElement;
+    public SpreadElement() => ((INode)this).Kind = TypeScriptSyntaxKind.SpreadElement;
 
-    internal IExpression Expression { get; set; } = default!;
+    public IExpression Expression? { get; set; }
 }

@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TemplateSpan : Node
+public class TemplateSpan : Node
 {
-    internal TemplateSpan() => ((INode)this).Kind = SyntaxKind.TemplateSpan;
+    public TemplateSpan() => ((INode)this).Kind = TypeScriptSyntaxKind.TemplateSpan;
 
-    internal IExpression Expression { get; set; }
-    internal ILiteralLikeNode Literal { get; set; } // TemplateMiddle | TemplateTail
+    public IExpression Expression { get; set; }
+    public ILiteralLikeNode Literal { get; set; } // TemplateMiddle | TemplateTail
 }

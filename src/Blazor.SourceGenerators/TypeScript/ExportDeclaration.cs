@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ExportDeclaration : DeclarationStatement
+public class ExportDeclaration : DeclarationStatement
 {
-    internal ExportDeclaration() => ((INode)this).Kind = SyntaxKind.ExportDeclaration;
+    public ExportDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.ExportDeclaration;
 
-    internal NamedExports ExportClause { get; set; }
-    internal IExpression ModuleSpecifier { get; set; }
+    public NamedExports? ExportClause { get; set; }
+    public IExpression? ModuleSpecifier { get; set; }
 }

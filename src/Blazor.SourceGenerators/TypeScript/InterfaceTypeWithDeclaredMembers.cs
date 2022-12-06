@@ -1,11 +1,11 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class InterfaceTypeWithDeclaredMembers : InterfaceType
+public class InterfaceTypeWithDeclaredMembers : InterfaceType
 {
-    internal Symbol[] DeclaredProperties { get; set; }
-    internal Signature[] DeclaredCallSignatures { get; set; }
-    internal Signature[] DeclaredConstructSignatures { get; set; }
-    internal IndexInfo DeclaredStringIndexInfo { get; set; }
-    internal IndexInfo DeclaredNumberIndexInfo { get; set; }
+    public Symbol[]? DeclaredProperties { get; set; }
+    public Signature[]? DeclaredCallSignatures { get; set; }
+    public Signature[]? DeclaredConstructSignatures { get; set; }
+    public IndexInfo? DeclaredStringIndexInfo { get; set; }
+    public IndexInfo? DeclaredNumberIndexInfo { get; set; }
 }

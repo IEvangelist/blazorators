@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class IndexInfo
+public class IndexInfo
 {
-    internal TsType Type { get; set; }
-    internal bool IsReadonly { get; set; }
-    internal SignatureDeclaration Declaration { get; set; }
+    public TsType? Type { get; set; }
+    public bool IsReadonly { get; set; }
+    public SignatureDeclaration? Declaration { get; set; }
 }

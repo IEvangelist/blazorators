@@ -3,19 +3,19 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ClassExpression : Node, IClassLikeDeclaration, IPrimaryExpression
+public class ClassExpression : Node, IClassLikeDeclaration, IPrimaryExpression
 {
-    internal ClassExpression() => ((INode)this).Kind = SyntaxKind.ClassExpression;
+    public ClassExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.ClassExpression;
 
-    NodeArray<TypeParameterDeclaration> IClassLikeDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<HeritageClause> IClassLikeDeclaration.HeritageClauses { get; set; } = default!;
-    NodeArray<IClassElement> IClassLikeDeclaration.Members { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
-    object IPrimaryExpression.PrimaryExpressionBrand { get; set; } = default!;
-    object IMemberExpression.MemberExpressionBrand { get; set; } = default!;
-    object ILeftHandSideExpression.LeftHandSideExpressionBrand { get; set; } = default!;
-    object IIncrementExpression.IncrementExpressionBrand { get; set; } = default!;
-    object IUnaryExpression.UnaryExpressionBrand { get; set; } = default!;
-    object IExpression.ExpressionBrand { get; set; } = default!;
+    NodeArray<TypeParameterDeclaration>? IClassLikeDeclaration.TypeParameters? { get; set; }
+    NodeArray<HeritageClause>? IClassLikeDeclaration.HeritageClauses? { get; set; }
+    NodeArray<IClassElement>? IClassLikeDeclaration.Members? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
+    object IPrimaryExpression.PrimaryExpressionBrand? { get; set; }
+    object IMemberExpression.MemberExpressionBrand? { get; set; }
+    object ILeftHandSideExpression.LeftHandSideExpressionBrand? { get; set; }
+    object IIncrementExpression.IncrementExpressionBrand? { get; set; }
+    object IUnaryExpression.UnaryExpressionBrand? { get; set; }
+    object IExpression.ExpressionBrand? { get; set; }
 }

@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class IndexedAccessType : TypeVariable
+public class IndexedAccessType : TypeVariable
 {
-    internal TsType ObjectType { get; set; }
-    internal TsType IndexType { get; set; }
-    internal TsType Constraint { get; set; }
+    public TsType? ObjectType { get; set; }
+    public TsType? IndexType { get; set; }
+    public TsType? Constraint { get; set; }
 }

@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Bundle : Node
+public class Bundle : Node
 {
-    internal Bundle() => ((INode)this).Kind = SyntaxKind.Bundle;
+    public Bundle() => ((INode)this).Kind = TypeScriptSyntaxKind.Bundle;
 
-    internal SourceFile[] SourceFiles { get; set; } = default!;
+    public SourceFile[] SourceFiles? { get; set; }
 }

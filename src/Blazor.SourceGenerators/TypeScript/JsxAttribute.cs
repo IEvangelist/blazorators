@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsxAttribute : ObjectLiteralElement
+public class JsxAttribute : ObjectLiteralElement
 {
-    internal JsxAttribute() => ((INode)this).Kind = SyntaxKind.JsxAttribute;
+    public JsxAttribute() => ((INode)this).Kind = TypeScriptSyntaxKind.JsxAttribute;
 
-    internal Node Initializer { get; set; }
+    public Node Initializer { get; set; }
 }

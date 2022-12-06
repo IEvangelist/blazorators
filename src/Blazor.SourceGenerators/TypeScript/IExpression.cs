@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IExpression : IBlockOrExpression, IVariableDeclarationListOrExpression
 {
-    internal object ExpressionBrand { get; set; }
+    public object? ExpressionBrand { get; set; }
 }

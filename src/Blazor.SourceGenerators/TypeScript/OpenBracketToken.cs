@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class OpenBracketToken : Token
+public class OpenBracketToken : Token
 {
 }

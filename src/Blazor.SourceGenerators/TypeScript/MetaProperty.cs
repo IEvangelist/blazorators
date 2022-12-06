@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class MetaProperty : PrimaryExpression
+public class MetaProperty : PrimaryExpression
 {
-    internal MetaProperty() => ((INode)this).Kind = SyntaxKind.MetaProperty;
+    public MetaProperty() => ((INode)this).Kind = TypeScriptSyntaxKind.MetaProperty;
 
-    internal SyntaxKind KeywordToken { get; set; }
-    internal Identifier Name { get; set; }
+    public TypeScriptSyntaxKind KeywordToken { get; set; }
+    public Identifier Name { get; set; }
 }

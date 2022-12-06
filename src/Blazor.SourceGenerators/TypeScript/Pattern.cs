@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class Pattern
+public class Pattern
 {
-    internal string Prefix { get; set; }
-    internal string Suffix { get; set; }
+    public string? Prefix { get; set; }
+    public string? Suffix { get; set; }
 }

@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocTypeTag : JsDocTag
+public class JsDocTypeTag : JsDocTag
 {
-    internal JsDocTypeTag() => ((INode)this).Kind = SyntaxKind.JsDocTypeTag;
+    public JsDocTypeTag() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocTypeTag;
 
-    internal JsDocTypeExpression? TypeExpression { get; set; }
+    public JsDocTypeExpression? TypeExpression { get; set; }
 }

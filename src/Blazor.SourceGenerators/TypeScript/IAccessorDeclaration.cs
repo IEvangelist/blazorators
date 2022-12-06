@@ -8,5 +8,5 @@ public interface IAccessorDeclaration :
     IClassElement,
     IObjectLiteralElementLike
 {
-    internal IBlockOrExpression Body { get; set; }
+    public IBlockOrExpression Body { get; set; }
 }

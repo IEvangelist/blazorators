@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class CompilerHost : ModuleResolutionHost
+public class CompilerHost : ModuleResolutionHost
 {
-    internal WriteFileCallback WriteFile { get; set; }
+    public WriteFileCallback WriteFile? { get; set; }
 }

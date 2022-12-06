@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ResolvedModuleWithFailedLookupLocations
+public class ResolvedModuleWithFailedLookupLocations
 {
-    internal ResolvedModule ResolvedModule { get; set; } // ResolvedModuleFull
-    internal string[] FailedLookupLocations { get; set; }
+    public ResolvedModule? ResolvedModule { get; set; } // ResolvedModuleFull
+    public string[]? FailedLookupLocations { get; set; }
 }

@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class YieldExpression : Expression
+public class YieldExpression : Expression
 {
-    internal YieldExpression() => ((INode)this).Kind = SyntaxKind.YieldExpression;
+    public YieldExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.YieldExpression;
 
-    internal AsteriskToken AsteriskToken { get; set; }
-    internal IExpression Expression { get; set; }
+    public AsteriskToken AsteriskToken { get; set; }
+    public IExpression Expression { get; set; }
 }

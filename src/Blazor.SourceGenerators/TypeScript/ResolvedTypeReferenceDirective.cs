@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ResolvedTypeReferenceDirective
+public class ResolvedTypeReferenceDirective
 {
-    internal bool Primary { get; set; }
-    internal string ResolvedFileName { get; set; }
+    public bool Primary { get; set; }
+    public string? ResolvedFileName { get; set; }
 }

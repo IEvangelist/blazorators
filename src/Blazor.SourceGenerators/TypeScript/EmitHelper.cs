@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EmitHelper
+public class EmitHelper
 {
-    internal string Name { get; set; }
-    internal bool Scoped { get; set; }
-    internal string Text { get; set; }
-    internal int Priority { get; set; }
+    public string? Name { get; set; }
+    public bool Scoped { get; set; }
+    public string? Text { get; set; }
+    public int Priority { get; set; }
 }

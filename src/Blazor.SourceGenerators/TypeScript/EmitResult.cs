@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EmitResult
+public class EmitResult
 {
-    internal bool EmitSkipped { get; set; }
-    internal Diagnostic[] Diagnostics { get; set; }
-    internal string[] EmittedFiles { get; set; }
-    internal SourceMapData[] SourceMaps { get; set; }
+    public bool EmitSkipped { get; set; }
+    public TypeScriptDiagnostic[] Diagnostics { get; set; } = Array.Empty<TypeScriptDiagnostic>();
+    public string[] EmittedFiles { get; set; } = Array.Empty<string>();
+    public SourceMapData[] SourceMaps { get; set; } = Array.Empty<SourceMapData>();
 }

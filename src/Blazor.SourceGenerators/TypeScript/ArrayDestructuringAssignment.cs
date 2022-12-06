@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ArrayDestructuringAssignment : AssignmentExpression
+public class ArrayDestructuringAssignment : AssignmentExpression
 {
 }

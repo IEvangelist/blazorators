@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocReturnTag : JsDocTag
+public class JsDocReturnTag : JsDocTag
 {
-    internal JsDocReturnTag() => ((INode)this).Kind = SyntaxKind.JsDocReturnTag;
+    public JsDocReturnTag() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocReturnTag;
 
-    internal JsDocTypeExpression? TypeExpression { get; set; }
+    public JsDocTypeExpression? TypeExpression { get; set; }
 }

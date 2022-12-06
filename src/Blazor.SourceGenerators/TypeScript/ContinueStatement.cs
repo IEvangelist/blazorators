@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ContinueStatement : Statement, IBreakOrContinueStatement
+public class ContinueStatement : Statement, IBreakOrContinueStatement
 {
-    internal ContinueStatement() => ((INode)this).Kind = SyntaxKind.ContinueStatement;
+    public ContinueStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.ContinueStatement;
 
-    Identifier IBreakOrContinueStatement.Label { get; set; } = default!;
+    Identifier IBreakOrContinueStatement.Label? { get; set; }
 }

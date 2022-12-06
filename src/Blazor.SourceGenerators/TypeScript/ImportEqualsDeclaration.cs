@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ImportEqualsDeclaration : DeclarationStatement
+public class ImportEqualsDeclaration : DeclarationStatement
 {
-    internal ImportEqualsDeclaration() => ((INode)this).Kind = SyntaxKind.ImportEqualsDeclaration;
+    public ImportEqualsDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.ImportEqualsDeclaration;
 
-    internal INode ModuleReference { get; set; } = default!;
+    public INode ModuleReference? { get; set; }
 }

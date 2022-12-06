@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class NonNullExpression : /*LeftHandSideExpression*/MemberExpression
+public class NonNullExpression : /*LeftHandSideExpression*/MemberExpression
 {
-    internal NonNullExpression() => ((INode)this).Kind = SyntaxKind.NonNullExpression;
+    public NonNullExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.NonNullExpression;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

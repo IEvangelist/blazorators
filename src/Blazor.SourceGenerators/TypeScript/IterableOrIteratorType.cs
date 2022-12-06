@@ -3,13 +3,13 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class IterableOrIteratorType : TsType, IObjectType, IUnionType
+public class IterableOrIteratorType : TsType, IObjectType, IUnionType
 {
     ObjectFlags IObjectType.ObjectFlags { get; set; }
-    TsType[] IUnionOrIntersectionType.Types { get; set; } = default!;
-    SymbolTable IUnionOrIntersectionType.PropertyCache { get; set; } = default!;
-    Symbol[] IUnionOrIntersectionType.ResolvedProperties { get; set; } = default!;
-    IndexType IUnionOrIntersectionType.ResolvedIndexType { get; set; } = default!;
-    TsType IUnionOrIntersectionType.ResolvedBaseConstraint { get; set; } = default!;
-    bool IUnionOrIntersectionType.CouldContainTypeVariables { get; set; } = default!;
+    TsType[] IUnionOrIntersectionType.Types? { get; set; }
+    SymbolTable IUnionOrIntersectionType.PropertyCache? { get; set; }
+    Symbol[] IUnionOrIntersectionType.ResolvedProperties? { get; set; }
+    IndexType IUnionOrIntersectionType.ResolvedIndexType? { get; set; }
+    TsType IUnionOrIntersectionType.ResolvedBaseConstraint? { get; set; }
+    bool IUnionOrIntersectionType.CouldContainTypeVariables? { get; set; }
 }

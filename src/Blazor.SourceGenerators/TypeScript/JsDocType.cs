@@ -4,7 +4,7 @@
 namespace Blazor.SourceGenerators.TypeScript;
 
 
-internal class JsDocType : TypeNode, IJsDocType
+public class JsDocType : TypeNode, IJsDocType
 {
-    object IJsDocType.JsDocTypeBrand { get; set; } = default!;
+    object IJsDocType.JsDocTypeBrand? { get; set; }
 }

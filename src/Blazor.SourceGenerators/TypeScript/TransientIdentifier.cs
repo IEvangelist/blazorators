@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class TransientIdentifier : Identifier
+public class TransientIdentifier : Identifier
 {
-    internal Symbol ResolvedSymbol { get; set; }
+    public Symbol? ResolvedSymbol { get; set; }
 }

@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocNamespaceDeclaration : ModuleDeclaration
+public class JsDocNamespaceDeclaration : ModuleDeclaration
 {
 }

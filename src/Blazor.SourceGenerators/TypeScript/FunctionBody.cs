@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class FunctionBody : Block
+public class FunctionBody : Block
 {
 }

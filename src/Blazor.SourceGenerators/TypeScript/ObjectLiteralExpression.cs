@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ObjectLiteralExpression : ObjectLiteralExpressionBase<IObjectLiteralElementLike>
+public class ObjectLiteralExpression : ObjectLiteralExpressionBase<IObjectLiteralElementLike>
 {
-    internal ObjectLiteralExpression() => ((INode)this).Kind = SyntaxKind.ObjectLiteralExpression;
+    public ObjectLiteralExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.ObjectLiteralExpression;
 
-    internal bool MultiLine { get; set; }
+    public bool MultiLine { get; set; }
 }

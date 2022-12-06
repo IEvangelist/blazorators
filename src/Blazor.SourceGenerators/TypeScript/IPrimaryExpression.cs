@@ -3,5 +3,5 @@
 
 public interface IPrimaryExpression : IMemberExpression
 {
-    internal object PrimaryExpressionBrand { get; set; }
+    public object PrimaryExpressionBrand { get; set; }
 }

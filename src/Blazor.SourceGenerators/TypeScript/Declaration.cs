@@ -3,8 +3,8 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Declaration : Node, IDeclaration
+public class Declaration : Node, IDeclaration
 {
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode? IDeclaration.Name { get; set; } = default!;
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
 }

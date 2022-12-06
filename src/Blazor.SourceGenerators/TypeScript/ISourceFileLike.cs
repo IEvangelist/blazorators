@@ -3,6 +3,6 @@
 
 public interface ISourceFileLike
 {
-    internal string Text { get; set; }
-    internal int[] LineMap { get; set; }
+    public string Text { get; set; }
+    public int[] LineMap { get; set; }
 }

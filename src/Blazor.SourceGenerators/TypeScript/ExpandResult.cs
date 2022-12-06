@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ExpandResult
+public class ExpandResult
 {
-    internal string[] FileNames { get; set; }
-    internal MapLike<WatchDirectoryFlags> WildcardDirectories { get; set; }
+    public string[] FileNames { get; set; } = Array.Empty<string>();
+    public MapLike<WatchDirectoryFlags> WildcardDirectories { get; set; } = MapLike<WatchDirectoryFlags>.Empty;
 }

@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal sealed class AfterFinallyFlow : IFlowNode, IFlowLock
+public sealed class AfterFinallyFlow : IFlowNode, IFlowLock
 {
-    internal FlowNode Antecedent { get; set; } = default!;
+    public FlowNode Antecedent? { get; set; }
     bool IFlowLock.Locked { get; set; }
     FlowFlags IFlowNode.Flags { get; set; }
     int IFlowNode.Id { get; set; }

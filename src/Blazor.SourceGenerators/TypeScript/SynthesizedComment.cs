@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class SynthesizedComment : CommentRange
+public class SynthesizedComment : CommentRange
 {
-    internal string Text { get; set; }
+    public string? Text { get; set; }
 }

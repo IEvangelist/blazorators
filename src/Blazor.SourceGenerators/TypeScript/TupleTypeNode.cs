@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TupleTypeNode : TypeNode
+public class TupleTypeNode : TypeNode
 {
-    internal TupleTypeNode() => ((INode)this).Kind = SyntaxKind.TupleType;
+    public TupleTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.TupleType;
 
-    internal NodeArray<ITypeNode> ElementTypes { get; set; }
+    public NodeArray<ITypeNode> ElementTypes { get; set; }
 }

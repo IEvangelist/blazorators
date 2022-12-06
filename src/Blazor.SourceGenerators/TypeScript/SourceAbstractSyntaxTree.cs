@@ -5,15 +5,15 @@ using TsParser = Blazor.SourceGenerators.TypeScript.Parser.Parser;
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal sealed class SourceAbstractSyntaxTree : ISourceAbstractSyntaxTree
+public sealed class SourceAbstractSyntaxTree : ISourceAbstractSyntaxTree
 {
     private bool _childrenMade = false;
 
     private ISourceAbstractSyntaxTree Ast => this;
 
     ScriptTarget ISourceAbstractSyntaxTree.ScriptTarget { get; set; } = ScriptTarget.Latest;
-    string ISourceAbstractSyntaxTree.SourceStr { get; set; } = default!;
-    Node ISourceAbstractSyntaxTree.RootNode { get; set; } = default!;
+    string ISourceAbstractSyntaxTree.SourceStr? { get; set; }
+    Node ISourceAbstractSyntaxTree.RootNode? { get; set; }
 
     async Task ISourceAbstractSyntaxTree.LoadAbstractSyntaxTreeAsync(
         string source, string fileName, bool setChildren)
@@ -38,7 +38,7 @@ internal sealed class SourceAbstractSyntaxTree : ISourceAbstractSyntaxTree
         }
     }
 
-    internal IEnumerable<Node> OfKind(SyntaxKind kind) =>
+    public IEnumerable<Node> OfKind(TypeScriptSyntaxKind kind) =>
         Ast.RootNode?.OfKind(kind) ?? Enumerable.Empty<Node>();
 
     IEnumerable<Node> ISourceAbstractSyntaxTree.GetDescendants()

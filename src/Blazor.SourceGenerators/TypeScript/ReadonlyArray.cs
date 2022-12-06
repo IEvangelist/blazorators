@@ -3,6 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ReadonlyArray<T> : List<T>
+public class ReadonlyArray<T> : List<T>
 {
+    public static ReadonlyArray<T> Empty => new();
 }

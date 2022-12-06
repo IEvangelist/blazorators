@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class CommandLineOption : CommandLineOptionBase
+public class CommandLineOption : CommandLineOptionBase
 {
 }

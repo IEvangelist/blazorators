@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ArrayTypeNode : TypeNode
+public class ArrayTypeNode : TypeNode
 {
-    internal ArrayTypeNode() => ((INode)this).Kind = SyntaxKind.ArrayType;
+    public ArrayTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.ArrayType;
 
-    internal ITypeNode ElementType { get; set; } = default!;
+    public ITypeNode ElementType? { get; set; }
 }

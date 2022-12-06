@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class FlowType : object
+public class FlowType : object
 {
 }

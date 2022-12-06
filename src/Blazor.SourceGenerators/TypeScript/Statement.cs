@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Statement : Node, IStatement
+public class Statement : Node, IStatement
 {
-    object IStatement.StatementBrand { get; set; } = default!;
+    object IStatement.StatementBrand? { get; set; }
 }

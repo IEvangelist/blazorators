@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class VoidExpression : UnaryExpression
+public class VoidExpression : UnaryExpression
 {
-    internal VoidExpression() => ((INode)this).Kind = SyntaxKind.VoidExpression;
+    public VoidExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.VoidExpression;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

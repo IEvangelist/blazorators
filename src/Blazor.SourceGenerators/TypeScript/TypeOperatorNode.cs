@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeOperatorNode : ParenthesizedTypeNode
+public class TypeOperatorNode : ParenthesizedTypeNode
 {
-    internal TypeOperatorNode() => ((INode)this).Kind = SyntaxKind.TypeOperator;
+    public TypeOperatorNode() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeOperator;
 
-    internal SyntaxKind Operator { get; set; } = SyntaxKind.KeyOfKeyword;
+    public TypeScriptSyntaxKind Operator { get; set; } = TypeScriptSyntaxKind.KeyOfKeyword;
 }

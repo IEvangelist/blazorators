@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocUnionType : JsDocType
+public class JsDocUnionType : JsDocType
 {
-    internal JsDocUnionType() => ((INode)this).Kind = SyntaxKind.JsDocUnionType;
+    public JsDocUnionType() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocUnionType;
 
-    internal NodeArray<IJsDocType> Types { get; set; }
+    public NodeArray<IJsDocType> Types { get; set; }
 }

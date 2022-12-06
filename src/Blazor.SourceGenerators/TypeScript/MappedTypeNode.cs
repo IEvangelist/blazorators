@@ -3,11 +3,11 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class MappedTypeNode : Node, ITypeNode, IDeclaration
+public class MappedTypeNode : Node, ITypeNode, IDeclaration
 {
-    internal MappedTypeNode() => ((INode)this).Kind = SyntaxKind.MappedType;
+    public MappedTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.MappedType;
 
-    object ITypeNode.TypeNodeBrand { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
+    object ITypeNode.TypeNodeBrand? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
 }

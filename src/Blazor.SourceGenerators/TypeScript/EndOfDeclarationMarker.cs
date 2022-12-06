@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EndOfDeclarationMarker : Statement
+public class EndOfDeclarationMarker : Statement
 {
-    internal EndOfDeclarationMarker() => ((INode)this).Kind = SyntaxKind.EndOfDeclarationMarker;
+    public EndOfDeclarationMarker() => ((INode)this).Kind = TypeScriptSyntaxKind.EndOfDeclarationMarker;
 }

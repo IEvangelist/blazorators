@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class CompilerOptionsValue
+public class CompilerOptionsValue
 {
 }

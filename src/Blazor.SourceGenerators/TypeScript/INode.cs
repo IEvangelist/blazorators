@@ -5,35 +5,35 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface INode : ITextRange
 {
-    internal SyntaxKind Kind { get; set; }
-    internal NodeFlags Flags { get; set; }
-    internal ModifierFlags ModifierFlagsCache { get; set; }
-    internal TransformFlags TransformFlags { get; set; }
-    internal NodeArray<Decorator> Decorators { get; set; }
-    internal NodeArray<Modifier> Modifiers { get; set; }
-    internal int Id { get; set; }
-    internal INode? Parent { get; set; }
-    internal List<Node>? Children { get; set; }
-    internal int Depth { get; set; }
-    internal Node Original { get; set; }
-    internal bool StartsOnNewLine { get; set; }
-    internal List<JsDoc> JsDoc { get; set; }
-    internal List<JsDoc> JsDocCache { get; set; }
-    internal Symbol Symbol { get; set; }
-    internal SymbolTable Locals { get; set; }
-    internal Node NextContainer { get; set; }
-    internal Symbol LocalSymbol { get; set; }
-    internal FlowNode FlowNode { get; set; }
-    internal EmitNode EmitNode { get; set; }
-    internal TsType ContextualType { get; set; }
-    internal TypeMapper ContextualMapper { get; set; }
-    internal int TagInt { get; set; }
-    internal Node First { get; }
-    internal Node Last { get; }
-    internal int Count { get; }
+    public TypeScriptSyntaxKind Kind { get; set; }
+    public NodeFlags Flags { get; set; }
+    public ModifierFlags ModifierFlagsCache { get; set; }
+    public TransformFlags TransformFlags { get; set; }
+    public NodeArray<Decorator> Decorators { get; set; }
+    public NodeArray<Modifier> Modifiers { get; set; }
+    public int Id { get; set; }
+    public INode? Parent { get; set; }
+    public List<Node>? Children { get; set; }
+    public int Depth { get; set; }
+    public Node Original { get; set; }
+    public bool StartsOnNewLine { get; set; }
+    public List<JsDoc> JsDoc { get; set; }
+    public List<JsDoc> JsDocCache { get; set; }
+    public Symbol Symbol { get; set; }
+    public SymbolTable Locals { get; set; }
+    public Node NextContainer { get; set; }
+    public Symbol LocalSymbol { get; set; }
+    public FlowNode FlowNode { get; set; }
+    public EmitNode EmitNode { get; set; }
+    public TsType ContextualType { get; set; }
+    public TypeMapper ContextualMapper { get; set; }
+    public int TagInt { get; set; }
+    public Node First { get; }
+    public Node Last { get; }
+    public int Count { get; }
 
-    internal string? GetText(string? source = null);
-    internal string? GetTextWithComments(string? source = null);
-    internal string? GetTreeString(bool withPos = true);
-    internal string ToString(bool withPos);
+    public string? GetText(string? source = null);
+    public string? GetTextWithComments(string? source = null);
+    public string? GetTreeString(bool withPos = true);
+    public string ToString(bool withPos);
 }

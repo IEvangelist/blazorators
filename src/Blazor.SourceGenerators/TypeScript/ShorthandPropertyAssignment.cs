@@ -3,11 +3,11 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ShorthandPropertyAssignment : ObjectLiteralElement, IObjectLiteralElementLike
+public class ShorthandPropertyAssignment : ObjectLiteralElement, IObjectLiteralElementLike
 {
-    internal ShorthandPropertyAssignment() => ((INode)this).Kind = SyntaxKind.ShorthandPropertyAssignment;
+    public ShorthandPropertyAssignment() => ((INode)this).Kind = TypeScriptSyntaxKind.ShorthandPropertyAssignment;
 
-    internal QuestionToken QuestionToken { get; set; }
-    internal Token EqualsToken { get; set; } // Token<SyntaxKind.EqualsToken>
-    internal IExpression ObjectAssignmentInitializer { get; set; }
+    public QuestionToken QuestionToken { get; set; }
+    public Token EqualsToken { get; set; } // Token<TypeScriptSyntaxKind.EqualsToken>
+    public IExpression ObjectAssignmentInitializer { get; set; }
 }

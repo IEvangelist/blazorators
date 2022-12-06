@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class DoStatement : IterationStatement
+public class DoStatement : IterationStatement
 {
-    internal DoStatement() => ((INode)this).Kind = SyntaxKind.DoStatement;
+    public DoStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.DoStatement;
 
-    internal IExpression Expression { get; set; }
+    public IExpression? Expression { get; set; }
 }

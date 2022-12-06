@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class VariableDeclarationList : Node, IVariableDeclarationList
+public class VariableDeclarationList : Node, IVariableDeclarationList
 {
-    internal VariableDeclarationList() => ((INode)this).Kind = SyntaxKind.VariableDeclarationList;
+    public VariableDeclarationList() => ((INode)this).Kind = TypeScriptSyntaxKind.VariableDeclarationList;
 
-    internal NodeArray<VariableDeclaration> Declarations { get; set; }
+    public NodeArray<VariableDeclaration> Declarations { get; set; }
 }

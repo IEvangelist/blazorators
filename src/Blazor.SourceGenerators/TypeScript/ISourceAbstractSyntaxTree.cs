@@ -5,15 +5,15 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface ISourceAbstractSyntaxTree
 {
-    internal ScriptTarget ScriptTarget { get; set; }
+    public ScriptTarget ScriptTarget { get; set; }
 
-    internal string SourceStr { get; set; }
+    public string SourceStr { get; set; }
 
-    internal Node RootNode { get; set; }
+    public Node RootNode { get; set; }
 
-    internal string GetTreeString(bool withPos);
+    public string GetTreeString(bool withPos);
 
-    internal IEnumerable<Node> GetDescendants();
+    public IEnumerable<Node> GetDescendants();
 
-    internal Task LoadAbstractSyntaxTreeAsync(string source, string fileName, bool setChildren = true);
+    public Task LoadAbstractSyntaxTreeAsync(string source, string fileName, bool setChildren = true);
 }

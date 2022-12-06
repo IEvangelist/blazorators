@@ -1,12 +1,12 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeParameter : TypeVariable
+public class TypeParameter : TypeVariable
 {
-    internal TsType Constraint { get; set; }
-    internal TsType Default { get; set; }
-    internal TypeParameter Target { get; set; }
-    internal TypeMapper Mapper { get; set; }
-    internal bool IsThisType { get; set; }
-    internal TsType ResolvedDefaultType { get; set; }
+    public TsType? Constraint { get; set; }
+    public TsType? Default { get; set; }
+    public TypeParameter? Target { get; set; }
+    public TypeMapper? Mapper { get; set; }
+    public bool IsThisType { get; set; }
+    public TsType? ResolvedDefaultType { get; set; }
 }

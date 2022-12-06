@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class SignatureDeclaration : Declaration, ISignatureDeclaration
+public class SignatureDeclaration : Declaration, ISignatureDeclaration
 {
-    internal NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
-    internal NodeArray<ParameterDeclaration> Parameters { get; set; }
-    internal ITypeNode Type { get; set; }
+    public NodeArray<TypeParameterDeclaration>? TypeParameters { get; set; }
+    public NodeArray<ParameterDeclaration>? Parameters { get; set; }
+    public ITypeNode? Type { get; set; }
 }

@@ -3,15 +3,15 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class CallExpression : Node, IMemberExpression, IDeclaration
+public class CallExpression : Node, IMemberExpression, IDeclaration
 {
-    internal CallExpression() => ((INode)this).Kind = SyntaxKind.CallExpression;
+    public CallExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.CallExpression;
 
-    object IMemberExpression.MemberExpressionBrand { get; set; } = default!;
-    object ILeftHandSideExpression.LeftHandSideExpressionBrand { get; set; } = default!;
-    object IIncrementExpression.IncrementExpressionBrand { get; set; } = default!;
-    object IUnaryExpression.UnaryExpressionBrand { get; set; } = default!;
-    object IExpression.ExpressionBrand { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
+    object IMemberExpression.MemberExpressionBrand? { get; set; }
+    object ILeftHandSideExpression.LeftHandSideExpressionBrand? { get; set; }
+    object IIncrementExpression.IncrementExpressionBrand? { get; set; }
+    object IUnaryExpression.UnaryExpressionBrand? { get; set; }
+    object IExpression.ExpressionBrand? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
 }

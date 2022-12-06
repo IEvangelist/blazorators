@@ -1,11 +1,11 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ForStatement : IterationStatement
+public class ForStatement : IterationStatement
 {
-    internal ForStatement() => ((INode)this).Kind = SyntaxKind.ForStatement;
+    public ForStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.ForStatement;
 
-    internal /*ForInitializer*/IVariableDeclarationListOrExpression Initializer { get; set; }
-    internal IExpression Condition { get; set; }
-    internal IExpression Incrementor { get; set; }
+    public /*ForInitializer*/IVariableDeclarationListOrExpression Initializer { get; set; }
+    public IExpression Condition { get; set; }
+    public IExpression Incrementor { get; set; }
 }

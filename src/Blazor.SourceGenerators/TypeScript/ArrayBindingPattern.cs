@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ArrayBindingPattern : Node, IBindingPattern
+public class ArrayBindingPattern : Node, IBindingPattern
 {
-    internal ArrayBindingPattern() => ((INode)this).Kind = SyntaxKind.ArrayBindingPattern;
+    public ArrayBindingPattern() => ((INode)this).Kind = TypeScriptSyntaxKind.ArrayBindingPattern;
 
-    NodeArray<IArrayBindingElement> IBindingPattern.Elements { get; set; } = default!;
+    NodeArray<IArrayBindingElement> IBindingPattern.Elements? { get; set; }
 }

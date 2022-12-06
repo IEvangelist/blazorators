@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class FlowStart : FlowNode
+public class FlowStart : FlowNode
 {
-    internal Node Container { get; set; } // FunctionExpression | ArrowFunction | MethodDeclaration
+    public Node? Container { get; set; } // FunctionExpression | ArrowFunction | MethodDeclaration
 }

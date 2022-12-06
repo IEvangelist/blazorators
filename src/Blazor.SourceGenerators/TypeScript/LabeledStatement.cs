@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class LabeledStatement : Statement
+public class LabeledStatement : Statement
 {
-    internal LabeledStatement() => ((INode)this).Kind = SyntaxKind.LabeledStatement;
+    public LabeledStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.LabeledStatement;
 
-    internal Identifier Label { get; set; }
-    internal IStatement Statement { get; set; }
+    public Identifier Label { get; set; }
+    public IStatement Statement { get; set; }
 }

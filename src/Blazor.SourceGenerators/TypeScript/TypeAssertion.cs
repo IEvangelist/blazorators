@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeAssertion : UnaryExpression
+public class TypeAssertion : UnaryExpression
 {
-    internal TypeAssertion() => ((INode)this).Kind = SyntaxKind.TypeAssertionExpression;
+    public TypeAssertion() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeAssertionExpression;
 
-    internal ITypeNode Type { get; set; }
-    internal IExpression Expression { get; set; }
+    public ITypeNode Type { get; set; }
+    public IExpression Expression { get; set; }
 }

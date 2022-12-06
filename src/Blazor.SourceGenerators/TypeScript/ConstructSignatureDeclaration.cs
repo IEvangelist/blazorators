@@ -3,13 +3,13 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ConstructSignatureDeclaration : Declaration, ISignatureDeclaration, ITypeElement
+public class ConstructSignatureDeclaration : Declaration, ISignatureDeclaration, ITypeElement
 {
-    internal ConstructSignatureDeclaration() => ((INode)this).Kind = SyntaxKind.ConstructSignature;
+    public ConstructSignatureDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.ConstructSignature;
 
-    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;
-    ITypeNode ISignatureDeclaration.Type { get; set; } = default!;
-    object ITypeElement.TypeElementBrand { get; set; } = default!;
-    QuestionToken ITypeElement.QuestionToken { get; set; } = default!;
+    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters? { get; set; }
+    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters? { get; set; }
+    ITypeNode ISignatureDeclaration.Type? { get; set; }
+    object ITypeElement.TypeElementBrand? { get; set; }
+    QuestionToken ITypeElement.QuestionToken? { get; set; }
 }

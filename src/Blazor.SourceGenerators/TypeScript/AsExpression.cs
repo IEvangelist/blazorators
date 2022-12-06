@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class AsExpression : Expression
+public class AsExpression : Expression
 {
-    internal AsExpression() => ((INode)this).Kind = SyntaxKind.AsExpression;
+    public AsExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.AsExpression;
 
-    internal IExpression Expression { get; set; } = default!;
-    internal ITypeNode Type { get; set; } = default!;
+    public IExpression Expression? { get; set; }
+    public ITypeNode Type? { get; set; }
 }

@@ -3,17 +3,17 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class IndexSignatureDeclaration : Declaration,
+public class IndexSignatureDeclaration : Declaration,
     ISignatureDeclaration,
     IClassElement,
     ITypeElement
 {
-    internal IndexSignatureDeclaration() => ((INode)this).Kind = SyntaxKind.IndexSignature;
+    public IndexSignatureDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.IndexSignature;
 
-    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;
-    ITypeNode ISignatureDeclaration.Type { get; set; } = default!;
-    object IClassElement.ClassElementBrand { get; set; } = default!;
-    object ITypeElement.TypeElementBrand { get; set; } = default!;
-    QuestionToken ITypeElement.QuestionToken { get; set; } = default!;
+    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters? { get; set; }
+    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters? { get; set; }
+    ITypeNode ISignatureDeclaration.Type? { get; set; }
+    object IClassElement.ClassElementBrand? { get; set; }
+    object ITypeElement.TypeElementBrand? { get; set; }
+    QuestionToken ITypeElement.QuestionToken? { get; set; }
 }

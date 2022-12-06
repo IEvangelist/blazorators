@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class DebuggerStatement : Statement
+public class DebuggerStatement : Statement
 {
-    internal DebuggerStatement() => ((INode)this).Kind = SyntaxKind.DebuggerStatement;
+    public DebuggerStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.DebuggerStatement;
 }

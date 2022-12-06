@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsxSelfClosingElement : PrimaryExpression, IJsxChild
+public class JsxSelfClosingElement : PrimaryExpression, IJsxChild
 {
-    internal JsxSelfClosingElement() => ((INode)this).Kind = SyntaxKind.JsxSelfClosingElement;
+    public JsxSelfClosingElement() => ((INode)this).Kind = TypeScriptSyntaxKind.JsxSelfClosingElement;
 
-    internal IJsxTagNameExpression TagName { get; set; }
-    internal JsxAttributes Attributes { get; set; }
+    public IJsxTagNameExpression TagName { get; set; }
+    public JsxAttributes Attributes { get; set; }
 }

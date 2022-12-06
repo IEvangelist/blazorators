@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class AssignmentExpression : BinaryExpression
+public class AssignmentExpression : BinaryExpression
 {
 }

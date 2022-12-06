@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class GeneratedIdentifier : Identifier
+public class GeneratedIdentifier : Identifier
 {
 }

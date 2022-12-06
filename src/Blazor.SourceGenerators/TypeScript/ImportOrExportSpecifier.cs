@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface ImportOrExportSpecifier : IDeclaration
 {
-    internal Identifier PropertyName { get; set; }
+    public Identifier PropertyName { get; set; }
 }

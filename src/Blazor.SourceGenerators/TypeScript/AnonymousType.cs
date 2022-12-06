@@ -3,8 +3,8 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class AnonymousType : ObjectType
+public class AnonymousType : ObjectType
 {
-    internal AnonymousType Target { get; set; } = default!;
-    internal TypeMapper Mapper { get; set; } = default!;
+    public AnonymousType Target? { get; set; }
+    public TypeMapper Mapper? { get; set; }
 }

@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ClassElement : Declaration, IClassElement
+public class ClassElement : Declaration, IClassElement
 {
-    object IClassElement.ClassElementBrand { get; set; } = default!;
+    object IClassElement.ClassElementBrand? { get; set; }
 }

@@ -6,30 +6,30 @@ namespace Blazor.SourceGenerators.TypeScript;
 /// <summary>
 /// Represents a TypeScript node as a <see cref="TextRange"/>.
 /// </summary>
-internal class Node : TextRange, INode
+public class Node : TextRange, INode
 {
-    SyntaxKind INode.Kind { get; set; }
+    TypeScriptSyntaxKind INode.Kind { get; set; }
     NodeFlags INode.Flags { get; set; }
     ModifierFlags INode.ModifierFlagsCache { get; set; }
     TransformFlags INode.TransformFlags { get; set; }
-    NodeArray<Decorator> INode.Decorators { get; set; } = default!;
-    NodeArray<Modifier> INode.Modifiers { get; set; } = default!;
+    NodeArray<Decorator> INode.Decorators? { get; set; }
+    NodeArray<Modifier> INode.Modifiers? { get; set; }
     int INode.Id { get; set; }
     INode? INode.Parent { get; set; }
     List<Node>? INode.Children { get; set; }
     int INode.Depth { get; set; }
-    Node INode.Original { get; set; } = default!;
+    Node INode.Original? { get; set; }
     bool INode.StartsOnNewLine { get; set; }
-    List<JsDoc> INode.JsDoc { get; set; } = default!;
-    List<JsDoc> INode.JsDocCache { get; set; } = default!;
-    Symbol INode.Symbol { get; set; } = default!;
-    SymbolTable INode.Locals { get; set; } = default!;
-    Node INode.NextContainer { get; set; } = default!;
-    Symbol INode.LocalSymbol { get; set; } = default!;
-    FlowNode INode.FlowNode { get; set; } = default!;
-    EmitNode INode.EmitNode { get; set; } = default!;
-    TsType INode.ContextualType { get; set; } = default!;
-    TypeMapper INode.ContextualMapper { get; set; } = default!;
+    List<JsDoc> INode.JsDoc? { get; set; }
+    List<JsDoc> INode.JsDocCache? { get; set; }
+    Symbol INode.Symbol? { get; set; }
+    SymbolTable INode.Locals? { get; set; }
+    Node INode.NextContainer? { get; set; }
+    Symbol INode.LocalSymbol? { get; set; }
+    FlowNode INode.FlowNode? { get; set; }
+    EmitNode INode.EmitNode? { get; set; }
+    TsType INode.ContextualType? { get; set; }
+    TypeMapper INode.ContextualMapper? { get; set; }
     int INode.TagInt { get; set; }
     Node INode.First { get; } = default!;
     Node INode.Last { get; } = default!;
@@ -38,35 +38,35 @@ internal class Node : TextRange, INode
     /// <summary>
     /// Gets the node's implementation of the <see cref="ISourceAbstractSyntaxTree" />.
     /// </summary>
-    internal ISourceAbstractSyntaxTree AbstractSyntaxTree { get; set; } = default!;
+    public ISourceAbstractSyntaxTree AbstractSyntaxTree? { get; set; }
 
     /// <summary>
     /// Gets the source string from the underlying <see cref="AbstractSyntaxTree" /> as its raw value.
     /// </summary>
-    internal string SourceStr => AbstractSyntaxTree.SourceStr;
+    public string SourceStr => AbstractSyntaxTree.SourceStr;
 
     /// <summary>
     /// Gets an identifier string that represents the node.
     /// </summary>
-    internal string? IdentifierStr => ((INode)this).Kind == SyntaxKind.Identifier
+    public string? IdentifierStr => ((INode)this).Kind == TypeScriptSyntaxKind.Identifier
         ? ((INode)this).GetText()
         : ((INode)this).Children
             ?.Cast<INode>()
-            ?.FirstOrDefault(node => node.Kind is SyntaxKind.Identifier)
+            ?.FirstOrDefault(node => node.Kind is TypeScriptSyntaxKind.Identifier)
             ?.GetText()
             ?.Trim();
 
     /// <summary>
     /// Gets the node's parent identifier.
     /// </summary>
-    internal int? ParentId { get; set; }
+    public int? ParentId { get; set; }
 
     /// <summary>
     /// Defaults to -1, otherwise, when a zero or greater value, represents the start of the node.
     /// </summary>
-    internal int NodeStart { get; set; } = -1;
+    public int NodeStart { get; set; } = -1;
 
-    internal void MakeChildren(SourceAbstractSyntaxTree ast)
+    public void MakeChildren(SourceAbstractSyntaxTree ast)
     {
         ((INode)this).Children = new List<Node>();
         Ts.ForEachChild(this, node =>
@@ -96,17 +96,17 @@ internal class Node : TextRange, INode
     public override string ToString()
     {
         var posStr = $" [{((INode)this).Pos}, {((INode)this).End}]";
-        return $"{Enum.GetName(typeof(SyntaxKind), ((INode)this).Kind)}  {posStr} {IdentifierStr}";
+        return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), ((INode)this).Kind)}  {posStr} {IdentifierStr}";
     }
 
-    internal Node? First => ((INode)this).Children.FirstOrDefault();
-    internal Node? Last => ((INode)this).Children.LastOrDefault();
-    internal int Count => ((INode)this).Children?.Count ?? 0;
+    public Node? First => ((INode)this).Children.FirstOrDefault();
+    public Node? Last => ((INode)this).Children.LastOrDefault();
+    public int Count => ((INode)this).Children?.Count ?? 0;
 
-    internal IEnumerable<Node> OfKind(SyntaxKind kind) =>
+    public IEnumerable<Node> OfKind(TypeScriptSyntaxKind kind) =>
         GetDescendants(false).OfKind(kind);
 
-    internal IEnumerable<Node> GetDescendants(bool includeSelf = true)
+    public IEnumerable<Node> GetDescendants(bool includeSelf = true)
     {
         if (includeSelf) yield return this;
 
@@ -122,22 +122,25 @@ internal class Node : TextRange, INode
     string? INode.GetText(string? source)
     {
         source ??= SourceStr;
+        INode node = this;
 
         if (NodeStart is -1)
         {
-            return ((INode)this).Pos.HasValue && ((INode)this).End.HasValue
-                ? source[((INode)this).Pos.Value..((INode)this).End.Value]
+            return node.Pos.HasValue && node.End.HasValue
+                ? source.SubString(node.Pos.Value, node.End.Value)
                 : null;
         }
 
-        return ((INode)this).End.HasValue ? source[NodeStart..((INode)this).End.Value] : null;
+        return node.End.HasValue ? source.SubString(NodeStart, node.End.Value) : null;
     }
 
     string? INode.GetTextWithComments(string? source)
     {
         source ??= SourceStr;
-        return ((INode)this).Pos.HasValue && ((INode)this).End.HasValue
-            ? source[((INode)this).Pos.Value..((INode)this).End.Value]
+        INode node = this;
+
+        return node.Pos.HasValue && node.End.HasValue
+            ? source.SubString(node.Pos.Value, node.End.Value)
             : null;
     }
 
@@ -161,9 +164,9 @@ internal class Node : TextRange, INode
         if (withPos)
         {
             var posStr = $" [{((INode)this).Pos}, {((INode)this).End}]";
-            return $"{Enum.GetName(typeof(SyntaxKind), ((INode)this).Kind)}  {posStr} {IdentifierStr}";
+            return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), ((INode)this).Kind)}  {posStr} {IdentifierStr}";
         }
 
-        return $"{Enum.GetName(typeof(SyntaxKind), ((INode)this).Kind)}  {IdentifierStr}";
+        return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), ((INode)this).Kind)}  {IdentifierStr}";
     }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class MergeDeclarationMarker : Statement
+public class MergeDeclarationMarker : Statement
 {
-    internal MergeDeclarationMarker() => ((INode)this).Kind = SyntaxKind.MergeDeclarationMarker;
+    public MergeDeclarationMarker() => ((INode)this).Kind = TypeScriptSyntaxKind.MergeDeclarationMarker;
 }

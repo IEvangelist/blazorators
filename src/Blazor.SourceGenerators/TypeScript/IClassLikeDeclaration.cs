@@ -3,7 +3,7 @@
 
 public interface IClassLikeDeclaration : IDeclaration
 {
-    internal NodeArray<TypeParameterDeclaration>? TypeParameters { get; set; }
-    internal NodeArray<HeritageClause>? HeritageClauses { get; set; }
-    internal NodeArray<IClassElement>? Members { get; set; }
+    public NodeArray<TypeParameterDeclaration>? TypeParameters { get; set; }
+    public NodeArray<HeritageClause>? HeritageClauses { get; set; }
+    public NodeArray<IClassElement>? Members { get; set; }
 }

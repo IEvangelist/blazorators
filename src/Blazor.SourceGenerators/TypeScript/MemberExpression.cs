@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class MemberExpression : LeftHandSideExpression, IMemberExpression
+public class MemberExpression : LeftHandSideExpression, IMemberExpression
 {
-    object IMemberExpression.MemberExpressionBrand { get; set; } = default!;
+    object IMemberExpression.MemberExpressionBrand? { get; set; }
 }

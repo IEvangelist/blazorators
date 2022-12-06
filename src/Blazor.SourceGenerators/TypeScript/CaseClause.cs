@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class CaseClause : Node, ICaseOrDefaultClause
+public class CaseClause : Node, ICaseOrDefaultClause
 {
-    internal CaseClause() => ((INode)this).Kind = SyntaxKind.CaseClause;
+    public CaseClause() => ((INode)this).Kind = TypeScriptSyntaxKind.CaseClause;
 
-    internal IExpression Expression { get; set; } = default!;
-    internal NodeArray<IStatement> Statements { get; set; } = default!;
+    public IExpression Expression? { get; set; }
+    public NodeArray<IStatement> Statements? { get; set; }
 }

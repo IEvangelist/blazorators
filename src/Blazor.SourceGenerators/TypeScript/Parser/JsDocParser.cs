@@ -5,27 +5,27 @@ using static Blazor.SourceGenerators.TypeScript.Parser.Scanner;
 
 namespace Blazor.SourceGenerators.TypeScript.Parser;
 
-internal sealed class JsDocParser
+public sealed class JsDocParser
 {
-    internal Parser Parser { get; set; }
-    internal JsDocParser(Parser parser) => Parser = parser;
+    public Parser Parser { get; set; }
+    public JsDocParser(Parser parser) => Parser = parser;
 
     private Scanner Scanner => Parser.Scanner;
     private string? SourceText => Parser.SourceText;
-    private SyntaxKind CurrentToken { get => Parser.CurrentToken; set => Parser.CurrentToken = value; }
+    private TypeScriptSyntaxKind CurrentToken { get => Parser.CurrentToken; set => Parser.CurrentToken = value; }
     private bool ParseErrorBeforeNextFinishedNode { get => Parser.ParseErrorBeforeNextFinishedNode; set => Parser.ParseErrorBeforeNextFinishedNode = value; }
-    private List<Diagnostic>? ParseDiagnostics { get => Parser.ParseDiagnostics; set => Parser.ParseDiagnostics = value; }
+    private List<TypeScriptDiagnostic>? ParseDiagnostics { get => Parser.ParseDiagnostics; set => Parser.ParseDiagnostics = value; }
 
     private void ClearState() => Parser.ClearState();
     private void FixupParentReferences(INode rootNode) => Parser.FixupParentReferences(rootNode);
     private void ParseErrorAtCurrentToken(DiagnosticMessage? message, object? arg0 = null) => Parser.ParseErrorAtCurrentToken(message, arg0);
     private void ParseErrorAtPosition(int start, int length, DiagnosticMessage? message, object? arg0 = null) => Parser.ParseErrorAtPosition(start, length, message, arg0);
-    private SyntaxKind Token => Parser.Token;
-    private SyntaxKind NextToken => Parser.NextToken;
+    private TypeScriptSyntaxKind Token => Parser.Token;
+    private TypeScriptSyntaxKind NextToken => Parser.NextToken;
     private T TryParse<T>(Func<T> callback) => Parser.TryParse(callback);
-    private bool ParseExpected(SyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
-    private bool ParseOptional(SyntaxKind kind) => Parser.ParseOptional(kind);
-    private INode? ParseOptionalToken<T>(SyntaxKind kind) where T : Node, new() => Parser.ParseOptionalToken<T>(kind);
+    private bool ParseExpected(TypeScriptSyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
+    private bool ParseOptional(TypeScriptSyntaxKind kind) => Parser.ParseOptional(kind);
+    private INode? ParseOptionalToken<T>(TypeScriptSyntaxKind kind) where T : Node, new() => Parser.ParseOptionalToken<T>(kind);
     private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token);
     private NodeArray<T?> CreateList<T>(T[]? elements = null, int? pos = null) where T : Node, new() => Parser.CreateList<T>(elements, pos);
     private T FinishNode<T>(T node, int? end = null) where T : Node => Parser.FinishNode(node, end);
@@ -34,22 +34,22 @@ internal sealed class JsDocParser
     private TypeLiteralNode ParseTypeLiteral() => Parser.ParseTypeLiteral();
     private IExpression ParseExpression() => Parser.ParseExpression();
 
-    internal bool IsJsDocType() => Token switch
+    public bool IsJsDocType() => Token switch
     {
-        SyntaxKind.AsteriskToken or
-        SyntaxKind.QuestionToken or
-        SyntaxKind.OpenParenToken or
-        SyntaxKind.OpenBracketToken or
-        SyntaxKind.ExclamationToken or
-        SyntaxKind.OpenBraceToken or
-        SyntaxKind.FunctionKeyword or
-        SyntaxKind.DotDotDotToken or
-        SyntaxKind.NewKeyword or
-        SyntaxKind.ThisKeyword => true,
+        TypeScriptSyntaxKind.AsteriskToken or
+        TypeScriptSyntaxKind.QuestionToken or
+        TypeScriptSyntaxKind.OpenParenToken or
+        TypeScriptSyntaxKind.OpenBracketToken or
+        TypeScriptSyntaxKind.ExclamationToken or
+        TypeScriptSyntaxKind.OpenBraceToken or
+        TypeScriptSyntaxKind.FunctionKeyword or
+        TypeScriptSyntaxKind.DotDotDotToken or
+        TypeScriptSyntaxKind.NewKeyword or
+        TypeScriptSyntaxKind.ThisKeyword => true,
         _ => TokenIsIdentifierOrKeyword(Token),
     };
 
-    internal static (JsDocTypeExpression res, List<Diagnostic>? diagnostics) ParseJsDocTypeExpressionForTests(
+    public static (JsDocTypeExpression res, List<TypeScriptDiagnostic>? diagnostics) ParseJsDocTypeExpressionForTests(
         string content, int? start, int? length)
     {
         var dp = new JsDocParser(new Parser());
@@ -69,16 +69,16 @@ internal sealed class JsDocParser
         return (jsDocTypeExpression, diagnostics);
     }
 
-    internal JsDocTypeExpression ParseJsDocTypeExpression()
+    public JsDocTypeExpression ParseJsDocTypeExpression()
     {
         var result = new JsDocTypeExpression();
 
 
-        ParseExpected(SyntaxKind.OpenBraceToken);
+        ParseExpected(TypeScriptSyntaxKind.OpenBraceToken);
 
         result.Type = ParseJsDocTopLevelType();
 
-        ParseExpected(SyntaxKind.CloseBraceToken);
+        ParseExpected(TypeScriptSyntaxKind.CloseBraceToken);
 
 
         FixupParentReferences(result);
@@ -87,16 +87,16 @@ internal sealed class JsDocParser
     }
 
 
-    internal IJsDocType ParseJsDocTopLevelType()
+    public IJsDocType ParseJsDocTopLevelType()
     {
         var type = ParseJsDocType();
-        if (Token is SyntaxKind.BarToken)
+        if (Token is TypeScriptSyntaxKind.BarToken)
         {
             var unionType = new JsDocUnionType { Types = ParseJsDocTypeList(type) };
             type = FinishNode(unionType);
         }
 
-        if (Token is SyntaxKind.EqualsToken)
+        if (Token is TypeScriptSyntaxKind.EqualsToken)
         {
             var optionalType = new JsDocOptionalType();
 
@@ -108,25 +108,25 @@ internal sealed class JsDocParser
         return type;
     }
 
-    internal IJsDocType ParseJsDocType()
+    public IJsDocType ParseJsDocType()
     {
         var type = ParseBasicTypeExpression();
         while (true)
         {
-            if (Token is SyntaxKind.OpenBracketToken)
+            if (Token is TypeScriptSyntaxKind.OpenBracketToken)
             {
                 var arrayType = new JsDocArrayType { ElementType = type };
                 _ = NextToken;
-                ParseExpected(SyntaxKind.CloseBracketToken);
+                ParseExpected(TypeScriptSyntaxKind.CloseBracketToken);
                 type = FinishNode(arrayType);
             }
-            else if (Token is SyntaxKind.QuestionToken)
+            else if (Token is TypeScriptSyntaxKind.QuestionToken)
             {
                 var nullableType = new JsDocNullableType { Type = type };
                 _ = NextToken;
                 type = FinishNode(nullableType);
             }
-            else if (Token is SyntaxKind.ExclamationToken)
+            else if (Token is TypeScriptSyntaxKind.ExclamationToken)
             {
                 var nonNullableType = new JsDocNonNullableType { Type = type };
                 _ = NextToken;
@@ -142,56 +142,56 @@ internal sealed class JsDocParser
     }
 
 
-    internal IJsDocType ParseBasicTypeExpression() => Token switch
+    public IJsDocType ParseBasicTypeExpression() => Token switch
     {
-        SyntaxKind.AsteriskToken => ParseJsDocAllType(),
-        SyntaxKind.QuestionToken => ParseJsDocUnknownOrNullableType(),
-        SyntaxKind.OpenParenToken => ParseJsDocUnionType(),
-        SyntaxKind.OpenBracketToken => ParseJsDocTupleType(),
-        SyntaxKind.ExclamationToken => ParseJsDocNonNullableType(),
-        SyntaxKind.OpenBraceToken => ParseJsDocRecordType(),
-        SyntaxKind.FunctionKeyword => ParseJsDocFunctionType(),
-        SyntaxKind.DotDotDotToken => ParseJsDocVariadicType(),
-        SyntaxKind.NewKeyword => ParseJsDocConstructorType(),
-        SyntaxKind.ThisKeyword => ParseJsDocThisType(),
-        SyntaxKind.AnyKeyword or
-        SyntaxKind.StringKeyword or
-        SyntaxKind.NumberKeyword or
-        SyntaxKind.BooleanKeyword or
-        SyntaxKind.SymbolKeyword or
-        SyntaxKind.VoidKeyword or
-        SyntaxKind.NullKeyword or
-        SyntaxKind.UndefinedKeyword or
-        SyntaxKind.NeverKeyword or
-        SyntaxKind.ObjectKeyword => ParseTokenNode<JsDocType>(),
-        SyntaxKind.StringLiteral or
-        SyntaxKind.NumericLiteral or
-        SyntaxKind.TrueKeyword or
-        SyntaxKind.FalseKeyword => ParseJsDocLiteralType(),
+        TypeScriptSyntaxKind.AsteriskToken => ParseJsDocAllType(),
+        TypeScriptSyntaxKind.QuestionToken => ParseJsDocUnknownOrNullableType(),
+        TypeScriptSyntaxKind.OpenParenToken => ParseJsDocUnionType(),
+        TypeScriptSyntaxKind.OpenBracketToken => ParseJsDocTupleType(),
+        TypeScriptSyntaxKind.ExclamationToken => ParseJsDocNonNullableType(),
+        TypeScriptSyntaxKind.OpenBraceToken => ParseJsDocRecordType(),
+        TypeScriptSyntaxKind.FunctionKeyword => ParseJsDocFunctionType(),
+        TypeScriptSyntaxKind.DotDotDotToken => ParseJsDocVariadicType(),
+        TypeScriptSyntaxKind.NewKeyword => ParseJsDocConstructorType(),
+        TypeScriptSyntaxKind.ThisKeyword => ParseJsDocThisType(),
+        TypeScriptSyntaxKind.AnyKeyword or
+        TypeScriptSyntaxKind.StringKeyword or
+        TypeScriptSyntaxKind.NumberKeyword or
+        TypeScriptSyntaxKind.BooleanKeyword or
+        TypeScriptSyntaxKind.SymbolKeyword or
+        TypeScriptSyntaxKind.VoidKeyword or
+        TypeScriptSyntaxKind.NullKeyword or
+        TypeScriptSyntaxKind.UndefinedKeyword or
+        TypeScriptSyntaxKind.NeverKeyword or
+        TypeScriptSyntaxKind.ObjectKeyword => ParseTokenNode<JsDocType>(),
+        TypeScriptSyntaxKind.StringLiteral or
+        TypeScriptSyntaxKind.NumericLiteral or
+        TypeScriptSyntaxKind.TrueKeyword or
+        TypeScriptSyntaxKind.FalseKeyword => ParseJsDocLiteralType(),
         _ => ParseJsDocTypeReference(),
     };
 
-    internal JsDocThisType ParseJsDocThisType()
+    public JsDocThisType ParseJsDocThisType()
     {
         var result = new JsDocThisType();
         _ = NextToken;
-        ParseExpected(SyntaxKind.ColonToken);
+        ParseExpected(TypeScriptSyntaxKind.ColonToken);
         result.Type = ParseJsDocType();
 
         return FinishNode(result);
     }
 
-    internal JsDocConstructorType ParseJsDocConstructorType()
+    public JsDocConstructorType ParseJsDocConstructorType()
     {
         var result = new JsDocConstructorType();
         _ = NextToken;
-        ParseExpected(SyntaxKind.ColonToken);
+        ParseExpected(TypeScriptSyntaxKind.ColonToken);
         result.Type = ParseJsDocType();
 
         return FinishNode(result);
     }
 
-    internal JsDocVariadicType ParseJsDocVariadicType()
+    public JsDocVariadicType ParseJsDocVariadicType()
     {
         var result = new JsDocVariadicType();
         _ = NextToken;
@@ -200,21 +200,21 @@ internal sealed class JsDocParser
         return FinishNode(result);
     }
 
-    internal JsDocFunctionType ParseJsDocFunctionType()
+    public JsDocFunctionType ParseJsDocFunctionType()
     {
         var result = new JsDocFunctionType();
         _ = NextToken;
 
-        ParseExpected(SyntaxKind.OpenParenToken);
+        ParseExpected(TypeScriptSyntaxKind.OpenParenToken);
 
         var declaration = result as ISignatureDeclaration;
         declaration.Parameters = Parser.ParseDelimitedList(
             ParsingContext.JSDocFunctionParameters, ParseJsDocParameter);
 
         CheckForTrailingComma(declaration.Parameters);
-        ParseExpected(SyntaxKind.CloseParenToken);
+        ParseExpected(TypeScriptSyntaxKind.CloseParenToken);
 
-        if (Token is SyntaxKind.ColonToken)
+        if (Token is TypeScriptSyntaxKind.ColonToken)
         {
             _ = NextToken;
             declaration.Type = ParseJsDocType();
@@ -223,13 +223,13 @@ internal sealed class JsDocParser
         return FinishNode(result);
     }
 
-    internal ParameterDeclaration ParseJsDocParameter()
+    public ParameterDeclaration ParseJsDocParameter()
     {
         var parameter = new ParameterDeclaration();
         var declaration = parameter as IVariableLikeDeclaration;
         declaration.Type = ParseJsDocType();
 
-        if (ParseOptional(SyntaxKind.EqualsToken))
+        if (ParseOptional(TypeScriptSyntaxKind.EqualsToken))
         {
             declaration.QuestionToken = new QuestionToken();
         }
@@ -237,22 +237,22 @@ internal sealed class JsDocParser
         return FinishNode(parameter);
     }
 
-    internal JsDocTypeReference ParseJsDocTypeReference()
+    public JsDocTypeReference ParseJsDocTypeReference()
     {
         var result = new JsDocTypeReference
         {
             Name = Parser.ParseSimplePropertyName() as Identifier
         };
 
-        if (Token is SyntaxKind.LessThanToken)
+        if (Token is TypeScriptSyntaxKind.LessThanToken)
         {
             result.TypeArguments = ParseTypeArguments();
         }
         else
         {
-            while (ParseOptional(SyntaxKind.DotToken))
+            while (ParseOptional(TypeScriptSyntaxKind.DotToken))
             {
-                if (Token is SyntaxKind.LessThanToken)
+                if (Token is TypeScriptSyntaxKind.LessThanToken)
                 {
                     result.TypeArguments = ParseTypeArguments();
                     break;
@@ -267,7 +267,7 @@ internal sealed class JsDocParser
         return FinishNode(result);
     }
 
-    internal NodeArray<IJsDocType> ParseTypeArguments()
+    public NodeArray<IJsDocType> ParseTypeArguments()
     {
         _ = NextToken;
         var typeArguments = ParseDelimitedList(
@@ -275,12 +275,12 @@ internal sealed class JsDocParser
 
         CheckForTrailingComma(typeArguments);
         CheckForEmptyTypeArgumentList(typeArguments);
-        ParseExpected(SyntaxKind.GreaterThanToken);
+        ParseExpected(TypeScriptSyntaxKind.GreaterThanToken);
 
         return typeArguments;
     }
 
-    internal void CheckForEmptyTypeArgumentList<T>(NodeArray<T> typeArguments)
+    public void CheckForEmptyTypeArgumentList<T>(NodeArray<T> typeArguments)
     {
         if (!ParseDiagnostics.Any() && typeArguments != null && !typeArguments.Any() &&
             typeArguments is ITextRange textRange && !string.IsNullOrWhiteSpace(SourceText))
@@ -292,17 +292,17 @@ internal sealed class JsDocParser
         }
     }
 
-    internal QualifiedName ParseQualifiedName(IEntityName left) =>
+    public QualifiedName ParseQualifiedName(IEntityName left) =>
         FinishNode(new QualifiedName
         {
             Left = left,
             Right = ParseIdentifierName()
         });
 
-    internal JsDocRecordType ParseJsDocRecordType() =>
+    public JsDocRecordType ParseJsDocRecordType() =>
         FinishNode(new JsDocRecordType { Literal = ParseTypeLiteral() });
 
-    internal JsDocNonNullableType ParseJsDocNonNullableType()
+    public JsDocNonNullableType ParseJsDocNonNullableType()
     {
         var result = new JsDocNonNullableType();
         _ = NextToken;
@@ -311,7 +311,7 @@ internal sealed class JsDocParser
         return FinishNode(result);
     }
 
-    internal JsDocTupleType ParseJsDocTupleType()
+    public JsDocTupleType ParseJsDocTupleType()
     {
         var result = new JsDocTupleType();
         _ = NextToken;
@@ -319,12 +319,12 @@ internal sealed class JsDocParser
             ParsingContext.JSDocTupleTypes, ParseJsDocType);
 
         CheckForTrailingComma(result.Types);
-        ParseExpected(SyntaxKind.CloseBracketToken);
+        ParseExpected(TypeScriptSyntaxKind.CloseBracketToken);
 
         return FinishNode(result);
     }
 
-    internal void CheckForTrailingComma<T>(NodeArray<T> list)
+    public void CheckForTrailingComma<T>(NodeArray<T> list)
     {
         if (Parser.ParseDiagnostics?.Count == 0 && list.HasTrailingComma && list is ITextRange range)
         {
@@ -334,17 +334,17 @@ internal sealed class JsDocParser
         }
     }
 
-    internal JsDocUnionType ParseJsDocUnionType()
+    public JsDocUnionType ParseJsDocUnionType()
     {
         var result = new JsDocUnionType();
         _ = NextToken;
         result.Types = ParseJsDocTypeList(ParseJsDocType());
-        ParseExpected(SyntaxKind.CloseParenToken);
+        ParseExpected(TypeScriptSyntaxKind.CloseParenToken);
 
         return FinishNode(result);
     }
 
-    internal NodeArray<IJsDocType> ParseJsDocTypeList(IJsDocType firstType)
+    public NodeArray<IJsDocType> ParseJsDocTypeList(IJsDocType firstType)
     {
         var types = new NodeArray<IJsDocType>
         {
@@ -352,7 +352,7 @@ internal sealed class JsDocParser
         };
         var range = types as ITextRange;
         range.Pos = firstType.Pos;
-        while (ParseOptional(SyntaxKind.BarToken))
+        while (ParseOptional(TypeScriptSyntaxKind.BarToken))
         {
             types.Add(ParseJsDocType());
         }
@@ -361,7 +361,7 @@ internal sealed class JsDocParser
         return types;
     }
 
-    internal JsDocAllType ParseJsDocAllType()
+    public JsDocAllType ParseJsDocAllType()
     {
         var result = new JsDocAllType();
         _ = NextToken;
@@ -369,27 +369,27 @@ internal sealed class JsDocParser
         return FinishNode(result);
     }
 
-    internal JsDocLiteralType ParseJsDocLiteralType() =>
+    public JsDocLiteralType ParseJsDocLiteralType() =>
         FinishNode(new JsDocLiteralType { Literal = Parser.ParseLiteralTypeNode() });
 
-    internal JsDocType ParseJsDocUnknownOrNullableType()
+    public JsDocType ParseJsDocUnknownOrNullableType()
     {
         var pos = Scanner.StartPos;
 
         _ = NextToken;
 
-        return Token is SyntaxKind.CommaToken or
-            SyntaxKind.CloseBraceToken or
-            SyntaxKind.CloseParenToken or
-            SyntaxKind.GreaterThanToken or
-            SyntaxKind.EqualsToken or
-            SyntaxKind.BarToken
+        return Token is TypeScriptSyntaxKind.CommaToken or
+            TypeScriptSyntaxKind.CloseBraceToken or
+            TypeScriptSyntaxKind.CloseParenToken or
+            TypeScriptSyntaxKind.GreaterThanToken or
+            TypeScriptSyntaxKind.EqualsToken or
+            TypeScriptSyntaxKind.BarToken
                 ? FinishNode(new JsDocUnknownType())
                 : FinishNode(new JsDocNullableType { Type = ParseJsDocType() });
     }
 
 
-    internal Tuple<JsDoc, List<Diagnostic>?>? ParseIsolatedJsDocComment(string content, int start, int length)
+    public Tuple<JsDoc, List<TypeScriptDiagnostic>?>? ParseIsolatedJsDocComment(string content, int start, int length)
     {
         Parser ??= new Parser();
         Parser.InitializeState(content, ScriptTarget.Latest, null, ScriptKind.Js);
@@ -404,7 +404,7 @@ internal sealed class JsDocParser
     }
 
 
-    internal JsDoc? ParseJsDocComment(INode parent, int? start, int? length)
+    public JsDoc? ParseJsDocComment(INode parent, int? start, int? length)
     {
         var saveToken = CurrentToken;
         var saveParseDiagnosticsLength = Parser.ParseDiagnostics?.Count ?? 0;
@@ -422,7 +422,7 @@ internal sealed class JsDocParser
         return comment;
     }
 
-    internal JsDoc? ParseJsDocCommentWorker(int? start = null, int? length = null)
+    public JsDoc? ParseJsDocCommentWorker(int? start = null, int? length = null)
     {
         var content = Parser.SourceText ?? "";
 
@@ -446,12 +446,12 @@ internal sealed class JsDocParser
             var indent = start - Math.Max(content.LastIndexOf('\n', (int)start), 0) + 4;
 
             NextJsDocToken();
-            while (Token is SyntaxKind.WhitespaceTrivia)
+            while (Token is TypeScriptSyntaxKind.WhitespaceTrivia)
             {
                 NextJsDocToken();
             }
 
-            if (Token is SyntaxKind.NewLineTrivia)
+            if (Token is TypeScriptSyntaxKind.NewLineTrivia)
             {
                 state = JSDocState.BeginningOfLine;
                 indent = 0;
@@ -459,11 +459,11 @@ internal sealed class JsDocParser
                 NextJsDocToken();
             }
 
-            while (Token is not SyntaxKind.EndOfFileToken)
+            while (Token is not TypeScriptSyntaxKind.EndOfFileToken)
             {
                 switch (Token)
                 {
-                    case SyntaxKind.AtToken:
+                    case TypeScriptSyntaxKind.AtToken:
                         if (state is JSDocState.BeginningOfLine || state is JSDocState.SawAsterisk)
                         {
                             RemoveTrailingNewlines(comments);
@@ -479,12 +479,12 @@ internal sealed class JsDocParser
                             PushComment(Scanner.TokenText);
                         }
                         break;
-                    case SyntaxKind.NewLineTrivia:
+                    case TypeScriptSyntaxKind.NewLineTrivia:
                         comments.Add(Scanner.TokenText);
                         state = JSDocState.BeginningOfLine;
                         indent = 0;
                         break;
-                    case SyntaxKind.AsteriskToken:
+                    case TypeScriptSyntaxKind.AsteriskToken:
                         var asterisk = Scanner.TokenText;
                         if (state is JSDocState.SawAsterisk || state is JSDocState.SavingComments)
                         {
@@ -497,11 +497,11 @@ internal sealed class JsDocParser
                             indent += asterisk.Length;
                         }
                         break;
-                    case SyntaxKind.Identifier:
+                    case TypeScriptSyntaxKind.Identifier:
                         PushComment(Scanner.TokenText);
                         state = JSDocState.SavingComments;
                         break;
-                    case SyntaxKind.WhitespaceTrivia:
+                    case TypeScriptSyntaxKind.WhitespaceTrivia:
                         var whitespace = Scanner.TokenText;
                         if (state is JSDocState.SavingComments)
                         {
@@ -513,7 +513,7 @@ internal sealed class JsDocParser
                         }
                         indent += whitespace.Length;
                         break;
-                    case SyntaxKind.EndOfFileToken:
+                    case TypeScriptSyntaxKind.EndOfFileToken:
                         break;
                     default:
                         state = JSDocState.SavingComments;
@@ -584,7 +584,7 @@ internal sealed class JsDocParser
 
         void SkipWhitespace()
         {
-            while (Token is SyntaxKind.WhitespaceTrivia or SyntaxKind.NewLineTrivia)
+            while (Token is TypeScriptSyntaxKind.WhitespaceTrivia or TypeScriptSyntaxKind.NewLineTrivia)
             {
                 NextJsDocToken();
             }
@@ -632,11 +632,11 @@ internal sealed class JsDocParser
             List<string> comments2 = new();
             var state = JSDocState.SawAsterisk;
             int? margin = null;
-            while (Token is not SyntaxKind.AtToken && Token is not SyntaxKind.EndOfFileToken)
+            while (Token is not TypeScriptSyntaxKind.AtToken && Token is not TypeScriptSyntaxKind.EndOfFileToken)
             {
                 switch (Token)
                 {
-                    case SyntaxKind.NewLineTrivia:
+                    case TypeScriptSyntaxKind.NewLineTrivia:
                         if (state >= JSDocState.SawAsterisk)
                         {
                             state = JSDocState.BeginningOfLine;
@@ -644,9 +644,9 @@ internal sealed class JsDocParser
                         }
                         indent = 0;
                         break;
-                    case SyntaxKind.AtToken:
+                    case TypeScriptSyntaxKind.AtToken:
                         break;
-                    case SyntaxKind.WhitespaceTrivia:
+                    case TypeScriptSyntaxKind.WhitespaceTrivia:
                         if (state is JSDocState.SavingComments)
                         {
                             PushComment(Scanner.TokenText);
@@ -661,7 +661,7 @@ internal sealed class JsDocParser
                             indent += whitespace.Length;
                         }
                         break;
-                    case SyntaxKind.AsteriskToken:
+                    case TypeScriptSyntaxKind.AsteriskToken:
                         if (state is JSDocState.BeginningOfLine)
                         {
                             state = JSDocState.SawAsterisk;
@@ -676,7 +676,7 @@ caseLabel5: state = JSDocState.SavingComments;
                         break;
                 }
 
-                if (Token is SyntaxKind.AtToken)
+                if (Token is TypeScriptSyntaxKind.AtToken)
                 {
                     break;
                 }
@@ -732,7 +732,7 @@ caseLabel5: state = JSDocState.SavingComments;
             TryParse(() =>
             {
                 SkipWhitespace();
-                return Token is not SyntaxKind.OpenBraceToken ? null : ParseJsDocTypeExpression();
+                return Token is not TypeScriptSyntaxKind.OpenBraceToken ? null : ParseJsDocTypeExpression();
             });
 
         JsDocParameterTag? ParseParamTag(AtToken atToken, Identifier tagName)
@@ -743,17 +743,17 @@ caseLabel5: state = JSDocState.SavingComments;
             Identifier? name = null;
             var isBracketed = false;
 
-            if (ParseOptionalToken<OpenBracketToken>(SyntaxKind.OpenBracketToken) is not null)
+            if (ParseOptionalToken<OpenBracketToken>(TypeScriptSyntaxKind.OpenBracketToken) is not null)
             {
                 name = ParseJsDocIdentifierName();
                 SkipWhitespace();
                 isBracketed = true;
-                if (ParseOptionalToken<EqualsToken>(SyntaxKind.EqualsToken) is not null)
+                if (ParseOptionalToken<EqualsToken>(TypeScriptSyntaxKind.EqualsToken) is not null)
                 {
                     ParseExpression();
                 }
 
-                ParseExpected(SyntaxKind.CloseBracketToken);
+                ParseExpected(TypeScriptSyntaxKind.CloseBracketToken);
             }
             else if (TokenIsIdentifierOrKeyword(Token))
             {
@@ -794,7 +794,7 @@ caseLabel5: state = JSDocState.SavingComments;
 
         JsDocReturnTag ParseReturnTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind is SyntaxKind.JsDocReturnTag) && tagName is ITextRange range)
+            if (tags.Any(t => t.Kind is TypeScriptSyntaxKind.JsDocReturnTag) && tagName is ITextRange range)
             {
                 ParseErrorAtPosition(
                     range.Pos ?? 0,
@@ -813,7 +813,7 @@ caseLabel5: state = JSDocState.SavingComments;
 
         JsDocTypeTag ParseTypeTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind is SyntaxKind.JsDocTypeTag) && tagName is ITextRange range)
+            if (tags.Any(t => t.Kind is TypeScriptSyntaxKind.JsDocTypeTag) && tagName is ITextRange range)
             {
                 ParseErrorAtPosition(
                     range.Pos ?? 0,
@@ -886,9 +886,9 @@ caseLabel5: state = JSDocState.SavingComments;
                 var rightNode = typedefTag.FullName as INode;
                 while (rightNode is not null)
                 {
-                    if (rightNode.Kind is SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body is null)
+                    if (rightNode.Kind is TypeScriptSyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body is null)
                     {
-                        declaration.Name = rightNode.Kind is SyntaxKind.Identifier
+                        declaration.Name = rightNode.Kind is TypeScriptSyntaxKind.Identifier
                             ? rightNode
                             : (rightNode as IDeclaration)?.Name;
 
@@ -904,10 +904,10 @@ caseLabel5: state = JSDocState.SavingComments;
             SkipWhitespace();
             if (typeExpression is not null)
             {
-                if (typeExpression.Type.Kind is SyntaxKind.JsDocTypeReference)
+                if (typeExpression.Type.Kind is TypeScriptSyntaxKind.JsDocTypeReference)
                 {
                     var jsDocTypeReference = (JsDocTypeReference)typeExpression.Type;
-                    if (jsDocTypeReference.Name?.Kind is SyntaxKind.Identifier)
+                    if (jsDocTypeReference.Name?.Kind is TypeScriptSyntaxKind.Identifier)
                     {
                         var name = jsDocTypeReference.Name as Identifier;
                         if (name?.Text == "Object")
@@ -934,12 +934,12 @@ caseLabel5: state = JSDocState.SavingComments;
             var canParseTag = true;
             var seenAsterisk = false;
             var parentTagTerminated = false;
-            while (Token is not SyntaxKind.EndOfFileToken && !parentTagTerminated)
+            while (Token is not TypeScriptSyntaxKind.EndOfFileToken && !parentTagTerminated)
             {
                 NextJsDocToken();
                 switch (Token)
                 {
-                    case SyntaxKind.AtToken:
+                    case TypeScriptSyntaxKind.AtToken:
                         if (canParseTag)
                         {
                             parentTagTerminated = !TryParseChildTag(jsDocTypeLiteral);
@@ -950,22 +950,22 @@ caseLabel5: state = JSDocState.SavingComments;
                         }
                         seenAsterisk = false;
                         break;
-                    case SyntaxKind.NewLineTrivia:
+                    case TypeScriptSyntaxKind.NewLineTrivia:
                         resumePos = Scanner.StartPos - 1;
                         canParseTag = true;
                         seenAsterisk = false;
                         break;
-                    case SyntaxKind.AsteriskToken:
+                    case TypeScriptSyntaxKind.AsteriskToken:
                         if (seenAsterisk)
                         {
                             canParseTag = false;
                         }
                         seenAsterisk = true;
                         break;
-                    case SyntaxKind.Identifier:
+                    case TypeScriptSyntaxKind.Identifier:
                         canParseTag = false;
                         break;
-                    case SyntaxKind.EndOfFileToken:
+                    case TypeScriptSyntaxKind.EndOfFileToken:
                         break;
                 }
             }
@@ -978,7 +978,7 @@ caseLabel5: state = JSDocState.SavingComments;
         {
             var pos = Scanner.TokenPos;
             var typeNameOrNamespaceName = ParseJsDocIdentifierName();
-            if (typeNameOrNamespaceName != null && ParseOptional(SyntaxKind.DotToken))
+            if (typeNameOrNamespaceName != null && ParseOptional(TypeScriptSyntaxKind.DotToken))
             {
                 var jsDocNamespaceNode = new JsDocNamespaceDeclaration();
                 var declaration = jsDocNamespaceNode as IDeclaration;
@@ -1041,7 +1041,7 @@ caseLabel5: state = JSDocState.SavingComments;
 
         JsDocTemplateTag? ParseTemplateTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind is SyntaxKind.JsDocTemplateTag) &&
+            if (tags.Any(t => t.Kind is TypeScriptSyntaxKind.JsDocTemplateTag) &&
                 tagName is ITextRange range)
             {
                 ParseErrorAtPosition(
@@ -1067,7 +1067,7 @@ caseLabel5: state = JSDocState.SavingComments;
                 FinishNode(typeParameter);
 
                 typeParameters.Add(typeParameter);
-                if (Token is SyntaxKind.CommaToken)
+                if (Token is TypeScriptSyntaxKind.CommaToken)
                 {
                     NextJsDocToken();
                     SkipWhitespace();
@@ -1093,7 +1093,7 @@ caseLabel5: state = JSDocState.SavingComments;
             return result;
         }
 
-        SyntaxKind NextJsDocToken()
+        TypeScriptSyntaxKind NextJsDocToken()
         {
             CurrentToken = Scanner.ScanJsDocToken();
             return CurrentToken;

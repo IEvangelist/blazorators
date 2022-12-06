@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ImportDeclaration : Statement
+public class ImportDeclaration : Statement
 {
-    internal ImportDeclaration() => ((INode)this).Kind = SyntaxKind.ImportDeclaration;
+    public ImportDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.ImportDeclaration;
 
-    internal ImportClause ImportClause { get; set; }
-    internal IExpression ModuleSpecifier { get; set; }
+    public ImportClause ImportClause { get; set; }
+    public IExpression ModuleSpecifier { get; set; }
 }

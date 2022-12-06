@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocVariadicType : JsDocType
+public class JsDocVariadicType : JsDocType
 {
-    internal JsDocVariadicType() => ((INode)this).Kind = SyntaxKind.JsDocVariadicType;
+    public JsDocVariadicType() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocVariadicType;
 
-    internal IJsDocType Type { get; set; }
+    public IJsDocType Type { get; set; }
 }

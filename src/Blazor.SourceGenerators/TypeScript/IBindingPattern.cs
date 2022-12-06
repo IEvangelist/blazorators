@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IBindingPattern : INode
 {
-    internal NodeArray<IArrayBindingElement> Elements { get; set; }
+    public NodeArray<IArrayBindingElement> Elements { get; set; }
 }

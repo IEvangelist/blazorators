@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeReference : ObjectType, ITypeReference
+public class TypeReference : ObjectType, ITypeReference
 {
-    internal GenericType Target { get; set; }
-    internal TsType[] TypeArguments { get; set; }
+    public GenericType? Target { get; set; }
+    public TsType[]? TypeArguments { get; set; }
 }

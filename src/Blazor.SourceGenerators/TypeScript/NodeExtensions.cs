@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal static class NodeExtensions
+public static class NodeExtensions
 {
-    internal static IEnumerable<INode> GetDescendants(this INode node, bool includeSelf = true)
+    public static IEnumerable<INode> GetDescendants(this INode node, bool includeSelf = true)
     {
         if (includeSelf) yield return node;
 
@@ -18,7 +18,7 @@ internal static class NodeExtensions
         }
     }
 
-    internal static IEnumerable<INode> GetAncestors(this INode node)
+    public static IEnumerable<INode> GetAncestors(this INode node)
     {
         var current = node.Parent;
 
@@ -29,7 +29,7 @@ internal static class NodeExtensions
         }
     }
 
-    internal static IEnumerable<Node> OfKind(this IEnumerable<Node> nodes, SyntaxKind kind)
+    public static IEnumerable<Node> OfKind(this IEnumerable<Node> nodes, TypeScriptSyntaxKind kind)
     {
         foreach (var node in nodes.Where(node => node.Kind == kind))
         {
@@ -37,7 +37,7 @@ internal static class NodeExtensions
         }
     }
 
-    internal static IEnumerable<INode> OfKind(this IEnumerable<INode> nodes, SyntaxKind kind)
+    public static IEnumerable<INode> OfKind(this IEnumerable<INode> nodes, TypeScriptSyntaxKind kind)
     {
         foreach (var node in nodes.Where(node => node.Kind == kind))
         {

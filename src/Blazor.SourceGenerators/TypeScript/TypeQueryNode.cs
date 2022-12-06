@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeQueryNode : TypeNode
+public class TypeQueryNode : TypeNode
 {
-    internal TypeQueryNode() => ((INode)this).Kind = SyntaxKind.TypeQuery;
+    public TypeQueryNode() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeQuery;
 
-    internal IEntityName ExprName { get; set; }
+    public IEntityName ExprName { get; set; }
 }

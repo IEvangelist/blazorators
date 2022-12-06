@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeAliasDeclaration : DeclarationStatement
+public class TypeAliasDeclaration : DeclarationStatement
 {
-    internal TypeAliasDeclaration() => ((INode)this).Kind = SyntaxKind.TypeAliasDeclaration;
+    public TypeAliasDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeAliasDeclaration;
 
-    internal NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
-    internal ITypeNode Type { get; set; }
+    public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
+    public ITypeNode Type { get; set; }
 }

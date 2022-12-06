@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsxText : Node, IJsxChild
+public class JsxText : Node, IJsxChild
 {
-    internal JsxText() => ((INode)this).Kind = SyntaxKind.JsxText;
+    public JsxText() => ((INode)this).Kind = TypeScriptSyntaxKind.JsxText;
 }

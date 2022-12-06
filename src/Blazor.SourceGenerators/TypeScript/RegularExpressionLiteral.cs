@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class RegularExpressionLiteral : LiteralExpression
+public class RegularExpressionLiteral : LiteralExpression
 {
-    internal RegularExpressionLiteral() => ((INode)this).Kind = SyntaxKind.RegularExpressionLiteral;
+    public RegularExpressionLiteral() => ((INode)this).Kind = TypeScriptSyntaxKind.RegularExpressionLiteral;
 }

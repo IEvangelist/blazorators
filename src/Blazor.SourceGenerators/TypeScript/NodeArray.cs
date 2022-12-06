@@ -3,18 +3,20 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class NodeArray<T> : List<T>, ITextRange
+public class NodeArray<T> : List<T>, ITextRange
 {
-    internal bool HasTrailingComma { get; set; }
-    internal TransformFlags TransformFlags { get; set; }
+    public bool HasTrailingComma { get; set; }
+    public TransformFlags TransformFlags { get; set; }
     int? ITextRange.Pos { get; set; }
     int? ITextRange.End { get; set; }
 
-    internal NodeArray()
+    public NodeArray()
     {
     }
 
-    internal NodeArray(T[] elements) : base(elements)
+    public NodeArray(T[] elements) : base(elements)
     {
     }
+
+    public static NodeArray<T> Empty => new(Array.Empty<T>());
 }

@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class CheckJsDirective : TextRange
+public class CheckJsDirective : TextRange
 {
-    internal bool Enabled { get; set; }
+    public bool Enabled { get; set; }
 }

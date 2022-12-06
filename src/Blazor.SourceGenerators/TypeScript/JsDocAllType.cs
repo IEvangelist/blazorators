@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocAllType : JsDocType
+public class JsDocAllType : JsDocType
 {
-    internal JsDocAllType() => ((INode)this).Kind = SyntaxKind.JsDocAllType;
+    public JsDocAllType() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocAllType;
 }

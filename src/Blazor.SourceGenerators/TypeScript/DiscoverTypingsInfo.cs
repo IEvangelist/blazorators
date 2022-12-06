@@ -1,13 +1,13 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class DiscoverTypingsInfo
+public class DiscoverTypingsInfo
 {
-    internal string[] FileNames { get; set; }
-    internal string ProjectRootPath { get; set; }
-    internal string SafeListPath { get; set; }
-    internal Map<string> PackageNameToTypingLocation { get; set; }
-    internal TypeAcquisition TypeAcquisition { get; set; }
-    internal CompilerOptions CompilerOptions { get; set; }
-    internal ReadonlyArray<string> UnresolvedImports { get; set; }
+    public string[] FileNames { get; set; } = Array.Empty<string>();
+    public string? ProjectRootPath { get; set; }
+    public string? SafeListPath { get; set; }
+    public Map<string> PackageNameToTypingLocation { get; set; } = Map<string>.Empty;
+    public TypeAcquisition? TypeAcquisition { get; set; }
+    public CompilerOptions? CompilerOptions { get; set; }
+    public ReadonlyArray<string> UnresolvedImports { get; set; } = ReadonlyArray<string>.Empty;
 }

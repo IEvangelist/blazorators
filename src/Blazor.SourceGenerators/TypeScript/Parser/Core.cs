@@ -4,12 +4,12 @@
 namespace Blazor.SourceGenerators.TypeScript.Parser;
 
 // from core.ts
-internal static class Core
+public static class Core
 {
     private const char DirectorySeparator = '/';
     private const CharacterCode DirectorySeparatorCharCode = CharacterCode.Slash;
 
-    internal static int BinarySearch(
+    public static int BinarySearch(
         int[] array, int value, Func<int, int, int>? comparer = null, int? offset = null)
     {
         if (array is null || array.Length == 0)
@@ -39,12 +39,12 @@ internal static class Core
         return ~low;
     }
 
-    internal static bool PositionIsSynthesized(int pos) =>
+    public static bool PositionIsSynthesized(int pos) =>
         // This is a fast way of testing the following conditions:
         //  pos is null || pos is null || isNaN(pos) || pos < 0;
         !(pos >= 0);
 
-    internal static ScriptKind EnsureScriptKind(string fileName, ScriptKind scriptKind)
+    public static ScriptKind EnsureScriptKind(string fileName, ScriptKind scriptKind)
     {
         // Using scriptKind as a condition handles both:
         // - 'scriptKind' is unspecified and thus it is `null`
@@ -56,7 +56,7 @@ internal static class Core
         return sk != ScriptKind.Unknown ? sk : ScriptKind.Ts;
     }
 
-    internal static ScriptKind GetScriptKindFromFileName(string fileName) =>
+    public static ScriptKind GetScriptKindFromFileName(string fileName) =>
         Path.GetExtension(fileName)?.ToLower() switch
         {
             ".js" => ScriptKind.Js,
@@ -66,7 +66,7 @@ internal static class Core
             _ => ScriptKind.Unknown
         };
 
-    internal static string NormalizePath(string path)
+    public static string NormalizePath(string path)
     {
         path = NormalizeSlashes(path);
         var rootLength = GetRootLength(path);
@@ -83,10 +83,10 @@ internal static class Core
         }
     }
 
-    internal static string NormalizeSlashes(string path) =>
+    public static string NormalizeSlashes(string path) =>
         Regex.Replace(path, "/\\/ g", "/");
 
-    internal static int GetRootLength(string path)
+    public static int GetRootLength(string path)
     {
         if (path.CharCodeAt(0) is CharacterCode.Slash)
         {
@@ -114,9 +114,9 @@ internal static class Core
         return idx != -1 ? idx + "://".Length : 0;
     }
 
-    internal static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
+    public static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
     {
-        var parts = normalizedSlashedPath[rootLength..].Split(DirectorySeparator);
+        var parts = normalizedSlashedPath.SubString(rootLength).Split(DirectorySeparator);
         List<string> normalized = new();
         foreach (var part in parts)
         {
@@ -140,18 +140,18 @@ internal static class Core
         return normalized;
     }
 
-    internal static T? LastOrUndefined<T>(List<T> array) where T : class =>
+    public static T? LastOrUndefined<T>(List<T> array) where T : class =>
         array != null && array.Any()
             ? array.Last()
             : default;
 
-    internal static bool PathEndsWithDirectorySeparator(string path) =>
+    public static bool PathEndsWithDirectorySeparator(string path) =>
         path.CharCodeAt(path.Length - 1) == DirectorySeparatorCharCode;
 
-    internal static bool FileExtensionIs(string path, string extension) =>
+    public static bool FileExtensionIs(string path, string extension) =>
         path.Length > extension.Length && EndsWith(path, extension);
 
-    internal static bool EndsWith(string str, string suffix)
+    public static bool EndsWith(string str, string suffix)
     {
         var expectedPos = str.Length - suffix.Length;
         return expectedPos >= 0 && str.IndexOf(
@@ -160,12 +160,14 @@ internal static class Core
             StringComparison.Ordinal) == expectedPos;
     }
 
-    internal static Diagnostic CreateFileDiagnostic(
+    public static TypeScriptDiagnostic CreateFileDiagnostic(
         SourceFile file,
         int start,
         int length,
         DiagnosticMessage? message = null,
-        params string[] args) => new()
+        params string[] args)
+    {
+        TypeScriptDiagnostic diagnostic = new()
         {
             File = file,
             Start = start,
@@ -174,8 +176,10 @@ internal static class Core
             Category = message?.Category ?? DiagnosticCategory.Unknown,
             Code = message?.Code ?? 0,
         };
+        return diagnostic;
+    }
 
-    internal static string GetLocaleSpecificMessage(
+    public static string GetLocaleSpecificMessage(
         DiagnosticMessage? message = null,
         params string[] args) =>
         "localizedDiagnosticMessages";// && localizedDiagnosticMessages[message.key] || message.message;

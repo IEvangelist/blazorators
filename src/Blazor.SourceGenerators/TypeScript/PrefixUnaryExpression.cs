@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PrefixUnaryExpression : IncrementExpression
+public class PrefixUnaryExpression : IncrementExpression
 {
-    internal PrefixUnaryExpression() => ((INode)this).Kind = SyntaxKind.PrefixUnaryExpression;
+    public PrefixUnaryExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.PrefixUnaryExpression;
 
-    internal SyntaxKind Operator { get; set; }
-    internal IExpression Operand { get; set; }
+    public TypeScriptSyntaxKind Operator { get; set; }
+    public IExpression Operand { get; set; }
 }

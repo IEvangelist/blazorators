@@ -3,16 +3,16 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocPropertyTag : Node, IJsDocTag, ITypeElement
+public class JsDocPropertyTag : Node, IJsDocTag, ITypeElement
 {
-    internal JsDocPropertyTag() => ((INode)this).Kind = SyntaxKind.JsDocPropertyTag;
+    public JsDocPropertyTag() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocPropertyTag;
 
-    internal JsDocTypeExpression? TypeExpression { get; set; } = default!;
-    AtToken IJsDocTag.AtToken { get; set; } = default!;
-    Identifier IJsDocTag.TagName { get; set; } = default!;
-    string IJsDocTag.Comment { get; set; } = default!;
-    object ITypeElement.TypeElementBrand { get; set; } = default!;
-    INode? IDeclaration.Name { get; set; } = default!;
-    QuestionToken ITypeElement.QuestionToken { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
+    public JsDocTypeExpression? TypeExpression? { get; set; }
+    AtToken IJsDocTag.AtToken? { get; set; }
+    Identifier IJsDocTag.TagName? { get; set; }
+    string IJsDocTag.Comment? { get; set; }
+    object ITypeElement.TypeElementBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
+    QuestionToken ITypeElement.QuestionToken? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
 }

@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class QualifiedName : Node, IEntityName
+public class QualifiedName : Node, IEntityName
 {
-    internal QualifiedName() => ((INode)this).Kind = SyntaxKind.QualifiedName;
+    public QualifiedName() => ((INode)this).Kind = TypeScriptSyntaxKind.QualifiedName;
 
-    internal IEntityName Left { get; set; }
-    internal Identifier Right { get; set; }
+    public IEntityName Left { get; set; }
+    public Identifier Right { get; set; }
 }

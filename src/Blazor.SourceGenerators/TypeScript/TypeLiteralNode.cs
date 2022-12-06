@@ -1,12 +1,12 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeLiteralNode : Node, ITypeNode, IDeclaration
+public class TypeLiteralNode : Node, ITypeNode, IDeclaration
 {
-    internal TypeLiteralNode() => ((INode)this).Kind = SyntaxKind.TypeLiteral;
+    public TypeLiteralNode() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeLiteral;
 
-    internal NodeArray<ITypeElement> Members { get; set; }
-    internal object DeclarationBrand { get; set; }
-    internal INode Name { get; set; }
-    internal object TypeNodeBrand { get; set; }
+    public NodeArray<ITypeElement> Members { get; set; }
+    public object DeclarationBrand { get; set; }
+    public INode? Name { get; set; }
+    public object TypeNodeBrand { get; set; }
 }

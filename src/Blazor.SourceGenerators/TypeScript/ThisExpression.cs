@@ -1,15 +1,15 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ThisExpression : Node, IPrimaryExpression, IKeywordTypeNode
+public class ThisExpression : Node, IPrimaryExpression, IKeywordTypeNode
 {
-    internal ThisExpression() => ((INode)this).Kind = SyntaxKind.ThisKeyword;
+    public ThisExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.ThisKeyword;
 
-    internal object TypeNodeBrand { get; set; }
-    internal object PrimaryExpressionBrand { get; set; }
-    internal object MemberExpressionBrand { get; set; }
-    internal object LeftHandSideExpressionBrand { get; set; }
-    internal object IncrementExpressionBrand { get; set; }
-    internal object UnaryExpressionBrand { get; set; }
-    internal object ExpressionBrand { get; set; }
+    public object TypeNodeBrand { get; set; }
+    public object PrimaryExpressionBrand { get; set; }
+    public object MemberExpressionBrand { get; set; }
+    public object LeftHandSideExpressionBrand { get; set; }
+    public object IncrementExpressionBrand { get; set; }
+    public object UnaryExpressionBrand { get; set; }
+    public object ExpressionBrand { get; set; }
 }

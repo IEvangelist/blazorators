@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TemplateHead : LiteralLikeNode
+public class TemplateHead : LiteralLikeNode
 {
-    internal TemplateHead() => ((INode)this).Kind = SyntaxKind.TemplateHead;
+    public TemplateHead() => ((INode)this).Kind = TypeScriptSyntaxKind.TemplateHead;
 }

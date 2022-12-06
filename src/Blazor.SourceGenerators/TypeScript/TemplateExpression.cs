@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TemplateExpression : PrimaryExpression
+public class TemplateExpression : PrimaryExpression
 {
-    internal TemplateExpression() => ((INode)this).Kind = SyntaxKind.TemplateExpression;
+    public TemplateExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.TemplateExpression;
 
-    internal TemplateHead Head { get; set; }
-    internal NodeArray<TemplateSpan> TemplateSpans { get; set; }
+    public TemplateHead Head { get; set; }
+    public NodeArray<TemplateSpan> TemplateSpans { get; set; }
 }

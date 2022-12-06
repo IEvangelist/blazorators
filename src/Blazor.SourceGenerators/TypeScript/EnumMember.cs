@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EnumMember : Declaration
+public class EnumMember : Declaration
 {
-    internal EnumMember() => ((INode)this).Kind = SyntaxKind.EnumMember;
+    public EnumMember() => ((INode)this).Kind = TypeScriptSyntaxKind.EnumMember;
 
-    internal IExpression Initializer { get; set; }
+    public IExpression? Initializer { get; set; }
 }

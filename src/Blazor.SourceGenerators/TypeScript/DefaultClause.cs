@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class DefaultClause : Node, ICaseOrDefaultClause
+public class DefaultClause : Node, ICaseOrDefaultClause
 {
-    internal DefaultClause() => ((INode)this).Kind = SyntaxKind.DefaultClause;
+    public DefaultClause() => ((INode)this).Kind = TypeScriptSyntaxKind.DefaultClause;
 
-    internal NodeArray<IStatement> Statements { get; set; }
+    public NodeArray<IStatement> Statements { get; set; } = NodeArray<IStatement>.Empty;
 }

@@ -1,16 +1,16 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PromiseOrAwaitableType : TsType, IObjectType, IUnionType
+public class PromiseOrAwaitableType : TsType, IObjectType, IUnionType
 {
-    internal TsType PromiseTypeOfPromiseConstructor { get; set; }
-    internal TsType PromisedTypeOfPromise { get; set; }
-    internal TsType AwaitedTypeOfType { get; set; }
-    internal ObjectFlags ObjectFlags { get; set; }
-    internal TsType[] Types { get; set; }
-    internal SymbolTable PropertyCache { get; set; }
-    internal Symbol[] ResolvedProperties { get; set; }
-    internal IndexType ResolvedIndexType { get; set; }
-    internal TsType ResolvedBaseConstraint { get; set; }
-    internal bool CouldContainTypeVariables { get; set; }
+    public TsType? PromiseTypeOfPromiseConstructor { get; set; }
+    public TsType? PromisedTypeOfPromise { get; set; }
+    public TsType? AwaitedTypeOfType { get; set; }
+    public ObjectFlags ObjectFlags { get; set; }
+    public TsType[]? Types { get; set; }
+    public SymbolTable? PropertyCache { get; set; }
+    public Symbol[]? ResolvedProperties { get; set; }
+    public IndexType? ResolvedIndexType { get; set; }
+    public TsType? ResolvedBaseConstraint { get; set; }
+    public bool CouldContainTypeVariables { get; set; }
 }

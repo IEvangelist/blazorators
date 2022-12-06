@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class FlowLabel : FlowNode
+public class FlowLabel : FlowNode
 {
-    internal FlowNode[] Antecedents { get; set; }
+    public FlowNode[] Antecedents { get; set; } = Array.Empty<FlowNode>();
 }

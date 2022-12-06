@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class EndOfFileToken : Token
+public class EndOfFileToken : Token
 {
-    public EndOfFileToken() => ((INode)this).Kind = SyntaxKind.EndOfFileToken;
+    public EndOfFileToken() => ((INode)this).Kind = TypeScriptSyntaxKind.EndOfFileToken;
 }

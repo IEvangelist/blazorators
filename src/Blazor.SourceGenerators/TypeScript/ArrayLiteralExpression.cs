@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ArrayLiteralExpression : PrimaryExpression
+public class ArrayLiteralExpression : PrimaryExpression
 {
-    internal ArrayLiteralExpression() => ((INode)this).Kind = SyntaxKind.ArrayLiteralExpression;
+    public ArrayLiteralExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.ArrayLiteralExpression;
 
-    internal NodeArray<IExpression> Elements { get; set; } = default!;
-    internal bool MultiLine { get; set; }
+    public NodeArray<IExpression> Elements? { get; set; }
+    public bool MultiLine { get; set; }
 }

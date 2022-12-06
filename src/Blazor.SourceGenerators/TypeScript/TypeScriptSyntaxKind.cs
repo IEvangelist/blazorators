@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal enum SyntaxKind
+public enum TypeScriptSyntaxKind
 {
     Unknown,
     EndOfFileToken,

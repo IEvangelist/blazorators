@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class EnumDeclaration : DeclarationStatement
+public class EnumDeclaration : DeclarationStatement
 {
-    internal EnumDeclaration() => ((INode)this).Kind = SyntaxKind.EnumDeclaration;
+    public EnumDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.EnumDeclaration;
 
-    internal NodeArray<EnumMember> Members { get; set; }
+    public NodeArray<EnumMember> Members { get; set; } = NodeArray<EnumMember>.Empty;
 }

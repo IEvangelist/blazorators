@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Map
+public class Map
 {
-    internal int Size { get; set; }
+    public int Size { get; set; }
 }

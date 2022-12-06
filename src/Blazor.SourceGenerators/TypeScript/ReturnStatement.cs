@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ReturnStatement : Statement
+public class ReturnStatement : Statement
 {
-    internal ReturnStatement() => ((INode)this).Kind = SyntaxKind.ReturnStatement;
+    public ReturnStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.ReturnStatement;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

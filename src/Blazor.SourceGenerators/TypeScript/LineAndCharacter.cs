@@ -3,8 +3,8 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class LineAndCharacter
+public class LineAndCharacter
 {
-    internal int Line { get; set; }
-    internal int Character { get; set; }
+    public int Line { get; set; }
+    public int Character { get; set; }
 }

@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class LeftHandSideExpression : IncrementExpression, ILeftHandSideExpression
+public class LeftHandSideExpression : IncrementExpression, ILeftHandSideExpression
 {
-    object ILeftHandSideExpression.LeftHandSideExpressionBrand { get; set; } = default!;
+    object ILeftHandSideExpression.LeftHandSideExpressionBrand? { get; set; }
 }

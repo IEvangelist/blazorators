@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface ILeftHandSideExpression : IIncrementExpression
 {
-    internal object LeftHandSideExpressionBrand { get; set; }
+    public object LeftHandSideExpressionBrand { get; set; }
 }

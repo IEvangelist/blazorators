@@ -1,21 +1,21 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class Signature
+public class Signature
 {
-    internal SignatureDeclaration Declaration { get; set; }
-    internal TypeParameter[] TypeParameters { get; set; }
-    internal Symbol[] Parameters { get; set; }
-    internal Symbol ThisParameter { get; set; }
-    internal TsType ResolvedReturnType { get; set; }
-    internal int MinArgumentCount { get; set; }
-    internal bool HasRestParameter { get; set; }
-    internal bool HasLiteralTypes { get; set; }
-    internal Signature Target { get; set; }
-    internal TypeMapper Mapper { get; set; }
-    internal Signature[] UnionSignatures { get; set; }
-    internal Signature ErasedSignatureCache { get; set; }
-    internal ObjectType IsolatedSignatureType { get; set; }
-    internal ITypePredicate TypePredicate { get; set; }
-    internal Map<Signature> Instantiations { get; set; }
+    public SignatureDeclaration? Declaration { get; set; }
+    public TypeParameter[]? TypeParameters { get; set; }
+    public Symbol[]? Parameters { get; set; }
+    public Symbol? ThisParameter { get; set; }
+    public TsType? ResolvedReturnType { get; set; }
+    public int MinArgumentCount { get; set; }
+    public bool HasRestParameter { get; set; }
+    public bool HasLiteralTypes { get; set; }
+    public Signature? Target { get; set; }
+    public TypeMapper? Mapper { get; set; }
+    public Signature[]? UnionSignatures { get; set; }
+    public Signature? ErasedSignatureCache { get; set; }
+    public ObjectType? IsolatedSignatureType { get; set; }
+    public ITypePredicate? TypePredicate { get; set; }
+    public Map<Signature>? Instantiations { get; set; }
 }

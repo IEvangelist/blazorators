@@ -3,23 +3,23 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class FunctionExpression : Node, IPrimaryExpression, IFunctionLikeDeclaration
+public class FunctionExpression : Node, IPrimaryExpression, IFunctionLikeDeclaration
 {
-    internal FunctionExpression() => ((INode)this).Kind = SyntaxKind.FunctionExpression;
+    public FunctionExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.FunctionExpression;
 
-    public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; } = default!;
-    public NodeArray<ParameterDeclaration> Parameters { get; set; } = default!;
-    public ITypeNode Type { get; set; } = default!;
-    object IPrimaryExpression.PrimaryExpressionBrand { get; set; } = default!;
-    object IMemberExpression.MemberExpressionBrand { get; set; } = default!;
-    object ILeftHandSideExpression.LeftHandSideExpressionBrand { get; set; } = default!;
-    object IIncrementExpression.IncrementExpressionBrand { get; set; } = default!;
-    object IUnaryExpression.UnaryExpressionBrand { get; set; } = default!;
-    object IExpression.ExpressionBrand { get; set; } = default!;
-    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
-    AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;
-    QuestionToken IFunctionLikeDeclaration.QuestionToken { get; set; } = default!;
-    IBlockOrExpression IFunctionLikeDeclaration.Body { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
+    public NodeArray<TypeParameterDeclaration> TypeParameters? { get; set; }
+    public NodeArray<ParameterDeclaration> Parameters? { get; set; }
+    public ITypeNode Type? { get; set; }
+    object IPrimaryExpression.PrimaryExpressionBrand? { get; set; }
+    object IMemberExpression.MemberExpressionBrand? { get; set; }
+    object ILeftHandSideExpression.LeftHandSideExpressionBrand? { get; set; }
+    object IIncrementExpression.IncrementExpressionBrand? { get; set; }
+    object IUnaryExpression.UnaryExpressionBrand? { get; set; }
+    object IExpression.ExpressionBrand? { get; set; }
+    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand? { get; set; }
+    AsteriskToken IFunctionLikeDeclaration.AsteriskToken? { get; set; }
+    QuestionToken IFunctionLikeDeclaration.QuestionToken? { get; set; }
+    IBlockOrExpression IFunctionLikeDeclaration.Body? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
 }

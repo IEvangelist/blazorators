@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class SyntaxList : Node
+public class SyntaxList : Node
 {
-    internal SyntaxList() => ((INode)this).Kind = SyntaxKind.SyntaxList;
+    public SyntaxList() => ((INode)this).Kind = TypeScriptSyntaxKind.SyntaxList;
 
-    internal Node[] _children { get; set; }
+    public Node[] _children { get; set; }
 }

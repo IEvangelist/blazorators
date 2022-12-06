@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class IndexType : TsType
+public class IndexType : TsType
 {
-    internal TsType Type { get; set; } // TypeVariable | UnionOrIntersectionType
+    public TsType? Type { get; set; } // TypeVariable | UnionOrIntersectionType
 }

@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsxExpression : Expression, IJsxChild
+public class JsxExpression : Expression, IJsxChild
 {
-    internal JsxExpression() => ((INode)this).Kind = SyntaxKind.JsxExpression;
+    public JsxExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.JsxExpression;
 
-    internal Token DotDotDotToken { get; set; }
-    internal IExpression Expression { get; set; }
+    public Token DotDotDotToken { get; set; }
+    public IExpression Expression { get; set; }
 }

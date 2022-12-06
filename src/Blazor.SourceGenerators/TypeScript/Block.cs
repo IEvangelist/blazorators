@@ -3,10 +3,10 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Block : Statement, IBlockOrExpression
+public class Block : Statement, IBlockOrExpression
 {
-    internal Block() => ((INode)this).Kind = SyntaxKind.Block;
+    public Block() => ((INode)this).Kind = TypeScriptSyntaxKind.Block;
 
-    internal NodeArray<IStatement> Statements { get; set; } = default!;
-    internal bool MultiLine { get; set; }
+    public NodeArray<IStatement> Statements? { get; set; }
+    public bool MultiLine { get; set; }
 }

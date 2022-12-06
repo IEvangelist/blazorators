@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeOfExpression : UnaryExpression
+public class TypeOfExpression : UnaryExpression
 {
-    internal TypeOfExpression() => ((INode)this).Kind = SyntaxKind.TypeOfExpression;
+    public TypeOfExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeOfExpression;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

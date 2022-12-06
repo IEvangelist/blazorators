@@ -3,16 +3,16 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ConstructorDeclaration : Declaration, IFunctionLikeDeclaration, IClassElement
+public class ConstructorDeclaration : Declaration, IFunctionLikeDeclaration, IClassElement
 {
-    internal ConstructorDeclaration() => ((INode)this).Kind = SyntaxKind.Constructor;
+    public ConstructorDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.Constructor;
 
-    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
-    AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;
-    QuestionToken IFunctionLikeDeclaration.QuestionToken { get; set; } = default!;
-    IBlockOrExpression IFunctionLikeDeclaration.Body { get; set; } = default!;
-    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;
-    ITypeNode ISignatureDeclaration.Type { get; set; } = default!;
-    object IClassElement.ClassElementBrand { get; set; } = default!;
+    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand? { get; set; }
+    AsteriskToken IFunctionLikeDeclaration.AsteriskToken? { get; set; }
+    QuestionToken IFunctionLikeDeclaration.QuestionToken? { get; set; }
+    IBlockOrExpression IFunctionLikeDeclaration.Body? { get; set; }
+    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters? { get; set; }
+    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters? { get; set; }
+    ITypeNode ISignatureDeclaration.Type? { get; set; }
+    object IClassElement.ClassElementBrand? { get; set; }
 }

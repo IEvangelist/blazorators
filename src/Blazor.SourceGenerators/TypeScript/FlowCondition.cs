@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class FlowCondition : FlowNode
+public class FlowCondition : FlowNode
 {
-    internal IExpression Expression { get; set; }
-    internal FlowNode Antecedent { get; set; }
+    public IExpression? Expression { get; set; }
+    public FlowNode? Antecedent { get; set; }
 }

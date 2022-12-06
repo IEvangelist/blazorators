@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IStatement : INode
 {
-    internal object StatementBrand { get; set; }
+    public object StatementBrand { get; set; }
 }

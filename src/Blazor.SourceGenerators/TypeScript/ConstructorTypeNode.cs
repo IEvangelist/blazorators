@@ -3,14 +3,14 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ConstructorTypeNode : Node, ITypeNode, IFunctionOrConstructorTypeNode
+public class ConstructorTypeNode : Node, ITypeNode, IFunctionOrConstructorTypeNode
 {
-    internal ConstructorTypeNode() => ((INode)this).Kind = SyntaxKind.ConstructorType;
+    public ConstructorTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.ConstructorType;
 
-    object ITypeNode.TypeNodeBrand { get; set; } = default!;
-    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;
-    ITypeNode ISignatureDeclaration.Type { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
+    object ITypeNode.TypeNodeBrand? { get; set; }
+    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters? { get; set; }
+    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters? { get; set; }
+    ITypeNode ISignatureDeclaration.Type? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
 }

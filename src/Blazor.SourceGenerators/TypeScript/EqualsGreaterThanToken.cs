@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class EqualsGreaterThanToken : Token
+public class EqualsGreaterThanToken : Token
 {
-    internal EqualsGreaterThanToken() => ((INode)this).Kind = SyntaxKind.EqualsGreaterThanToken;
+    public EqualsGreaterThanToken() => ((INode)this).Kind = TypeScriptSyntaxKind.EqualsGreaterThanToken;
 }

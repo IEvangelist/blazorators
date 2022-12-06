@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PluginImport
+public class PluginImport
 {
-    internal string Name { get; set; }
+    public string? Name { get; set; }
 }

@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypeMapper
+public class TypeMapper
 {
-    internal TsType[] MappedTypes { get; set; }
-    internal TsType[] Instantiations { get; set; }
-    internal InferenceContext Context { get; set; }
+    public TsType[]? MappedTypes { get; set; }
+    public TsType[]? Instantiations { get; set; }
+    public InferenceContext? Context { get; set; }
 }

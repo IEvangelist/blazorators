@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ITypePredicate : TypePredicateBase
+public class ITypePredicate : TypePredicateBase
 {
 }

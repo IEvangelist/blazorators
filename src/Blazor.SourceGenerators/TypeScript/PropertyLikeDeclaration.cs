@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class PropertyLikeDeclaration : Declaration
+public class PropertyLikeDeclaration : Declaration
 {
 }

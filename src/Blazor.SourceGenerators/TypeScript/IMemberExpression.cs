@@ -3,5 +3,5 @@
 
 public interface IMemberExpression : ILeftHandSideExpression
 {
-    internal object MemberExpressionBrand { get; set; }
+    public object MemberExpressionBrand { get; set; }
 }

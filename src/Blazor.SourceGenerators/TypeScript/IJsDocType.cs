@@ -3,5 +3,5 @@
 
 public interface IJsDocType : ITypeNode
 {
-    internal object JsDocTypeBrand { get; set; }
+    public object JsDocTypeBrand { get; set; }
 }

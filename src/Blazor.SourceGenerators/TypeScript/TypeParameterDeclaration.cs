@@ -3,11 +3,11 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class TypeParameterDeclaration : Declaration
+public class TypeParameterDeclaration : Declaration
 {
-    public TypeParameterDeclaration() => ((INode)this).Kind = SyntaxKind.TypeParameter;
+    public TypeParameterDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.TypeParameter;
 
-    internal ITypeNode Constraint { get; set; }
-    internal ITypeNode Default { get; set; }
-    internal IExpression Expression { get; set; }
+    public ITypeNode Constraint { get; set; }
+    public ITypeNode Default { get; set; }
+    public IExpression Expression { get; set; }
 }

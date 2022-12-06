@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsxOpeningElement : JsxSelfClosingElement
+public class JsxOpeningElement : JsxSelfClosingElement
 {
-    internal JsxOpeningElement() => ((INode)this).Kind = SyntaxKind.JsxOpeningElement;
+    public JsxOpeningElement() => ((INode)this).Kind = TypeScriptSyntaxKind.JsxOpeningElement;
 }

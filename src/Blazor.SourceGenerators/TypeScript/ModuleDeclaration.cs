@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ModuleDeclaration : DeclarationStatement
+public class ModuleDeclaration : DeclarationStatement
 {
-    internal ModuleDeclaration() => ((INode)this).Kind = SyntaxKind.ModuleDeclaration;
+    public ModuleDeclaration() => ((INode)this).Kind = TypeScriptSyntaxKind.ModuleDeclaration;
 
-    internal INode? Body { get; set; }
+    public INode? Body { get; set; }
 }

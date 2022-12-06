@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ExpressionWithTypeArguments : TypeNode
+public class ExpressionWithTypeArguments : TypeNode
 {
-    internal ExpressionWithTypeArguments() => ((INode)this).Kind = SyntaxKind.ExpressionWithTypeArguments;
+    public ExpressionWithTypeArguments() => ((INode)this).Kind = TypeScriptSyntaxKind.ExpressionWithTypeArguments;
 
-    internal IExpression Expression { get; set; }
-    internal NodeArray<ITypeNode> TypeArguments { get; set; }
+    public IExpression? Expression { get; set; }
+    public NodeArray<ITypeNode> TypeArguments { get; set; } = NodeArray<ITypeNode>.Empty;
 }

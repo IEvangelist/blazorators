@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class SpreadAssignment : ObjectLiteralElement, IObjectLiteralElementLike
+public class SpreadAssignment : ObjectLiteralElement, IObjectLiteralElementLike
 {
-    internal SpreadAssignment() => ((INode)this).Kind = SyntaxKind.SpreadAssignment;
+    public SpreadAssignment() => ((INode)this).Kind = TypeScriptSyntaxKind.SpreadAssignment;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

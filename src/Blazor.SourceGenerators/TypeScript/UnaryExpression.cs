@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class UnaryExpression : Expression, IUnaryExpression
+public class UnaryExpression : Expression, IUnaryExpression
 {
-    object IUnaryExpression.UnaryExpressionBrand { get; set; } = default!;
+    object IUnaryExpression.UnaryExpressionBrand? { get; set; }
 }

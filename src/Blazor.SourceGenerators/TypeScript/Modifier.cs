@@ -3,6 +3,6 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Modifier : Node
+public class Modifier : Node
 {
 }

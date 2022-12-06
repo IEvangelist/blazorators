@@ -3,6 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class Map<T> : List<T>
+public class Map<T> : List<T>
 {
+    public static Map<T> Empty => new();
 }

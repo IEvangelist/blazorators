@@ -3,13 +3,13 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocParameterTag : JsDocTag
+public class JsDocParameterTag : JsDocTag
 {
-    internal JsDocParameterTag() => ((INode)this).Kind = SyntaxKind.JsDocParameterTag;
+    public JsDocParameterTag() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocParameterTag;
 
-    internal Identifier? PreParameterName { get; set; }
-    internal JsDocTypeExpression? TypeExpression { get; set; }
-    internal Identifier? PostParameterName { get; set; }
-    internal Identifier? ParameterName { get; set; }
-    internal bool IsBracketed { get; set; }
+    public Identifier? PreParameterName { get; set; }
+    public JsDocTypeExpression? TypeExpression { get; set; }
+    public Identifier? PostParameterName { get; set; }
+    public Identifier? ParameterName { get; set; }
+    public bool IsBracketed { get; set; }
 }

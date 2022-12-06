@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class DeclarationStatement : Node, IDeclarationStatement, IDeclaration, IStatement
+public class DeclarationStatement : Node, IDeclarationStatement, IDeclaration, IStatement
 {
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode? IDeclaration.Name { get; set; } = default!;
-    object IStatement.StatementBrand { get; set; } = default!;
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
+    object IStatement.StatementBrand? { get; set; }
 }

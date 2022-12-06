@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class SuperExpression : PrimaryExpression
+public class SuperExpression : PrimaryExpression
 {
-    internal SuperExpression() => ((INode)this).Kind = SyntaxKind.SuperKeyword;
+    public SuperExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.SuperKeyword;
 }

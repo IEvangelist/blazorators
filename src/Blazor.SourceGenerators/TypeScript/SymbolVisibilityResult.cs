@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class SymbolVisibilityResult
+public class SymbolVisibilityResult
 {
-    internal SymbolAccessibility Accessibility { get; set; }
-    internal IAnyImportSyntax[] AliasesToMakeVisible { get; set; }
-    internal string ErrorSymbolName { get; set; }
-    internal Node ErrorNode { get; set; }
+    public SymbolAccessibility Accessibility { get; set; }
+    public IAnyImportSyntax[]? AliasesToMakeVisible { get; set; }
+    public string? ErrorSymbolName { get; set; }
+    public Node? ErrorNode { get; set; }
 }

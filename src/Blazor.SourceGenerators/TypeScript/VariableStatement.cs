@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class VariableStatement : Statement
+public class VariableStatement : Statement
 {
-    internal VariableStatement() => ((INode)this).Kind = SyntaxKind.VariableStatement;
+    public VariableStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.VariableStatement;
 
-    internal IVariableDeclarationList DeclarationList { get; set; }
+    public IVariableDeclarationList DeclarationList { get; set; }
 }

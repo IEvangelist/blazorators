@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ColonToken : Token
+public class ColonToken : Token
 {
-    internal ColonToken() => ((INode)this).Kind = SyntaxKind.ColonToken;
+    public ColonToken() => ((INode)this).Kind = TypeScriptSyntaxKind.ColonToken;
 }

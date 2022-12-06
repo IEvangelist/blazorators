@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PatternAmbientModule
+public class PatternAmbientModule
 {
-    internal Pattern Pattern { get; set; }
-    internal Symbol Symbol { get; set; }
+    public Pattern? Pattern { get; set; }
+    public Symbol? Symbol { get; set; }
 }

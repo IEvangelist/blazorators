@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ReadonlyToken : Token
+public class ReadonlyToken : Token
 {
-    internal ReadonlyToken() => ((INode)this).Kind = SyntaxKind.ReadonlyKeyword;
+    public ReadonlyToken() => ((INode)this).Kind = TypeScriptSyntaxKind.ReadonlyKeyword;
 }

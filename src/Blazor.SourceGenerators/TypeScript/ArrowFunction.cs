@@ -3,18 +3,18 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class ArrowFunction : Node, IExpression, IFunctionLikeDeclaration
+public class ArrowFunction : Node, IExpression, IFunctionLikeDeclaration
 {
-    internal ArrowFunction() => ((INode)this).Kind = SyntaxKind.ArrowFunction;
+    public ArrowFunction() => ((INode)this).Kind = TypeScriptSyntaxKind.ArrowFunction;
 
-    object IExpression.ExpressionBrand { get; set; } = default!;
-    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand { get; set; } = default!;
-    AsteriskToken IFunctionLikeDeclaration.AsteriskToken { get; set; } = default!;
-    QuestionToken IFunctionLikeDeclaration.QuestionToken { get; set; } = default!;
-    IBlockOrExpression IFunctionLikeDeclaration.Body { get; set; } = default!;
-    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters { get; set; } = default!;
-    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters { get; set; } = default!;
-    ITypeNode ISignatureDeclaration.Type { get; set; } = default!;
-    object IDeclaration.DeclarationBrand { get; set; } = default!;
-    INode IDeclaration.Name { get; set; } = default!;
+    object IExpression.ExpressionBrand { get; set; }
+    object IFunctionLikeDeclaration.FunctionLikeDeclarationBrand? { get; set; }
+    AsteriskToken IFunctionLikeDeclaration.AsteriskToken? { get; set; }
+    QuestionToken IFunctionLikeDeclaration.QuestionToken? { get; set; }
+    IBlockOrExpression IFunctionLikeDeclaration.Body? { get; set; }
+    NodeArray<TypeParameterDeclaration> ISignatureDeclaration.TypeParameters? { get; set; }
+    NodeArray<ParameterDeclaration> ISignatureDeclaration.Parameters? { get; set; }
+    ITypeNode ISignatureDeclaration.Type? { get; set; }
+    object IDeclaration.DeclarationBrand? { get; set; }
+    INode? IDeclaration.Name? { get; set; }
 }

@@ -3,5 +3,5 @@
 
 public interface IClassElement : IDeclaration
 {
-    internal object ClassElementBrand { get; set; }
+    public object ClassElementBrand { get; set; }
 }

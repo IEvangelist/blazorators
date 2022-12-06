@@ -3,15 +3,15 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class NullLiteral : Node, IPrimaryExpression, ITypeNode
+public class NullLiteral : Node, IPrimaryExpression, ITypeNode
 {
-    internal NullLiteral() => ((INode)this).Kind = SyntaxKind.NullKeyword;
+    public NullLiteral() => ((INode)this).Kind = TypeScriptSyntaxKind.NullKeyword;
 
-    object IPrimaryExpression.PrimaryExpressionBrand { get; set; } = default!;
-    object IMemberExpression.MemberExpressionBrand { get; set; } = default!;
-    object ILeftHandSideExpression.LeftHandSideExpressionBrand { get; set; } = default!;
-    object IIncrementExpression.IncrementExpressionBrand { get; set; } = default!;
-    object IUnaryExpression.UnaryExpressionBrand { get; set; } = default!;
-    object IExpression.ExpressionBrand { get; set; } = default!;
-    object ITypeNode.TypeNodeBrand { get; set; } = default!;
+    object IPrimaryExpression.PrimaryExpressionBrand? { get; set; }
+    object IMemberExpression.MemberExpressionBrand? { get; set; }
+    object ILeftHandSideExpression.LeftHandSideExpressionBrand? { get; set; }
+    object IIncrementExpression.IncrementExpressionBrand? { get; set; }
+    object IUnaryExpression.UnaryExpressionBrand? { get; set; }
+    object IExpression.ExpressionBrand? { get; set; }
+    object ITypeNode.TypeNodeBrand? { get; set; }
 }

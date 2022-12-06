@@ -3,5 +3,5 @@
 
 public interface IUnaryExpression : IExpression
 {
-    internal object UnaryExpressionBrand { get; set; }
+    public object UnaryExpressionBrand { get; set; }
 }

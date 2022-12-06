@@ -1,7 +1,7 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PrintHandlers
+public class PrintHandlers
 {
     // onEmitSourceMapOfNode { get; set; }
     // onEmitSourceMapOfToken { get; set; }

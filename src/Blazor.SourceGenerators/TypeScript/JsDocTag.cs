@@ -3,11 +3,11 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocTag : Node, IJsDocTag
+public class JsDocTag : Node, IJsDocTag
 {
-    internal JsDocTag() => ((INode)this).Kind = SyntaxKind.JsDocTag;
+    public JsDocTag() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocTag;
 
-    AtToken IJsDocTag.AtToken { get; set; } = default!;
-    Identifier IJsDocTag.TagName { get; set; } = default!;
-    string IJsDocTag.Comment { get; set; } = default!;
+    AtToken IJsDocTag.AtToken? { get; set; }
+    Identifier IJsDocTag.TagName? { get; set; }
+    string IJsDocTag.Comment? { get; set; }
 }

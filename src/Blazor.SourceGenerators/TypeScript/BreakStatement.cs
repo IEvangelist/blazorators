@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class BreakStatement : Statement, IBreakOrContinueStatement
+public class BreakStatement : Statement, IBreakOrContinueStatement
 {
-    internal BreakStatement() => ((INode)this).Kind = SyntaxKind.BreakStatement;
+    public BreakStatement() => ((INode)this).Kind = TypeScriptSyntaxKind.BreakStatement;
 
-    Identifier IBreakOrContinueStatement.Label { get; set; } = default!;
+    Identifier IBreakOrContinueStatement.Label? { get; set; }
 }

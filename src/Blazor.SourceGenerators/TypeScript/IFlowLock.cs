@@ -5,5 +5,5 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface IFlowLock
 {
-    internal bool Locked { get; set; }
+    public bool Locked { get; set; }
 }

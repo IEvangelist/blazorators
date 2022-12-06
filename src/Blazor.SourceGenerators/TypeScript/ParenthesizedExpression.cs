@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ParenthesizedExpression : PrimaryExpression
+public class ParenthesizedExpression : PrimaryExpression
 {
-    internal ParenthesizedExpression() => ((INode)this).Kind = SyntaxKind.ParenthesizedExpression;
+    public ParenthesizedExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.ParenthesizedExpression;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

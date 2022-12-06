@@ -1,16 +1,16 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PropertyAccessExpression : Node, IMemberExpression, IDeclaration, IJsxTagNameExpression
+public class PropertyAccessExpression : Node, IMemberExpression, IDeclaration, IJsxTagNameExpression
 {
-    internal PropertyAccessExpression() => ((INode)this).Kind = SyntaxKind.PropertyAccessExpression;
+    public PropertyAccessExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.PropertyAccessExpression;
 
-    internal IExpression Expression { get; set; } //LeftHandSideExpression
-    internal object DeclarationBrand { get; set; }
-    internal INode Name { get; set; }
-    internal object MemberExpressionBrand { get; set; }
-    internal object LeftHandSideExpressionBrand { get; set; }
-    internal object IncrementExpressionBrand { get; set; }
-    internal object UnaryExpressionBrand { get; set; }
-    internal object ExpressionBrand { get; set; }
+    public IExpression Expression { get; set; } //LeftHandSideExpression
+    public object DeclarationBrand { get; set; }
+    public INode? Name { get; set; }
+    public object MemberExpressionBrand { get; set; }
+    public object LeftHandSideExpressionBrand { get; set; }
+    public object IncrementExpressionBrand { get; set; }
+    public object UnaryExpressionBrand { get; set; }
+    public object ExpressionBrand { get; set; }
 }

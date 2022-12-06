@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ImportClause : Declaration
+public class ImportClause : Declaration
 {
-    internal ImportClause() => ((INode)this).Kind = SyntaxKind.ImportClause;
+    public ImportClause() => ((INode)this).Kind = TypeScriptSyntaxKind.ImportClause;
 
-    internal INamedImportBindings NamedBindings { get; set; }
+    public INamedImportBindings NamedBindings { get; set; }
 }

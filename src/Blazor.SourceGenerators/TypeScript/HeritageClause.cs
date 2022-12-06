@@ -1,10 +1,10 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class HeritageClause : Node
+public class HeritageClause : Node
 {
-    internal HeritageClause() => ((INode)this).Kind = SyntaxKind.HeritageClause;
+    public HeritageClause() => ((INode)this).Kind = TypeScriptSyntaxKind.HeritageClause;
 
-    internal SyntaxKind Token { get; set; } = default!;
-    internal NodeArray<ExpressionWithTypeArguments> Types { get; set; } = default!;
+    public TypeScriptSyntaxKind Token? { get; set; }
+    public NodeArray<ExpressionWithTypeArguments> Types? { get; set; }
 }

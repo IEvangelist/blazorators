@@ -4,7 +4,7 @@
 namespace Blazor.SourceGenerators.TypeScript;
 
 [Flags]
-internal enum NodeFlags
+public enum NodeFlags
 {
     None = 0,
     Let = 1 << 0, // Variable declaration
@@ -41,7 +41,7 @@ internal enum NodeFlags
     TypeExcludesFlags = YieldContext | AwaitContext
 }
 
-internal enum ParsingContext
+public enum ParsingContext
 {
     SourceElements, // Elements in source file
     BlockStatements, // Statements in block
@@ -73,21 +73,21 @@ internal enum ParsingContext
     Count // Number of parsing contexts
 }
 
-internal enum Tristate
+public enum Tristate
 {
     False,
     True,
     Unknown
 }
 
-internal enum JSDocState
+public enum JSDocState
 {
     BeginningOfLine,
     SawAsterisk,
     SavingComments
 }
 
-internal enum ModifierFlags
+public enum ModifierFlags
 {
     None = 0,
     Export = 1 << 0, // Declarations
@@ -113,7 +113,7 @@ internal enum ModifierFlags
     ExportDefault = Export | Default
 }
 
-internal enum JsxFlags
+public enum JsxFlags
 {
     None = 0,
 
@@ -126,14 +126,14 @@ internal enum JsxFlags
     IntrinsicElement = IntrinsicNamedElement | IntrinsicIndexedElement
 }
 
-internal enum RelationComparisonResult
+public enum RelationComparisonResult
 {
     Succeeded = 1, // Should be truthy
     Failed = 2,
     FailedAndReported = 3
 }
 
-internal enum GeneratedIdentifierKind
+public enum GeneratedIdentifierKind
 {
     None, // Not automatically generated.
     Auto, // Automatically generated identifier.
@@ -142,7 +142,7 @@ internal enum GeneratedIdentifierKind
     Node // Unique name based on the node in the 'original' property.
 }
 
-internal enum FlowFlags
+public enum FlowFlags
 {
     Unreachable = 1 << 0, // Unreachable code
     Start = 1 << 1, // Start of flow graph
@@ -161,7 +161,7 @@ internal enum FlowFlags
     Condition = TrueCondition | FalseCondition
 }
 
-internal enum ExitStatus
+public enum ExitStatus
 {
     // Compiler ran successfully.  Either this was a simple do-nothing compilation (for example,
     // when -version or -help was provided, or this was a normal compilation, no diagnostics
@@ -175,7 +175,7 @@ internal enum ExitStatus
     DiagnosticsPresentOutputsGenerated = 2
 }
 
-internal enum NodeBuilderFlags
+public enum NodeBuilderFlags
 {
     None = 0,
     AllowThisInObjectLiteral = 1 << 0,
@@ -186,7 +186,7 @@ internal enum NodeBuilderFlags
     AllowEmptyTuple = 1 << 5
 }
 
-internal enum TypeFormatFlags
+public enum TypeFormatFlags
 {
     None = 0x00000000,
     WriteArrayAsGenericType = 0x00000001, // Write Array<T> instead T[]
@@ -212,7 +212,7 @@ internal enum TypeFormatFlags
     AddUndefined = 0x00001000 // Add undefined to types of initialized, non-optional parameters
 }
 
-internal enum SymbolFormatFlags
+public enum SymbolFormatFlags
 {
     None = 0x00000000,
 
@@ -228,26 +228,26 @@ internal enum SymbolFormatFlags
     UseOnlyExternalAliasing = 0x00000002
 }
 
-internal enum SymbolAccessibility
+public enum SymbolAccessibility
 {
     Accessible,
     NotAccessible,
     CannotBeNamed
 }
 
-internal enum SyntheticSymbolKind
+public enum SyntheticSymbolKind
 {
     UnionOrIntersection,
     Spread
 }
 
-internal enum TypePredicateKind
+public enum TypePredicateKind
 {
     This,
     Identifier
 }
 
-internal enum TypeReferenceSerializationKind
+public enum TypeReferenceSerializationKind
 {
     Unknown, // The TypeReferenceNode could not be resolved. The type name
 
@@ -270,7 +270,7 @@ internal enum TypeReferenceSerializationKind
     ObjectType // The TypeReferenceNode resolves to any other type.
 }
 
-internal enum SymbolFlags
+public enum SymbolFlags
 {
     None = 0,
     FunctionScopedVariable = 1 << 0, // Variable (var) or parameter
@@ -353,13 +353,13 @@ internal enum SymbolFlags
 
     ClassMember = Method | Accessor | Property,
 
-    /* @internal */
+    /* @public */
     // The set of things we consider semantically classifiable.  Used to speed up the LS during
     // classification.
     Classifiable = Class | Enum | TypeAlias | Interface | TypeParameter | Module
 }
 
-internal enum CheckFlags
+public enum CheckFlags
 {
     Instantiated = 1 << 0, // Instantiated symbol
     SyntheticProperty = 1 << 1, // Property in union or intersection type
@@ -367,14 +367,14 @@ internal enum CheckFlags
     Readonly = 1 << 3, // Readonly transient symbol
     Partial = 1 << 4, // Synthetic property present in some but not all constituents
     HasNonUniformType = 1 << 5, // Synthetic property with non-uniform type in constituents
-    ContainsPublic = 1 << 6, // Synthetic property with internal constituent(s)
+    ContainsPublic = 1 << 6, // Synthetic property with public constituent(s)
     ContainsProtected = 1 << 7, // Synthetic property with protected constituent(s)
     ContainsPrivate = 1 << 8, // Synthetic property with private constituent(s)
     ContainsStatic = 1 << 9, // Synthetic property with static constituent(s)
     Synthetic = SyntheticProperty | SyntheticMethod
 }
 
-internal enum NodeCheckFlags
+public enum NodeCheckFlags
 {
     TypeChecked = 0x00000001, // Node has been type checked
     LexicalThis = 0x00000002, // Lexical 'this' reference
@@ -411,7 +411,7 @@ internal enum NodeCheckFlags
     ConstructorReferenceInClass = 0x01000000 // Binding to a class constructor inside of the class's body.
 }
 
-internal enum TypeFlags
+public enum TypeFlags
 {
     Any = 1 << 0,
     String = 1 << 1,
@@ -434,36 +434,36 @@ internal enum TypeFlags
     Index = 1 << 18, // keyof T
     IndexedAccess = 1 << 19, // T[K]
 
-    /* @internal */
+    /* @public */
     FreshLiteral = 1 << 20, // Fresh literal type
 
-    /* @internal */
+    /* @public */
     ContainsWideningType = 1 << 21, // Type is or contains undefined or null widening type
 
-    /* @internal */
+    /* @public */
     ContainsObjectLiteral = 1 << 22, // Type is or contains object literal type
 
-    /* @internal */
+    /* @public */
     ContainsAnyFunctionType = 1 << 23, // Type is or contains object literal type
     NonPrimitive = 1 << 24, // intrinsic object type
 
-    /* @internal */
+    /* @public */
     JsxAttributes = 1 << 25, // Jsx attributes type
 
-    /* @internal */
+    /* @public */
     Nullable = Undefined | Null,
     Literal = StringLiteral | NumberLiteral | BooleanLiteral | EnumLiteral,
     StringOrNumberLiteral = StringLiteral | NumberLiteral,
 
-    /* @internal */
+    /* @public */
     DefinitelyFalsy = StringLiteral | NumberLiteral | BooleanLiteral | Void | Undefined | Null,
     PossiblyFalsy = DefinitelyFalsy | String | Number | Boolean,
 
-    /* @internal */
+    /* @public */
     Intrinsic = Any | String | Number | Boolean | BooleanLiteral | EsSymbol | Void | Undefined | Null | Never |
                 NonPrimitive,
 
-    /* @internal */
+    /* @public */
     Primitive = String | Number | Boolean | Enum | EsSymbol | Void | Undefined | Null | Literal,
     StringLike = String | StringLiteral | Index,
     NumberLike = Number | NumberLiteral | Enum | EnumLiteral,
@@ -480,14 +480,14 @@ internal enum TypeFlags
                  BooleanLike | EsSymbol | NonPrimitive,
     NotUnionOrUnit = Any | EsSymbol | Object | NonPrimitive,
 
-    /* @internal */
+    /* @public */
     RequiresWidening = ContainsWideningType | ContainsObjectLiteral,
 
-    /* @internal */
+    /* @public */
     PropagatingFlags = ContainsWideningType | ContainsObjectLiteral | ContainsAnyFunctionType
 }
 
-internal enum ObjectFlags
+public enum ObjectFlags
 {
     Class = 1 << 0, // Class
     Interface = 1 << 1, // Interface
@@ -502,19 +502,19 @@ internal enum ObjectFlags
     ClassOrInterface = Class | Interface
 }
 
-internal enum SignatureKind
+public enum SignatureKind
 {
     Call,
     Construct
 }
 
-internal enum IndexKind
+public enum IndexKind
 {
     String,
     Number
 }
 
-internal enum SpecialPropertyAssignmentKind
+public enum SpecialPropertyAssignmentKind
 {
     None,
 
@@ -534,7 +534,7 @@ internal enum SpecialPropertyAssignmentKind
     Property
 }
 
-internal enum DiagnosticCategory
+public enum DiagnosticCategory
 {
     Warning,
     Error,
@@ -542,13 +542,13 @@ internal enum DiagnosticCategory
     Unknown
 }
 
-internal enum ModuleResolutionKind
+public enum ModuleResolutionKind
 {
     Classic = 1,
     NodeJs = 2
 }
 
-internal enum ModuleKind
+public enum ModuleKind
 {
     None = 0,
     CommonJs = 1,
@@ -558,7 +558,7 @@ internal enum ModuleKind
     Es2015 = 5
 }
 
-internal enum JsxEmit
+public enum JsxEmit
 {
     None = 0,
     Preserve = 1,
@@ -566,13 +566,13 @@ internal enum JsxEmit
     ReactNative = 3
 }
 
-internal enum NewLineKind
+public enum NewLineKind
 {
     CarriageReturnLineFeed = 0,
     LineFeed = 1
 }
 
-internal enum ScriptKind
+public enum ScriptKind
 {
     Unknown = 0,
     Js = 1,
@@ -582,7 +582,7 @@ internal enum ScriptKind
     External = 5
 }
 
-internal enum ScriptTarget
+public enum ScriptTarget
 {
     Es3 = 0,
     Es5 = 1,
@@ -593,25 +593,25 @@ internal enum ScriptTarget
     Latest = EsNext
 }
 
-internal enum LanguageVariant
+public enum LanguageVariant
 {
     Standard,
     Jsx
 }
 
-internal enum DiagnosticStyle
+public enum DiagnosticStyle
 {
     Simple,
     Pretty
 }
 
-internal enum WatchDirectoryFlags
+public enum WatchDirectoryFlags
 {
     None = 0,
     Recursive = 1 << 0
 }
 
-internal enum CharacterCode
+public enum CharacterCode
 {
     NullCharacter = 0,
     MaxAsciiCharacter = 0x7F,
@@ -748,7 +748,7 @@ internal enum CharacterCode
     VerticalTab = 0x0B // \v
 }
 
-internal enum Extension
+public enum Extension
 {
     Ts,
     Tsx,
@@ -758,7 +758,7 @@ internal enum Extension
     LastTypeScriptExtension = Dts
 }
 
-internal enum TransformFlags
+public enum TransformFlags
 {
     None = 0,
 
@@ -855,7 +855,7 @@ internal enum TransformFlags
     Es2015FunctionSyntaxMask = ContainsCapturedLexicalThis | ContainsDefaultValueAssignments
 }
 
-internal enum EmitFlags
+public enum EmitFlags
 {
     SingleLine = 1 << 0, // The contents of this node should be emitted on a single line.
     AdviseOnEmitNode = 1 << 1, // The printer should invoke the onEmitNode callback when printing this node.
@@ -900,7 +900,7 @@ internal enum EmitFlags
         1 << 21 // Declaration has an associated NotEmittedStatement to mark the end of the declaration
 }
 
-internal enum ExternalEmitHelpers
+public enum ExternalEmitHelpers
 {
     Extends = 1 << 0, // __extends (used by the ES2015 class transformation)
     Assign = 1 << 1, // __assign (used by Jsx and ESNext object spread transformations)
@@ -930,7 +930,7 @@ internal enum ExternalEmitHelpers
     LastEmitHelper = AsyncValues
 }
 
-internal enum EmitHint
+public enum EmitHint
 {
     SourceFile, // Emitting a SourceFile
     Expression, // Emitting an Expression

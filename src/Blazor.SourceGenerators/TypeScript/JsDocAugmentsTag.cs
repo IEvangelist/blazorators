@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class JsDocAugmentsTag : JsDocTag
+public class JsDocAugmentsTag : JsDocTag
 {
-    internal JsDocAugmentsTag() => ((INode)this).Kind = SyntaxKind.JsDocAugmentsTag;
+    public JsDocAugmentsTag() => ((INode)this).Kind = TypeScriptSyntaxKind.JsDocAugmentsTag;
 
-    internal JsDocTypeExpression? TypeExpression { get; set; }
+    public JsDocTypeExpression? TypeExpression { get; set; }
 }

@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class PartiallyEmittedExpression : LeftHandSideExpression
+public class PartiallyEmittedExpression : LeftHandSideExpression
 {
-    internal PartiallyEmittedExpression() => ((INode)this).Kind = SyntaxKind.PartiallyEmittedExpression;
+    public PartiallyEmittedExpression() => ((INode)this).Kind = TypeScriptSyntaxKind.PartiallyEmittedExpression;
 
-    internal IExpression Expression { get; set; }
+    public IExpression Expression { get; set; }
 }

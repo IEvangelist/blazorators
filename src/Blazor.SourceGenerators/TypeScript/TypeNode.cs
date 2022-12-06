@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.TypeScript;
 
-internal class TypeNode : Node, ITypeNode
+public class TypeNode : Node, ITypeNode
 {
-    object ITypeNode.TypeNodeBrand { get; set; } = default!;
+    object ITypeNode.TypeNodeBrand? { get; set; }
 }

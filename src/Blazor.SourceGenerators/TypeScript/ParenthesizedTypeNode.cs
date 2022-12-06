@@ -1,9 +1,9 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class ParenthesizedTypeNode : TypeNode
+public class ParenthesizedTypeNode : TypeNode
 {
-    internal ParenthesizedTypeNode() => ((INode)this).Kind = SyntaxKind.ParenthesizedType;
+    public ParenthesizedTypeNode() => ((INode)this).Kind = TypeScriptSyntaxKind.ParenthesizedType;
 
-    internal ITypeNode Type { get; set; }
+    public ITypeNode Type { get; set; }
 }

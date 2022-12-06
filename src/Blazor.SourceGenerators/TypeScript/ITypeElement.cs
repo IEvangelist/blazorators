@@ -3,6 +3,6 @@
 
 public interface ITypeElement : IDeclaration
 {
-    internal object TypeElementBrand { get; set; }
-    internal QuestionToken QuestionToken { get; set; }
+    public object TypeElementBrand { get; set; }
+    public QuestionToken QuestionToken { get; set; }
 }

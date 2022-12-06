@@ -1,8 +1,8 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-internal class TypePredicateBase
+public class TypePredicateBase
 {
-    internal TypePredicateKind Kind { get; set; }
-    internal TsType Type { get; set; }
+    public TypePredicateKind Kind { get; set; }
+    public TsType? Type { get; set; }
 }
