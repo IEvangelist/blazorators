@@ -84,6 +84,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "SeanFeldman",
+      "name": "Sean Feldman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1309622?v=4",
+      "profile": "http://weblogs.asp.net/sfeldman",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
