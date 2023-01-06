@@ -5,7 +5,7 @@
 
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!--
@@ -776,6 +776,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center"><a href="https://github.com/fabiansanchez18"><img src="https://avatars.githubusercontent.com/u/106093861?v=4?s=100" width="100px;" alt="fabiansanchez18"/><br /><sub><b>fabiansanchez18</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Afabiansanchez18" title="Bug reports">🐛</a></td>
+      <td align="center"><a href="http://weblogs.asp.net/sfeldman"><img src="https://avatars.githubusercontent.com/u/1309622?v=4?s=100" width="100px;" alt="Sean Feldman"/><br /><sub><b>Sean Feldman</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3ASeanFeldman" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
