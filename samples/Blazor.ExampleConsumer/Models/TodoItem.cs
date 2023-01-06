@@ -7,7 +7,7 @@ public record class TodoItem(
     string Task,
     bool IsCompleted)
 {
-    internal const string IdPrefix = "todo:";
+    internal const string IdPrefix = "todo";
 
     [JsonIgnore]
     public string Id => $"{IdPrefix}{GetHashCode()}";

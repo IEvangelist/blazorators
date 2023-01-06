@@ -8,28 +8,29 @@ namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class TodoList
 {
-    List<TodoItem> _todos = new();
+    HashSet<TodoItem> _todos = new();
     string? _todoValue;
 
     [Inject]
     public ILocalStorageService LocalStorage { get; set; } = null!;
 
-    protected override void OnInitialized()
+    protected override void OnInitialized() => UpdateTodoItems();
+
+    void UpdateTodoItems()
     {
         var todos = GetTaskItemKeys()
-            .Where(key => key.StartsWith(TodoItem.IdPrefix))
-            .Select(key => LocalStorage.GetItem<TodoItem>(key))
-            .Where(todo => todo is not null)
-            .ToList() ?? new();
+                    .Where(key => key.StartsWith(TodoItem.IdPrefix))
+                    .Select(key => LocalStorage.GetItem<TodoItem>(key))
+                    .Where(todo => todo is not null)
+                    .ToHashSet() ?? new();
 
         _todos = todos!;
     }
-        
 
     IEnumerable<string> GetTaskItemKeys()
     {
         var length = LocalStorage.Length;
-        for (var i = 0; i < length; ++ i)
+        for (var i = 0; i < length; ++i)
         {
             if (LocalStorage.Key(i) is { Length: > 0 } key)
             {
@@ -59,9 +60,7 @@ public sealed partial class TodoList
 
     void Delete(TodoItem todo)
     {
-        if (_todos.Remove(todo))
-        {
-            LocalStorage.RemoveItem(todo.Id);
-        }
+        LocalStorage.RemoveItem(todo.Id);
+        UpdateTodoItems();
     }
 }
