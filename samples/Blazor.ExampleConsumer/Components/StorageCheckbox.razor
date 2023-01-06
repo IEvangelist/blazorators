@@ -19,13 +19,23 @@
     [Parameter]
     public RenderFragment EndContent { get; set; } = null!;
 
-    void OnIsCompletedChanged(ChangeEventArgs args)
+    [Parameter]
+    public EventCallback<TodoItem> ItemChanged { get; set; }
+
+    Task OnIsCompletedChanged(ChangeEventArgs args)
     {
         if (bool.TryParse(args?.Value?.ToString(), out var isCompleted))
         {
             LocalStorage.SetItem(
                 Item.Id,
                 Item = Item with { IsCompleted = isCompleted });
+
+            if (ItemChanged.HasDelegate)
+            {
+                return ItemChanged.InvokeAsync(Item);
+            }
         }
+
+        return Task.CompletedTask;
     }
 }

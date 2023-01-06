@@ -5,7 +5,7 @@
 <h1>
     <span class="pe-1">Local Storage</span>
     <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
-        rel="noopener noreferrer nofollow">
+       rel="noopener noreferrer nofollow">
         <span class="oi oi-external-link"></span>
     </a>
 </h1>
@@ -16,15 +16,21 @@
         <div class="d-flex justify-content-center align-items-center">
             <div class="form-outline flex-fill">
                 <div class="input-group">
-                    <input type="text" class="form-control form-control-lg" 
-                        @bind=_todoValue
-                        @onkeyup="@OnKeyUp"
-                        autocomplete="off"
-                        placeholder="New task..." />
+                    <input type="text" class="form-control form-control-lg"
+                           @bind=_todoValue
+                           @onkeyup="@OnKeyUp"
+                           autocomplete="off"
+                           placeholder="New task..." />
                     <button type="button" class="btn btn-primary"
-                        @onclick="AddNewTodo">Add</button>
-                    </div>                
-            </div>            
+                            @onclick="AddNewTodo">
+                        Add
+                    </button>
+                    <button type="button" class="btn btn-danger"
+                            @onclick="ClearAll">
+                        Clear All
+                    </button>
+                </div>
+            </div>
         </div>
         @if (_todos is { Count: > 0 })
         {
@@ -32,10 +38,10 @@
                 @foreach (var todo in _todos)
                 {
                     <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded bg-light">
-                        <StorageCheckbox Item=@todo>
+                        <StorageCheckbox Item=@todo ItemChanged=@OnItemChanged>
                             <EndContent>
                                 <button class="btn btn-danger" type="button" 
-                                @onclick=@(_ => Delete(todo))>
+                                    @onclick=@(_ => Delete(todo))>
                                     <span class="oi oi-trash"></span>
                                 </button>
                             </EndContent>
@@ -46,3 +52,32 @@
         }
     </div>
 </div>
+@if (_localStorageItems is { Count: > 0 })
+{
+    <div class="card mt-4">
+        <div class="card-body">
+            <details>
+                <summary>Raw <code>window.localStorage</code> values</summary>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var (i, key, value) in _localStorageItems.Select((kvp, i) => (i, kvp.Key, kvp.Value)))
+                    {
+                        <tr>
+                            <th scope="row">@i.ToString()</th>
+                            <td><code>@key.ToString()</code></td>
+                            <td><code>@value.ToString()</code></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </div>
+}
