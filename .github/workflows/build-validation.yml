@@ -68,8 +68,13 @@ jobs:
       run: |
         dotnet test ./tests/Blazor.SourceGenerators.Tests/Blazor.SourceGenerators.Tests.csproj --verbosity normal
 
+    - name: Build end-to-end tests
+      run: |
+        dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj -c Release
+
     - name: Install Playwright dependencies
-      run: pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net7.0/playwright.ps1 install --with-deps
+      run: |
+        pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net7.0/playwright.ps1 install --with-deps
 
     - name: Run end-to-end tests
       run: |
