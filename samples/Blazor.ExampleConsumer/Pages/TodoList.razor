@@ -16,16 +16,16 @@
         <div class="d-flex justify-content-center align-items-center">
             <div class="form-outline flex-fill">
                 <div class="input-group">
-                    <input type="text" class="form-control form-control-lg"
+                    <input id="todo" type="text" class="form-control form-control-lg"
                            @bind=_todoValue
                            @onkeyup="@OnKeyUp"
                            autocomplete="off"
                            placeholder="New task..." />
-                    <button type="button" class="btn btn-primary"
+                    <button id="add" type="button" class="btn btn-primary"
                             @onclick="AddNewTodo">
                         Add
                     </button>
-                    <button type="button" class="btn btn-danger"
+                    <button id="clearall" type="button" class="btn btn-danger"
                             @onclick="ClearAll">
                         Clear All
                     </button>
@@ -34,7 +34,7 @@
         </div>
         @if (_todos is { Count: > 0 })
         {
-            <ul class="list-group mb-0 pt-5">
+            <ul id="todo-list" class="list-group mb-0 pt-5">
                 @foreach (var todo in _todos)
                 {
                     <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded bg-light">

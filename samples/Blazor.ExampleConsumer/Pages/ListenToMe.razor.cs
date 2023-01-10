@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.JSInterop;
-
 namespace Blazor.ExampleConsumer.Pages;
 
 public sealed partial class ListenToMe : IAsyncDisposable
