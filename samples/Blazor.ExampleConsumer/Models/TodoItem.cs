@@ -5,12 +5,16 @@ using System.Text.RegularExpressions;
 
 namespace Blazor.ExampleConsumer.Models;
 
-public record class TodoItem(
+public partial record class TodoItem(
     string Task,
     bool IsCompleted)
 {
     internal const string IdPrefix = "todo";
 
     [JsonIgnore]
-    public string Id => $"{IdPrefix}{Regex.Replace(Task, "[^a-zA-Z0-9]", "")}";
+    public string Id =>
+        $"{IdPrefix}{AlphabetOrDigitRegex().Replace(Task, "")}";
+
+    [GeneratedRegex("[^a-zA-Z0-9]")]
+    private static partial Regex AlphabetOrDigitRegex();
 }

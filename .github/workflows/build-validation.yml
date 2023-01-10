@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
 
-    steps:    
+    steps:
     - uses: actions/checkout@main
     
     - name: Setup .NET 7.0
@@ -69,7 +69,7 @@ jobs:
         dotnet test ./tests/Blazor.SourceGenerators.Tests/Blazor.SourceGenerators.Tests.csproj --verbosity normal
 
     - name: Install Playwright dependencies
-      run: pwsh tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net7.0/playwright.ps1 install --with-deps
+      run: pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net7.0/playwright.ps1 install --with-deps
 
     - name: Run end-to-end tests
       run: |

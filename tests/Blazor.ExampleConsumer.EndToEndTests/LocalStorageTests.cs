@@ -55,18 +55,13 @@ public sealed partial class LocalStorageTests
 
 file static class Selectors
 {
-    internal const string StoragePagetNavLink = // "#storage";
-        "#app > div > div > div.collapse > nav > div:nth-child(2) > a";
+    internal const string StoragePagetNavLink = "#storage";
 
-    internal const string ClearAllButton = // "#clearall";
-        "#app > div > main > article > div:nth-child(3) > div > div > div > div > button.btn.btn-danger";
+    internal const string ClearAllButton = "#clearall";
 
-    internal const string TodoInput = // "#todo";
-        "#app > div > main > article > div:nth-child(3) > div > div > div > div > input";
+    internal const string TodoInput = "#todo";
 
-    internal const string AddButton = // "#add";
-        "#app > div > main > article > div:nth-child(3) > div > div > div > div > button.btn.btn-primary";
-    
-    internal const string TodoList = // "#todo-list > li"
-        "#app > div > main > article > div:nth-child(3) > div > ul > li";
+    internal const string AddButton = "#add";
+
+    internal const string TodoList = "#todo-list > li";
 }
