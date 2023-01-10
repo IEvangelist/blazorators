@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Description>Source generated JavaScript interop for the browser's geolocation API compatible with Blazor.</Description>
@@ -51,24 +51,25 @@
         <SupportedPlatform Include="browser" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(ImplicitUsings)' == 'enable' or '$(ImplicitUsings)' == 'true'">
+        <Using Include="Microsoft.JSInterop" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MinVer" Version="2.5.0">
+        <PackageReference Include="MinVer" Version="4.2.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.1" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Blazor.Serialization\Blazor.Serialization.csproj" />
-        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj"
-                          OutputItemType="Analyzer"
-                          SetTargetFramework="TargetFramework=netstandard2.0"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup Label="Files">

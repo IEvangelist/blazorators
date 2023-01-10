@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>true</ImplicitUsings>
+        <ImplicitUsings>enable</ImplicitUsings>
         <Description>Source generated JavaScript interop for the browser's permissions API compatible with Blazor WebAssembly.</Description>
         <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
         <NeutralLanguage>en-US</NeutralLanguage>
@@ -52,13 +52,13 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MinVer" Version="2.5.0">
+        <PackageReference Include="MinVer" Version="4.2.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
-        <PackageReference Include="Microsoft.JSInterop" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Primitives" Version="7.0.0" />
+        <PackageReference Include="Microsoft.JSInterop" Version="7.0.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -67,7 +67,7 @@
 
     <ItemGroup Label="Files">
         <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
-        <None Include="README.md"  Pack="true" PackagePath="\" />
+        <None Include="README.md" Pack="true" PackagePath="\" />
         <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 

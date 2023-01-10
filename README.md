@@ -45,6 +45,9 @@ A C# source generator that creates fully functioning Blazor JavaScript interop c
 
 > Targets the `IJSRuntime` type.
 
+> **Note**<br>
+> The reason that I generate two separate packages, one with an async API and another with the synchronous version is due to the explicit usage of `IJSInProcessRuntime` when using Blazor WebAssembly. This decision allows the APIs to be separate, and easily consumable from their repsective consuming Blazor apps, either Blazor server or Blazor WebAssembly. I might change it later to make this a consumer configuration, in that each consuming library will have to explicitly define a preprocessor directive to specify `IS_WEB_ASSEMBLY` defined.
+
 ## Using the `Blazor.SourceGenerators` package 📦
 
 As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) Web API.

@@ -14,15 +14,15 @@ jobs:
   deploy-to-github-pages:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@main
     - name: 'Print manual run reason'
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
         echo 'Reason: ${{ github.event.inputs.reason }}'
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
     - name: Publish .NET Core Project
       run: dotnet publish samples/Blazor.ExampleConsumer/Blazor.ExampleConsumer.csproj -c Release -o release --nologo
 
@@ -40,7 +40,7 @@ jobs:
       run: touch release/wwwroot/.nojekyll
 
     - name: Commit wwwroot to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+      uses: JamesIves/github-pages-deploy-action@main
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages

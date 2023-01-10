@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.github\workflows\build-validation.yml = .github\workflows\build-validation.yml
+		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 		logo-large.png = logo-large.png
 		logo.png = logo.png
@@ -47,11 +48,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis.WebA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechSynthesis", "src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj", "{CC36EFCE-CB59-4541-9E1E-2DBE5D1C290E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.SpeechRecognition.WebAssembly", "src\Blazor.SpeechRecognition.WebAssembly\Blazor.SpeechRecognition.WebAssembly.csproj", "{F8BC87F2-8864-49F8-B4C2-75662BEBB045}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechRecognition.WebAssembly", "src\Blazor.SpeechRecognition.WebAssembly\Blazor.SpeechRecognition.WebAssembly.csproj", "{F8BC87F2-8864-49F8-B4C2-75662BEBB045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.SpeechRecognition", "src\Blazor.SpeechRecognition\Blazor.SpeechRecognition.csproj", "{7FB98CAE-0CDB-4EF8-B9BB-6C51D62252CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.SpeechRecognition", "src\Blazor.SpeechRecognition\Blazor.SpeechRecognition.csproj", "{7FB98CAE-0CDB-4EF8-B9BB-6C51D62252CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Permissions.WebAssembly", "src\Blazor.Permissions.WebAssembly\Blazor.Permissions.WebAssembly.csproj", "{FD387378-9B27-4852-8A77-684C33FDE844}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Permissions.WebAssembly", "src\Blazor.Permissions.WebAssembly\Blazor.Permissions.WebAssembly.csproj", "{FD387378-9B27-4852-8A77-684C33FDE844}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
