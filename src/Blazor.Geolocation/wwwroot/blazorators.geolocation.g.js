@@ -17,7 +17,6 @@ const onSuccess = (dotnetObj, successMethodName, position) => {
         }
     };
     dotnetObj.invokeMethodAsync(successMethodName, result);
-    dotnetObj.dispose();
 };
 
 const onError = (dotnetObj, errorMethodName, error) => {
@@ -29,7 +28,6 @@ const onError = (dotnetObj, errorMethodName, error) => {
         TIMEOUT: error.TIMEOUT
     };
     dotnetObj.invokeMethodAsync(errorMethodName, result);
-    dotnetObj.dispose();
 };
 
 const getCurrentPosition = (
