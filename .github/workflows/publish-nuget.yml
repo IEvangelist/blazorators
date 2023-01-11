@@ -15,15 +15,20 @@ jobs:
         dotnet-version: 7.0.x
     - name: Test
       run: dotnet test --filter "Category!=EndToEnd"
-      
-    - name: Install Playwright dependencies
-      run: pwsh tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net7.0/playwright.ps1 install --with-deps
+    
+    - name: Build end-to-end tests
+      run: |
+        dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj
 
-    - name: End-to-end tests
+    - name: Install Playwright dependencies
+      run: |
+        pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Debug/net7.0/playwright.ps1 install --with-deps
+
+    - name: Run end-to-end tests
       run: |
         dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --verbosity normal
-
-  publish:
+  
+publish:
     needs: test
     runs-on: ubuntu-latest
     strategy:
