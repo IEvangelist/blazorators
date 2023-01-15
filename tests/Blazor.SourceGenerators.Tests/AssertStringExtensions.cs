@@ -5,8 +5,11 @@ using System.Text.RegularExpressions;
 
 namespace Blazor.SourceGenerators.Tests;
 
-static class AssertStringExtensions
+static partial class AssertStringExtensions
 {
     internal static string NormalizeNewlines(this string value) =>
-        Regex.Replace(value, @"\r\n|\n\r|\n|\r", "\r\n");
+        VariousLineEndingsRegex().Replace(value, "\r\n");
+    
+    [GeneratedRegex(@"\r\n|\n\r|\n|\r")]
+    private static partial Regex VariousLineEndingsRegex();
 }

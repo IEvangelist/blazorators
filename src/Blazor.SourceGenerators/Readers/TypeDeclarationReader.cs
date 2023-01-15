@@ -17,13 +17,10 @@ internal sealed partial class TypeDeclarationReader
     private IDictionary<string, string> TypeAliasMap =>
         _typeAliasMap ??= ReadTypeAliasMap(_typeDeclarationText.Value);
 
-    private TypeDeclarationReader()
-    {
-        _typeDeclarationText = new Lazy<string>(
-            valueFactory: () => GetEmbeddedResourceText());
-    }
+    internal string RawSourceText => _typeDeclarationText.Value;
 
-    private TypeDeclarationReader(Uri typeDeclarationSource)
+    private TypeDeclarationReader(
+        Uri? typeDeclarationSource = null)
     {
         _typeDeclarationSource = typeDeclarationSource;
         _typeDeclarationText = new Lazy<string>(
