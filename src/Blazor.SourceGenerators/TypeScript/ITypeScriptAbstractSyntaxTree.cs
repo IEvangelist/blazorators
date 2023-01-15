@@ -7,9 +7,9 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 public interface ITypeScriptAbstractSyntaxTree
 {
-    string SourceStr { get; set; }
-    
-    Node RootNode { get; set; }
+    string RawSourceText { get; set; }
+
+    RootNodeSourceFile RootNode { get; set; }
     
     void ParseAsAst(string source, string fileName = "app.ts", bool setChildren = true);
 }

@@ -11,15 +11,11 @@ public class Node : TextRange, INode
     public List<Node> Children { get; set; } = new List<Node>();
     public ITypeScriptAbstractSyntaxTree AbstractSyntaxTree { get; set; }
 
-    public string SourceStr
-    {
-        get => AbstractSyntaxTree.SourceStr;
-        set => AbstractSyntaxTree.SourceStr = value;
-    }
+    public string SourceStr => AbstractSyntaxTree.RawSourceText;
 
-    public string IdentifierStr => Kind == TypeScriptSyntaxKind.Identifier
+    public string IdentifierStr => Kind is TypeScriptSyntaxKind.Identifier
         ? GetText()
-        : Children.FirstOrDefault(v => v.Kind == TypeScriptSyntaxKind.Identifier)?.GetText().Trim();
+        : Children.FirstOrDefault(v => v.Kind is TypeScriptSyntaxKind.Identifier)?.GetText().Trim();
 
     public int ParentId { get; set; }
     public int Depth { get; set; }

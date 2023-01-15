@@ -1,7 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics;
 using Blazor.SourceGenerators.Parsers;
 using Blazor.SourceGenerators.Readers;
 using Blazor.SourceGenerators.TypeScript;
@@ -13,18 +12,35 @@ namespace Blazor.SourceGenerators.Tests;
 public class LibDomParserTests
 {
     [Fact]
+    public void FindsInterfaceAndCorrespondingImplementationCorrectly()
+    {
+        // Special interface for window or worker scope.
+        //     WindowOrWorkerGlobalScope
+
+        var reader = TypeDeclarationReader.Default;
+        var astParser =
+            new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
+        var interfaces = astParser.RootNode.OfKind(
+            TypeScriptSyntaxKind.InterfaceDeclaration);
+
+        var windowOrWorker = astParser.RootNode.WindowOrWorkerGlobalScope;
+        Assert.NotNull(windowOrWorker);
+
+        var cacheImplementation = windowOrWorker.Children.SingleOrDefault(
+            type => type.IdentifierStr is "caches" &&
+            type.Kind is TypeScriptSyntaxKind.PropertySignature);
+        var cacheStorageInterface = interfaces.SingleOrDefault(
+            type => type.IdentifierStr is "CacheStorage" &&
+            type.Kind is TypeScriptSyntaxKind.InterfaceDeclaration);
+        Assert.NotNull(cacheImplementation);
+    }
+
+    [Fact]
     public void AbstractSyntaxTreeParsesCorrectly()
     {
         var reader = TypeDeclarationReader.Default;
-        Assert.True(reader.TryGetDeclaration(
-            "Geolocation", out var declaration));
-
-        //var startingTimestamp = Stopwatch.GetTimestamp();
-
         var astParser =
             new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
-
-        //var elapsedTime = Stopwatch.GetElapsedTime(startingTimestamp);
 
         var interfaces = astParser.RootNode.OfKind(
             TypeScriptSyntaxKind.InterfaceDeclaration);
@@ -58,7 +74,7 @@ public class LibDomParserTests
         
         var successCallback = watchPosition.Children.Single(
             c => c.IdentifierStr is "successCallback");
-        Assert.NotNull(successCallback);        
+        Assert.NotNull(successCallback);
     }
 
     [Fact]

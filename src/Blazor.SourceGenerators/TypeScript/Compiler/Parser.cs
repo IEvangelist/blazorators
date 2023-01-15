@@ -26,7 +26,7 @@ public sealed class Parser
 
     public bool ParseErrorBeforeNextFinishedNode = false;
 
-    public SourceFile SourceFile;
+    public RootNodeSourceFile SourceFile;
 
     public List<TypeScriptDiagnostic> ParseDiagnostics;
 
@@ -48,7 +48,7 @@ public sealed class Parser
 
     public Parser() => JsDocParser = new JsDocParser(this);
 
-    public SourceFile ParseSourceFile(
+    public RootNodeSourceFile ParseSourceFile(
         string fileName,
         string sourceText,
         ScriptTarget? languageVersion,
@@ -112,7 +112,7 @@ public sealed class Parser
         SourceText = null;
     }
 
-    public SourceFile ParseSourceFileWorker(string fileName, ScriptTarget languageVersion, bool setParentNodes, ScriptKind scriptKind)
+    public RootNodeSourceFile ParseSourceFileWorker(string fileName, ScriptTarget languageVersion, bool setParentNodes, ScriptKind scriptKind)
     {
         SourceFile = CreateSourceFile(fileName, languageVersion, scriptKind);
         SourceFile.Flags = ContextFlags;
@@ -181,10 +181,9 @@ public sealed class Parser
         }
     }
 
-    public SourceFile CreateSourceFile(string fileName, ScriptTarget languageVersion, ScriptKind scriptKind)
+    public RootNodeSourceFile CreateSourceFile(string fileName, ScriptTarget languageVersion, ScriptKind scriptKind)
     {
-        //var sourceFile = (SourceFile)new SourceFileConstructor(SyntaxKind.SourceFile,  0,  sourceText.length);
-        var sourceFile = new SourceFile { Pos = 0, End = SourceText.Length };
+        var sourceFile = new RootNodeSourceFile { Pos = 0, End = SourceText.Length };
         NodeCount++;
         sourceFile.Text = SourceText;
         sourceFile.BindDiagnostics = new();
@@ -329,13 +328,12 @@ public sealed class Parser
         var saveParseErrorBeforeNextFinishedNode = ParseErrorBeforeNextFinishedNode;
         var saveContextFlags = ContextFlags;
         var result = isLookAhead
-                        ? Scanner.LookAhead(callback)
-                        : Scanner.TryScan(callback);
+            ? Scanner.LookAhead(callback)
+            : Scanner.TryScan(callback);
         Debug.Assert(saveContextFlags == ContextFlags);
-        if (result == null || ((result is bool) && Convert.ToBoolean(result) == false) || isLookAhead)
+        if (result == null || ((result is bool) && Convert.ToBoolean(result) is false) || isLookAhead)
         {
             CurrentToken = saveToken;
-            //parseDiagnostics.Count = saveParseDiagnosticsLength;
             ParseDiagnostics = ParseDiagnostics.Take(saveParseDiagnosticsLength).ToList();
             ParseErrorBeforeNextFinishedNode = saveParseErrorBeforeNextFinishedNode;
         }
@@ -1924,8 +1922,9 @@ public sealed class Parser
 
     public ITypeNode ParseUnionTypeOrHigher() => ParseUnionOrIntersectionType(SyntaxKind.UnionType, ParseIntersectionTypeOrHigher, SyntaxKind.BarToken);
 
-    public bool IsStartOfFunctionType() => CurrentToken == SyntaxKind.LessThanToken
-|| CurrentToken == SyntaxKind.OpenParenToken && LookAhead(IsUnambiguouslyStartOfFunctionType);
+    public bool IsStartOfFunctionType() =>
+        CurrentToken == SyntaxKind.LessThanToken||
+        (CurrentToken == SyntaxKind.OpenParenToken && LookAhead(IsUnambiguouslyStartOfFunctionType));
 
     public bool SkipParameterStart()
     {

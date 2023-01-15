@@ -408,7 +408,7 @@ public class JsDocParser
     public Tuple<JsDoc, List<TypeScriptDiagnostic>> ParseIsolatedJsDocComment(string content, int start, int length)
     {
         Parser.InitializeState(content, ScriptTarget.Latest, null, ScriptKind.Js);
-        Parser.SourceFile = new SourceFile { LanguageVariant = LanguageVariant.Standard, Text = content };
+        Parser.SourceFile = new() { LanguageVariant = LanguageVariant.Standard, Text = content };
         var jsDoc = ParseJsDocCommentWorker(start, length);
         var diagnostics = ParseDiagnostics;
 
