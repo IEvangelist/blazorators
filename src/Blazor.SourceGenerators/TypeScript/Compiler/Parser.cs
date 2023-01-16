@@ -15,7 +15,7 @@ namespace Blazor.SourceGenerators.TypeScript.Compiler;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Style", "IDE0007:Use implicit type", Justification = "Leave explicitly typed for future NRT work.")]
-public sealed class Parser
+internal sealed class Parser
 {
 
     public Scanner Scanner = new(ScriptTarget.Latest, skipTrivia: true, LanguageVariant.Standard, null, null);
@@ -29,8 +29,6 @@ public sealed class Parser
     public RootNodeSourceFile SourceFile;
 
     public List<TypeScriptDiagnostic> ParseDiagnostics;
-
-    public object SyntaxCursor;
 
     public SyntaxKind CurrentToken;
 
@@ -52,13 +50,12 @@ public sealed class Parser
         string fileName,
         string sourceText,
         ScriptTarget? languageVersion,
-        object syntaxCursor,
         bool setParentNodes,
         ScriptKind scriptKind)
     {
         scriptKind = EnsureScriptKind(fileName, scriptKind);
         var langVersion = languageVersion ?? ScriptTarget.Latest;
-        InitializeState(sourceText, langVersion, syntaxCursor, scriptKind);
+        InitializeState(sourceText, langVersion, scriptKind);
         var result = ParseSourceFileWorker(fileName, langVersion, setParentNodes, scriptKind);
         ClearState();
         return result;
@@ -66,7 +63,7 @@ public sealed class Parser
 
     public IEntityName ParseIsolatedEntityName(string content, ScriptTarget languageVersion)
     {
-        InitializeState(content, languageVersion, null, ScriptKind.Js);
+        InitializeState(content, languageVersion, ScriptKind.Js);
         // Prime the scanner.
         NextToken();
         var entityName = ParseEntityName(true);
@@ -81,10 +78,9 @@ public sealed class Parser
             ? LanguageVariant.Jsx
             : LanguageVariant.Standard;
 
-    public void InitializeState(string sourceText, ScriptTarget languageVersion, object _syntaxCursor, ScriptKind scriptKind)
+    public void InitializeState(string sourceText, ScriptTarget languageVersion, ScriptKind scriptKind)
     {
         SourceText = sourceText;
-        SyntaxCursor = _syntaxCursor;
         ParseDiagnostics = new();
         ParsingContext = 0;
         Identifiers = new();
@@ -108,7 +104,6 @@ public sealed class Parser
         ParseDiagnostics = null;
         SourceFile = null;
         Identifiers = null;
-        SyntaxCursor = null;
         SourceText = null;
     }
 
@@ -838,7 +833,7 @@ public sealed class Parser
         return node != null ? (T)ConsumeNode(node) : parseElement();
     }
 
-    public Node CurrentNode(ParsingContextEnum parsingContext) => ParseErrorBeforeNextFinishedNode ? null : null;//if (syntaxCursor == null)//{//    // if we don't have a cursor, we could never return a node from the old tree.//    return null;//}//var node = syntaxCursor.currentNode(scanner.StartPos);//if (nodeIsMissing(node))//{//    return null;//}//if (node.intersectsChange)//{//    return null;//}//if (containsParseError(node) != null)//{//    return null;//}//var nodeContextFlags = node.flags & NodeFlags.ContextFlags;//if (nodeContextFlags != contextFlags)//{//    return null;//}//if (!canReuseNode(node, parsingContext))//{//    return null;//}//return node;
+    public Node CurrentNode(ParsingContextEnum parsingContext) => ParseErrorBeforeNextFinishedNode ? null : null;
 
     public INode CurrentNode2(ParsingContextEnum parsingContext) => ParseErrorBeforeNextFinishedNode ? null : null;
 

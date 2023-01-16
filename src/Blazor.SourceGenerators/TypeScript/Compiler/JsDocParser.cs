@@ -9,7 +9,7 @@ using SyntaxKind = Blazor.SourceGenerators.TypeScript.Types.TypeScriptSyntaxKind
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Compiler;
 
-public class JsDocParser
+internal class JsDocParser
 {
     public Parser Parser { get; }
 
@@ -49,7 +49,7 @@ public class JsDocParser
     {
         var dp = new JsDocParser(new Parser());
         var languageVersion = ScriptTarget.Latest;
-        dp.Parser.InitializeState(content, languageVersion, null, ScriptKind.Js);
+        dp.Parser.InitializeState(content, languageVersion, ScriptKind.Js);
 
         var sourceFile = dp.Parser.CreateSourceFile("file.js", languageVersion, ScriptKind.Js);
 
@@ -407,7 +407,7 @@ public class JsDocParser
 
     public Tuple<JsDoc, List<TypeScriptDiagnostic>> ParseIsolatedJsDocComment(string content, int start, int length)
     {
-        Parser.InitializeState(content, ScriptTarget.Latest, null, ScriptKind.Js);
+        Parser.InitializeState(content, ScriptTarget.Latest, ScriptKind.Js);
         Parser.SourceFile = new() { LanguageVariant = LanguageVariant.Standard, Text = content };
         var jsDoc = ParseJsDocCommentWorker(start, length);
         var diagnostics = ParseDiagnostics;

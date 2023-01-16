@@ -11,5 +11,5 @@ public interface ITypeScriptAbstractSyntaxTree
 
     RootNodeSourceFile RootNode { get; set; }
 
-    void ParseAsAst(string source, string fileName = "app.ts", bool setChildren = true);
+    void ParseAsAst(string source, string fileName = "app.ts");
 }

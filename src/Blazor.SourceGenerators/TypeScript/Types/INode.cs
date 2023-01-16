@@ -27,7 +27,7 @@ public interface INode : ITextRange
     Symbol LocalSymbol { get; set; }
     FlowNode FlowNode { get; set; }
     EmitNode EmitNode { get; set; }
-    Type ContextualType { get; set; }
+    TypeScriptType ContextualType { get; set; }
     TypeMapper ContextualMapper { get; set; }
     int TagInt { get; set; }
     string GetText(string source = null);

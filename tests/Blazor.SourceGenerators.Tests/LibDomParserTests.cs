@@ -16,7 +16,7 @@ public class LibDomParserTests
     {
         var reader = TypeDeclarationReader.Default;
         var astParser =
-            new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
+            new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
         var interfaces = astParser.RootNode.OfKind(
             TypeScriptSyntaxKind.InterfaceDeclaration);
 
@@ -34,7 +34,7 @@ public class LibDomParserTests
     {
         var reader = TypeDeclarationReader.Default;
         var astParser =
-            new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
+            new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
 
     }
 
@@ -43,7 +43,7 @@ public class LibDomParserTests
     {
         var reader = TypeDeclarationReader.Default;
         var astParser =
-            new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
+            new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
 
         var interfaces = astParser.RootNode.OfKind(
             TypeScriptSyntaxKind.InterfaceDeclaration);

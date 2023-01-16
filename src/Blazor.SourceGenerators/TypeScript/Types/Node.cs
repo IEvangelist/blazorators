@@ -39,12 +39,12 @@ public class Node : TextRange, INode
     public FlowNode FlowNode { get; set; }
     public EmitNode EmitNode { get; set; }
 
-    public Type ContextualType { get; set; }
+    public TypeScriptType ContextualType { get; set; }
     public TypeMapper ContextualMapper { get; set; }
 
     public int TagInt { get; set; }
 
-    public void MakeChildren(ITypeScriptAbstractSyntaxTree abstractSyntaxTree)
+    public void ParseChildren(ITypeScriptAbstractSyntaxTree abstractSyntaxTree)
     {
         Children = new List<Node>();
         Ts.ForEachChild(this, node =>
@@ -57,7 +57,7 @@ public class Node : TextRange, INode
             n.Parent = this;
             if (n.Pos != null) n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
             Children.Add(n);
-            n.MakeChildren(abstractSyntaxTree);
+            n.ParseChildren(abstractSyntaxTree);
             return null;
         });
     }

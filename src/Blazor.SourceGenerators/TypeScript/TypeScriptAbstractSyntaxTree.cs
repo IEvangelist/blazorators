@@ -17,33 +17,26 @@ internal sealed class TypeScriptAbstractSyntaxTree : ITypeScriptAbstractSyntaxTr
     public TypeScriptAbstractSyntaxTree(
         string source = null,
         string fileName = "app.ts",
-        ScriptTarget languageVersion = ScriptTarget.Latest,
-        bool setChildren = true)
+        ScriptTarget languageVersion = ScriptTarget.Latest)
     {
         _languageVersion = languageVersion;
         if (source is not null)
         {
-            ParseAsAst(source, fileName, setChildren);
+            ParseAsAst(source, fileName);
         }
     }
 
-    public void ParseAsAst(string source, string fileName = "app.ts", bool setChildren = true)
+    public void ParseAsAst(string source, string fileName = "app.ts")
     {
         RawSourceText = source;
         var parser = new Parser();
-        var sourceFile = parser.ParseSourceFile(
+        RootNode = parser.ParseSourceFile(
             fileName,
             source,
             _languageVersion,
-            null,
-            false,
+            true,
             ScriptKind.Ts);
-
-        RootNode = sourceFile;
         RootNode.AbstractSyntaxTree = this;
-        if (setChildren)
-        {
-            RootNode.MakeChildren(this);
-        }
+        RootNode.ParseChildren(this);
     }
 }
