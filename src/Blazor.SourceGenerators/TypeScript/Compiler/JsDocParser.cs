@@ -304,7 +304,7 @@ public class JsDocParser
     public JsDocNonNullableType ParseJsDocNonNullableType()
     {
         var result = new JsDocNonNullableType();
-        
+
         _ = NextToken;
 
         result.Type = ParseJsDocType();

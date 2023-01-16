@@ -39,7 +39,7 @@ static class StringExtensions
     public static string SubString(this string str, int start, int? end = null) =>
         end is null ? str.Substring(start) : str.Substring(start, (int)end - start);
 
-    public static string[] Exec(this Regex regex, string text) =>
+    public static string[] Match(this Regex regex, string text) =>
         regex.Match(text).Captures.Cast<string>().ToArray();
 
     public static bool Test(this Regex r, string text) => r.IsMatch(text);

@@ -10,6 +10,6 @@ public interface ITypeScriptAbstractSyntaxTree
     string RawSourceText { get; set; }
 
     RootNodeSourceFile RootNode { get; set; }
-    
+
     void ParseAsAst(string source, string fileName = "app.ts", bool setChildren = true);
 }

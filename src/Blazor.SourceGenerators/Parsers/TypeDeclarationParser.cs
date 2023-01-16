@@ -10,7 +10,7 @@ internal sealed partial class TypeDeclarationParser
             valueFactory: () => new TypeDeclarationParser(TypeDeclarationReader.Default));
 
     readonly TypeDeclarationReader _reader;
-    
+
     internal static TypeDeclarationParser Default => s_defaultParser.Value;
 
     internal TypeDeclarationParser(TypeDeclarationReader reader) => _reader = reader;

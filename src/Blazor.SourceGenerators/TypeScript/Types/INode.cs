@@ -11,7 +11,7 @@ public interface INode : ITextRange
     NodeFlags Flags { get; set; }
     ModifierFlags ModifierFlagsCache { get; set; }
     TransformFlags TransformFlags { get; set; }
-    NodeArray<Decorator> Decorators { get; set; }    
+    NodeArray<Decorator> Decorators { get; set; }
     NodeArray<Modifier> Modifiers { get; set; }
     int Id { get; set; }
     INode Parent { get; set; }

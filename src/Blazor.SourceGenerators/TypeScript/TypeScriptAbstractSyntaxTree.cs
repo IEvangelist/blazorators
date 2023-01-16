@@ -38,7 +38,7 @@ internal sealed class TypeScriptAbstractSyntaxTree : ITypeScriptAbstractSyntaxTr
             null,
             false,
             ScriptKind.Ts);
-        
+
         RootNode = sourceFile;
         RootNode.AbstractSyntaxTree = this;
         if (setChildren)

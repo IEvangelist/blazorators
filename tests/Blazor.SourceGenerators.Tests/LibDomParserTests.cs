@@ -14,25 +14,28 @@ public class LibDomParserTests
     [Fact]
     public void FindsInterfaceAndCorrespondingImplementationCorrectly()
     {
-        // Special interface for window or worker scope.
-        //     WindowOrWorkerGlobalScope
-
         var reader = TypeDeclarationReader.Default;
         var astParser =
             new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
         var interfaces = astParser.RootNode.OfKind(
             TypeScriptSyntaxKind.InterfaceDeclaration);
 
-        var windowOrWorker = astParser.RootNode.WindowOrWorkerGlobalScope;
-        Assert.NotNull(windowOrWorker);
+        var window = astParser.RootNode.Window;
+        Assert.NotNull(window);
 
-        var cacheImplementation = windowOrWorker.Children.SingleOrDefault(
-            type => type.IdentifierStr is "caches" &&
-            type.Kind is TypeScriptSyntaxKind.PropertySignature);
-        var cacheStorageInterface = interfaces.SingleOrDefault(
-            type => type.IdentifierStr is "CacheStorage" &&
-            type.Kind is TypeScriptSyntaxKind.InterfaceDeclaration);
-        Assert.NotNull(cacheImplementation);
+        var heritage = window.Children.Single(
+            c => c.Kind is TypeScriptSyntaxKind.HeritageClause);
+        Assert.NotNull(heritage);
+        Assert.Contains(heritage.Children, c => c.IdentifierStr is "WindowOrWorkerGlobalScope");
+    }
+
+    [Fact]
+    public void CanReplaceBruteForceParser()
+    {
+        var reader = TypeDeclarationReader.Default;
+        var astParser =
+            new TypeScriptAbstractSyntaxTree(reader.RawSourceText, setChildren: true);
+
     }
 
     [Fact]
@@ -71,7 +74,7 @@ public class LibDomParserTests
         Assert.Contains(watchPosition.Children,
             c => c.IdentifierStr is "options" &&
             c.Kind is TypeScriptSyntaxKind.Parameter);
-        
+
         var successCallback = watchPosition.Children.Single(
             c => c.IdentifierStr is "successCallback");
         Assert.NotNull(successCallback);

@@ -17,7 +17,7 @@ internal static class GeneratorExecutionContextExtensions
                 SourceText.From(dependentObj.ToString(),
                 Encoding.UTF8));
         }
-        
+
         return context;
     }
 

@@ -109,7 +109,7 @@ public class Node : TextRange, INode
                 yield return child;
         }
     }
-    
+
     public string GetTreeString(bool withPos = true)
     {
         var sb = new StringBuilder();

@@ -1248,7 +1248,7 @@ public sealed class Parser
         NextToken();
         FinishNode(node);
         if (node.Kind == SyntaxKind.NumericLiteral
-                        && SourceText.CharCodeAt(tokenPos) == CharacterCode._0
+                        && SourceText.CharCodeAt(tokenPos) is CharacterCode._0
                         && IsOctalDigit(SourceText.CharCodeAt(tokenPos + 1)))
         {
             node.IsOctalLiteral = true;
@@ -1923,7 +1923,7 @@ public sealed class Parser
     public ITypeNode ParseUnionTypeOrHigher() => ParseUnionOrIntersectionType(SyntaxKind.UnionType, ParseIntersectionTypeOrHigher, SyntaxKind.BarToken);
 
     public bool IsStartOfFunctionType() =>
-        CurrentToken == SyntaxKind.LessThanToken||
+        CurrentToken == SyntaxKind.LessThanToken ||
         (CurrentToken == SyntaxKind.OpenParenToken && LookAhead(IsUnambiguouslyStartOfFunctionType));
 
     public bool SkipParameterStart()

@@ -12,7 +12,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
         (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
-    };    
+    };
 
     public void Initialize(GeneratorInitializationContext context)
     {

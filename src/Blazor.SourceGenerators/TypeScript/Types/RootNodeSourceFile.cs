@@ -5,8 +5,8 @@ namespace Blazor.SourceGenerators.TypeScript.Types;
 
 public sealed class RootNodeSourceFile : SourceFile
 {
-    public Node? WindowOrWorkerGlobalScope =>
+    public Node? Window =>
         AbstractSyntaxTree.RootNode
             .OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
-            .FirstOrDefault(node => node.IdentifierStr is nameof(WindowOrWorkerGlobalScope));
+            .FirstOrDefault(node => node.IdentifierStr is nameof(Window));
 }

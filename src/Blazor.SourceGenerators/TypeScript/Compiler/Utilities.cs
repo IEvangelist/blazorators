@@ -52,8 +52,8 @@ public sealed class Utilities
     public static string EscapeIdentifier(
         string identifier) =>
         identifier.Length >= 2 &&
-            identifier.CharCodeAt(0) == CharacterCode._ &&
-            identifier.CharCodeAt(1) == CharacterCode._
+            identifier.CharCodeAt(0) is CharacterCode._ &&
+            identifier.CharCodeAt(1) is CharacterCode._
                 ? $"_{identifier}"
                 : identifier;
 
@@ -73,8 +73,8 @@ public sealed class Utilities
 
         commentRanges ??= new List<CommentRange>();
         return commentRanges.Where(comment =>
-                text.CharCodeAt((comment.Pos ?? 0) + 1) == CharacterCode.Asterisk &&
-                text.CharCodeAt((comment.Pos ?? 0) + 2) == CharacterCode.Asterisk &&
+                text.CharCodeAt((comment.Pos ?? 0) + 1) is CharacterCode.Asterisk &&
+                text.CharCodeAt((comment.Pos ?? 0) + 2) is CharacterCode.Asterisk &&
                 text.CharCodeAt((comment.Pos ?? 0) + 3) != CharacterCode.Slash)
             .ToList();
     }

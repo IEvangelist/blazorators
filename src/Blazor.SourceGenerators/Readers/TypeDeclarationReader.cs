@@ -30,7 +30,7 @@ internal sealed partial class TypeDeclarationReader
     IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
     {
         ConcurrentDictionary<string, string> map = new();
-            
+
         try
         {
             if (typeDeclarations is { Length: > 0 })

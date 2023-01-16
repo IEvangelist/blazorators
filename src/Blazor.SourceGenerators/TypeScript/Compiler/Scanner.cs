@@ -257,7 +257,7 @@ public sealed class Scanner
             switch (ch)
             {
                 case CharacterCode.CarriageReturn:
-                    if (text.CharCodeAt(pos) == CharacterCode.LineFeed)
+                    if (text.CharCodeAt(pos) is CharacterCode.LineFeed)
                     {
                         pos++;
                     }
@@ -324,18 +324,18 @@ linefeed: result.Add(lineStart);
     public static bool IsWhiteSpaceSingleLine(CharacterCode @char) =>
         // Note: nextLine is in the Zs space, and should be considered to be a whitespace.
         // It is explicitly not a line-break as it isn't in the exact set specified by EcmaScript.
-        @char == CharacterCode.Space ||
-        @char == CharacterCode.Tab ||
-        @char == CharacterCode.VerticalTab ||
-        @char == CharacterCode.FormFeed ||
-        @char == CharacterCode.NonBreakingSpace ||
-        @char == CharacterCode.NextLine ||
-        @char == CharacterCode.Ogham ||
+        @char is CharacterCode.Space ||
+        @char is CharacterCode.Tab ||
+        @char is CharacterCode.VerticalTab ||
+        @char is CharacterCode.FormFeed ||
+        @char is CharacterCode.NonBreakingSpace ||
+        @char is CharacterCode.NextLine ||
+        @char is CharacterCode.Ogham ||
         (@char >= CharacterCode.EnQuad && @char <= CharacterCode.ZeroWidthSpace) ||
-        @char == CharacterCode.NarrowNoBreakSpace ||
-        @char == CharacterCode.MathematicalSpace ||
-        @char == CharacterCode.IdeographicSpace ||
-        @char == CharacterCode.ByteOrderMark;
+        @char is CharacterCode.NarrowNoBreakSpace ||
+        @char is CharacterCode.MathematicalSpace ||
+        @char is CharacterCode.IdeographicSpace ||
+        @char is CharacterCode.ByteOrderMark;
 
 
     public static bool IsLineBreak(CharacterCode @char) =>
@@ -349,10 +349,10 @@ linefeed: result.Add(lineStart);
         //     \u2029              Paragraph separator     <PS>
         // Only the characters in Table 3 are treated as line terminators. Other new line or line
         // breaking characters are treated as white space but not as line terminators.
-        @char == CharacterCode.LineFeed ||
-        @char == CharacterCode.CarriageReturn ||
-        @char == CharacterCode.LineSeparator ||
-        @char == CharacterCode.ParagraphSeparator;
+        @char is CharacterCode.LineFeed ||
+        @char is CharacterCode.CarriageReturn ||
+        @char is CharacterCode.LineSeparator ||
+        @char is CharacterCode.ParagraphSeparator;
 
     public bool IsDigit(CharacterCode @char) =>
         @char >= CharacterCode._0 && @char <= CharacterCode._9;
@@ -398,7 +398,7 @@ linefeed: result.Add(lineStart);
             {
                 case CharacterCode.CarriageReturn:
                     if (pos + 1 >= text.Length) return pos;
-                    if (text.CharCodeAt(pos + 1) == CharacterCode.LineFeed)
+                    if (text.CharCodeAt(pos + 1) is CharacterCode.LineFeed)
                     {
                         pos++;
                     }
@@ -422,7 +422,7 @@ linefeed: pos++;
                         break;
                     }
                     if (pos + 1 >= text.Length) return pos;
-                    if (text.CharCodeAt(pos + 1) == CharacterCode.Slash)
+                    if (text.CharCodeAt(pos + 1) is CharacterCode.Slash)
                     {
                         pos += 2;
                         while (pos < text.Length)
@@ -436,14 +436,14 @@ linefeed: pos++;
                         continue;
                     }
                     if (pos + 1 >= text.Length) return pos;
-                    if (text.CharCodeAt(pos + 1) == CharacterCode.Asterisk)
+                    if (text.CharCodeAt(pos + 1) is CharacterCode.Asterisk)
                     {
                         pos += 2;
                         while (pos < text.Length)
                         {
                             if (pos + 1 >= text.Length) return pos;
-                            if (text.CharCodeAt(pos) == CharacterCode.Asterisk &&
-                                text.CharCodeAt(pos + 1) == CharacterCode.Slash)
+                            if (text.CharCodeAt(pos) is CharacterCode.Asterisk &&
+                                text.CharCodeAt(pos + 1) is CharacterCode.Slash)
                             {
                                 pos += 2;
                                 break;
@@ -495,8 +495,8 @@ linefeed: pos++;
                         return false;
                     }
                 };
-                return ch == CharacterCode.equals ||
-                    text.CharCodeAt(pos + s_mergeConflictMarkerLength) == CharacterCode.Space;
+                return ch is CharacterCode.equals ||
+                    text.CharCodeAt(pos + s_mergeConflictMarkerLength) is CharacterCode.Space;
             }
         }
         return false;
@@ -509,7 +509,7 @@ linefeed: pos++;
         error.Invoke(Diagnostics.Merge_conflict_marker_encountered, s_mergeConflictMarkerLength);
         var ch = text.CharCodeAt(pos);
         var len = text.Length;
-        if (ch == CharacterCode.LessThan || ch == CharacterCode.GreaterThan)
+        if (ch is CharacterCode.LessThan || ch is CharacterCode.GreaterThan)
         {
             while (pos < len && !IsLineBreak(text.CharCodeAt(pos)))
             {
@@ -521,7 +521,7 @@ linefeed: pos++;
             while (pos < len)
             {
                 var ch2 = text.CharCodeAt(pos);
-                if (ch2 == CharacterCode.GreaterThan && IsConflictMarkerTrivia(text, pos))
+                if (ch2 is CharacterCode.GreaterThan && IsConflictMarkerTrivia(text, pos))
                 {
                     break;
                 }
@@ -537,7 +537,7 @@ linefeed: pos++;
 
     public static int ScanShebangTrivia(string text, int pos)
     {
-        var shebang = s_shebangTriviaRegex.Exec(text)[0];
+        var shebang = StringExtensions.Match(s_shebangTriviaRegex, text)[0];
         pos += shebang.Length;
         return pos;
     }
@@ -564,7 +564,7 @@ linefeed: pos++;
             switch (ch)
             {
                 case CharacterCode.CarriageReturn:
-                    if (text.CharCodeAt(pos + 1) == CharacterCode.LineFeed)
+                    if (text.CharCodeAt(pos + 1) is CharacterCode.LineFeed)
                     {
                         pos++;
                     }
@@ -590,12 +590,12 @@ linefeed: pos++;
                 case CharacterCode.Slash:
                     var nextChar = text.CharCodeAt(pos + 1);
                     var hasTrailingNewLine = false;
-                    if (nextChar == CharacterCode.Slash || nextChar == CharacterCode.Asterisk)
+                    if (nextChar is CharacterCode.Slash || nextChar is CharacterCode.Asterisk)
                     {
-                        var kind = nextChar == CharacterCode.Slash ? TypeScriptSyntaxKind.SingleLineCommentTrivia : TypeScriptSyntaxKind.MultiLineCommentTrivia;
+                        var kind = nextChar is CharacterCode.Slash ? TypeScriptSyntaxKind.SingleLineCommentTrivia : TypeScriptSyntaxKind.MultiLineCommentTrivia;
                         var startPos = pos;
                         pos += 2;
-                        if (nextChar == CharacterCode.Slash)
+                        if (nextChar is CharacterCode.Slash)
                         {
                             while (pos < text.Length)
                             {
@@ -611,7 +611,7 @@ linefeed: pos++;
                         {
                             while (pos < text.Length)
                             {
-                                if (text.CharCodeAt(pos) == CharacterCode.Asterisk && text.CharCodeAt(pos + 1) == CharacterCode.Slash)
+                                if (text.CharCodeAt(pos) is CharacterCode.Asterisk && text.CharCodeAt(pos + 1) is CharacterCode.Slash)
                                 {
                                     pos += 2;
                                     break;
@@ -731,17 +731,17 @@ breakScan:
             null) ?? new List<CommentRange>();
 
     public string GetShebang(string text) => s_shebangTriviaRegex.Test(text)
-        ? s_shebangTriviaRegex.Exec(text)[0]
+        ? StringExtensions.Match(s_shebangTriviaRegex, text)[0]
         : null;
 
     public bool IsIdentifierStart(CharacterCode code, ScriptTarget languageVersion) =>
         (code >= CharacterCode.A && code <= CharacterCode.Z) || (code >= CharacterCode.a && code <= CharacterCode.z) ||
-        code == CharacterCode.Dollar || code == CharacterCode._ ||
+        code is CharacterCode.Dollar || code is CharacterCode._ ||
         (code > CharacterCode.MaxAsciiCharacter && IsUnicodeIdentifierStart(code, languageVersion));
 
 
     public bool IsIdentifierPart(CharacterCode code, ScriptTarget languageVersion) => (code >= CharacterCode.A && code <= CharacterCode.Z) || (code >= CharacterCode.a && code <= CharacterCode.z) ||
-        (code >= CharacterCode._0 && code <= CharacterCode._9) || code == CharacterCode.Dollar || code == CharacterCode._ ||
+        (code >= CharacterCode._0 && code <= CharacterCode._9) || code is CharacterCode.Dollar || code is CharacterCode._ ||
         (code > CharacterCode.MaxAsciiCharacter && IsUnicodeIdentifierPart(code, languageVersion));
 
 
@@ -776,7 +776,7 @@ breakScan:
         {
             TextPos++;
         }
-        if (_text.CharCodeAt(TextPos) == CharacterCode.Dot)
+        if (_text.CharCodeAt(TextPos) is CharacterCode.Dot)
         {
             TextPos++;
             while (IsDigit(_text.CharCodeAt(TextPos)))
@@ -785,10 +785,10 @@ breakScan:
             }
         }
         var end = TextPos;
-        if (_text.CharCodeAt(TextPos) == CharacterCode.E || _text.CharCodeAt(TextPos) == CharacterCode.e)
+        if (_text.CharCodeAt(TextPos) is CharacterCode.E || _text.CharCodeAt(TextPos) is CharacterCode.e)
         {
             TextPos++;
-            if (_text.CharCodeAt(TextPos) == CharacterCode.Plus || _text.CharCodeAt(TextPos) == CharacterCode.Minus)
+            if (_text.CharCodeAt(TextPos) is CharacterCode.Plus || _text.CharCodeAt(TextPos) is CharacterCode.Minus)
             {
                 TextPos++;
             }
@@ -885,7 +885,7 @@ breakScan:
                 TextPos++;
                 break;
             }
-            if (ch == CharacterCode.Backslash && allowEscapes)
+            if (ch is CharacterCode.Backslash && allowEscapes)
             {
                 result += _text.SubString(start, TextPos);
                 result += ScanEscapeSequence();
@@ -907,7 +907,7 @@ breakScan:
 
     public TypeScriptSyntaxKind ScanTemplateAndSetTokenValue()
     {
-        var startedWithBacktick = _text.CharCodeAt(TextPos) == CharacterCode.Backtick;
+        var startedWithBacktick = _text.CharCodeAt(TextPos) is CharacterCode.Backtick;
         TextPos++;
         var start = TextPos;
         var contents = "";
@@ -923,32 +923,32 @@ breakScan:
                 break;
             }
             var currChar = _text.CharCodeAt(TextPos);
-            if (currChar == CharacterCode.Backtick)
+            if (currChar is CharacterCode.Backtick)
             {
                 contents += _text.SubString(start, TextPos);
                 TextPos++;
                 resultingToken = startedWithBacktick ? TypeScriptSyntaxKind.NoSubstitutionTemplateLiteral : TypeScriptSyntaxKind.TemplateTail;
                 break;
             }
-            if (currChar == CharacterCode.Dollar && TextPos + 1 < _end && _text.CharCodeAt(TextPos + 1) == CharacterCode.OpenBrace)
+            if (currChar is CharacterCode.Dollar && TextPos + 1 < _end && _text.CharCodeAt(TextPos + 1) is CharacterCode.OpenBrace)
             {
                 contents += _text.SubString(start, TextPos);
                 TextPos += 2;
                 resultingToken = startedWithBacktick ? TypeScriptSyntaxKind.TemplateHead : TypeScriptSyntaxKind.TemplateMiddle;
                 break;
             }
-            if (currChar == CharacterCode.Backslash)
+            if (currChar is CharacterCode.Backslash)
             {
                 contents += _text.SubString(start, TextPos);
                 contents += ScanEscapeSequence();
                 start = TextPos;
                 continue;
             }
-            if (currChar == CharacterCode.CarriageReturn)
+            if (currChar is CharacterCode.CarriageReturn)
             {
                 contents += _text.SubString(start, TextPos);
                 TextPos++;
-                if (TextPos < _end && _text.CharCodeAt(TextPos) == CharacterCode.LineFeed)
+                if (TextPos < _end && _text.CharCodeAt(TextPos) is CharacterCode.LineFeed)
                 {
                     TextPos++;
                 }
@@ -995,7 +995,7 @@ breakScan:
             case CharacterCode.DoubleQuote:
                 return "\"";
             case CharacterCode.u:
-                if (TextPos < _end && _text.CharCodeAt(TextPos) == CharacterCode.OpenBrace)
+                if (TextPos < _end && _text.CharCodeAt(TextPos) is CharacterCode.OpenBrace)
                 {
                     HasExtendedUnicodeEscape = true;
                     TextPos++;
@@ -1007,7 +1007,7 @@ breakScan:
                 // '\xDD'
                 return ScanHexadecimalEscape(numDigits: 2);
             case CharacterCode.CarriageReturn:
-                if (TextPos < _end && _text.CharCodeAt(TextPos) == CharacterCode.LineFeed)
+                if (TextPos < _end && _text.CharCodeAt(TextPos) is CharacterCode.LineFeed)
                 {
                     TextPos++;
                 }
@@ -1059,7 +1059,7 @@ linefeed: return "";
             isInvalidExtendedEscape = true;
         }
         else
-        if (_text.CharCodeAt(TextPos) == CharacterCode.CloseBrace)
+        if (_text.CharCodeAt(TextPos) is CharacterCode.CloseBrace)
         {
             // Only swallow the following character up if it's a '}'.
             TextPos++;
@@ -1088,7 +1088,7 @@ linefeed: return "";
 
     public CharacterCode PeekUnicodeEscape()
     {
-        if (TextPos + 5 < _end && _text.CharCodeAt(TextPos + 1) == CharacterCode.u)
+        if (TextPos + 5 < _end && _text.CharCodeAt(TextPos + 1) is CharacterCode.u)
         {
             var start = TextPos;
             TextPos += 2;
@@ -1111,7 +1111,7 @@ linefeed: return "";
                 TextPos++;
             }
             else
-            if (ch == CharacterCode.Backslash)
+            if (ch is CharacterCode.Backslash)
             {
                 ch = PeekUnicodeEscape();
                 if (!(ch >= 0 && IsIdentifierPart(ch, _languageVersion)))
@@ -1189,7 +1189,7 @@ linefeed: return "";
                 return Token;
             }
             var @char = _text.CharCodeAt(TextPos);
-            if (@char == CharacterCode.Hash && TextPos == 0 && IsShebangTrivia(_text, TextPos))
+            if (@char is CharacterCode.Hash && TextPos is 0 && IsShebangTrivia(_text, TextPos))
             {
                 TextPos = ScanShebangTrivia(_text, TextPos);
                 if (_skipTrivia)
@@ -1215,7 +1215,8 @@ linefeed: return "";
                     }
                     else
                     {
-                        if (@char == CharacterCode.CarriageReturn && TextPos + 1 < _end && _text.CharCodeAt(TextPos + 1) == CharacterCode.LineFeed)
+                        if (@char is CharacterCode.CarriageReturn && TextPos + 1 < _end &&
+                            _text.CharCodeAt(TextPos + 1) is CharacterCode.LineFeed)
                         {
                             TextPos += 2;
                         }
@@ -1251,9 +1252,9 @@ space: if (_skipTrivia)
                     goto exclamation;
 #pragma warning restore CS0162 // Unreachable code detected
                 case CharacterCode.Exclamation:
-exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+exclamation: if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
-                        if (_text.CharCodeAt(TextPos + 2) == CharacterCode.equals)
+                        if (_text.CharCodeAt(TextPos + 2) is CharacterCode.equals)
                         {
                             TextPos += 3;
                             Token = TypeScriptSyntaxKind.ExclamationEqualsEqualsToken;
@@ -1275,7 +1276,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = ScanTemplateAndSetTokenValue();
                     return Token;
                 case CharacterCode.Percent:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.PercentEqualsToken;
@@ -1285,13 +1286,13 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = TypeScriptSyntaxKind.PercentToken;
                     return Token;
                 case CharacterCode.Ampersand:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Ampersand)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Ampersand)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.AmpersandAmpersandToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.AmpersandEqualsToken;
@@ -1309,15 +1310,15 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = TypeScriptSyntaxKind.CloseParenToken;
                     return Token;
                 case CharacterCode.Asterisk:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.AsteriskEqualsToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Asterisk)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Asterisk)
                     {
-                        if (_text.CharCodeAt(TextPos + 2) == CharacterCode.equals)
+                        if (_text.CharCodeAt(TextPos + 2) is CharacterCode.equals)
                         {
                             TextPos += 3;
                             Token = TypeScriptSyntaxKind.AsteriskAsteriskEqualsToken;
@@ -1331,13 +1332,13 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = TypeScriptSyntaxKind.AsteriskToken;
                     return Token;
                 case CharacterCode.Plus:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Plus)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Plus)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.PlusPlusToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.PlusEqualsToken;
@@ -1351,13 +1352,13 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = TypeScriptSyntaxKind.CommaToken;
                     return Token;
                 case CharacterCode.Minus:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Minus)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Minus)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.MinusMinusToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.MinusEqualsToken;
@@ -1373,7 +1374,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                         Token = TypeScriptSyntaxKind.NumericLiteral;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Dot && _text.CharCodeAt(TextPos + 2) == CharacterCode.Dot)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Dot && _text.CharCodeAt(TextPos + 2) is CharacterCode.Dot)
                     {
                         TextPos += 3;
                         Token = TypeScriptSyntaxKind.DotDotDotToken;
@@ -1383,7 +1384,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = TypeScriptSyntaxKind.DotToken;
                     return Token;
                 case CharacterCode.Slash:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Slash)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Slash)
                     {
                         TextPos += 2;
                         while (TextPos < _end)
@@ -1405,14 +1406,14 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                         }
                     }
 
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Asterisk)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Asterisk)
                     {
                         TextPos += 2;
                         var commentClosed = false;
                         while (TextPos < _end)
                         {
                             var ch2 = _text.CharCodeAt(TextPos);
-                            if (ch2 == CharacterCode.Asterisk && _text.CharCodeAt(TextPos + 1) == CharacterCode.Slash)
+                            if (ch2 is CharacterCode.Asterisk && _text.CharCodeAt(TextPos + 1) is CharacterCode.Slash)
                             {
                                 TextPos += 2;
                                 commentClosed = true;
@@ -1439,7 +1440,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                             return Token;
                         }
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.SlashEqualsToken;
@@ -1449,7 +1450,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                     Token = TypeScriptSyntaxKind.SlashToken;
                     return Token;
                 case CharacterCode._0:
-                    if (TextPos + 2 < _end && (_text.CharCodeAt(TextPos + 1) == CharacterCode.X || _text.CharCodeAt(TextPos + 1) == CharacterCode.x))
+                    if (TextPos + 2 < _end && (_text.CharCodeAt(TextPos + 1) is CharacterCode.X || _text.CharCodeAt(TextPos + 1) is CharacterCode.x))
                     {
                         TextPos += 2;
                         var value = ScanMinimumNumberOfHexDigits(1);
@@ -1463,7 +1464,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                         return Token;
                     }
                     else if (TextPos + 2 < _end &&
-                        (_text.CharCodeAt(TextPos + 1) == CharacterCode.B || _text.CharCodeAt(TextPos + 1) == CharacterCode.b))
+                        (_text.CharCodeAt(TextPos + 1) is CharacterCode.B || _text.CharCodeAt(TextPos + 1) is CharacterCode.b))
                     {
                         TextPos += 2;
                         var value = ScanBinaryOrOctalDigits(/* base */ 2);
@@ -1477,7 +1478,7 @@ exclamation: if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
                         return Token;
                     }
                     else if (TextPos + 2 < _end &&
-                        (_text.CharCodeAt(TextPos + 1) == CharacterCode.O || _text.CharCodeAt(TextPos + 1) == CharacterCode.o))
+                        (_text.CharCodeAt(TextPos + 1) is CharacterCode.O || _text.CharCodeAt(TextPos + 1) is CharacterCode.o))
                     {
                         TextPos += 2;
                         var value = ScanBinaryOrOctalDigits(/* base */ 8);
@@ -1531,9 +1532,9 @@ onethroughnine: TokenValue = ScanNumber();
                             return Token;
                         }
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.LessThan)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.LessThan)
                     {
-                        if (_text.CharCodeAt(TextPos + 2) == CharacterCode.equals)
+                        if (_text.CharCodeAt(TextPos + 2) is CharacterCode.equals)
                         {
                             TextPos += 3;
                             Token = TypeScriptSyntaxKind.LessThanLessThanEqualsToken;
@@ -1543,14 +1544,14 @@ onethroughnine: TokenValue = ScanNumber();
                         Token = TypeScriptSyntaxKind.LessThanLessThanToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.LessThanEqualsToken;
                         return Token;
                     }
                     if (_languageVariant == LanguageVariant.Jsx &&
-                        _text.CharCodeAt(TextPos + 1) == CharacterCode.Slash &&
+                        _text.CharCodeAt(TextPos + 1) is CharacterCode.Slash &&
                         _text.CharCodeAt(TextPos + 2) != CharacterCode.Asterisk)
                     {
                         TextPos += 2;
@@ -1574,9 +1575,9 @@ onethroughnine: TokenValue = ScanNumber();
                             return Token;
                         }
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
-                        if (_text.CharCodeAt(TextPos + 2) == CharacterCode.equals)
+                        if (_text.CharCodeAt(TextPos + 2) is CharacterCode.equals)
                         {
                             TextPos += 3;
                             Token = TypeScriptSyntaxKind.EqualsEqualsEqualsToken;
@@ -1586,7 +1587,7 @@ onethroughnine: TokenValue = ScanNumber();
                         Token = TypeScriptSyntaxKind.EqualsEqualsToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.GreaterThan)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.GreaterThan)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.EqualsGreaterThanToken;
@@ -1625,7 +1626,7 @@ onethroughnine: TokenValue = ScanNumber();
                     Token = TypeScriptSyntaxKind.CloseBracketToken;
                     return Token;
                 case CharacterCode.Caret:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.CaretEqualsToken;
@@ -1639,13 +1640,13 @@ onethroughnine: TokenValue = ScanNumber();
                     Token = TypeScriptSyntaxKind.OpenBraceToken;
                     return Token;
                 case CharacterCode.Bar:
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Bar)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Bar)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.BarBarToken;
                         return Token;
                     }
-                    if (_text.CharCodeAt(TextPos + 1) == CharacterCode.equals)
+                    if (_text.CharCodeAt(TextPos + 1) is CharacterCode.equals)
                     {
                         TextPos += 2;
                         Token = TypeScriptSyntaxKind.BarEqualsToken;
@@ -1685,7 +1686,7 @@ onethroughnine: TokenValue = ScanNumber();
                         TextPos++;
                         while (TextPos < _end && IsIdentifierPart(@char = _text.CharCodeAt(TextPos), _languageVersion)) TextPos++;
                         TokenValue = _text.SubString(TokenPos, TextPos);
-                        if (@char == CharacterCode.Backslash)
+                        if (@char is CharacterCode.Backslash)
                         {
                             TokenValue += ScanIdentifierParts();
                         }
@@ -1778,7 +1779,7 @@ onethroughnine: TokenValue = ScanNumber();
                     inEscape = false;
                 }
                 else
-                if (ch == CharacterCode.Slash && !inCharacterClass)
+                if (ch is CharacterCode.Slash && !inCharacterClass)
                 {
                     // A slash within a character class is permissible,
                     // but in general it signals the end of the regexp literal.
@@ -1786,17 +1787,17 @@ onethroughnine: TokenValue = ScanNumber();
                     break;
                 }
                 else
-                if (ch == CharacterCode.OpenBracket)
+                if (ch is CharacterCode.OpenBracket)
                 {
                     inCharacterClass = true;
                 }
                 else
-                if (ch == CharacterCode.Backslash)
+                if (ch is CharacterCode.Backslash)
                 {
                     inEscape = true;
                 }
                 else
-                if (ch == CharacterCode.CloseBracket)
+                if (ch is CharacterCode.CloseBracket)
                 {
                     inCharacterClass = false;
                 }
@@ -1840,9 +1841,9 @@ onethroughnine: TokenValue = ScanNumber();
             return Token;
         }
         var @char = _text.CharCodeAt(TextPos);
-        if (@char == CharacterCode.LessThan)
+        if (@char is CharacterCode.LessThan)
         {
-            if (_text.CharCodeAt(TextPos + 1) == CharacterCode.Slash)
+            if (_text.CharCodeAt(TextPos + 1) is CharacterCode.Slash)
             {
                 TextPos += 2;
                 Token = TypeScriptSyntaxKind.LessThanSlashToken;
@@ -1852,7 +1853,7 @@ onethroughnine: TokenValue = ScanNumber();
             Token = TypeScriptSyntaxKind.LessThanToken;
             return Token;
         }
-        if (@char == CharacterCode.OpenBrace)
+        if (@char is CharacterCode.OpenBrace)
         {
             TextPos++;
             Token = TypeScriptSyntaxKind.OpenBraceToken;
@@ -1862,11 +1863,11 @@ onethroughnine: TokenValue = ScanNumber();
         {
             TextPos++;
             @char = _text.CharCodeAt(TextPos);
-            if (@char == CharacterCode.OpenBrace)
+            if (@char is CharacterCode.OpenBrace)
             {
                 break;
             }
-            if (@char == CharacterCode.LessThan)
+            if (@char is CharacterCode.LessThan)
             {
                 if (IsConflictMarkerTrivia(_text, TextPos))
                 {
@@ -1890,7 +1891,7 @@ onethroughnine: TokenValue = ScanNumber();
             while (TextPos < _end)
             {
                 var ch = _text.CharCodeAt(TextPos);
-                if (ch == CharacterCode.Minus || (firstCharPosition == TextPos ? IsIdentifierStart(ch, _languageVersion) : IsIdentifierPart(ch, _languageVersion)))
+                if (ch is CharacterCode.Minus || (firstCharPosition == TextPos ? IsIdentifierStart(ch, _languageVersion) : IsIdentifierPart(ch, _languageVersion)))
                 {
                     TextPos++;
                 }
