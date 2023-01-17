@@ -8,12 +8,12 @@ namespace Blazor.SourceGenerators.TypeScript.Types;
 
 public class Node : TextRange, INode
 {
-    public List<Node> Children { get; set; } = new List<Node>();
+    public List<Node> Children { get; set; } = new();
     public ITypeScriptAbstractSyntaxTree AbstractSyntaxTree { get; set; }
 
-    public string SourceStr => AbstractSyntaxTree.RawSourceText;
+    public string RawSourceText => AbstractSyntaxTree.RawSourceText;
 
-    public string IdentifierStr => Kind is TypeScriptSyntaxKind.Identifier
+    public string Identifier => Kind is TypeScriptSyntaxKind.Identifier
         ? GetText()
         : Children.FirstOrDefault(v => v.Kind is TypeScriptSyntaxKind.Identifier)?.GetText().Trim();
 
@@ -38,24 +38,23 @@ public class Node : TextRange, INode
     public Symbol LocalSymbol { get; set; }
     public FlowNode FlowNode { get; set; }
     public EmitNode EmitNode { get; set; }
-
     public TypeScriptType ContextualType { get; set; }
     public TypeMapper ContextualMapper { get; set; }
-
     public int TagInt { get; set; }
 
     public void ParseChildren(ITypeScriptAbstractSyntaxTree abstractSyntaxTree)
     {
-        Children = new List<Node>();
         Ts.ForEachChild(this, node =>
         {
-            if (node == null)
-                return null;
+            if (node is null) return null;
             var n = (Node)node;
             n.AbstractSyntaxTree = abstractSyntaxTree;
             n.Depth = Depth + 1;
             n.Parent = this;
-            if (n.Pos != null) n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
+            if (n.Pos.HasValue)
+            {
+                n.NodeStart = Scanner.SkipTriviaM(RawSourceText, n.Pos.Value);
+            }
             Children.Add(n);
             n.ParseChildren(abstractSyntaxTree);
             return null;
@@ -64,7 +63,7 @@ public class Node : TextRange, INode
 
     public string GetText(string source = null)
     {
-        source ??= SourceStr;
+        source ??= RawSourceText;
 
         return NodeStart is -1
             ? Pos.HasValue && End.HasValue
@@ -75,7 +74,7 @@ public class Node : TextRange, INode
 
     public string GetTextWithComments(string source = null)
     {
-        source ??= SourceStr;
+        source ??= RawSourceText;
         return Pos != null && End != null
             ? source.Substring((int)Pos, (int)End - (int)Pos)
             : null;
@@ -89,15 +88,16 @@ public class Node : TextRange, INode
         {
             var posStr = $" [{Pos}, {End}]";
 
-            return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), Kind)}  {posStr} {IdentifierStr}";
+            return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), Kind)}  {posStr} {Identifier}";
         }
-        return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), Kind)}  {IdentifierStr}";
+        return $"{Enum.GetName(typeof(TypeScriptSyntaxKind), Kind)}  {Identifier}";
     }
     public Node First => Children.FirstOrDefault();
     public Node Last => Children.LastOrDefault();
     public int Count => Children.Count;
 
-    public IEnumerable<Node> OfKind(TypeScriptSyntaxKind kind) => GetDescendants(false).OfKind(kind);
+    public IEnumerable<Node> OfKind(TypeScriptSyntaxKind kind) =>
+        GetDescendants(false).OfKind(kind);
 
     public IEnumerable<Node> GetDescendants(bool includeSelf = true)
     {

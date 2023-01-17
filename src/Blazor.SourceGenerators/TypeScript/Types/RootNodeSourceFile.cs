@@ -8,5 +8,5 @@ public sealed class RootNodeSourceFile : SourceFile
     public Node? Window =>
         AbstractSyntaxTree.RootNode
             .OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
-            .FirstOrDefault(node => node.IdentifierStr is nameof(Window));
+            .FirstOrDefault(node => node.Identifier is nameof(Window));
 }

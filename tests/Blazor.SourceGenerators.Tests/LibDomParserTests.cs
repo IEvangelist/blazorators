@@ -26,7 +26,7 @@ public class LibDomParserTests
         var heritage = window.Children.Single(
             c => c.Kind is TypeScriptSyntaxKind.HeritageClause);
         Assert.NotNull(heritage);
-        Assert.Contains(heritage.Children, c => c.IdentifierStr is "WindowOrWorkerGlobalScope");
+        Assert.Contains(heritage.Children, c => c.Identifier is "WindowOrWorkerGlobalScope");
     }
 
     [Fact]
@@ -49,34 +49,34 @@ public class LibDomParserTests
             TypeScriptSyntaxKind.InterfaceDeclaration);
 
         var geolocation = interfaces.Single(
-            type => type.IdentifierStr is "Geolocation" &&
+            type => type.Identifier is "Geolocation" &&
             type.Kind is TypeScriptSyntaxKind.InterfaceDeclaration);
         Assert.NotNull(geolocation);
         Assert.Contains(geolocation.Children,
-            c => c.IdentifierStr is "getCurrentPosition" &&
+            c => c.Identifier is "getCurrentPosition" &&
             c.Kind is TypeScriptSyntaxKind.MethodSignature);
         Assert.Contains(geolocation.Children,
-            c => c.IdentifierStr is "watchPosition" &&
+            c => c.Identifier is "watchPosition" &&
             c.Kind is TypeScriptSyntaxKind.MethodSignature);
         Assert.Contains(geolocation.Children,
-            c => c.IdentifierStr is "clearWatch" &&
+            c => c.Identifier is "clearWatch" &&
             c.Kind is TypeScriptSyntaxKind.MethodSignature);
 
         var watchPosition = geolocation.Children.Single(
-            c => c.IdentifierStr is "watchPosition");
+            c => c.Identifier is "watchPosition");
         Assert.NotNull(watchPosition);
         Assert.Contains(watchPosition.Children,
-            c => c.IdentifierStr is "successCallback" &&
+            c => c.Identifier is "successCallback" &&
             c.Kind is TypeScriptSyntaxKind.Parameter);
         Assert.Contains(watchPosition.Children,
-            c => c.IdentifierStr is "errorCallback" &&
+            c => c.Identifier is "errorCallback" &&
             c.Kind is TypeScriptSyntaxKind.Parameter);
         Assert.Contains(watchPosition.Children,
-            c => c.IdentifierStr is "options" &&
+            c => c.Identifier is "options" &&
             c.Kind is TypeScriptSyntaxKind.Parameter);
 
         var successCallback = watchPosition.Children.Single(
-            c => c.IdentifierStr is "successCallback");
+            c => c.Identifier is "successCallback");
         Assert.NotNull(successCallback);
     }
 
