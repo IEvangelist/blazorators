@@ -5,9 +5,9 @@ using Blazor.SourceGenerators.TypeScript.Types;
 
 namespace Blazor.SourceGenerators.TypeScript.Compiler;
 
-public static class Factory
+internal  static class Factory
 {
-    public static INode SkipPartiallyEmittedExpressions(INode node)
+    internal  static INode SkipPartiallyEmittedExpressions(INode node)
     {
         while (node is { Kind: TypeScriptSyntaxKind.PartiallyEmittedExpression } and
             PartiallyEmittedExpression expression)

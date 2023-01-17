@@ -454,7 +454,7 @@ internal sealed partial class TypeDeclarationParser
         if (isSuccess)
         {
             var name = match.GetGroupValue("Name");
-            if ((name is "addEventListener" or "removeEventListener") ||
+            if (name is "addEventListener" or "removeEventListener" ||
                 (name is not null && name.Contains("this")))
             {
                 return false;

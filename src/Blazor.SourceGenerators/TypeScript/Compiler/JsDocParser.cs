@@ -386,12 +386,7 @@ internal class JsDocParser
     public JsDocType ParseJsDocUnknownOrNullableType()
     {
         _ = NextToken;
-        if (Token == SyntaxKind.CommaToken ||
-                            Token == SyntaxKind.CloseBraceToken ||
-                            Token == SyntaxKind.CloseParenToken ||
-                            Token == SyntaxKind.GreaterThanToken ||
-                            Token == SyntaxKind.EqualsToken ||
-                            Token == SyntaxKind.BarToken)
+        if (Token is SyntaxKind.CommaToken or SyntaxKind.CloseBraceToken or SyntaxKind.CloseParenToken or SyntaxKind.GreaterThanToken or SyntaxKind.EqualsToken or SyntaxKind.BarToken)
         {
             var result = new JsDocUnknownType();
 
@@ -503,7 +498,7 @@ internal class JsDocParser
                         break;
                     case SyntaxKind.AsteriskToken:
                         var asterisk = Scanner.TokenText;
-                        if (state == JSDocState.SawAsterisk || state == JSDocState.SavingComments)
+                        if (state is JSDocState.SawAsterisk or JSDocState.SavingComments)
                         {
                             state = JSDocState.SavingComments;
 
@@ -614,7 +609,7 @@ internal class JsDocParser
 
         void SkipWhitespace()
         {
-            while (Token == SyntaxKind.WhitespaceTrivia || Token == SyntaxKind.NewLineTrivia)
+            while (Token is SyntaxKind.WhitespaceTrivia or SyntaxKind.NewLineTrivia)
             {
                 NextJsDocToken();
             }

@@ -65,8 +65,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
             foreach (var parser in options.Parsers)
             {
                 var result = parser.ParseTargetType(options.TypeName!);
-                if (result.Status is ParserResultStatus.SuccessfullyParsed &&
-                    result.Value is not null)
+                if (result is { Status: ParserResultStatus.SuccessfullyParsed, Value: { } })
                 {
                     var namespaceString =
                         (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch

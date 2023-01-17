@@ -11,8 +11,7 @@ internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
-        if (context.Node is InterfaceDeclarationSyntax interfaceDeclaration &&
-            interfaceDeclaration.AttributeLists.Count > 0)
+        if (context.Node is InterfaceDeclarationSyntax { AttributeLists.Count: > 0 } interfaceDeclaration)
         {
             foreach (var attributeListSyntax in interfaceDeclaration.AttributeLists)
             {

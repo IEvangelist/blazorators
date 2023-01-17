@@ -9,12 +9,11 @@ using static Blazor.SourceGenerators.TypeScript.Compiler.Ts;
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Compiler;
 
-public sealed class Utilities
+internal static class Utilities
 {
-    public static int GetFullWidth(INode node) => (node.End ?? 0) - (node.Pos ?? 0);
+    internal static int GetFullWidth(INode node) => (node.End ?? 0) - (node.Pos ?? 0);
 
-
-    public static INode ContainsParseError(INode node)
+    internal static INode ContainsParseError(INode node)
     {
         AggregateChildData(node);
 
@@ -22,34 +21,33 @@ public sealed class Utilities
     }
 
 
-    public static void AggregateChildData(INode node)
+    internal static void AggregateChildData(INode node)
     {
-        if ((node.Flags & NodeFlags.HasAggregatedChildData) != 0)
+        if ((node.Flags & NodeFlags.HasAggregatedChildData) == 0) return;
+
+        var thisNodeOrAnySubNodesHasError =
+            (node.Flags & NodeFlags.ThisNodeHasError) is not 0 ||
+            ForEachChild(node, ContainsParseError) != null;
+
+        if (thisNodeOrAnySubNodesHasError)
         {
-            var thisNodeOrAnySubNodesHasError =
-                (node.Flags & NodeFlags.ThisNodeHasError) is not 0 ||
-                ForEachChild(node, ContainsParseError) != null;
-
-            if (thisNodeOrAnySubNodesHasError)
-            {
-                node.Flags |= NodeFlags.ThisNodeOrAnySubNodesHasError;
-            }
-
-            node.Flags |= NodeFlags.HasAggregatedChildData;
+            node.Flags |= NodeFlags.ThisNodeOrAnySubNodesHasError;
         }
+
+        node.Flags |= NodeFlags.HasAggregatedChildData;
     }
 
-    public static bool NodeIsMissing(INode node) =>
+    internal static bool NodeIsMissing(INode node) =>
         node is null ||
         (node.Pos == node.End && node.Pos >= 0 && node.Kind != TypeScriptSyntaxKind.EndOfFileToken);
 
-    public static string GetTextOfNodeFromSourceText(
+    internal static string GetTextOfNodeFromSourceText(
         string sourceText, INode node) =>
         NodeIsMissing(node)
         ? ""
         : sourceText.SubString(SkipTriviaM(sourceText, node.Pos ?? 0), node.End);
 
-    public static string EscapeIdentifier(
+    internal static string EscapeIdentifier(
         string identifier) =>
         identifier.Length >= 2 &&
             identifier.CharCodeAt(0) is CharacterCode._ &&
@@ -57,17 +55,18 @@ public sealed class Utilities
                 ? $"_{identifier}"
                 : identifier;
 
-    public static List<CommentRange> GetLeadingCommentRangesOfNodeFromText(INode node, string text) =>
+    internal static List<CommentRange> GetLeadingCommentRangesOfNodeFromText(
+        INode node, string text) =>
         GetLeadingCommentRanges(text, node.Pos ?? 0);
 
-    public static List<CommentRange> GetJsDocCommentRanges(
+    internal static List<CommentRange> GetJsDocCommentRanges(
         INode node, string text)
     {
         var commentRanges =
-            node.Kind is TypeScriptSyntaxKind.Parameter ||
-            node.Kind is TypeScriptSyntaxKind.TypeParameter ||
-            node.Kind is TypeScriptSyntaxKind.FunctionExpression ||
-            node.Kind is TypeScriptSyntaxKind.ArrowFunction
+            node.Kind is TypeScriptSyntaxKind.Parameter or
+                TypeScriptSyntaxKind.TypeParameter or
+                TypeScriptSyntaxKind.FunctionExpression or
+                TypeScriptSyntaxKind.ArrowFunction
                 ? GetTrailingCommentRanges(text, node.Pos ?? 0).Concat(GetLeadingCommentRanges(text, node.Pos ?? 0))
                 : GetLeadingCommentRangesOfNodeFromText(node, text);
 
@@ -79,15 +78,13 @@ public sealed class Utilities
             .ToList();
     }
 
-    public static bool IsKeyword(TypeScriptSyntaxKind token) =>
-        TypeScriptSyntaxKind.FirstKeyword <= token &&
-        token <= TypeScriptSyntaxKind.LastKeyword;
+    internal static bool IsKeyword(TypeScriptSyntaxKind token) =>
+        token is >= TypeScriptSyntaxKind.FirstKeyword and <= TypeScriptSyntaxKind.LastKeyword;
 
-    public static bool IsTrivia(TypeScriptSyntaxKind token) =>
-        TypeScriptSyntaxKind.FirstTriviaToken <= token &&
-        token <= TypeScriptSyntaxKind.LastTriviaToken;
+    internal static bool IsTrivia(TypeScriptSyntaxKind token) =>
+        token is >= TypeScriptSyntaxKind.FirstTriviaToken and <= TypeScriptSyntaxKind.LastTriviaToken;
 
-    public static bool IsModifierKind(TypeScriptSyntaxKind token) => token switch
+    internal static bool IsModifierKind(TypeScriptSyntaxKind token) => token switch
     {
         TypeScriptSyntaxKind.AbstractKeyword or
         TypeScriptSyntaxKind.AsyncKeyword or
@@ -104,13 +101,13 @@ public sealed class Utilities
         _ => false,
     };
 
-    public static bool IsParameterDeclaration(IVariableLikeDeclaration node)
+    internal static bool IsParameterDeclaration(IVariableLikeDeclaration node)
     {
         var root = GetRootDeclaration(node);
         return root.Kind is TypeScriptSyntaxKind.Parameter;
     }
 
-    public static INode GetRootDeclaration(INode node)
+    internal static INode GetRootDeclaration(INode node)
     {
         while (node.Kind is TypeScriptSyntaxKind.BindingElement)
         {
@@ -120,14 +117,13 @@ public sealed class Utilities
         return node;
     }
 
-
-    public static bool HasModifiers(Node node) =>
+    internal static bool HasModifiers(Node node) =>
         GetModifierFlags(node) is not ModifierFlags.None;
 
-    public static bool HasModifier(INode node, ModifierFlags flags) =>
+    internal static bool HasModifier(INode node, ModifierFlags flags) =>
         (GetModifierFlags(node) & flags) is not 0;
 
-    public static ModifierFlags GetModifierFlags(INode node)
+    internal static ModifierFlags GetModifierFlags(INode node)
     {
         if ((node.ModifierFlagsCache & ModifierFlags.HasComputedFlags) != 0)
         {
@@ -137,14 +133,11 @@ public sealed class Utilities
         var flags = ModifierFlags.None;
         if (node.Modifiers != null)
         {
-            foreach (var modifier in node.Modifiers)
-            {
-                flags |= ModifierToFlag(modifier.Kind);
-            }
+            flags = node.Modifiers.Aggregate(flags, (current, modifier) => current | ModifierToFlag(modifier.Kind));
         }
 
         if (node.Flags.HasFlag(NodeFlags.NestedNamespace) ||
-            (node is Identifier identifier && identifier.IsInJsDocNamespace))
+            node is Identifier { IsInJsDocNamespace: true })
         {
             flags |= ModifierFlags.Export;
         }
@@ -155,7 +148,7 @@ public sealed class Utilities
     }
 
 
-    public static ModifierFlags ModifierToFlag(TypeScriptSyntaxKind token) => token switch
+    internal static ModifierFlags ModifierToFlag(TypeScriptSyntaxKind token) => token switch
     {
         TypeScriptSyntaxKind.StaticKeyword => ModifierFlags.Static,
         TypeScriptSyntaxKind.PublicKeyword => ModifierFlags.Public,
@@ -171,43 +164,42 @@ public sealed class Utilities
         _ => ModifierFlags.None,
     };
 
-    public static bool IsLogicalOperator(TypeScriptSyntaxKind token) =>
-        token is TypeScriptSyntaxKind.BarBarToken ||
-        token is TypeScriptSyntaxKind.AmpersandAmpersandToken ||
-        token is TypeScriptSyntaxKind.ExclamationToken;
+    internal static bool IsLogicalOperator(TypeScriptSyntaxKind token) =>
+        token is TypeScriptSyntaxKind.BarBarToken or
+            TypeScriptSyntaxKind.AmpersandAmpersandToken or
+            TypeScriptSyntaxKind.ExclamationToken;
 
-    public static bool IsAssignmentOperator(TypeScriptSyntaxKind token) =>
-        token >= TypeScriptSyntaxKind.FirstAssignment &&
-        token <= TypeScriptSyntaxKind.LastAssignment;
+    internal static bool IsAssignmentOperator(TypeScriptSyntaxKind token) =>
+        token is >= TypeScriptSyntaxKind.FirstAssignment and <= TypeScriptSyntaxKind.LastAssignment;
 
-    public static bool IsLeftHandSideExpressionKind(TypeScriptSyntaxKind kind) =>
-        kind is TypeScriptSyntaxKind.PropertyAccessExpression ||
-        kind is TypeScriptSyntaxKind.ElementAccessExpression ||
-        kind is TypeScriptSyntaxKind.NewExpression ||
-        kind is TypeScriptSyntaxKind.CallExpression ||
-        kind is TypeScriptSyntaxKind.JsxElement ||
-        kind is TypeScriptSyntaxKind.JsxSelfClosingElement ||
-        kind is TypeScriptSyntaxKind.TaggedTemplateExpression ||
-        kind is TypeScriptSyntaxKind.ArrayLiteralExpression ||
-        kind is TypeScriptSyntaxKind.ParenthesizedExpression ||
-        kind is TypeScriptSyntaxKind.ObjectLiteralExpression ||
-        kind is TypeScriptSyntaxKind.ClassExpression ||
-        kind is TypeScriptSyntaxKind.FunctionExpression ||
-        kind is TypeScriptSyntaxKind.Identifier ||
-        kind is TypeScriptSyntaxKind.RegularExpressionLiteral ||
-        kind is TypeScriptSyntaxKind.NumericLiteral ||
-        kind is TypeScriptSyntaxKind.StringLiteral ||
-        kind is TypeScriptSyntaxKind.NoSubstitutionTemplateLiteral ||
-        kind is TypeScriptSyntaxKind.TemplateExpression ||
-        kind is TypeScriptSyntaxKind.FalseKeyword ||
-        kind is TypeScriptSyntaxKind.NullKeyword ||
-        kind is TypeScriptSyntaxKind.ThisKeyword ||
-        kind is TypeScriptSyntaxKind.TrueKeyword ||
-        kind is TypeScriptSyntaxKind.SuperKeyword ||
-        kind is TypeScriptSyntaxKind.NonNullExpression ||
-        kind is TypeScriptSyntaxKind.MetaProperty;
+    internal static bool IsLeftHandSideExpressionKind(TypeScriptSyntaxKind kind) =>
+        kind is TypeScriptSyntaxKind.PropertyAccessExpression or
+            TypeScriptSyntaxKind.ElementAccessExpression or
+            TypeScriptSyntaxKind.NewExpression or
+            TypeScriptSyntaxKind.CallExpression or
+            TypeScriptSyntaxKind.JsxElement or
+            TypeScriptSyntaxKind.JsxSelfClosingElement or
+            TypeScriptSyntaxKind.TaggedTemplateExpression or
+            TypeScriptSyntaxKind.ArrayLiteralExpression or
+            TypeScriptSyntaxKind.ParenthesizedExpression or
+            TypeScriptSyntaxKind.ObjectLiteralExpression or
+            TypeScriptSyntaxKind.ClassExpression or
+            TypeScriptSyntaxKind.FunctionExpression or
+            TypeScriptSyntaxKind.Identifier or
+            TypeScriptSyntaxKind.RegularExpressionLiteral or
+            TypeScriptSyntaxKind.NumericLiteral or
+            TypeScriptSyntaxKind.StringLiteral or
+            TypeScriptSyntaxKind.NoSubstitutionTemplateLiteral or
+            TypeScriptSyntaxKind.TemplateExpression or
+            TypeScriptSyntaxKind.FalseKeyword or
+            TypeScriptSyntaxKind.NullKeyword or
+            TypeScriptSyntaxKind.ThisKeyword or
+            TypeScriptSyntaxKind.TrueKeyword or
+            TypeScriptSyntaxKind.SuperKeyword or
+            TypeScriptSyntaxKind.NonNullExpression or
+            TypeScriptSyntaxKind.MetaProperty;
 
-    public static bool IsLeftHandSideExpression(IExpression node) =>
+    internal static bool IsLeftHandSideExpression(IExpression node) =>
         IsLeftHandSideExpressionKind(
             SkipPartiallyEmittedExpressions(node).Kind);
 }

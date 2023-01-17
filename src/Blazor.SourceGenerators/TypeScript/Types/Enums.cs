@@ -1,6 +1,10 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+#nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
 [Flags]
@@ -621,6 +625,7 @@ public enum JSDocState
     SavingComments
 }
 
+[Flags]
 public enum ModifierFlags
 {
     None = 0,
