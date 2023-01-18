@@ -46,8 +46,7 @@ public class Node : TextRange, INode
     public TypeMapper ContextualMapper { get; set; }
     public int TagInt { get; set; }
 
-    public void ParseChildren(ITypeScriptAbstractSyntaxTree abstractSyntaxTree)
-    {
+    public void ParseChildren(ITypeScriptAbstractSyntaxTree abstractSyntaxTree) =>
         Ts.ForEachChild(this, node =>
         {
             if (node is null) return null;
@@ -63,7 +62,6 @@ public class Node : TextRange, INode
             n.ParseChildren(abstractSyntaxTree);
             return null;
         });
-    }
 
     public string GetText(string source = null)
     {

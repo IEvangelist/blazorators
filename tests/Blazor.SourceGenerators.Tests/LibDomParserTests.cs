@@ -11,16 +11,18 @@ namespace Blazor.SourceGenerators.Tests;
 
 public class LibDomParserTests
 {
+    private readonly ITypeScriptAbstractSyntaxTree _sut;
+
+    public LibDomParserTests()
+    {
+        var reader = TypeDeclarationReader.Default;
+        _sut = new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
+    }
+
     [Fact]
     public void FindsInterfaceAndCorrespondingImplementationCorrectly()
     {
-        var reader = TypeDeclarationReader.Default;
-        var astParser =
-            new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
-        var interfaces = astParser.RootNode.OfKind(
-            TypeScriptSyntaxKind.InterfaceDeclaration);
-
-        var window = astParser.RootNode.Window;
+        var window = _sut.RootNode.Window;
         Assert.NotNull(window);
 
         var heritage = window.Children.Single(
@@ -32,20 +34,23 @@ public class LibDomParserTests
     [Fact]
     public void CanReplaceBruteForceParser()
     {
-        var reader = TypeDeclarationReader.Default;
-        var astParser =
-            new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
+        var cacheStorage =
+            _sut.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
+                .Single(c => c is { Identifier: "CacheStorage" });
+        Assert.NotNull(cacheStorage);
 
+        var methods = cacheStorage.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        Assert.Contains(methods, m => m.Identifier is "has");
+        Assert.Contains(methods, m => m.Identifier is "open");
+        Assert.Contains(methods, m => m.Identifier is "delete");
+        Assert.Contains(methods, m => m.Identifier is "keys");
+        Assert.Contains(methods, m => m.Identifier is "match");
     }
 
     [Fact]
     public void AbstractSyntaxTreeParsesCorrectly()
     {
-        var reader = TypeDeclarationReader.Default;
-        var astParser =
-            new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
-
-        var interfaces = astParser.RootNode.OfKind(
+        var interfaces = _sut.RootNode.OfKind(
             TypeScriptSyntaxKind.InterfaceDeclaration);
 
         var geolocation = interfaces.Single(
