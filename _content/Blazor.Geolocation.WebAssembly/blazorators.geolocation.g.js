@@ -1,5 +1,10 @@
-// Copyright (c) David Pine. All rights reserved.
+﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
+
+console.groupCollapsed(
+    '%cblazorators%c geolocation %cJavaScript loaded',
+    'background: purple; color: white; padding: 1px 3px; border-radius: 3px;',
+    'color: cyan;', 'color: initial;');
 
 const onSuccess = (dotnetObj, successMethodName, position) => {
     // HACK: Blazor isn't correctly deserializing these.
@@ -19,6 +24,8 @@ const onSuccess = (dotnetObj, successMethodName, position) => {
     dotnetObj.invokeMethod(successMethodName, result);
 };
 
+console.log('%O %cfunction %cdefined ✅.', onSuccess, 'color: magenta;', 'color: initial;');
+
 const onError = (dotnetObj, errorMethodName, error) => {
     const result = {
         Code: error.code,
@@ -29,6 +36,8 @@ const onError = (dotnetObj, errorMethodName, error) => {
     };
     dotnetObj.invokeMethod(errorMethodName, result);
 };
+
+console.log('%O %cfunction %cdefined ✅.', onError, 'color: magenta;', 'color: initial;');
 
 const getCurrentPosition = (
     dotnetObj,
@@ -41,6 +50,8 @@ const getCurrentPosition = (
         options);
 }
 
+console.log('%O %cfunction %cdefined ✅.', getCurrentPosition, 'color: magenta;', 'color: initial;');
+
 const watchPosition = (
     dotnetObj,
     successMethodName,
@@ -52,9 +63,13 @@ const watchPosition = (
         options);
 }
 
+console.log('%O %cfunction %cdefined ✅.', watchPosition, 'color: magenta;', 'color: initial;');
+
 window.blazorators = Object.assign({}, window.blazorators, {
     geolocation: {
         getCurrentPosition,
         watchPosition
     }
 });
+
+console.groupEnd();

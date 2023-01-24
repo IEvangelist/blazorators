@@ -98,3 +98,16 @@ export const recognizeSpeech =
 window.addEventListener('beforeunload', _ => {
     cancelSpeechRecognition(true);
 });
+
+export const logModuleDetails = () => {
+    console.groupCollapsed(
+        '%cblazorators%c speechRecognition %cJavaScript module loaded',
+        'background: purple; color: white; padding: 1px 3px; border-radius: 3px;',
+        'color: cyan;', 'color: initial;');
+
+    console.log('%O %cfunction %cexported ✅.', cancelSpeechRecognition, 'color: magenta;', 'color: initial;');
+
+    console.log('%O %cfunction %cexported ✅.', recognizeSpeech, 'color: magenta;', 'color: initial;');
+
+    console.groupEnd();
+};
