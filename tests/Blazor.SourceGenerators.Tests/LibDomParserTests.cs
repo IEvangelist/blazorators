@@ -39,7 +39,7 @@ public class LibDomParserTests
                 .Single(c => c is { Identifier: "CacheStorage" });
         Assert.NotNull(cacheStorage);
 
-        var methods = cacheStorage.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        var methods = cacheStorage.OfKind(TypeScriptSyntaxKind.MethodSignature).Cast<MethodSignature>();
         Assert.Contains(methods, m => m.Identifier is "has");
         Assert.Contains(methods, m => m.Identifier is "open");
         Assert.Contains(methods, m => m.Identifier is "delete");
