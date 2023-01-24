@@ -7,4 +7,5 @@ internal static class JavaScriptInteropMethodIdentifiers
 {
     internal const string RecognizeSpeech = "recognizeSpeech";
     internal const string CancelSpeechRecognition = "cancelSpeechRecognition";
+    internal const string LogModuleDetails = "logModuleDetails";
 }

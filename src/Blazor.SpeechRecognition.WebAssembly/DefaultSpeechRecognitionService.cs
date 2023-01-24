@@ -27,11 +27,19 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     }
 
     /// <inheritdoc />
-    public async Task InitializeModuleAsync() =>
+    public async Task InitializeModuleAsync(bool logModuleDetails)
+    {
         _speechRecognitionModule =
             await _javaScript.InvokeAsync<IJSInProcessObjectReference>(
                 "import",
                 "./_content/Blazor.SpeechRecognition.WebAssembly/blazorators.speechRecognition.js");
+
+        if (logModuleDetails)
+        {
+            _speechRecognitionModule?.InvokeVoid(
+                JavaScriptInteropMethodIdentifiers.LogModuleDetails);
+        }
+    }
 
     /// <inheritdoc />
     public void CancelSpeechRecognition(

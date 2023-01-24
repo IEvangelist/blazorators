@@ -13,7 +13,10 @@ public interface ISpeechRecognitionService : IAsyncDisposable
     /// Call once, before using in the consuming components
     /// <c>OnAfterRenderAsync(bool firstRender)</c> override, when firstRender is <c>true</c>.
     /// </summary>
-    Task InitializeModuleAsync();
+    /// <param name="logModuleDetails">
+    /// When <c>true</c>, logs the module details to the JavaScript <c>console</c> as a group.
+    /// </param>
+    Task InitializeModuleAsync(bool logModuleDetails = true);
 
     /// <summary>
     /// Cancels the active speech recognition session.
