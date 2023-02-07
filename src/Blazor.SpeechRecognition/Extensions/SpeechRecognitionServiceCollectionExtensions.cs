@@ -15,5 +15,5 @@ public static class SpeechRecognitionServiceCollectionExtensions
     /// <returns>The same <paramref name="services"/> instance that was added to.</returns>
     public static IServiceCollection AddSpeechRecognitionServices(
         this IServiceCollection services) =>
-        services.AddSingleton<ISpeechRecognitionService, DefaultSpeechRecognitionService>();
+        services.AddScoped<ISpeechRecognitionService, DefaultSpeechRecognitionService>();
 }

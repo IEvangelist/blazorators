@@ -500,17 +500,17 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         GeneratorOptions options,
         string implementation)
     {
+        var serviceLifetime = options.IsWebAssembly
+            ? "Singleton"
+            : "Scoped";
         var addExpression = options.IsWebAssembly
-            ? @"services.AddSingleton<IJSInProcessRuntime>(serviceProvider =>
+            ? $@"services.Add{serviceLifetime}<IJSInProcessRuntime>(serviceProvider =>
             (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
             "
             : "services";
 
         var @interface = options.Implementation.ToInterfaceName();
         var nonService = options.Implementation.ToImplementationName(false);
-        var serviceLifetime = options.IsWebAssembly
-            ? "Singleton"
-            : "Scoped";
 
         var extensions = $@"// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License:

@@ -16,6 +16,13 @@
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
 <body>
+    <a id="gitlink" target="_blank"
+       href="https://github.com/IEvangelist/blazorators">
+        <img style="position: absolute; top: 0; right: 0; border: 0; z-index: 1000"
+             src="https://aral.github.io/fork-me-on-github-retina-ribbons/right-cerulean@2x.png"
+             alt="Fork me on GitHub">
+    </a>
+
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
     <div id="blazor-error-ui">
@@ -30,5 +37,9 @@
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Blazor.Geolocation/blazorators.geolocation.g.js"></script>
+    <script src="_content/Blazor.SpeechSynthesis/blazorators.speechSynthesis.g.js"></script>
+    <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AuFFokbS0x6puH-xXz-ADH1ZcMnPC1JkdSyRidoWCGYpVYTlnivpswV0D-OtfxGb" async defer></script>
+    <script src="app.js"></script>
 </body>
 </html>

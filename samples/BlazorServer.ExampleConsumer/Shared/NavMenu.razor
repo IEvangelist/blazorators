@@ -1,39 +1,63 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">BlazorServer.ExampleConsumer</a>
+        <a class="navbar-brand" href="">
+            <img src="logo.png" height="32" width="32" />
+            <span class="ps-2">Blazorators</span>
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink id="home" class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink id="storage" class="nav-link" href="todos">
+                <span class="oi oi-task" aria-hidden="true"></span> Local Storage
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink id="geolocation" class="nav-link" href="geolocation">
+                <span class="oi oi-map" aria-hidden="true"></span> Geolocation
             </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink id="tts" class="nav-link" href="speak">
+                <span class="oi oi-audio" aria-hidden="true"></span> Text-to-speech
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink id="stt" class="nav-link" href="listen">
+                <span class="oi oi-microphone" aria-hidden="true"></span> Speech-to-text
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink id="track" class="nav-link" href="track">
+                <span class="oi oi-compass" aria-hidden="true"></span> Track
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink id="sandbox" class="nav-link" href="sandbox">
+                <span class="oi oi-inbox" aria-hidden="true"></span> Sandbox
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <a id="code" href="https://github.com/IEvangelist/blazorators" target="_blank"
+                class="nav-link" rel="noopener noreferrer nofollow">
+                <span class="oi oi-code" aria-hidden="true"></span> Source Code
+            </a>
         </div>
     </nav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+    bool _collapseNavMenu = true;
+    string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+    void ToggleNavMenu() => _collapseNavMenu = !_collapseNavMenu;
 }

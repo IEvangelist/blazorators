@@ -6,7 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    </ItemGroup>
+
+    <ItemGroup>
     <ProjectReference Include="..\..\src\Blazor.Geolocation\Blazor.Geolocation.csproj" />
     <ProjectReference Include="..\..\src\Blazor.LocalStorage\Blazor.LocalStorage.csproj" />
     <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />

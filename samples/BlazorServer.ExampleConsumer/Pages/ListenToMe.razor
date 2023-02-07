@@ -1,0 +1,29 @@
+﻿@page "/listen"
+
+<PageTitle>Speech-to-text</PageTitle>
+
+<p>This page demonstrates the source generated <code>Blazor.SpeechRecongition</code> package.</p>
+
+<div class="mb-3 w-75">
+    <label for="text" class="form-label">
+        Speech-to-text
+    </label>
+    <textarea class="form-control" id="text" 
+        readonly=@_isRecognizingSpeech rows="6" @bind=@_transcript>
+    </textarea>
+</div>
+<Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
+
+<button type="button" class="btn btn-lg btn-primary"
+        @onclick=@OnRecognizeSpeechClick>
+    @if (_isRecognizingSpeech)
+    {
+        <span class="oi oi-media-stop"></span>
+        <span class="ps-2">Stop</span>
+    }
+    else
+    {
+        <span class="oi oi-microphone"></span>
+        <span class="ps-2">Listen</span>
+    }
+</button>

@@ -1,0 +1,49 @@
+﻿@page "/sandbox"
+@inject IGeolocationService GeolocationService
+
+<h1>
+    🎭 Sandbox
+    @if (_isLoading)
+    {
+        <span class="spinner-border text-primary" style="border-width: .12em;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </span>
+    }
+    @if (_position is not null)
+    {
+        <span class="pe-1">: 
+            <code>
+                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
+            </code>
+        </span>
+        <a href="https://www.nuget.org/packages/Blazor.LocalStorage" target="_blank"
+            rel="noopener noreferrer nofollow">
+            <span class="oi oi-external-link"></span>
+        </a>
+    }
+</h1>
+
+<Code Value=@_position T=GeolocationPosition IsError=false />
+<Code Value=@_positionError T=GeolocationPositionError IsError=true />
+
+<BingMap Position=@_position />
+
+@code {
+    bool _isLoading => _position is null && _positionError is null;
+    
+    GeolocationPosition? _position;
+    GeolocationPositionError? _positionError;
+
+    protected override async Task OnInitializedAsync() =>
+        await GeolocationService.GetCurrentPositionAsync(
+            position =>
+            {
+                _position = position;
+                StateHasChanged();
+            },
+            positionError =>
+            {
+                _positionError = positionError;
+                StateHasChanged();
+            });
+}

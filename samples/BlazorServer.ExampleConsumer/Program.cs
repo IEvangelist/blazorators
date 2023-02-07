@@ -1,14 +1,11 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using BlazorServer.ExampleConsumer.Data;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 // Use source-generated DI bits...
 builder.Services.AddLocalStorageServices();
