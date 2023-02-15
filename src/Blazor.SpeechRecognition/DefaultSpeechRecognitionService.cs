@@ -17,7 +17,7 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
         _speechRecognitionModule =
             new(() => javaScript.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./_content/Blazor.SpeechRecognition.WebAssembly/blazorators.speechRecognition.js")
+                "./_content/Blazor.SpeechRecognition/blazorators.speechRecognition.js")
                 .AsTask());
 
     async ValueTask InitializeSpeechRecognitionSubjectAsync()
