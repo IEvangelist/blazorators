@@ -3,7 +3,7 @@
 
 namespace BlazorServer.ExampleConsumer.Pages;
 
-public sealed partial class ListenToMe : IAsyncDisposable
+public sealed partial class ListenToMe : IDisposable
 {
     const string TranscriptKey = "listen-to-me-page-transcript";
 
@@ -82,13 +82,5 @@ public sealed partial class ListenToMe : IAsyncDisposable
             StateHasChanged();
         });
 
-    public async ValueTask DisposeAsync()
-    {
-        if (SpeechRecognition is not null)
-        {
-            await SpeechRecognition.DisposeAsync();
-        }
-
-        _recognitionSubscription?.Dispose();
-    }
+    public void Dispose() => _recognitionSubscription?.Dispose();
 }

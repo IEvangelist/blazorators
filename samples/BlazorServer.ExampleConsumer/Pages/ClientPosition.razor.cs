@@ -31,13 +31,13 @@ public sealed partial class ClientPosition
 
         await Geolocation.GetCurrentPositionAsync(
             component: this,
-            onSuccessCallbackMethodName: nameof(OnPositionRecieved),
+            onSuccessCallbackMethodName: nameof(OnPositionReceived),
             onErrorCallbackMethodName: nameof(OnPositionError),
             options: _options);
     }
 
     [JSInvokable]
-    public void OnPositionRecieved(GeolocationPosition position)
+    public void OnPositionReceived(GeolocationPosition position)
     {
         _isLoading = false;
         _position = position;
