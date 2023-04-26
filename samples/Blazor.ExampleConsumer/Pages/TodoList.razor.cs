@@ -30,12 +30,12 @@ public sealed partial class TodoList
 
         foreach (var key in GetLocalStorageKeys())
         {
-            if (TryGet(key, out TodoItem? todo))
+            if (TryGet(key, out TodoItem? todo) && todo is not null)
             {
                 _localStorageItems[key] = todo.ToString();
                 continue;
             }
-            if (TryGet(key, out string? @string))
+            if (TryGet(key, out string? @string) && @string is not null)
             {
                 _localStorageItems[key] = @string;
                 continue;
