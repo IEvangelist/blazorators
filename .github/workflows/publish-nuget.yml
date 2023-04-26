@@ -14,7 +14,7 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Test
-      run: dotnet test --filter "Category!=EndToEnd"
+      run: dotnet test --filter "Category!=EndToEnd" --configuration Release
     
     - name: Build end-to-end tests
       run: |
