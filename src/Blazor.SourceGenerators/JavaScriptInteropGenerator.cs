@@ -19,7 +19,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 #if DEBUG
         if (!System.Diagnostics.Debugger.IsAttached)
         {
-            //System.Diagnostics.Debugger.Launch();
+            System.Diagnostics.Debugger.Launch();
         }
 #endif
 
@@ -65,7 +65,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
             foreach (var parser in options.Parsers)
             {
                 var result = parser.ParseTargetType(options.TypeName!);
-                if (result.Status == ParserResultStatus.SuccessfullyParsed &&
+                if (result.Status is ParserResultStatus.SuccessfullyParsed &&
                     result.Value is not null)
                 {
                     var namespaceString =

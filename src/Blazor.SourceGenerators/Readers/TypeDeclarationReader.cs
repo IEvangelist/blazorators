@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.Readers;
 
 internal sealed partial class TypeDeclarationReader
 {
-    readonly Uri _typeDeclarationSource;
+    readonly Uri? _typeDeclarationSource;
     readonly Lazy<string> _typeDeclarationText;
 
     IDictionary<string, string>? _typeDeclarationMap;
@@ -17,14 +17,17 @@ internal sealed partial class TypeDeclarationReader
     private IDictionary<string, string> TypeAliasMap =>
         _typeAliasMap ??= ReadTypeAliasMap(_typeDeclarationText.Value);
 
-    private TypeDeclarationReader(
-        Uri? typeDeclarationSource = null)
+    private TypeDeclarationReader()
     {
-        _typeDeclarationSource = typeDeclarationSource ?? s_defaultTypeDeclarationSource;
         _typeDeclarationText = new Lazy<string>(
-            valueFactory: () => _typeDeclarationSource.IsFile
-                ? GetLocalFileText(_typeDeclarationSource.LocalPath)
-                : GetRemoteFileText(_typeDeclarationSource.OriginalString));
+            valueFactory: () => GetEmbeddedResourceText());
+    }
+
+    private TypeDeclarationReader(Uri typeDeclarationSource)
+    {
+        _typeDeclarationSource = typeDeclarationSource;
+        _typeDeclarationText = new Lazy<string>(
+            valueFactory: () => GetLocalFileText(_typeDeclarationSource.LocalPath));
     }
 
     IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
@@ -51,7 +54,7 @@ internal sealed partial class TypeDeclarationReader
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error intializing lib dom parser. {ex}");
+            Console.WriteLine($"Error initializing lib dom parser. {ex}");
         }
 
         return map;
@@ -81,7 +84,7 @@ internal sealed partial class TypeDeclarationReader
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error intializing lib dom parser. {ex}");
+            Console.WriteLine($"Error initializing lib dom parser. {ex}");
         }
 
         return map;

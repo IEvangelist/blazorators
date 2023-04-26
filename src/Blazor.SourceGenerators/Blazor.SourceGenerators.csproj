@@ -71,6 +71,11 @@
 
     <ItemGroup>
       <None Remove="bin\Debug\netstandard2.0\\Blazor.SourceGenerators.dll" />
+      <None Remove="Data\lib.dom.d.ts" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Data\lib.dom.d.ts" />
     </ItemGroup>
 
     <ItemGroup>
