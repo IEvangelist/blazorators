@@ -19,7 +19,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 #if DEBUG
         if (!System.Diagnostics.Debugger.IsAttached)
         {
-            System.Diagnostics.Debugger.Launch();
+            // System.Diagnostics.Debugger.Launch();
         }
 #endif
 

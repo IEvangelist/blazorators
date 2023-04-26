@@ -18,7 +18,7 @@ jobs:
     
     - name: Build end-to-end tests
       run: |
-        dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj
+        dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release
 
     - name: Install Playwright dependencies
       run: |
@@ -69,7 +69,7 @@ jobs:
         
     - name: Restore dependencies for ${{ matrix.project }}
       run: |
-        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj
+        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release
       
     - name: Build ${{ matrix.project }}
       run: |
