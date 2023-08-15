@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		global.json = global.json
 		LICENSE = LICENSE
 		logo-large.png = logo-large.png
 		logo.png = logo.png
@@ -54,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.ExampleConsumer.EndT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorServer.ExampleConsumer", "samples\BlazorServer.ExampleConsumer\BlazorServer.ExampleConsumer.csproj", "{31D54C48-6325-4591-8612-87A917D49028}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.CacheStorage.WebAssembly", "src\Blazor.CacheStorage.WebAssembly\Blazor.CacheStorage.WebAssembly.csproj", "{38FE259D-0B98-495E-B376-D0F3C9CA12B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.CacheStorage.WebAssembly", "src\Blazor.CacheStorage.WebAssembly\Blazor.CacheStorage.WebAssembly.csproj", "{38FE259D-0B98-495E-B376-D0F3C9CA12B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

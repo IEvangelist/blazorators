@@ -22,18 +22,28 @@ static class Descriptors
         true);
 
     internal static readonly DiagnosticDescriptor UnableToParseGeneratorOptionsDiagnostic = new(
-        "BR0003",
-        "The GeneratorOptions required for source generation are unresolvable",
-        "JSAutoGenericInteropAttribute must provide the fully qualified 'Descriptors' type name.",
-        "Blazorators.JSAutoGenericInteropAttribute",
-        DiagnosticSeverity.Error,
-        true);
+        id: "BR0003",
+        title: "The GeneratorOptions required for source generation are unresolvable",
+        messageFormat: "JSAutoGenericInteropAttribute must provide the fully qualified 'Descriptors' type name.",
+        category: "Blazorators.JSAutoGenericInteropAttribute",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 
     internal static readonly DiagnosticDescriptor MissingBlazorSerializationPackageReferenceDiagnostic = new(
-        "BR0004",
-        "Missing package reference of Blazor.Serialization",
-        "When using JSAutoGenericInteropAttribute you must reference Blazor.Serialization.",
-        "Blazorators.JSAutoGenericInteropAttribute",
-        DiagnosticSeverity.Error,
-        true);
+        id: "BR0004",
+        title: "Missing package reference of Blazor.Serialization",
+        messageFormat: "When using JSAutoGenericInteropAttribute you must reference Blazor.Serialization.",
+        category: "Blazorators.JSAutoGenericInteropAttribute",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    internal static readonly DiagnosticDescriptor SourceGenerationFailedDiagnostic = new(
+        id: "BR0005",
+        title: "Unknown error, send help?!",
+        messageFormat: """
+            Try deleting your bin and obj folders, clean and try the build again. Exception: {0}
+            """,
+        category: "Blazor.SourceGenerators.JavaScriptInteropGenerator.TryExecute",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }

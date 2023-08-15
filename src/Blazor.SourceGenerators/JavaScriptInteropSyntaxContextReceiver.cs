@@ -17,12 +17,12 @@ internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
             {
                 foreach (var attributeSyntax in attributeListSyntax.Attributes)
                 {
-                    var name = attributeSyntax.Name.ToString();
+                    var attributeName = attributeSyntax.Name.ToString();
 
                     var isAutoInterop =
-                        nameof(JSAutoInteropAttribute).Contains(name);
+                        nameof(JSAutoInteropAttribute).Contains(attributeName);
                     var isAutoGenericInterop =
-                        nameof(JSAutoGenericInteropAttribute).Contains(name);
+                        nameof(JSAutoGenericInteropAttribute).Contains(attributeName);
 
                     if (isAutoInterop || isAutoGenericInterop)
                     {

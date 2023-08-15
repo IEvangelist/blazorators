@@ -24,10 +24,10 @@ internal sealed partial class TypeDeclarationReader
     {
         _typeDeclarationSource = typeDeclarationSource;
         _typeDeclarationText = new Lazy<string>(
-            valueFactory: () => GetLocalFileText(_typeDeclarationSource.LocalPath));
+            valueFactory: () => GetEmbeddedResourceText());
     }
 
-    IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
+    ConcurrentDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
     {
         ConcurrentDictionary<string, string> map = new();
 
@@ -57,7 +57,7 @@ internal sealed partial class TypeDeclarationReader
         return map;
     }
 
-    IDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
+    ConcurrentDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
     {
         ConcurrentDictionary<string, string> map = new();
 
