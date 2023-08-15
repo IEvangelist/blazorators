@@ -113,4 +113,27 @@ public class LibDomParserTests
         Assert.Single(dependencies);
         Assert.True(dependencies.ContainsKey("PositionOptions"));
     }
+    
+    [Fact]
+    public void VerifyLocalStorageCanBeReadByDefault()
+    {
+        var sut = TypeDeclarationParser.Default;
+        var parserResult = sut.ParseTargetType("Storage");
+
+        Assert.Equal(ParserResultStatus.SuccessfullyParsed, parserResult.Status);
+
+        // Assert
+        var properties = parserResult.Value?.Properties;
+        Assert.NotNull(properties);
+        Assert.Equal(2, properties?.Count ?? 0);
+
+        var methods = parserResult.Value?.Methods;
+        Assert.NotNull(methods);
+        Assert.Equal(5, methods.Count);
+        Assert.Contains(methods, m => m.RawName is "getItem");
+        Assert.Contains(methods, m => m.RawName is "setItem");
+        Assert.Contains(methods, m => m.RawName is "removeItem");
+        Assert.Contains(methods, m => m.RawName is "clear");
+        Assert.Contains(methods, m => m.RawName is "key");
+    }
 }
