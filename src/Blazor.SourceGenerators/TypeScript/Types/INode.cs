@@ -34,8 +34,8 @@ public interface INode : ITextRange
     TypeScriptType ContextualType { get; set; }
     TypeMapper ContextualMapper { get; set; }
     int TagInt { get; set; }
-    string GetText(string source = null);
-    string GetTextWithComments(string source = null);
+    ReadOnlySpan<char> GetText(string source = null);
+    ReadOnlySpan<char> GetTextWithComments(string source = null);
     string GetTreeString(bool withPos = true);
     string ToString(bool withPos);
     Node First { get; }

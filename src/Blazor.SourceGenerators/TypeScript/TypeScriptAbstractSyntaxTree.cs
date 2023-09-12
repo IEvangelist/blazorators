@@ -9,34 +9,53 @@ namespace Blazor.SourceGenerators.TypeScript;
 
 internal sealed class TypeScriptAbstractSyntaxTree : ITypeScriptAbstractSyntaxTree
 {
-    private readonly ScriptTarget _languageVersion;
+    public ScriptTarget Target { get; }
 
-    public string RawSourceText { get; set; }
-    public RootNodeSourceFile RootNode { get; set; }
+    public string RawSourceText { get; }
 
-    public TypeScriptAbstractSyntaxTree(
-        string source = null,
+    public RootNodeSourceFile RootNode { get; }
+
+    private TypeScriptAbstractSyntaxTree(
+        string sourceText = null,
         string fileName = "app.ts",
-        ScriptTarget languageVersion = ScriptTarget.Latest)
+        ScriptTarget target = ScriptTarget.Latest)
     {
-        _languageVersion = languageVersion;
-        if (source is not null)
-        {
-            ParseAsAst(source, fileName);
-        }
-    }
+        Target = target;
 
-    public void ParseAsAst(string source, string fileName = "app.ts")
-    {
-        RawSourceText = source;
+        if (string.IsNullOrWhiteSpace(sourceText))
+        {
+            throw new ArgumentNullException(nameof(sourceText));
+        }
+
+        RawSourceText = sourceText;
         var parser = new Parser();
         RootNode = parser.ParseSourceFile(
             fileName,
-            source,
-            _languageVersion,
+            sourceText,
+            Target,
             true,
             ScriptKind.Ts);
         RootNode.AbstractSyntaxTree = this;
         RootNode.ParseChildren(this);
     }
+
+    /// <summary>
+    /// Gets a representation of the TypeScript abstract syntax tree from the given
+    /// <paramref name="sourceText"/> and <paramref name="fileName"/>.
+    /// </summary>
+    /// <param name="sourceText">
+    /// The source text to parse the abstract syntax tree from.
+    /// </param>
+    /// <param name="fileName">
+    /// The name of the file to parse the abstract syntax tree from.
+    /// </param>
+    /// <param name="target">
+    /// The target script version to parse the abstract syntax tree from.
+    /// </param>
+    /// <returns>An instance of <see cref="ITypeScriptAbstractSyntaxTree"/> instance.</returns>
+    public static ITypeScriptAbstractSyntaxTree FromSourceText(
+        string sourceText,
+        string fileName = "lib.dom.d.ts",
+        ScriptTarget target = ScriptTarget.Latest) =>
+        new TypeScriptAbstractSyntaxTree(sourceText, fileName, target);
 }

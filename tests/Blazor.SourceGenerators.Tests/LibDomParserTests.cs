@@ -16,7 +16,7 @@ public class LibDomParserTests
     public LibDomParserTests()
     {
         var reader = TypeDeclarationReader.Default;
-        _sut = new TypeScriptAbstractSyntaxTree(reader.RawSourceText);
+        _sut = TypeScriptAbstractSyntaxTree.FromSourceText(reader.RawSourceText);
     }
 
     [Fact]
@@ -37,6 +37,7 @@ public class LibDomParserTests
         var cacheStorage =
             _sut.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
                 .Single(c => c is { Identifier: "CacheStorage" });
+
         Assert.NotNull(cacheStorage);
 
         var methods = cacheStorage.OfKind(TypeScriptSyntaxKind.MethodSignature).Cast<MethodSignature>();

@@ -2,14 +2,12 @@
 // Licensed under the MIT License.
 
 #nullable disable
+using System.Diagnostics;
 using Blazor.SourceGenerators.TypeScript.Compiler;
 
-// Copyright (c) David Pine. All rights reserved.
-// Licensed under the MIT License.
-
-#nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
+[DebuggerDisplay("{SourceText}")]
 public class Node : TextRange, INode
 {
     public List<Node> Children { get; set; } = new();
@@ -17,9 +15,14 @@ public class Node : TextRange, INode
 
     public string RawSourceText => AbstractSyntaxTree.RawSourceText;
 
+    public string SourceText => GetText().ToString();
+
     public string Identifier => Kind is TypeScriptSyntaxKind.Identifier
-        ? GetText()
-        : Children.FirstOrDefault(v => v.Kind is TypeScriptSyntaxKind.Identifier)?.GetText().Trim();
+        ? GetText().ToString()
+        : Children.FirstOrDefault(v => v.Kind is TypeScriptSyntaxKind.Identifier)
+            ?.GetText()
+            .Trim()
+            .ToString();
 
     public int ParentId { get; set; }
     public int Depth { get; set; }
@@ -63,23 +66,27 @@ public class Node : TextRange, INode
             return null;
         });
 
-    public string GetText(string source = null)
+    public ReadOnlySpan<char> GetText(string source = null)
     {
         source ??= RawSourceText;
 
-        return NodeStart is -1
-            ? Pos.HasValue && End.HasValue
-                ? source.SubString(Pos.Value, End.Value)
-                : null
-            : End.HasValue ? source.SubString(NodeStart, End.Value) : null;
+        var (start, end) = (Pos ?? NodeStart, End.Value);
+
+        return start is 0 || end is 0
+            ? null
+            : source.AsSpan(start, end - start);
     }
 
-    public string GetTextWithComments(string source = null)
+    public ReadOnlySpan<char> GetTextWithComments(string source = null)
     {
         source ??= RawSourceText;
-        return Pos != null && End != null
-            ? source.Substring((int)Pos, (int)End - (int)Pos)
-            : null;
+
+        var (start, end) =
+            (Pos.GetValueOrDefault(-1), End.GetValueOrDefault(-1));
+
+        return start is -1 || end is -1
+            ? null
+            : source.AsSpan(start, end - start);
     }
 
     public override string ToString() => ToString(true);
