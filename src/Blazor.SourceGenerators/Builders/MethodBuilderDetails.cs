@@ -3,6 +3,21 @@
 
 namespace Blazor.SourceGenerators.Builders;
 
+/// <summary>
+/// Represents the details of a method builder, including information about the method's return type, name, and parameters.
+/// </summary>
+/// <param name="Method">The <see cref="CSharpMethod"/> to generate code for.</param>
+/// <param name="IsVoid">A value indicating whether the method returns <see langword="void"/>.</param>
+/// <param name="IsPrimitiveType">A value indicating whether the method returns a primitive type.</param>
+/// <param name="IsGenericReturnType">A value indicating whether the method returns a generic type.</param>
+/// <param name="ContainsGenericParameters">A value indicating whether the method contains generic parameters.</param>
+/// <param name="CSharpMethodName">The name of the method.</param>
+/// <param name="FullyQualifiedJavaScriptIdentifier">The fully qualified JavaScript identifier.</param>
+/// <param name="ReturnType">The return type of the method.</param>
+/// <param name="BareType">The bare type of the method.</param>
+/// <param name="Suffix">The suffix to append to the method name.</param>
+/// <param name="ExtendingType">The type to extend.</param>
+/// <param name="GenericTypeArgs">The generic type arguments.</param>
 internal readonly record struct MethodBuilderDetails(
     CSharpMethod Method,
     bool IsVoid,
@@ -27,11 +42,23 @@ internal readonly record struct MethodBuilderDetails(
     /// </summary>
     internal const string GenericComponentType = "TComponent";
 
+    /// <summary>
+    /// Returns a string representing a generic type argument with the specified value.
+    /// </summary>
     internal static readonly Func<string, string> ToGenericTypeArgument =
-        string (string value) => $"<{value}>";
+        static string (string value) => $"<{value}>";
 
+    /// <summary>
+    /// Gets a value indicating whether the method's return type is serializable.
+    /// </summary>
     internal bool IsSerializable => IsGenericReturnType || ContainsGenericParameters;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="MethodBuilderDetails"/> based on the provided <see cref="CSharpMethod"/> and <see cref="GeneratorOptions"/>.
+    /// </summary>
+    /// <param name="method">The <see cref="CSharpMethod"/> to create the <see cref="MethodBuilderDetails"/> from.</param>
+    /// <param name="options">The <see cref="GeneratorOptions"/> to use when creating the <see cref="MethodBuilderDetails"/>.</param>
+    /// <returns>A new instance of <see cref="MethodBuilderDetails"/> based on the provided <see cref="CSharpMethod"/> and <see cref="GeneratorOptions"/>.</returns>
     internal static MethodBuilderDetails Create(CSharpMethod method, GeneratorOptions options)
     {
         var isGenericReturnType = method.IsGenericReturnType(options);

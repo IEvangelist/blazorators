@@ -2,11 +2,15 @@
 // Licensed under the MIT License.
 
 using System.Text.RegularExpressions;
+using Blazor.SourceGenerators.Builders;
 
 namespace Blazor.SourceGenerators.Tests;
 
-static class AssertStringExtensions
+static partial class AssertStringExtensions
 {
     internal static string NormalizeNewlines(this string value) =>
-        Regex.Replace(value, @"\r\n|\n\r|\n|\r", "\r\n");
+        NewLineRegex().Replace(value, SourceBuilder.NewLine.ToString());
+
+    [GeneratedRegex(@"\r\n|\n\r|\n|\r")]
+    private static partial Regex NewLineRegex();
 }
