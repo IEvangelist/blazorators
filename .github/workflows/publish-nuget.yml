@@ -71,7 +71,7 @@ jobs:
         
     - name: Restore dependencies for ${{ matrix.project }}
       run: |
-        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release
+        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj
       
     - name: Build ${{ matrix.project }}
       run: |
