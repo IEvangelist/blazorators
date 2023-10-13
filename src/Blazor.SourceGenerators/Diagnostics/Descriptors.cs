@@ -24,7 +24,7 @@ static class Descriptors
     internal static readonly DiagnosticDescriptor UnableToParseGeneratorOptionsDiagnostic = new(
         "BR0003",
         "The GeneratorOptions required for source generation are unresolvable",
-        "JSAutoGenericInteropAttribute must provide the fully qualified 'Descriptors' type name.",
+        "JSAutoGenericInteropAttribute must provide the fully qualified 'Descriptors' type name",
         "Blazorators.JSAutoGenericInteropAttribute",
         DiagnosticSeverity.Error,
         true);
@@ -32,7 +32,7 @@ static class Descriptors
     internal static readonly DiagnosticDescriptor MissingBlazorSerializationPackageReferenceDiagnostic = new(
         "BR0004",
         "Missing package reference of Blazor.Serialization",
-        "When using JSAutoGenericInteropAttribute you must reference Blazor.Serialization.",
+        "When using JSAutoGenericInteropAttribute you must reference Blazor.Serialization",
         "Blazorators.JSAutoGenericInteropAttribute",
         DiagnosticSeverity.Error,
         true);

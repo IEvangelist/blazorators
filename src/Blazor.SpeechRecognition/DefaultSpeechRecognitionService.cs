@@ -3,22 +3,19 @@
 
 namespace Microsoft.JSInterop;
 
-internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionService
+internal sealed class DefaultSpeechRecognitionService(
+    IJSRuntime javaScript) : ISpeechRecognitionService
 {
     readonly ConcurrentDictionary<Guid, Func<Task>> _onStartedCallbackRegistry = new();
     readonly ConcurrentDictionary<Guid, Func<Task>> _onEndedCallbackRegistry = new();
     readonly ConcurrentDictionary<Guid, Func<SpeechRecognitionErrorEvent, Task>> _onErrorCallbackRegistry = new();
     readonly ConcurrentDictionary<Guid, Func<string, Task>> _onResultCallbackRegistry = new();
-    readonly Lazy<Task<IJSObjectReference>> _speechRecognitionModule;
-    SpeechRecognitionSubject? _speechRecognition;
-
-    public DefaultSpeechRecognitionService(
-        IJSRuntime javaScript) =>
-        _speechRecognitionModule =
+    readonly Lazy<Task<IJSObjectReference>> _speechRecognitionModule =
             new(() => javaScript.InvokeAsync<IJSObjectReference>(
                 "import",
                 "./_content/Blazor.SpeechRecognition/blazorators.speechRecognition.js")
                 .AsTask());
+    SpeechRecognitionSubject? _speechRecognition;
 
     async ValueTask InitializeSpeechRecognitionSubjectAsync()
     {
@@ -73,13 +70,13 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
 
             _onResultCallbackRegistry.Clear();
             _onResultCallbackRegistry[key] = onRecognized;
-        
+
             await module.InvokeVoidAsync(
                 JavaScriptInteropMethodIdentifiers.RecognizeSpeech,
                 DotNetObjectReference.Create(this),
                 language,
                 key,
-                nameof(OnSpeechRecongizedAsync),
+                nameof(OnSpeechRecognizedAsync),
                 nameof(OnRecognitionErrorAsync),
                 nameof(OnStartedAsync),
                 nameof(OnEndedAsync));
@@ -110,7 +107,7 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
                 await callback.Invoke(errorEvent).ConfigureAwait(false));
 
     [JSInvokable]
-    public void OnSpeechRecongizedAsync(string key, string transcript, bool isFinal) =>
+    public void OnSpeechRecognizedAsync(string key, string transcript, bool isFinal) =>
         _speechRecognition?.RecognitionReceived(
             new SpeechRecognitionResult(key, transcript, isFinal));
 

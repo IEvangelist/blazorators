@@ -1,18 +1,15 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Blazor.Serialization.Extensions;
-using BlazorServer.ExampleConsumer.Models;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorServer.ExampleConsumer.Pages;
 
 public sealed partial class TodoList
 {
-    readonly Dictionary<string, string> _localStorageItems = new();
-    HashSet<TodoItem> _todos = new();
+    readonly Dictionary<string, string> _localStorageItems = [];
+    HashSet<TodoItem> _todos = [];
     string? _todoValue;
 
     [Inject]
@@ -30,7 +27,7 @@ public sealed partial class TodoList
 
     async Task UpdateTodoItemsAsync()
     {
-        HashSet<TodoItem> todos = new();
+        HashSet<TodoItem> todos = [];
         await foreach (var key in GetLocalStorageKeysAsync())
         {
             if (key.StartsWith(TodoItem.IdPrefix))

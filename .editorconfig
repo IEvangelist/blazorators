@@ -14,6 +14,7 @@ file_header_template = Copyright (c) David Pine. All rights reserved.\nLicensed 
 indent_size = 4
 tab_width = 4
 trim_trailing_whitespace = true
+end_of_line = lf
 
 ############################### 
 # .NET Coding Conventions     # 

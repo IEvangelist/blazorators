@@ -5,7 +5,6 @@ namespace Blazor.SourceGenerators.Readers;
 
 internal sealed partial class TypeDeclarationReader
 {
-    readonly Uri? _typeDeclarationSource;
     readonly Lazy<string> _typeDeclarationText;
 
     IDictionary<string, string>? _typeDeclarationMap;
@@ -23,17 +22,10 @@ internal sealed partial class TypeDeclarationReader
             valueFactory: () => GetEmbeddedResourceText());
     }
 
-    private TypeDeclarationReader(Uri typeDeclarationSource)
-    {
-        _typeDeclarationSource = typeDeclarationSource;
-        _typeDeclarationText = new Lazy<string>(
-            valueFactory: () => GetLocalFileText(_typeDeclarationSource.LocalPath));
-    }
-
     IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
     {
         ConcurrentDictionary<string, string> map = new();
-            
+
         try
         {
             if (typeDeclarations is { Length: > 0 })

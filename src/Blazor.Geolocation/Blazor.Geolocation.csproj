@@ -4,6 +4,7 @@
         <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>preview</LangVersion>
         <Description>Source generated JavaScript interop for the browser's geolocation API compatible with Blazor.</Description>
         <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
         <NeutralLanguage>en-US</NeutralLanguage>
@@ -16,7 +17,7 @@
         <Version Condition=" '$(VersionSuffix)' != '' ">$(ClientVersion)-$(VersionSuffix)</Version>
         <FileVersion>$(ClientVersion)</FileVersion>
         <Authors>David Pine</Authors>
-        <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <AssemblyName>Blazor.Geolocation</AssemblyName>
         <Title>A C# source-generated Razor class library implementation of the native browser's geolocation API available as a DI-ready service.</Title>
         <PackageId>Blazor.Geolocation</PackageId>
@@ -60,11 +61,12 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MinVer" Version="4.2.0">
+        <PackageReference Include="MinVer" Version="4.3.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DependencyInjectionVersion)" />
+        <PackageReference Include="Microsoft.JSInterop" Version="$(JSInteropVersion)" />
     </ItemGroup>
 
     <ItemGroup>

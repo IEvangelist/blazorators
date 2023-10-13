@@ -1,7 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Blazor.ExampleConsumer.Pages;
+namespace Blazor.ExampleConsumer.Components.Pages;
 
 public sealed partial class ListenToMe : IDisposable
 {
@@ -9,7 +9,7 @@ public sealed partial class ListenToMe : IDisposable
 
     IDisposable? _recognitionSubscription;
     bool _isRecognizingSpeech = false;
-    SpeechRecognitionErrorEvent? _errorEvent;    
+    SpeechRecognitionErrorEvent? _errorEvent;
     string? _transcript;
 
     [Inject]

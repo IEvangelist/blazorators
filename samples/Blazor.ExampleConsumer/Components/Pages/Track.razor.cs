@@ -1,9 +1,9 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Blazor.ExampleConsumer.Pages;
+namespace Blazor.ExampleConsumer.Components.Pages;
 
-public sealed partial class ClientPosition
+public partial class Track : IDisposable
 {
     readonly JsonSerializerOptions _opts = new()
     {
@@ -20,17 +20,18 @@ public sealed partial class ClientPosition
 
     GeolocationPosition? _position;
     GeolocationPositionError? _positionError;
+    double _watchId;
     bool _isLoading = true;
 
     protected override void OnInitialized() =>
-        Geolocation.GetCurrentPosition(
+        _watchId = Geolocation.WatchPosition(
             component: this,
-            onSuccessCallbackMethodName: nameof(OnPositionReceived),
+            onSuccessCallbackMethodName: nameof(OnPositionRecieved),
             onErrorCallbackMethodName: nameof(OnPositionError),
             options: _options);
 
     [JSInvokable]
-    public void OnPositionReceived(GeolocationPosition position)
+    public void OnPositionRecieved(GeolocationPosition position)
     {
         _isLoading = false;
         _position = position;
@@ -44,4 +45,6 @@ public sealed partial class ClientPosition
         _positionError = positionError;
         StateHasChanged();
     }
+
+    public void Dispose() => Geolocation.ClearWatch(_watchId);
 }

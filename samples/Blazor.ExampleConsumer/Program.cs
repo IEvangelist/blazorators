@@ -1,4 +1,7 @@
-using Blazor.ExampleConsumer;
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+using Blazor.ExampleConsumer.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 

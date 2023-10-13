@@ -38,10 +38,11 @@ jobs:
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
         echo 'Reason: ${{ github.event.inputs.reason }}'
-    - name: Setup .NET 7.0
+    - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
+        dotnet-quality: preview
 
     - name: Restore dependencies for ${{ matrix.project }}
       run: |
@@ -59,10 +60,11 @@ jobs:
     steps:
     - uses: actions/checkout@main
     
-    - name: Setup .NET 7.0
+    - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
+        dotnet-quality: preview
 
     - name: Run tests
       run: |

@@ -7,7 +7,7 @@ internal class JavaScriptInteropSyntaxContextReceiver : ISyntaxContextReceiver
 {
     internal static ISyntaxContextReceiver Create() => new JavaScriptInteropSyntaxContextReceiver();
 
-    public HashSet<InterfaceDeclarationDetails> InterfaceDeclarations { get; } = new();
+    public HashSet<InterfaceDeclarationDetails> InterfaceDeclarations { get; } = [];
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {

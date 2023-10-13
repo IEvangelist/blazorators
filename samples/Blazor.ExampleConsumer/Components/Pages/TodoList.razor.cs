@@ -5,12 +5,12 @@ using System.Diagnostics.CodeAnalysis;
 using Blazor.ExampleConsumer.Models;
 using Microsoft.AspNetCore.Components.Web;
 
-namespace Blazor.ExampleConsumer.Pages;
+namespace Blazor.ExampleConsumer.Components.Pages;
 
 public sealed partial class TodoList
 {
-    readonly Dictionary<string, string> _localStorageItems = new();
-    HashSet<TodoItem> _todos = new();
+    readonly Dictionary<string, string> _localStorageItems = [];
+    HashSet<TodoItem> _todos = [];
     string? _todoValue;
 
     [Inject]
@@ -24,7 +24,7 @@ public sealed partial class TodoList
             .Where(key => key.StartsWith(TodoItem.IdPrefix))
             .Select(key => LocalStorage.GetItem<TodoItem>(key))
             .Where(todo => todo is not null)
-            .ToHashSet() ?? new();
+            .ToHashSet() ?? [];
 
         _todos = todos!;
 

@@ -8,7 +8,7 @@ static class ListExtensions
     internal static IEnumerable<(Interation Index, T Item)> Select<T>(this List<T> list)
     {
         var count = list.Count;
-        for (var i = 0; i < count; ++ i)
+        for (var i = 0; i < count; ++i)
         {
             yield return (new(i, count), list[i]);
         }

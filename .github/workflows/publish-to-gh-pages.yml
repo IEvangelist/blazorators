@@ -19,10 +19,11 @@ jobs:
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
         echo 'Reason: ${{ github.event.inputs.reason }}'
-    - name: Setup .NET Core SDK
+    - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
+        dotnet-quality: preview
     - name: Publish .NET Core Project
       run: dotnet publish samples/Blazor.ExampleConsumer/Blazor.ExampleConsumer.csproj -c Release -o release --nologo
 
