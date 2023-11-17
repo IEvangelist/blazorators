@@ -1,14 +1,11 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace BlazorServer.ExampleConsumer.Pages;
+
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 [IgnoreAntiforgeryToken]
-public class ErrorModel(ILogger<ErrorModel> logger) : PageModel
+public class ErrorModel : PageModel
 {
     public string? RequestId { get; set; }
 
