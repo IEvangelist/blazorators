@@ -1,23 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <LangVersion>preview</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Humanizer.Core" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Blazor.Geolocation\Blazor.Geolocation.csproj" />
-        <ProjectReference Include="..\..\src\Blazor.LocalStorage\Blazor.LocalStorage.csproj" />
-        <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
-        <ProjectReference Include="..\..\src\Blazor.SessionStorage\Blazor.SessionStorage.csproj" />
-        <ProjectReference Include="..\..\src\Blazor.SpeechRecognition\Blazor.SpeechRecognition.csproj" />
-        <ProjectReference Include="..\..\src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Blazor.Geolocation\Blazor.Geolocation.csproj" />
+    <ProjectReference Include="..\..\src\Blazor.LocalStorage\Blazor.LocalStorage.csproj" />
+    <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
+    <ProjectReference Include="..\..\src\Blazor.SessionStorage\Blazor.SessionStorage.csproj" />
+    <ProjectReference Include="..\..\src\Blazor.SpeechRecognition\Blazor.SpeechRecognition.csproj" />
+    <ProjectReference Include="..\..\src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj" />
+  </ItemGroup>
 
 </Project>

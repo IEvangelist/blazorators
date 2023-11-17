@@ -3,7 +3,7 @@
 
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
-global using BlazorServer.ExampleConsumer.Models;
-global using Microsoft.AspNetCore.Components;
 global using Microsoft.JSInterop;
+global using Microsoft.AspNetCore.Components;
+global using BlazorServer.ExampleConsumer.Models;
 global using static System.Globalization.CultureInfo;

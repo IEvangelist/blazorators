@@ -23,7 +23,6 @@ jobs:
       uses: actions/setup-dotnet@main
       with:
         dotnet-version: 8.0.x
-        dotnet-quality: preview
     - name: Publish .NET Core Project
       run: dotnet publish samples/Blazor.ExampleConsumer/Blazor.ExampleConsumer.csproj -c Release -o release --nologo
 

@@ -1,46 +1,31 @@
 <Project>
-    <PropertyGroup>
-        <_ParentDirectoryBuildPropsPath Condition="'$(_DirectoryBuildPropsFile)' != ''">$([System.IO.Path]::Combine('..', '$(_DirectoryBuildPropsFile)'))</_ParentDirectoryBuildPropsPath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ParentDirectoryBuildPropsPath Condition="'$(_DirectoryBuildPropsFile)' != ''">$([System.IO.Path]::Combine('..', '$(_DirectoryBuildPropsFile)'))</_ParentDirectoryBuildPropsPath>
+  </PropertyGroup>
 
-    <Import Project="$(_ParentDirectoryBuildPropsPath)" Condition="Exists('$(_ParentDirectoryBuildPropsPath)')"/>
+  <Import Project="$(_ParentDirectoryBuildPropsPath)" Condition="Exists('$(_ParentDirectoryBuildPropsPath)')"/>
 
-    <PropertyGroup>
-        <WarningLevel>3</WarningLevel>
-        <AnalysisLevel>preview</AnalysisLevel>
-        <Features>strict</Features>
-    </PropertyGroup>
+  <PropertyGroup>
+    <WarningLevel>3</WarningLevel>
+    <AnalysisLevel>preview</AnalysisLevel>
+    <Features>strict</Features>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <DefaultTargetFrameworks>net7.0;net8.0</DefaultTargetFrameworks>
-    </PropertyGroup>
+  <PropertyGroup>
+    <DefaultTargetFrameworks>net7.0;net8.0</DefaultTargetFrameworks>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
 
-    <!-- .NET 7 package reference versions -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <DependencyInjectionVersion>7.0.0</DependencyInjectionVersion>
-        <PrimitivesVersion>7.0.0</PrimitivesVersion>
-        <JSInteropVersion>7.0.12</JSInteropVersion>
-        <ComponentsWebVersion>7.0.12</ComponentsWebVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
-    <!-- .NET 8 package reference versions -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <DependencyInjectionVersion>8.0.0-rc.2.23479.6</DependencyInjectionVersion>
-        <PrimitivesVersion>8.0.0-rc.2.23479.6</PrimitivesVersion>
-        <JSInteropVersion>8.0.0-rc.2.23480.2</JSInteropVersion>
-        <ComponentsWebVersion>8.0.0-rc.2.23480.2</ComponentsWebVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <IsPackable>true</IsPackable>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <SourceLinkCreate>true</SourceLinkCreate>
-        <SourceLinkOriginUrl>https://github.com/IEvangelist/azure-cosmos-dotnet-repository</SourceLinkOriginUrl>
-    </PropertyGroup>
+  <PropertyGroup>
+    <SourceLinkCreate>true</SourceLinkCreate>
+    <SourceLinkOriginUrl>https://github.com/IEvangelist/azure-cosmos-dotnet-repository</SourceLinkOriginUrl>
+  </PropertyGroup>
 </Project>
