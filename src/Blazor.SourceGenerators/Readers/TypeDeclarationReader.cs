@@ -5,58 +5,37 @@ namespace Blazor.SourceGenerators.Readers;
 
 internal sealed partial class TypeDeclarationReader
 {
-    readonly Lazy<string> _typeDeclarationText;
+    private readonly Lazy<string> _typeDeclarationText;
+    private IDictionary<string, string>? _typeAliasMap;
+    private IDictionary<string, string>? _typeDeclarationMap;
 
-    IDictionary<string, string>? _typeDeclarationMap;
-    IDictionary<string, string>? _typeAliasMap;
+    private TypeDeclarationReader()
+    {
+        _typeDeclarationText = new Lazy<string>(valueFactory: () => GetEmbeddedResourceText());
+    }
 
-    private IDictionary<string, string> TypeDeclarationMap =>
-        _typeDeclarationMap ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
+    /// <summary>
+    /// For testing purposes.
+    /// </summary>
+    internal bool IsInitialized => TypeDeclarationMap is { Count: > 0 };
+
+    internal string RawSourceText => _typeDeclarationText.Value;
 
     private IDictionary<string, string> TypeAliasMap =>
         _typeAliasMap ??= ReadTypeAliasMap(_typeDeclarationText.Value);
 
-    internal string RawSourceText => _typeDeclarationText.Value;
+    private IDictionary<string, string> TypeDeclarationMap =>
+                        _typeDeclarationMap ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
 
-    private TypeDeclarationReader(
-        Uri? typeDeclarationSource = null)
-    {
-        _typeDeclarationSource = typeDeclarationSource;
-        _typeDeclarationText = new Lazy<string>(
-            valueFactory: () => GetEmbeddedResourceText());
-    }
+    public bool TryGetDeclaration(
+        string typeName, out string? declaration) =>
+        TypeDeclarationMap.TryGetValue(typeName, out declaration);
 
-    ConcurrentDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
-    {
-        ConcurrentDictionary<string, string> map = new();
+    public bool TryGetTypeAlias(
+        string typeAliasName, out string? typeAlias) =>
+        TypeAliasMap.TryGetValue(typeAliasName, out typeAlias);
 
-        try
-        {
-            if (typeDeclarations is { Length: > 0 })
-            {
-                var matchCollection =
-                    InterfaceRegex.Matches(typeDeclarations).Cast<Match>().Select(m => m.Value);
-                Parallel.ForEach(
-                    matchCollection,
-                    match =>
-                    {
-                        var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(match, "TypeName");
-                        if (typeName is not null)
-                        {
-                            map[typeName] = match;
-                        }
-                    });
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error initializing lib dom parser. {ex}");
-        }
-
-        return map;
-    }
-
-    ConcurrentDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
+    private static ConcurrentDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
     {
         ConcurrentDictionary<string, string> map = new();
 
@@ -86,16 +65,33 @@ internal sealed partial class TypeDeclarationReader
         return map;
     }
 
-    /// <summary>
-    /// For testing purposes.
-    /// </summary>
-    internal bool IsInitialized => TypeDeclarationMap is { Count: > 0 };
+    private static ConcurrentDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
+    {
+        ConcurrentDictionary<string, string> map = new();
 
-    public bool TryGetDeclaration(
-        string typeName, out string? declaration) =>
-        TypeDeclarationMap.TryGetValue(typeName, out declaration);
+        try
+        {
+            if (typeDeclarations is { Length: > 0 })
+            {
+                var matchCollection =
+                    InterfaceRegex.Matches(typeDeclarations).Cast<Match>().Select(m => m.Value);
+                Parallel.ForEach(
+                    matchCollection,
+                    match =>
+                    {
+                        var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(match, "TypeName");
+                        if (typeName is not null)
+                        {
+                            map[typeName] = match;
+                        }
+                    });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing lib dom parser. {ex}");
+        }
 
-    public bool TryGetTypeAlias(
-        string typeAliasName, out string? typeAlias) =>
-        TypeAliasMap.TryGetValue(typeAliasName, out typeAlias);
+        return map;
+    }
 }

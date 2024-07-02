@@ -114,7 +114,7 @@ public class LibDomParserTests
         Assert.Single(dependencies);
         Assert.True(dependencies.ContainsKey("PositionOptions"));
     }
-    
+
     [Fact]
     public void VerifyLocalStorageCanBeReadByDefault()
     {
@@ -126,7 +126,7 @@ public class LibDomParserTests
         // Assert
         var properties = parserResult.Value?.Properties;
         Assert.NotNull(properties);
-        Assert.Equal(2, properties?.Count ?? 0);
+        Assert.Equal(2, properties.Count);
 
         var methods = parserResult.Value?.Methods;
         Assert.NotNull(methods);

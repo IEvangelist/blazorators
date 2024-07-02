@@ -12,17 +12,10 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
         (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
-    };
+    ];
 
     public void Initialize(GeneratorInitializationContext context)
     {
-#if DEBUG
-        if (!System.Diagnostics.Debugger.IsAttached)
-        {
-            // System.Diagnostics.Debugger.Launch();
-        }
-#endif
-
         // Register a syntax receiver that will be created for each generation pass
         context.RegisterForSyntaxNotifications(
             JavaScriptInteropSyntaxContextReceiver.Create);
@@ -110,7 +103,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
     }
 
-    static bool IsDiagnosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
+    private static bool IsDiagnosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
     {
         if (options.TypeName is null)
         {
@@ -134,7 +127,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 
         if (options.SupportsGenerics &&
             context.Compilation.ReferencedAssemblyNames.Any(ai =>
-            ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)) is false)
+            !ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)))
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(
