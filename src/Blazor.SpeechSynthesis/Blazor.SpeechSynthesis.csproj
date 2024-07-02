@@ -1,79 +1,75 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Description>Source generated JavaScript interop for the browser's speechSynthesis API compatible with Blazor.</Description>
-        <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
-        <NeutralLanguage>en-US</NeutralLanguage>
-        <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
-        <ClientVersion Condition=" '$(IsPreview)' != 'true' ">$(ClientOfficialVersion)</ClientVersion>
-        <ClientVersion Condition=" '$(IsPreview)' == 'true' ">$(ClientPreviewVersion)</ClientVersion>
-        <VersionSuffix Condition=" '$(IsNightly)' == 'true' ">nightly-$(CurrentDate)</VersionSuffix>
-        <VersionSuffix Condition=" '$(IsPreview)' == 'true' ">preview</VersionSuffix>
-        <Version Condition=" '$(VersionSuffix)' == '' ">$(ClientVersion)</Version>
-        <Version Condition=" '$(VersionSuffix)' != '' ">$(ClientVersion)-$(VersionSuffix)</Version>
-        <FileVersion>$(ClientVersion)</FileVersion>
-        <Authors>David Pine</Authors>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <AssemblyName>Blazor.SpeechSynthesis</AssemblyName>
-        <Title>A C# source-generated class library implementation of the native browser's speechSynthesis API available as IJSRuntime extension methods.</Title>
-        <PackageId>Blazor.SpeechSynthesis</PackageId>
-        <PackageTags>dotnet;dotnetcore;csharp;blazor;generators;sourcegen;roslyn;</PackageTags>
-        <PackageReleaseNotes></PackageReleaseNotes>
-        <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
-        <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <ShippingScope>External</ShippingScope>
-        <SigningType>Product</SigningType>
-        <DebugType>embedded</DebugType>
-        <IncludeSymbols>false</IncludeSymbols>
-        <IncludeSource>false</IncludeSource>
-        <RootNamespace>Blazor.SpeechSynthesis</RootNamespace>
-        <NoWarn>NU5125;NU5039;</NoWarn>
-        <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
-        <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryType>git</RepositoryType>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <IsPackable>true</IsPackable>
-        <PackageIcon>logo.png</PackageIcon>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Description>Source generated JavaScript interop for the browser's speechSynthesis API compatible with Blazor.</Description>
+    <Copyright>Copyright © David Pine. All rights reserved. Licensed under the MIT License.</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd))</CurrentDate>
+    <ClientVersion Condition=" '$(IsPreview)' != 'true' ">$(ClientOfficialVersion)</ClientVersion>
+    <ClientVersion Condition=" '$(IsPreview)' == 'true' ">$(ClientPreviewVersion)</ClientVersion>
+    <VersionSuffix Condition=" '$(IsNightly)' == 'true' ">nightly-$(CurrentDate)</VersionSuffix>
+    <VersionSuffix Condition=" '$(IsPreview)' == 'true' ">preview</VersionSuffix>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(ClientVersion)</Version>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(ClientVersion)-$(VersionSuffix)</Version>
+    <FileVersion>$(ClientVersion)</FileVersion>
+    <Authors>David Pine</Authors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>Blazor.SpeechSynthesis</AssemblyName>
+    <Title>A C# source-generated class library implementation of the native browser's speechSynthesis API available as IJSRuntime extension methods.</Title>
+    <PackageId>Blazor.SpeechSynthesis</PackageId>
+    <PackageTags>dotnet;dotnetcore;csharp;blazor;generators;sourcegen;roslyn;</PackageTags>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
+    <PublishRepositoryUrl Condition=" '$(ProjectRef)' != 'True' ">true</PublishRepositoryUrl>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ShippingScope>External</ShippingScope>
+    <SigningType>Product</SigningType>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
+    <RootNamespace>Blazor.SpeechSynthesis</RootNamespace>
+    <NoWarn>NU5125;NU5039;</NoWarn>
+    <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+    <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IsPackable>true</IsPackable>
+    <PackageIcon>logo.png</PackageIcon>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="MinVer" Version="4.2.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="7.0.0" />
-        <PackageReference Include="Microsoft.JSInterop" Version="7.0.1" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MinVer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" />
+    <PackageReference Include="Microsoft.JSInterop" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Blazor.Serialization\Blazor.Serialization.csproj" />
-        <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Blazor.Serialization\Blazor.Serialization.csproj" />
+    <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
+  </ItemGroup>
 
-    <ItemGroup Label="Files">
-        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Extensions\" />
-    </ItemGroup>
+  <ItemGroup Label="Files">
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

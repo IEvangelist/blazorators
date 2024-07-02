@@ -357,7 +357,7 @@ internal sealed partial class TypeDeclarationParser
         string parametersString,
         Action<CSharpObject> appendDependentType)
     {
-        List<CSharpType> parameters = new();
+        List<CSharpType> parameters = [];
 
         // Example input:
         // "(someCallback: CallbackType, someId?: number | null)"

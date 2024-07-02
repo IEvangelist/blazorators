@@ -8,7 +8,7 @@ namespace Blazor.ExampleConsumer.Models;
 public partial record class TodoItem(
     string Task,
     bool IsCompleted)
-{ 
+{
     internal const string IdPrefix = "todo";
 
     [JsonIgnore]

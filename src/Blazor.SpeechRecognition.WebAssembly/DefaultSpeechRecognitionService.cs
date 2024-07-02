@@ -3,16 +3,13 @@
 
 namespace Microsoft.JSInterop;
 
-internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionService
+internal sealed class DefaultSpeechRecognitionService(IJSInProcessRuntime javaScript)
+    : ISpeechRecognitionService
 {
-    readonly IJSInProcessRuntime _javaScript;
     readonly SpeechRecognitionCallbackRegistry _callbackRegistry = new();
 
     IJSInProcessObjectReference? _speechRecognitionModule;
     SpeechRecognitionSubject? _speechRecognition;
-
-    public DefaultSpeechRecognitionService(
-        IJSInProcessRuntime javaScript) => _javaScript = javaScript;
 
     void InitializeSpeechRecognitionSubject()
     {
@@ -30,7 +27,7 @@ internal sealed class DefaultSpeechRecognitionService : ISpeechRecognitionServic
     public async Task InitializeModuleAsync(bool logModuleDetails)
     {
         _speechRecognitionModule =
-            await _javaScript.InvokeAsync<IJSInProcessObjectReference>(
+            await javaScript.InvokeAsync<IJSInProcessObjectReference>(
                 "import",
                 "./_content/Blazor.SpeechRecognition.WebAssembly/blazorators.speechRecognition.js");
 

@@ -9,7 +9,7 @@ public sealed partial class ListenToMe : IDisposable
 
     IDisposable? _recognitionSubscription;
     bool _isRecognizingSpeech = false;
-    SpeechRecognitionErrorEvent? _errorEvent;    
+    SpeechRecognitionErrorEvent? _errorEvent;
     string? _transcript;
 
     [Inject]

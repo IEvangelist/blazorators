@@ -8,9 +8,9 @@ namespace Blazor.SourceGenerators.CSharp;
 internal sealed partial record CSharpTopLevelObject(string RawTypeName)
     : ICSharpDependencyGraphObject
 {
-    public List<CSharpProperty>? Properties { get; init; } = new();
+    public List<CSharpProperty>? Properties { get; init; } = [];
 
-    public List<CSharpMethod>? Methods { get; init; } = new();
+    public List<CSharpMethod>? Methods { get; init; } = [];
 
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -52,7 +52,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         var methodLevel = builder.IndentationLevel;
 
         // Methods
-        foreach (var method in Methods ?? new List<CSharpMethod>())
+        foreach (var method in Methods ?? [])
         {
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);

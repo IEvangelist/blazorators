@@ -6,8 +6,8 @@ namespace Blazor.SourceGenerators;
 [Generator]
 internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 {
-    private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd = new()
-    {
+    private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd =
+    [
         (nameof(RecordCompat).ToGeneratedFileName(), RecordCompat),
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),

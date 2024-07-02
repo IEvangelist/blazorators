@@ -1,4 +1,7 @@
-﻿namespace Microsoft.JSInterop;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.JSInterop;
 
 /// <summary></summary>
 //[JSAutoInterop(

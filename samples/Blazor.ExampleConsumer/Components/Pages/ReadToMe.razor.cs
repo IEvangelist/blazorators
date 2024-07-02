@@ -3,7 +3,7 @@
 
 using Humanizer;
 
-namespace Blazor.ExampleConsumer.Pages;
+namespace Blazor.ExampleConsumer.Components.Pages;
 
 public sealed partial class ReadToMe : IDisposable
 {
