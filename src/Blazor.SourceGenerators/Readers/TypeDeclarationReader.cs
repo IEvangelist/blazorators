@@ -1,6 +1,9 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.TypeScript;
+using Blazor.SourceGenerators.TypeScript.Types;
+
 namespace Blazor.SourceGenerators.Readers;
 
 internal sealed partial class TypeDeclarationReader
@@ -8,10 +11,19 @@ internal sealed partial class TypeDeclarationReader
     private readonly Lazy<string> _typeDeclarationText;
     private IDictionary<string, string>? _typeAliasMap;
     private IDictionary<string, string>? _typeDeclarationMap;
+    private ITypeScriptAbstractSyntaxTree? _typeDeclarationTree;
 
-    private TypeDeclarationReader()
+    private TypeDeclarationReader(Uri typeDeclarationUri)
     {
-        _typeDeclarationText = new Lazy<string>(valueFactory: () => GetEmbeddedResourceText());
+        _typeDeclarationText = new Lazy<string>(valueFactory: () => typeDeclarationUri switch
+        {
+            { IsAbsoluteUri: true } => GetRemoteResourceText(typeDeclarationUri.AbsoluteUri),
+            _ => GetEmbeddedResourceText()
+        });
+    }
+
+    private TypeDeclarationReader() : this(null!)
+    {
     }
 
     /// <summary>
@@ -25,11 +37,22 @@ internal sealed partial class TypeDeclarationReader
         _typeAliasMap ??= ReadTypeAliasMap(_typeDeclarationText.Value);
 
     private IDictionary<string, string> TypeDeclarationMap =>
-                        _typeDeclarationMap ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
+        _typeDeclarationMap ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
+
+    private ITypeScriptAbstractSyntaxTree TypeDeclarationTree =>
+        _typeDeclarationTree ??= TypeScriptAbstractSyntaxTree.FromSourceText(_typeDeclarationText.Value);
 
     public bool TryGetDeclaration(
         string typeName, out string? declaration) =>
         TypeDeclarationMap.TryGetValue(typeName, out declaration);
+
+    public bool TryGetDeclaration(string typeName, out InterfaceDeclaration? declaration)
+    {
+       declaration = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
+            .FirstOrDefault(node => node.Identifier == typeName) as InterfaceDeclaration;
+
+        return declaration != null;
+    }
 
     public bool TryGetTypeAlias(
         string typeAliasName, out string? typeAlias) =>
