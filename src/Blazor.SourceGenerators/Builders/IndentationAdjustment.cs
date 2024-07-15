@@ -17,7 +17,7 @@ internal enum IndentationAdjustment
     /// The indentation level is increased.
     /// </summary>
     Increase,
-    
+
     /// <summary>
     /// The indentation level is decreased.
     /// </summary>

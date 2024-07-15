@@ -27,7 +27,7 @@ internal readonly record struct Indentation(int Level, int Spaces = 4)
     /// <param name="extra">An optional extra increment to add to the indentation level.</param>
     /// <returns>A new <see cref="Indentation"/> instance with the incremented indentation level.</returns>
     internal Indentation Increase(int extra = 0) => this with { Level = Level + 1 + extra };
-    
+
     /// <summary>
     /// Decreases the indentation level by the specified amount.
     /// </summary>

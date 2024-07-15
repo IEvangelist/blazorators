@@ -1,7 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics;
 using Blazor.SourceGenerators.TypeScript.Types;
 using static Blazor.SourceGenerators.TypeScript.Compiler.Scanner;
 using SyntaxKind = Blazor.SourceGenerators.TypeScript.Types.TypeScriptSyntaxKind;
@@ -28,16 +27,16 @@ internal class JsDocParser
     private SyntaxKind Token => Parser.CurrentToken;
     private SyntaxKind NextToken => Parser.NextToken();
     private T TryParse<T>(Func<T> callback) => Parser.TryParse(callback);
-    private bool ParseExpected(SyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
+    private void ParseExpected(SyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
     private bool ParseOptional(SyntaxKind t) => Parser.ParseOptional(t);
-    private INode ParseOptionalToken<T>(SyntaxKind t) where T : Node, new() => Parser.ParseOptionalToken<T>(t);
+    private Node ParseOptionalToken<T>(SyntaxKind t) where T : Node, new() => Parser.ParseOptionalToken<T>(t);
     private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token);
     private NodeArray<T> CreateList<T>(T[] elements = null, int? pos = null) => Parser.CreateList(elements, pos);
     private T FinishNode<T>(T node, int? end = null) where T : Node => Parser.FinishNode(node, end);
     private Identifier ParseIdentifierName() => Parser.ParseIdentifierName();
     private NodeArray<T> ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool? considerSemicolonAsDelimiter = null) where T : INode => Parser.ParseDelimitedList(kind, parseElement, considerSemicolonAsDelimiter);
     private TypeLiteralNode ParseTypeLiteral() => Parser.ParseTypeLiteral();
-    private IExpression ParseExpression() => Parser.ParseExpression();
+    private void ParseExpression() => Parser.ParseExpression();
 
     public bool IsJsDocType() => Token switch
     {
@@ -51,11 +50,13 @@ internal class JsDocParser
         var languageVersion = ScriptTarget.Latest;
         dp.Parser.InitializeState(content, languageVersion, ScriptKind.Js);
 
-        var sourceFile = dp.Parser.CreateSourceFile("file.js", languageVersion, ScriptKind.Js);
+        /* sourceFile */
+        dp.Parser.CreateSourceFile("file.js", languageVersion, ScriptKind.Js);
 
         dp.Parser.Scanner.SetText(content, start, length);
 
-        var currentToken = dp.Parser.Scanner.Scan();
+        /* currentToken */
+        dp.Parser.Scanner.Scan();
         var jsDocTypeExpression = dp.ParseJsDocTypeExpression();
         var diagnostics = dp.Parser.ParseDiagnostics;
 
@@ -115,8 +116,7 @@ internal class JsDocParser
 
                 type = FinishNode(arrayType);
             }
-            else
-        if (Token == SyntaxKind.QuestionToken)
+            else if (Token == SyntaxKind.QuestionToken)
             {
                 var nullableType = new JsDocNullableType { Type = type };
 
@@ -124,8 +124,7 @@ internal class JsDocParser
 
                 type = FinishNode(nullableType);
             }
-            else
-        if (Token == SyntaxKind.ExclamationToken)
+            else if (Token == SyntaxKind.ExclamationToken)
             {
                 var nonNullableType = new JsDocNonNullableType { Type = type };
 
@@ -274,7 +273,7 @@ internal class JsDocParser
 
     public void CheckForEmptyTypeArgumentList<T>(NodeArray<T> typeArguments)
     {
-        if (!ParseDiagnostics.Any() && typeArguments != null && !typeArguments.Any())
+        if (ParseDiagnostics.Count == 0 && typeArguments != null && !typeArguments.Any())
         {
             var start = (typeArguments.Pos ?? 0) - "<".Length;
             var end = SkipTriviaM(SourceText, (int)typeArguments.End) + ">".Length;
@@ -443,8 +442,8 @@ internal class JsDocParser
         Debug.Assert(strt <= end);
 
         Debug.Assert(end <= content.Length);
-        NodeArray<IJsDocTag> tags = new();
-        List<string> comments = new();
+        NodeArray<IJsDocTag> tags = [];
+        List<string> comments = [];
         JsDoc result = null;
         if (!IsJsDocStart(content, strt))
         {
@@ -522,17 +521,20 @@ internal class JsDocParser
                         break;
                     case SyntaxKind.WhitespaceTrivia:
                         var whitespace = Scanner.TokenText;
+#pragma warning disable S2583 // Conditionally executed code should be reachable
+
                         if (state == JSDocState.SavingComments)
                         {
 
                             comments.Add(whitespace);
                         }
-                        else
-                        if (margin != null && (indent ?? 0) + whitespace.Length > margin)
+                        else if (margin != null && (indent ?? 0) + whitespace.Length > margin)
                         {
 
                             comments.Add(whitespace.Slice((int)margin - (indent ?? 0) - 1));
                         }
+
+#pragma warning restore S2583 // Conditionally executed code should be reachable
 
                         indent += whitespace.Length;
 
@@ -577,7 +579,7 @@ internal class JsDocParser
 
         void RemoveLeadingNewlines(List<string> comments3)
         {
-            while (comments3.Any() && (comments3[0] == "\n" || comments3[0] == "\r"))
+            while (comments3.Count != 0 && (comments3[0] == "\n" || comments3[0] == "\r"))
             {
                 comments3 = comments3.Skip(1).ToList();
             }
@@ -585,7 +587,7 @@ internal class JsDocParser
 
         void RemoveTrailingNewlines(List<string> comments2)
         {
-            while (comments2.Any() && (comments2[comments2.Count - 1] == "\n" || comments2[comments2.Count - 1] == "\r"))
+            while (comments2.Count != 0 && (comments2[comments2.Count - 1] == "\n" || comments2[comments2.Count - 1] == "\r"))
             {
                 comments2.Pop();
             }
@@ -601,7 +603,7 @@ internal class JsDocParser
             var result2 = new JsDoc
             {
                 Tags = tags,
-                Comment = comments.Any() ? string.Join("", comments) : null
+                Comment = comments.Count != 0 ? string.Join("", comments) : null
             };
 
             return FinishNode(result2, end);
@@ -631,6 +633,8 @@ internal class JsDocParser
                 return;
             }
             IJsDocTag tag = null;
+#pragma warning disable S2583 // Conditionally executed code should be reachable
+
             if (tagName != null)
             {
                 tag = tagName.Text switch
@@ -649,6 +653,8 @@ internal class JsDocParser
 
                 tag = ParseUnknownTag(atToken, tagName);
             }
+
+#pragma warning restore S2583 // Conditionally executed code should be reachable
             if (tag == null)
             {
 
@@ -660,7 +666,7 @@ internal class JsDocParser
 
         List<string> ParseTagComments(int indent)
         {
-            List<string> comments2 = new();
+            List<string> comments2 = [];
             var state = JSDocState.SawAsterisk;
             int? margin = null;
             while (Token != SyntaxKind.AtToken && Token != SyntaxKind.EndOfFileToken)
@@ -691,11 +697,15 @@ internal class JsDocParser
                         else
                         {
                             var whitespace = Scanner.TokenText;
+#pragma warning disable S2583 // Conditionally executed code should be reachable
+
                             if (margin != null && indent + whitespace.Length > margin)
                             {
 
                                 comments2.Add(whitespace.Slice((int)margin - indent - 1));
                             }
+
+#pragma warning restore S2583 // Conditionally executed code should be reachable
 
                             indent += whitespace.Length;
                         }
@@ -711,7 +721,9 @@ internal class JsDocParser
 
                             break;
                         }
+#pragma warning disable S907 // "goto" statement should not be used
                         goto caseLabel5;
+#pragma warning restore S907 // "goto" statement should not be used
                     default:
 
 caseLabel5: state = JSDocState.SavingComments;
@@ -802,8 +814,7 @@ caseLabel5: state = JSDocState.SavingComments;
 
                 ParseExpected(SyntaxKind.CloseBracketToken);
             }
-            else
-        if (TokenIsIdentifierOrKeyword(Token))
+            else if (TokenIsIdentifierOrKeyword(Token))
             {
 
                 name = ParseJsDocIdentifierName();
@@ -843,7 +854,7 @@ caseLabel5: state = JSDocState.SavingComments;
 
         JsDocReturnTag ParseReturnTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind == SyntaxKind.JsDocReturnTag))
+            if (tags.Exists(t => t.Kind == SyntaxKind.JsDocReturnTag))
             {
 
                 ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
@@ -860,7 +871,7 @@ caseLabel5: state = JSDocState.SavingComments;
 
         JsDocTypeTag ParseTypeTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind == SyntaxKind.JsDocTypeTag))
+            if (tags.Exists(t => t.Kind == SyntaxKind.JsDocTypeTag))
             {
 
                 ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
@@ -931,10 +942,10 @@ caseLabel5: state = JSDocState.SavingComments;
                 var rightNode = typedefTag.FullName;
                 while (true)
                 {
-                    if (rightNode.Kind == SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body == null)
+                    if (rightNode?.Kind == SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body == null)
                     {
 
-                        typedefTag.Name = rightNode.Kind == SyntaxKind.Identifier ? rightNode : (rightNode as JsDocTypedefTag)?.Name;
+                        typedefTag.Name = rightNode?.Kind == SyntaxKind.Identifier ? rightNode : (rightNode as JsDocTypedefTag)?.Name;
 
                         break;
                     }
@@ -1021,10 +1032,11 @@ caseLabel5: state = JSDocState.SavingComments;
                     case SyntaxKind.Identifier:
 
                         canParseTag = false;
+#pragma warning disable S907 // "goto" statement should not be used
                         goto caseLabel5;
+#pragma warning restore S907 // "goto" statement should not be used
                     case SyntaxKind.EndOfFileToken:
-caseLabel5:
-                        break;
+caseLabel5: break;
                 }
             }
 
@@ -1035,7 +1047,6 @@ caseLabel5:
 
         INode ParseJsDocTypeNameWithNamespace(NodeFlags flags)
         {
-            var pos = Scanner.TokenPos;
             var typeNameOrNamespaceName = ParseJsDocIdentifierName();
             if (typeNameOrNamespaceName != null && ParseOptional(SyntaxKind.DotToken))
             {
@@ -1088,7 +1099,7 @@ caseLabel5:
                     var propertyTag = ParsePropertyTag(atToken, tagName);
                     if (propertyTag != null)
                     {
-                        parentTag.JsDocPropertyTags ??= new NodeArray<JsDocPropertyTag>();
+                        parentTag.JsDocPropertyTags ??= [];
 
                         parentTag.JsDocPropertyTags.Add(propertyTag);
 
@@ -1103,7 +1114,7 @@ caseLabel5:
 
         JsDocTemplateTag ParseTemplateTag(AtToken atToken, Identifier tagName)
         {
-            if (tags.Any(t => t.Kind == SyntaxKind.JsDocTemplateTag))
+            if (tags.Exists(t => t.Kind == SyntaxKind.JsDocTemplateTag))
             {
 
                 ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
@@ -1151,10 +1162,9 @@ caseLabel5:
             return result3;
         }
 
-        SyntaxKind NextJsDocToken()
+        void NextJsDocToken()
         {
             CurrentToken = Scanner.ScanJsDocToken();
-            return CurrentToken;
         }
 
         Identifier ParseJsDocIdentifierName() => CreateJsDocIdentifier(TokenIsIdentifierOrKeyword(Token));

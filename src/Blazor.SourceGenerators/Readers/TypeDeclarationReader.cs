@@ -36,8 +36,8 @@ internal sealed partial class TypeDeclarationReader
 
     public bool TryGetDeclaration(string typeName, out string? declaration)
     {
-       var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
-            .FirstOrDefault(node => node.Identifier == typeName) as InterfaceDeclaration;
+        var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
+             .FirstOrDefault(node => node.Identifier == typeName) as InterfaceDeclaration;
 
         declaration = node == null
             ? string.Empty
@@ -50,8 +50,8 @@ internal sealed partial class TypeDeclarationReader
 
     public bool TryGetTypeAlias(string typeName, out string? declaration)
     {
-       var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.TypeAliasDeclaration)
-            .FirstOrDefault(node => node.Identifier == typeName) as TypeAliasDeclaration;
+        var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.TypeAliasDeclaration)
+             .FirstOrDefault(node => node.Identifier == typeName) as TypeAliasDeclaration;
 
         declaration = node == null
             ? string.Empty

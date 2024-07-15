@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Reflection.Metadata;
 using Blazor.SourceGenerators.TypeScript;
 using Blazor.SourceGenerators.TypeScript.Types;
 
@@ -33,7 +31,7 @@ internal static class DependentTypeMapper
         var ast = s_lazyDefaultAst.Value;
         if (ast is null or { RootNode: null })
         {
-            return new();
+            return [];
         }
 
         var rootNode = ast.RootNode;
@@ -44,7 +42,7 @@ internal static class DependentTypeMapper
 
         if (interfaceNode is null)
         {
-            return new Dictionary<string, Node>();
+            return [];
         }
 
         var dependentTypes = new Dictionary<string, Node>

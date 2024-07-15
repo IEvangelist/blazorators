@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 #nullable disable
-using System.Diagnostics;
 using Blazor.SourceGenerators.TypeScript.Compiler;
 
 namespace Blazor.SourceGenerators.TypeScript.Types;
@@ -10,7 +9,7 @@ namespace Blazor.SourceGenerators.TypeScript.Types;
 [DebuggerDisplay("{SourceText}")]
 public class Node : TextRange, INode
 {
-    public List<Node> Children { get; set; } = new();
+    public List<Node> Children { get; set; } = [];
     public ITypeScriptAbstractSyntaxTree AbstractSyntaxTree { get; set; }
 
     public string RawSourceText => AbstractSyntaxTree.RawSourceText;
