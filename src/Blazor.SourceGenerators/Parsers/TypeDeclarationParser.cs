@@ -20,7 +20,7 @@ internal sealed partial class TypeDeclarationParser
     {
         ParserResult<CSharpTopLevelObject> result = new(ParserResultStatus.Unknown);
 
-        if (_reader.TryGetDeclaration(typeName, out InterfaceDeclaration? typescriptInterfaceDeclaration) && typescriptInterfaceDeclaration is not null)
+        if (_reader.TryGetDeclaration(typeName, out var typescriptInterfaceDeclaration) && typescriptInterfaceDeclaration is not null)
         {
             try
             {

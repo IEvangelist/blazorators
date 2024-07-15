@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.TypeScript.Types;
-
 namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class TypeDeclarationParser
@@ -10,6 +8,8 @@ internal sealed partial class TypeDeclarationParser
     internal CSharpObject? ToObject(string typeScriptTypeDeclaration)
     {
         CSharpObject? cSharpObject = null;
+
+        typeScriptTypeDeclaration = FormatInterfaceDeclaration(typeScriptTypeDeclaration);
 
         var lineTokens = typeScriptTypeDeclaration.Split('\n');
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -99,7 +99,7 @@ internal sealed partial class TypeDeclarationParser
                 // When a property defines a custom type, that type needs to also be parsed
                 // and source generated. This is so that dependent types are known and resolved.
                 if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
-                    _reader.TryGetDeclaration(mappedType, out string? typeScriptDefinitionText) &&
+                    _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
                     typeScriptDefinitionText is not null)
                 {
                     var obj = ToObject(typeScriptDefinitionText);
@@ -116,26 +116,11 @@ internal sealed partial class TypeDeclarationParser
         return cSharpObject;
     }
 
-    internal CSharpTopLevelObject? ToTopLevelObject(InterfaceDeclaration typeScriptTypeDeclaration)
-    {
-        var topLevelObject = new CSharpTopLevelObject(typeScriptTypeDeclaration.Identifier);
-
-        var methods = typeScriptTypeDeclaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
-        foreach (var method in methods)
-        {
-            var methodName = method.Identifier;
-            var parameters = method.OfKind(TypeScriptSyntaxKind.Parameter);
-            var returnType = method.OfKind(TypeScriptSyntaxKind.TypeReference).FirstOrDefault();
-
-
-        }
-
-        return topLevelObject;
-    }
-
     internal CSharpTopLevelObject? ToTopLevelObject(string typeScriptTypeDeclaration)
     {
         CSharpTopLevelObject? topLevelObject = null;
+
+        typeScriptTypeDeclaration = FormatInterfaceDeclaration(typeScriptTypeDeclaration);
 
         var lineTokens = typeScriptTypeDeclaration.Split('\n');
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -226,7 +211,7 @@ internal sealed partial class TypeDeclarationParser
                 // When a property defines a custom type, that type needs to also be parsed
                 // and source generated. This is so that dependent types are known and resolved.
                 if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
-                    _reader.TryGetDeclaration(mappedType, out string? typeScriptDefinitionText) &&
+                    _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
                     typeScriptDefinitionText is not null)
                 {
                     var obj = ToObject(typeScriptDefinitionText);
@@ -241,6 +226,19 @@ internal sealed partial class TypeDeclarationParser
         }
 
         return topLevelObject;
+    }
+
+
+
+    private static string FormatInterfaceDeclaration(string typescriptInterfaceDeclaration)
+    {
+        var typescriptInterfaceDeclarationStart = InterfaceRegex.Match(typescriptInterfaceDeclaration);
+        if (typescriptInterfaceDeclarationStart.Success && typescriptInterfaceDeclarationStart.Index >= 0)
+        {
+            typescriptInterfaceDeclaration = typescriptInterfaceDeclaration.Substring(typescriptInterfaceDeclarationStart.Index);
+        }
+
+        return typescriptInterfaceDeclaration;
     }
 
     private string TryGetPrimitiveType(string type)
@@ -278,7 +276,7 @@ internal sealed partial class TypeDeclarationParser
 
         var nonArrayMethodReturnType = methodReturnType.Replace("[]", "");
         if (!TypeMap.PrimitiveTypes.IsPrimitiveType(nonArrayMethodReturnType) &&
-            _reader.TryGetDeclaration(nonArrayMethodReturnType, out string? typeScriptDefinitionText) &&
+            _reader.TryGetDeclaration(nonArrayMethodReturnType, out var typeScriptDefinitionText) &&
             typeScriptDefinitionText is not null)
         {
             var dependentType = ToObject(typeScriptDefinitionText);
@@ -294,6 +292,8 @@ internal sealed partial class TypeDeclarationParser
     internal CSharpAction? ToAction(string typeScriptTypeDeclaration)
     {
         CSharpAction? cSharpAction = null;
+
+        typeScriptTypeDeclaration = FormatInterfaceDeclaration(typeScriptTypeDeclaration);
 
         var lineTokens = typeScriptTypeDeclaration.Split('\n');
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -391,7 +391,7 @@ internal sealed partial class TypeDeclarationParser
             // When a parameter defines a custom type, that type needs to also be parsed
             // and source generated. This is so that dependent types are known and resolved.
             if (!TypeMap.PrimitiveTypes.IsPrimitiveType(parameterType) &&
-                _reader.TryGetDeclaration(parameterType, out string? typeScriptDefinitionText) &&
+                _reader.TryGetDeclaration(parameterType, out var typeScriptDefinitionText) &&
                 typeScriptDefinitionText is not null)
             {
                 javaScriptMethod = javaScriptMethod with

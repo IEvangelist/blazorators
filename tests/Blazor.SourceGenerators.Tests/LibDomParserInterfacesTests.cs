@@ -11,64 +11,68 @@ public class LibDomParserInterfacesTests
     [Fact]
     public void CorrectlyConvertsTypeScriptInterfaceToCSharpClass()
     {
-        var text = @"interface MediaKeySystemConfiguration {
-    audioCapabilities?: MediaKeySystemMediaCapability[];
-    distinctiveIdentifier?: MediaKeysRequirement;
-    initDataTypes?: string[];
-    label?: string;
-    persistentState?: MediaKeysRequirement;
-    sessionTypes?: string[];
-    videoCapabilities?: MediaKeySystemMediaCapability[];
-}";
+        var text = """
+            interface MediaKeySystemConfiguration {
+                audioCapabilities?: MediaKeySystemMediaCapability[];
+                distinctiveIdentifier?: MediaKeysRequirement;
+                initDataTypes?: string[];
+                label?: string;
+                persistentState?: MediaKeysRequirement;
+                sessionTypes?: string[];
+                videoCapabilities?: MediaKeySystemMediaCapability[];
+            }
+            """;
         var sut = TypeDeclarationParser.Default;
         var actual = sut.ToObject(text);
-        var expected = @"#nullable enable
-using System.Text.Json.Serialization;
+        var expected = """
+            #nullable enable
+            using System.Text.Json.Serialization;
 
-namespace Microsoft.JSInterop;
+            namespace Microsoft.JSInterop;
 
-/// <summary>
-/// Source-generated object representing an ideally immutable <c>MediaKeySystemConfiguration</c> value.
-/// </summary>
-public class MediaKeySystemConfiguration
-{
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.audioCapabilities</c> value.
-    /// </summary>
-    [JsonPropertyName(""audioCapabilities"")]
-    public MediaKeySystemMediaCapability[]? AudioCapabilities { get; set; } = default!;
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.distinctiveIdentifier</c> value.
-    /// </summary>
-    [JsonPropertyName(""distinctiveIdentifier"")]
-    public string? DistinctiveIdentifier { get; set; } = default!;
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.initDataTypes</c> value.
-    /// </summary>
-    [JsonPropertyName(""initDataTypes"")]
-    public string[]? InitDataTypes { get; set; } = default!;
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.label</c> value.
-    /// </summary>
-    [JsonPropertyName(""label"")]
-    public string? Label { get; set; } = default!;
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.persistentState</c> value.
-    /// </summary>
-    [JsonPropertyName(""persistentState"")]
-    public string? PersistentState { get; set; } = default!;
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.sessionTypes</c> value.
-    /// </summary>
-    [JsonPropertyName(""sessionTypes"")]
-    public string[]? SessionTypes { get; set; } = default!;
-    /// <summary>
-    /// Source-generated property representing the <c>MediaKeySystemConfiguration.videoCapabilities</c> value.
-    /// </summary>
-    [JsonPropertyName(""videoCapabilities"")]
-    public MediaKeySystemMediaCapability[]? VideoCapabilities { get; set; } = default!;
-}
-";
+            /// <summary>
+            /// Source-generated object representing an ideally immutable <c>MediaKeySystemConfiguration</c> value.
+            /// </summary>
+            public class MediaKeySystemConfiguration
+            {
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.audioCapabilities</c> value.
+                /// </summary>
+                [JsonPropertyName("audioCapabilities")]
+                public MediaKeySystemMediaCapability[]? AudioCapabilities { get; set; } = default!;
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.distinctiveIdentifier</c> value.
+                /// </summary>
+                [JsonPropertyName("distinctiveIdentifier")]
+                public string? DistinctiveIdentifier { get; set; } = default!;
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.initDataTypes</c> value.
+                /// </summary>
+                [JsonPropertyName("initDataTypes")]
+                public string[]? InitDataTypes { get; set; } = default!;
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.label</c> value.
+                /// </summary>
+                [JsonPropertyName("label")]
+                public string? Label { get; set; } = default!;
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.persistentState</c> value.
+                /// </summary>
+                [JsonPropertyName("persistentState")]
+                public string? PersistentState { get; set; } = default!;
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.sessionTypes</c> value.
+                /// </summary>
+                [JsonPropertyName("sessionTypes")]
+                public string[]? SessionTypes { get; set; } = default!;
+                /// <summary>
+                /// Source-generated property representing the <c>MediaKeySystemConfiguration.videoCapabilities</c> value.
+                /// </summary>
+                [JsonPropertyName("videoCapabilities")]
+                public MediaKeySystemMediaCapability[]? VideoCapabilities { get; set; } = default!;
+            }
+
+            """;
 
         Assert.NotNull(actual);
 
@@ -83,11 +87,13 @@ public class MediaKeySystemConfiguration
     [Fact]
     public void CorrectlyConvertsTypeScriptInterfaceToCSharpExtensionObject()
     {
-        var text = @"interface Geolocation {
-    clearWatch(watchId: number): void;
-    getCurrentPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): void;
-    watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): number;
-}";
+        var text = """
+            interface Geolocation {
+                clearWatch(watchId: number): void;
+                getCurrentPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): void;
+                watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): number;
+            }
+            """;
         var sut = TypeDeclarationParser.Default;
         var actual = sut.ToTopLevelObject(text);
 

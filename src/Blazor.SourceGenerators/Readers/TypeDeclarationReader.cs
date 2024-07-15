@@ -9,8 +9,6 @@ namespace Blazor.SourceGenerators.Readers;
 internal sealed partial class TypeDeclarationReader
 {
     private readonly Lazy<string> _typeDeclarationText;
-    private IDictionary<string, string>? _typeAliasMap;
-    private IDictionary<string, string>? _typeDeclarationMap;
     private ITypeScriptAbstractSyntaxTree? _typeDeclarationTree;
 
     private TypeDeclarationReader(Uri typeDeclarationUri)
@@ -29,92 +27,38 @@ internal sealed partial class TypeDeclarationReader
     /// <summary>
     /// For testing purposes.
     /// </summary>
-    internal bool IsInitialized => TypeDeclarationMap is { Count: > 0 };
+    internal bool IsInitialized => TypeDeclarationTree.RootNode is { Count: > 0 };
 
     internal string RawSourceText => _typeDeclarationText.Value;
-
-    private IDictionary<string, string> TypeAliasMap =>
-        _typeAliasMap ??= ReadTypeAliasMap(_typeDeclarationText.Value);
-
-    private IDictionary<string, string> TypeDeclarationMap =>
-        _typeDeclarationMap ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
 
     private ITypeScriptAbstractSyntaxTree TypeDeclarationTree =>
         _typeDeclarationTree ??= TypeScriptAbstractSyntaxTree.FromSourceText(_typeDeclarationText.Value);
 
-    public bool TryGetDeclaration(
-        string typeName, out string? declaration) =>
-        TypeDeclarationMap.TryGetValue(typeName, out declaration);
-
-    public bool TryGetDeclaration(string typeName, out InterfaceDeclaration? declaration)
+    public bool TryGetDeclaration(string typeName, out string? declaration)
     {
-       declaration = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
+       var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
             .FirstOrDefault(node => node.Identifier == typeName) as InterfaceDeclaration;
+
+        declaration = node == null
+            ? string.Empty
+            : node.GetText().ToString();
+
+        declaration = declaration.TrimStart('\r', '\n');
 
         return declaration != null;
     }
 
-    public bool TryGetTypeAlias(
-        string typeAliasName, out string? typeAlias) =>
-        TypeAliasMap.TryGetValue(typeAliasName, out typeAlias);
-
-    private static ConcurrentDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
+    public bool TryGetTypeAlias(string typeName, out string? declaration)
     {
-        ConcurrentDictionary<string, string> map = new();
+       var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.TypeAliasDeclaration)
+            .FirstOrDefault(node => node.Identifier == typeName) as TypeAliasDeclaration;
 
-        try
-        {
-            if (typeDeclarations is { Length: > 0 })
-            {
-                var matchCollection =
-                    TypeRegex.Matches(typeDeclarations).Cast<Match>().Select(m => m.Value);
-                Parallel.ForEach(
-                    matchCollection,
-                    match =>
-                    {
-                        var typeName = TypeNameRegex.GetMatchGroupValue(match, "TypeName");
-                        if (typeName is not null)
-                        {
-                            map[typeName] = match;
-                        }
-                    });
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error initializing lib dom parser. {ex}");
-        }
+        declaration = node == null
+            ? string.Empty
+            : node.GetText().ToString();
 
-        return map;
-    }
+        declaration = declaration.TrimStart('\r', '\n');
 
-    private static ConcurrentDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
-    {
-        ConcurrentDictionary<string, string> map = new();
-
-        try
-        {
-            if (typeDeclarations is { Length: > 0 })
-            {
-                var matchCollection =
-                    InterfaceRegex.Matches(typeDeclarations).Cast<Match>().Select(m => m.Value);
-                Parallel.ForEach(
-                    matchCollection,
-                    match =>
-                    {
-                        var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(match, "TypeName");
-                        if (typeName is not null)
-                        {
-                            map[typeName] = match;
-                        }
-                    });
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error initializing lib dom parser. {ex}");
-        }
-
-        return map;
+        return declaration != null;
     }
 }
