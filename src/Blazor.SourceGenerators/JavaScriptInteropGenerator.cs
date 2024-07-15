@@ -126,8 +126,8 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
 
         if (options.SupportsGenerics &&
-            context.Compilation.ReferencedAssemblyNames.Any(ai =>
-            !ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)))
+            !context.Compilation.ReferencedAssemblyNames.Any(ai =>
+                ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)))
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(
