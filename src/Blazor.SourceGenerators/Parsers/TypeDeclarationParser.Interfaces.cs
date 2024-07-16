@@ -89,6 +89,11 @@ internal sealed partial class TypeDeclarationParser
         return csharpTopLevelObject;
     }
 
+    private static string GetNodeText(INode propertyTypeNode)
+    {
+        return propertyTypeNode.GetText().ToString().Trim();
+    }
+
     private IEnumerable<CSharpMethod> ParseMethods(string rawTypeName, IEnumerable<Node> objectMethods, Action<CSharpObject> appendDependency)
     {
         ICollection<CSharpMethod> methods = [];
@@ -96,7 +101,7 @@ internal sealed partial class TypeDeclarationParser
         {
             var methodName = method.Identifier;
             var methodParameters = method.Parameters;
-            var methodReturnType = method.Type.GetText().ToString().Trim();
+            var methodReturnType = GetNodeText(method.Type);
 
             if (methodName is null || methodParameters is null || string.IsNullOrEmpty(methodReturnType))
             {
@@ -127,7 +132,7 @@ internal sealed partial class TypeDeclarationParser
             var isNullable = parameter.QuestionToken is not null;
             var parameterName = parameter.Identifier;
 
-            var parameterType = parameter.Children[parameter.Children.Count - 1].GetText().ToString().Trim();
+            var parameterType = GetNodeText(parameter.Children[parameter.Children.Count - 1]);
             parameterType = isNullable ? parameterType.Replace(" | null", "") : parameterType;
 
             CSharpAction csharpAction = null!;
@@ -174,8 +179,19 @@ internal sealed partial class TypeDeclarationParser
             var isNullable = property.QuestionToken is not null;
 
             var propertyName = property.Identifier;
-            var propertyType = property.Children[property.Children.Count - 1].GetText().ToString().Trim();
-            propertyType = isNullable ? propertyType.Replace(" | null", "") : propertyType;
+
+            var propertyTypeNode = property.Children[property.Children.Count - 1];
+
+            // TODO: Handle other type of nodes correctly
+            // Examples:
+            // -    SomeCustomType | null                   #UnionNodeType
+            // -    ((this: SomeCustom, ev: Event) => any)  #ParenthesizedTypeNode, inside #FunctionTypeNode
+
+            var propertyType = propertyTypeNode switch
+            {
+                _ when isNullable => GetNodeText(propertyTypeNode).Replace(" | null", ""),
+                _ => GetNodeText(propertyTypeNode)
+            };
 
             if (propertyName is null || string.IsNullOrEmpty(propertyType))
             {
@@ -211,7 +227,7 @@ internal sealed partial class TypeDeclarationParser
         if (callSignatureDeclaration is not null)
         {
             var actionParameters = callSignatureDeclaration.Parameters;
-            var actionReturnType = callSignatureDeclaration.Type.GetText().ToString().Trim();
+            var actionReturnType = GetNodeText(callSignatureDeclaration.Type);
 
             if (actionParameters is null || string.IsNullOrEmpty(actionReturnType))
             {
