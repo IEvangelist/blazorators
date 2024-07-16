@@ -45,8 +45,7 @@ internal readonly record struct MethodBuilderDetails(
     /// <summary>
     /// Returns a string representing a generic type argument with the specified value.
     /// </summary>
-    internal static readonly Func<string, string> ToGenericTypeArgument =
-        static string (string value) => $"<{value}>";
+    internal static readonly Func<string, string> ToGenericTypeArgument = static string (string value) => $"<{value}>";
 
     /// <summary>
     /// Gets a value indicating whether the method's return type is serializable.
@@ -63,38 +62,17 @@ internal readonly record struct MethodBuilderDetails(
     {
         var isGenericReturnType = method.IsGenericReturnType(options);
         var isPrimitiveType = TypeMap.PrimitiveTypes.IsPrimitiveType(method.RawReturnTypeName);
-        var containsGenericParameters =
-            method.ParameterDefinitions.Any(p => p.IsGenericParameter(method.RawName, options));
-        var genericTypeArgs = isGenericReturnType
-            ? ToGenericTypeArgument(GenericTypeValue)
-            : containsGenericParameters ? ToGenericTypeArgument(GenericTypeValue) : null;
-        var fullyQualifiedJavaScriptIdentifier = method.JavaScriptMethodDependency?.InvokableMethodName;
-        fullyQualifiedJavaScriptIdentifier ??=
-            options.Implementation is not null
-                ? $"{options.Implementation}.{method.RawName}"
-                : method.RawName;
-        var (suffix, extendingType) = options.IsWebAssembly
-            ? ("", "IJSInProcessRuntime")
-            : ("Async", "IJSRuntime");
+        var containsGenericParameters = method.ParameterDefinitions.Any(p => p.IsGenericParameter(method.RawName, options));
 
-        if (method.IsJavaScriptOverride(options) && options.Implementation is not null)
-        {
-            var impl =
-                options.Implementation.Substring(
-                    options.Implementation.LastIndexOf(".") + 1);
-
-            fullyQualifiedJavaScriptIdentifier =
-                $"blazorators.{impl}.{method.RawName}";
-
-            suffix = "Async";
-        }
-
-        var (returnType, bareType) = method.GetMethodTypes(options, isGenericReturnType, isPrimitiveType);
+        var genericTypeArgs = DetermineGenericTypeArgs(isGenericReturnType, containsGenericParameters);
+        var fullyQualifiedJavaScriptIdentifier = DetermineJavaScriptIdentifier(method, options);
+        (var suffix, var extendingType) = DetermineSuffixAndExtendingType(method, options);
+        (var returnType, var bareType) = method.GetMethodTypes(options, isGenericReturnType, isPrimitiveType);
 
         return new MethodBuilderDetails(
             Method: method,
             IsVoid: method.IsVoid,
-            IsPrimitiveType: TypeMap.PrimitiveTypes.IsPrimitiveType(method.RawReturnTypeName),
+            IsPrimitiveType: isPrimitiveType,
             IsGenericReturnType: isGenericReturnType,
             ContainsGenericParameters: containsGenericParameters,
             CSharpMethodName: method.RawName.CapitalizeFirstLetter(),
@@ -103,6 +81,34 @@ internal readonly record struct MethodBuilderDetails(
             BareType: bareType,
             Suffix: suffix,
             ExtendingType: extendingType,
-            GenericTypeArgs: genericTypeArgs);
+            GenericTypeArgs: genericTypeArgs
+        );
+    }
+
+    private static string? DetermineGenericTypeArgs(bool isGenericReturnType, bool containsGenericParameters)
+    {
+        if (isGenericReturnType) return ToGenericTypeArgument(GenericTypeValue);
+        if (containsGenericParameters) return ToGenericTypeArgument(GenericTypeValue);
+        return null;
+    }
+
+    private static string DetermineJavaScriptIdentifier(CSharpMethod method, GeneratorOptions options)
+    {
+        if (method.IsJavaScriptOverride(options) && options.Implementation is not null)
+        {
+            var impl = options.Implementation.Substring(options.Implementation.LastIndexOf(".") + 1);
+            return $"blazorators.{impl}.{method.RawName}";
+        }
+        return method.JavaScriptMethodDependency?.InvokableMethodName ??
+            (options.Implementation is not null ? $"{options.Implementation}.{method.RawName}" : method.RawName);
+    }
+
+    private static (string Suffix, string ExtendingType) DetermineSuffixAndExtendingType(CSharpMethod method, GeneratorOptions options)
+    {
+        if (method.IsJavaScriptOverride(options) && options.Implementation is not null)
+        {
+            return ("Async", "IJSRuntime");
+        }
+        return options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
     }
 }

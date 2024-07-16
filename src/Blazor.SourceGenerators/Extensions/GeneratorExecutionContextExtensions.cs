@@ -52,7 +52,7 @@ internal static class GeneratorExecutionContextExtensions
 
     internal static GeneratorExecutionContext AddDependencyInjectionExtensionsSource(
         this GeneratorExecutionContext context,
-        CSharpTopLevelObject topLevelObject,
+        CSharpTopLevelObject _,
         string implementation,
         GeneratorOptions options)
     {

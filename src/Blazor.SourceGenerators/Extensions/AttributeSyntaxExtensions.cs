@@ -3,7 +3,7 @@
 
 namespace Blazor.SourceGenerators.Extensions;
 
-static class AttributeSyntaxExtensions
+internal static class AttributeSyntaxExtensions
 {
     internal static GeneratorOptions GetGeneratorOptions(
         this AttributeSyntax attribute,
@@ -12,8 +12,6 @@ static class AttributeSyntaxExtensions
         GeneratorOptions options = new(supportsGenerics);
         if (attribute is { ArgumentList: not null })
         {
-            var removeQuotes = static string (string value) => value.Replace("\"", "");
-
             foreach (var arg in attribute.ArgumentList.Arguments)
             {
                 var propName = arg.NameEquals?.Name?.ToString();
@@ -21,11 +19,11 @@ static class AttributeSyntaxExtensions
                 {
                     nameof(options.TypeName) => options with
                     {
-                        TypeName = removeQuotes(arg.Expression.ToString())
+                        TypeName = RemoveQuotes(arg.Expression.ToString())
                     },
                     nameof(options.Implementation) => options with
                     {
-                        Implementation = removeQuotes(arg.Expression.ToString())
+                        Implementation = RemoveQuotes(arg.Expression.ToString())
                     },
                     nameof(options.OnlyGeneratePureJS) => options with
                     {
@@ -33,7 +31,7 @@ static class AttributeSyntaxExtensions
                     },
                     nameof(options.Url) => options with
                     {
-                        Url = removeQuotes(arg.Expression.ToString())
+                        Url = RemoveQuotes(arg.Expression.ToString())
                     },
                     "HostingModel" => options with
                     {
@@ -81,9 +79,7 @@ static class AttributeSyntaxExtensions
             return descriptors
                 .Select(descriptor =>
                 {
-                    descriptor = descriptor
-                        .Replace("\"", "")
-                        .Trim();
+                    descriptor = RemoveQuotes(descriptor).Trim();
                     return descriptor;
                 })
                 .ToArray();
@@ -91,4 +87,6 @@ static class AttributeSyntaxExtensions
 
         return default;
     }
+
+    private static string RemoveQuotes(string value) => value.Replace("\"", "");
 }

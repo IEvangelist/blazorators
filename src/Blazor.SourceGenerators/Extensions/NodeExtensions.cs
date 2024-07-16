@@ -7,8 +7,7 @@ namespace Blazor.SourceGenerators.Extensions;
 
 public static class NodeExtensions
 {
-    public static IEnumerable<INode> GetDescendants(
-        this INode node, bool includeSelf = true)
+    public static IEnumerable<INode> GetDescendants(this INode node, bool includeSelf = true)
     {
         if (includeSelf) yield return node;
 
@@ -28,8 +27,7 @@ public static class NodeExtensions
         }
     }
 
-    public static IEnumerable<Node> OfKind(
-        this IEnumerable<Node> nodes, TypeScriptSyntaxKind kind)
+    public static IEnumerable<Node> OfKind(this IEnumerable<Node> nodes, TypeScriptSyntaxKind kind)
     {
         foreach (var node in nodes)
         {
@@ -37,8 +35,7 @@ public static class NodeExtensions
         }
     }
 
-    public static IEnumerable<INode> OfKind(
-        this IEnumerable<INode> nodes, TypeScriptSyntaxKind kind)
+    public static IEnumerable<INode> OfKind(this IEnumerable<INode> nodes, TypeScriptSyntaxKind kind)
     {
         foreach (var node in nodes)
         {
