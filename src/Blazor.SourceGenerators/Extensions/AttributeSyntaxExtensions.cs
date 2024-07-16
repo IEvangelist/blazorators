@@ -62,33 +62,36 @@ internal static class AttributeSyntaxExtensions
 
     static string[]? ParseArray(string args)
     {
+        // Remove unwanted parts of the string
         var replacedArgs = args
             .Replace("new[]", "")
             .Replace("new []", "")
             .Replace("new string[]", "")
             .Replace("new string []", "")
             .Replace("{", "[")
-            .Replace("}", "]");
+            .Replace("}", "]")
+            .Trim();
 
-        var values = SharedRegex.ArrayValuesRegex
-            .GetMatchGroupValue(replacedArgs, "Values");
+        // Find the first '[' and the last ']' to extract the array contents
+        var startIndex = replacedArgs.IndexOf('[') + 1;
+        var endIndex = replacedArgs.LastIndexOf(']');
 
-        if (values is not null)
+        // Check if the brackets are correctly positioned
+        if (startIndex > 0 && endIndex > startIndex)
         {
-            var trimmed = values.Trim();
-            var descriptors = trimmed.Split(',');
+            var values = replacedArgs.Substring(startIndex, endIndex - startIndex);
+
+            // Split the values by commas
+            var descriptors = values.Split(',');
 
             return descriptors
-                .Select(descriptor =>
-                {
-                    descriptor = RemoveQuotes(descriptor).Trim();
-                    return descriptor;
-                })
+                .Select(descriptor => RemoveQuotes(descriptor).Trim())
                 .ToArray();
         }
 
         return default;
     }
+
 
     private static string RemoveQuotes(string value) => value.Replace("\"", "");
 }

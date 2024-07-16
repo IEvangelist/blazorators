@@ -7,6 +7,10 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
+#pragma warning disable S2344 // Enumeration type names should not have "Flags" or "Enum" suffixes
+#pragma warning disable S4663 // Comments should not be empty
+#pragma warning disable S125 // Sections of code should not be commented out
+
 [Flags]
 public enum NodeFlags
 {
@@ -44,6 +48,8 @@ public enum NodeFlags
     // Exclude these flags when parsing a Type
     TypeExcludesFlags = YieldContext | AwaitContext
 }
+
+#pragma warning disable CA1069 // I valori di enumerazione non devono essere duplicati
 
 public enum TypeScriptSyntaxKind
 {
@@ -442,6 +448,8 @@ public enum TypeScriptSyntaxKind
     LastJsDocTagNode = JsDocLiteralType
 }
 
+#pragma warning restore CA1069 // I valori di enumerazione non devono essere duplicati
+
 public enum CharacterCode
 {
     NullCharacter = 0,
@@ -809,6 +817,8 @@ public enum TypeReferenceSerializationKind
     ObjectType // The TypeReferenceNode resolves to any other type.
 }
 
+#pragma warning disable CA1069 // I valori di enumerazione non devono essere duplicati
+
 public enum SymbolFlags
 {
     None = 0,
@@ -897,6 +907,8 @@ public enum SymbolFlags
     // classification.
     Classifiable = Class | Enum | TypeAlias | Interface | TypeParameter | Module
 }
+
+#pragma warning restore CA1069 // I valori di enumerazione non devono essere duplicati
 
 public enum CheckFlags
 {
@@ -1160,6 +1172,8 @@ public enum Extension
     LastTypeScriptExtension = Dts
 }
 
+#pragma warning disable CA1069 // I valori di enumerazione non devono essere duplicati
+
 public enum TransformFlags
 {
     None = 0,
@@ -1257,6 +1271,8 @@ public enum TransformFlags
     Es2015FunctionSyntaxMask = ContainsCapturedLexicalThis | ContainsDefaultValueAssignments
 }
 
+#pragma warning restore CA1069 // I valori di enumerazione non devono essere duplicati
+
 public enum EmitFlags
 {
     SingleLine = 1 << 0, // The contents of this node should be emitted on a single line.
@@ -1339,3 +1355,8 @@ public enum EmitHint
     IdentifierName, // Emitting an IdentifierName
     Unspecified // Emitting an otherwise unspecified node
 }
+
+
+#pragma warning restore S125 // Sections of code should not be commented out
+#pragma warning restore S4663 // Comments should not be empty
+#pragma warning restore S2344 // Enumeration type names should not have "Flags" or "Enum" suffixes
