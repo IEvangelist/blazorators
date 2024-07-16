@@ -34,18 +34,18 @@ public class LibDomParserTests
     [Fact]
     public void CanReplaceBruteForceParser()
     {
-        var cacheStorage =
-            _sut.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
-                .Single(c => c is { Identifier: "CacheStorage" });
+        var cacheStorage = _sut.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
+            .Single(type => type is { Identifier: "CacheStorage" });
 
         Assert.NotNull(cacheStorage);
 
-        var methods = cacheStorage.OfKind(TypeScriptSyntaxKind.MethodSignature).Cast<MethodSignature>();
-        Assert.Contains(methods, m => m.Identifier is "has");
-        Assert.Contains(methods, m => m.Identifier is "open");
-        Assert.Contains(methods, m => m.Identifier is "delete");
-        Assert.Contains(methods, m => m.Identifier is "keys");
-        Assert.Contains(methods, m => m.Identifier is "match");
+        var methods = cacheStorage.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        Assert.Collection(methods,
+            method => Assert.Equal("delete", method.Identifier),
+            method => Assert.Equal("has", method.Identifier),
+            method => Assert.Equal("keys", method.Identifier),
+            method => Assert.Equal("match", method.Identifier),
+            method => Assert.Equal("open", method.Identifier));
     }
 
     [Fact]
@@ -55,35 +55,29 @@ public class LibDomParserTests
             TypeScriptSyntaxKind.InterfaceDeclaration);
 
         var geolocation = interfaces.Single(
-            type => type.Identifier is "Geolocation" &&
-            type.Kind is TypeScriptSyntaxKind.InterfaceDeclaration);
+            type => type is { Identifier: "Geolocation", Kind: TypeScriptSyntaxKind.InterfaceDeclaration });
+
         Assert.NotNull(geolocation);
-        Assert.Contains(geolocation.Children,
-            c => c.Identifier is "getCurrentPosition" &&
-            c.Kind is TypeScriptSyntaxKind.MethodSignature);
-        Assert.Contains(geolocation.Children,
-            c => c.Identifier is "watchPosition" &&
-            c.Kind is TypeScriptSyntaxKind.MethodSignature);
-        Assert.Contains(geolocation.Children,
-            c => c.Identifier is "clearWatch" &&
-            c.Kind is TypeScriptSyntaxKind.MethodSignature);
+
+        var methods = geolocation.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        Assert.Collection(methods,
+            method => Assert.Equal("clearWatch", method.Identifier),
+            method => Assert.Equal("getCurrentPosition", method.Identifier),
+            method => Assert.Equal("watchPosition", method.Identifier));
 
         var watchPosition = geolocation.Children.Single(
             c => c.Identifier is "watchPosition");
         Assert.NotNull(watchPosition);
-        Assert.Contains(watchPosition.Children,
-            c => c.Identifier is "successCallback" &&
-            c.Kind is TypeScriptSyntaxKind.Parameter);
-        Assert.Contains(watchPosition.Children,
-            c => c.Identifier is "errorCallback" &&
-            c.Kind is TypeScriptSyntaxKind.Parameter);
-        Assert.Contains(watchPosition.Children,
-            c => c.Identifier is "options" &&
-            c.Kind is TypeScriptSyntaxKind.Parameter);
 
-        var successCallback = watchPosition.Children.Single(
-            c => c.Identifier is "successCallback");
-        Assert.NotNull(successCallback);
+        var parameters = watchPosition.OfKind(TypeScriptSyntaxKind.Parameter);
+        Assert.Collection(parameters,
+           parameter => Assert.Equal("successCallback", parameter.Identifier),
+           parameter => Assert.Equal("errorCallback", parameter.Identifier),
+           parameter => Assert.Equal("options", parameter.Identifier));
+
+        var successCallback = Assert.IsType<ParameterDeclaration>(
+            watchPosition.Children.Single(c => c.Identifier is "successCallback"));
+        Assert.Equal("PositionCallback", successCallback.Type.GetText().ToString().Trim());
     }
 
     [Fact]
@@ -100,10 +94,10 @@ public class LibDomParserTests
 
         var methods = result.Methods;
         Assert.NotNull(methods);
-        Assert.Equal(3, methods.Count);
-        Assert.Contains(methods, m => m.RawName is "clearWatch");
-        Assert.Contains(methods, m => m.RawName is "getCurrentPosition");
-        Assert.Contains(methods, m => m.RawName is "watchPosition");
+        Assert.Collection(methods,
+            method => Assert.Equal("clearWatch", method.RawName),
+            method => Assert.Equal("getCurrentPosition", method.RawName),
+            method => Assert.Equal("watchPosition", method.RawName));
 
         var properties = result.Properties;
         Assert.NotNull(properties);
@@ -111,8 +105,7 @@ public class LibDomParserTests
 
         var dependencies = result.DependentTypes;
         Assert.NotNull(dependencies);
-        Assert.Single(dependencies);
-        Assert.True(dependencies.ContainsKey("PositionOptions"));
+        Assert.Contains("PositionOptions", dependencies);
     }
 
     [Fact]
@@ -126,15 +119,16 @@ public class LibDomParserTests
         // Assert
         var properties = parserResult.Value?.Properties;
         Assert.NotNull(properties);
-        Assert.Equal(2, properties.Count);
+        Assert.Collection(properties,
+            property => Assert.Equal("length", property.RawName));
 
         var methods = parserResult.Value?.Methods;
         Assert.NotNull(methods);
-        Assert.Equal(5, methods.Count);
-        Assert.Contains(methods, m => m.RawName is "getItem");
-        Assert.Contains(methods, m => m.RawName is "setItem");
-        Assert.Contains(methods, m => m.RawName is "removeItem");
-        Assert.Contains(methods, m => m.RawName is "clear");
-        Assert.Contains(methods, m => m.RawName is "key");
+        Assert.Collection(methods,
+            method => Assert.Equal("clear", method.RawName),
+            method => Assert.Equal("getItem", method.RawName),
+            method => Assert.Equal("key", method.RawName),
+            method => Assert.Equal("removeItem", method.RawName),
+            method => Assert.Equal("setItem", method.RawName));
     }
 }
