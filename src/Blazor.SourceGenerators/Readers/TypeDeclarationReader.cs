@@ -9,7 +9,7 @@ namespace Blazor.SourceGenerators.Readers;
 internal sealed partial class TypeDeclarationReader
 {
     private readonly Lazy<string> _typeDeclarationText;
-    private ITypeScriptAbstractSyntaxTree? _typeDeclarationTree;
+    private ITypeScriptAbstractSyntaxTree? _typescriptAbstractSyntaxTree;
 
     private TypeDeclarationReader(Uri typeDeclarationUri)
     {
@@ -27,37 +27,25 @@ internal sealed partial class TypeDeclarationReader
     /// <summary>
     /// For testing purposes.
     /// </summary>
-    internal bool IsInitialized => TypeDeclarationTree.RootNode is { Count: > 0 };
+    internal bool IsInitialized => TypescriptAbstractSyntaxTree.RootNode is { Count: > 0 };
 
     internal string RawSourceText => _typeDeclarationText.Value;
 
-    private ITypeScriptAbstractSyntaxTree TypeDeclarationTree =>
-        _typeDeclarationTree ??= TypeScriptAbstractSyntaxTree.FromSourceText(_typeDeclarationText.Value);
+    private ITypeScriptAbstractSyntaxTree TypescriptAbstractSyntaxTree =>
+        _typescriptAbstractSyntaxTree ??= TypeScriptAbstractSyntaxTree.FromSourceText(_typeDeclarationText.Value);
 
-    public bool TryGetDeclaration(string typeName, out string? declaration)
+    public bool TryGetInterface(string typeName, out InterfaceDeclaration? declaration)
     {
-        var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
-             .FirstOrDefault(node => node.Identifier == typeName) as InterfaceDeclaration;
-
-        declaration = node == null
-            ? string.Empty
-            : node.GetText().ToString();
-
-        declaration = declaration.TrimStart('\r', '\n');
+        declaration = TypescriptAbstractSyntaxTree.RootNode.OfKind(TypeScriptSyntaxKind.InterfaceDeclaration)
+            .FirstOrDefault(node => node.Identifier == typeName) as InterfaceDeclaration;
 
         return declaration != null;
     }
 
-    public bool TryGetTypeAlias(string typeName, out string? declaration)
+    public bool TryGetTypeAlias(string typeName, out TypeAliasDeclaration? declaration)
     {
-        var node = TypeDeclarationTree.RootNode.OfKind(TypeScriptSyntaxKind.TypeAliasDeclaration)
+        declaration = TypescriptAbstractSyntaxTree.RootNode.OfKind(TypeScriptSyntaxKind.TypeAliasDeclaration)
              .FirstOrDefault(node => node.Identifier == typeName) as TypeAliasDeclaration;
-
-        declaration = node == null
-            ? string.Empty
-            : node.GetText().ToString();
-
-        declaration = declaration.TrimStart('\r', '\n');
 
         return declaration != null;
     }

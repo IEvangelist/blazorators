@@ -23,7 +23,7 @@ namespace Blazor.SourceGenerators.CSharp;
 internal record CSharpAction(
     string RawName,
     string? RawReturnTypeName = "void",
-    List<CSharpType>? ParameterDefinitions = null) : ICSharpDependencyGraphObject
+    IList<CSharpType>? ParameterDefinitions = null) : ICSharpDependencyGraphObject
 {
     /// <summary>
     /// The collection of types that this object depends on.

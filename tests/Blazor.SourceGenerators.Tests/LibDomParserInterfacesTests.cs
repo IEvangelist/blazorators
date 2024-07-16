@@ -11,19 +11,8 @@ public class LibDomParserInterfacesTests
     [Fact]
     public void CorrectlyConvertsTypeScriptInterfaceToCSharpClass()
     {
-        var text = """
-            interface MediaKeySystemConfiguration {
-                audioCapabilities?: MediaKeySystemMediaCapability[];
-                distinctiveIdentifier?: MediaKeysRequirement;
-                initDataTypes?: string[];
-                label?: string;
-                persistentState?: MediaKeysRequirement;
-                sessionTypes?: string[];
-                videoCapabilities?: MediaKeySystemMediaCapability[];
-            }
-            """;
         var sut = TypeDeclarationParser.Default;
-        var actual = sut.ToObject(text);
+        var actual = sut.ToObject("MediaKeySystemConfiguration");
         var expected = """
             #nullable enable
             using System.Text.Json.Serialization;
@@ -44,7 +33,7 @@ public class LibDomParserInterfacesTests
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.distinctiveIdentifier</c> value.
                 /// </summary>
                 [JsonPropertyName("distinctiveIdentifier")]
-                public string? DistinctiveIdentifier { get; set; } = default!;
+                public MediaKeysRequirement? DistinctiveIdentifier { get; set; } = default!;
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.initDataTypes</c> value.
                 /// </summary>
@@ -59,7 +48,7 @@ public class LibDomParserInterfacesTests
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.persistentState</c> value.
                 /// </summary>
                 [JsonPropertyName("persistentState")]
-                public string? PersistentState { get; set; } = default!;
+                public MediaKeysRequirement? PersistentState { get; set; } = default!;
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.sessionTypes</c> value.
                 /// </summary>
@@ -87,15 +76,8 @@ public class LibDomParserInterfacesTests
     [Fact]
     public void CorrectlyConvertsTypeScriptInterfaceToCSharpExtensionObject()
     {
-        var text = """
-            interface Geolocation {
-                clearWatch(watchId: number): void;
-                getCurrentPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): void;
-                watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback | null, options?: PositionOptions): number;
-            }
-            """;
         var sut = TypeDeclarationParser.Default;
-        var actual = sut.ToTopLevelObject(text);
+        var actual = sut.ToTopLevelObject("Geolocation");
 
         Assert.NotNull(actual);
 

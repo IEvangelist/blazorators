@@ -6,14 +6,6 @@ namespace Blazor.SourceGenerators.Builders;
 /// <summary>
 /// Represents the details of a property builder, including the C# property, its name, the fully qualified JavaScript identifier, the return type, the bare type, the suffix, the extending type, and the generic type arguments.
 /// </summary>
-/// <param name="Property">The <see cref="CSharpProperty"/> to generate code for.</param>
-/// <param name="CSharpPropertyName">The name of the property.</param>
-/// <param name="FullyQualifiedJavaScriptIdentifier">The fully qualified JavaScript identifier.</param>
-/// <param name="ReturnType">The return type of the property.</param>
-/// <param name="BareType">The bare type of the property.</param>
-/// <param name="Suffix">The suffix to append to the property name.</param>
-/// <param name="ExtendingType">The type to extend.</param>
-/// <param name="GenericTypeArgs">The generic type arguments.</param>
 internal readonly record struct PropertyBuilderDetails(
     CSharpProperty Property,
     string CSharpPropertyName,
@@ -33,22 +25,37 @@ internal readonly record struct PropertyBuilderDetails(
     internal static PropertyBuilderDetails Create(CSharpProperty property, GeneratorOptions options)
     {
         var csharpPropertyName = property.RawName.CapitalizeFirstLetter();
-        var javaScriptIndentifier = options.Implementation is not null
-            ? $"{options.Implementation}.{property.RawName}"
-            : property.RawName;
+        var fullyQualifiedJavaScriptIdentifier = DetermineJavaScriptIdentifier(property, options);
         var (returnType, bareType) = property.GetPropertyTypes(options);
-        var (suffix, extendingType) =
-            options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
-        var genericTypeArgs = $"<{bareType}>";
+        var (suffix, extendingType) = DetermineSuffixAndExtendingType(options);
+        var genericTypeArgs = DetermineGenericTypeArgs(bareType);
 
         return new PropertyBuilderDetails(
             Property: property,
             CSharpPropertyName: csharpPropertyName,
-            FullyQualifiedJavaScriptIdentifier: javaScriptIndentifier,
+            FullyQualifiedJavaScriptIdentifier: fullyQualifiedJavaScriptIdentifier,
             ReturnType: returnType,
             BareType: bareType,
             Suffix: suffix,
             ExtendingType: extendingType,
-            GenericTypeArgs: genericTypeArgs);
+            GenericTypeArgs: genericTypeArgs
+        );
+    }
+
+    private static string DetermineJavaScriptIdentifier(CSharpProperty property, GeneratorOptions options)
+    {
+        return options.Implementation is not null
+            ? $"{options.Implementation}.{property.RawName}"
+            : property.RawName;
+    }
+
+    private static (string Suffix, string ExtendingType) DetermineSuffixAndExtendingType(GeneratorOptions options)
+    {
+        return options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
+    }
+
+    private static string DetermineGenericTypeArgs(string bareType)
+    {
+        return $"<{bareType}>";
     }
 }

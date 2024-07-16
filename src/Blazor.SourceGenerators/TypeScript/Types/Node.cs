@@ -16,9 +16,15 @@ public class Node : TextRange, INode
 
     public string SourceText => GetText().ToString();
 
-    public string Identifier => Kind is TypeScriptSyntaxKind.Identifier
-        ? ((Identifier)this).Text
-        : ((Identifier)Children.Find(child => child.Kind is TypeScriptSyntaxKind.Identifier)).Text;
+    public string Identifier
+    {
+        get
+        {
+            if (Kind is TypeScriptSyntaxKind.Identifier) return ((Identifier)this).Text;
+            if (Children.Find(child => child.Kind is TypeScriptSyntaxKind.Identifier) is Identifier identifier) return identifier.Text;
+            return GetText().ToString();
+        }
+    }
 
     public int ParentId { get; set; }
     public int Depth { get; set; }

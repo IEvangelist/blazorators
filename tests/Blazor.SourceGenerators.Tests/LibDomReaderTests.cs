@@ -15,7 +15,7 @@ public class LibDomReaderTests
         var stopwatch = Stopwatch.StartNew();
 
         var sut = TypeDeclarationReader.Default;
-        _ = sut.TryGetDeclaration("foo", out var _);
+        _ = sut.TryGetInterface("foo", out var _);
 
         stopwatch.Stop();
 
@@ -30,19 +30,23 @@ public class LibDomReaderTests
             yield return new object[]
             {
                 "PositionCallback",
-                @"interface PositionCallback {
-    (position: GeolocationPosition): void;
-}",
+                """
+                interface PositionCallback {
+                    (position: GeolocationPosition): void;
+                }
+                """,
             };
 
             yield return new object[]
             {
                 "PositionOptions",
-                @"interface PositionOptions {
-    enableHighAccuracy?: boolean;
-    maximumAge?: number;
-    timeout?: number;
-}",
+                """
+                interface PositionOptions {
+                    enableHighAccuracy?: boolean;
+                    maximumAge?: number;
+                    timeout?: number;
+                }
+                """,
             };
         }
     }
@@ -54,11 +58,11 @@ public class LibDomReaderTests
     public void TryGetDeclarationReturnsCorrectly(string typeName, string expected)
     {
         var sut = TypeDeclarationReader.Default;
-        var result = sut.TryGetDeclaration(typeName, out var actual);
+        var result = sut.TryGetInterface(typeName, out var actual);
 
         Assert.True(result);
         Assert.NotNull(actual);
-        Assert.Equal(expected.NormalizeNewlines(), actual.NormalizeNewlines());
+        Assert.Equal(expected.NormalizeNewlines(), actual.GetText().ToString().Trim().NormalizeNewlines());
     }
 
     public static IEnumerable<object[]> TryGetTypeAliasInput
@@ -84,6 +88,6 @@ public class LibDomReaderTests
 
         Assert.True(result);
         Assert.NotNull(actual);
-        Assert.Equal(expected.NormalizeNewlines(), actual.NormalizeNewlines());
+        Assert.Equal(expected.NormalizeNewlines(), actual.GetText().ToString().Trim().NormalizeNewlines());
     }
 }
