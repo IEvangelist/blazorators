@@ -11,7 +11,7 @@ internal enum IndentationAdjustment
     /// <summary>
     /// No adjustment is made to the indentation level.
     /// </summary>
-    Noop,
+    NoOp,
 
     /// <summary>
     /// The indentation level is increased.

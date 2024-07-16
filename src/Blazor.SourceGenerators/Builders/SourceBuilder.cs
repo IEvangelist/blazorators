@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.Options;
+
 namespace Blazor.SourceGenerators.Builders;
 
 /// <summary>
@@ -158,7 +160,7 @@ internal sealed class SourceBuilder
     internal SourceBuilder AppendTripleSlashMethodComments(
         CSharpMethod method,
         bool extrapolateParameters = false,
-        IndentationAdjustment adjustment = IndentationAdjustment.Noop)
+        IndentationAdjustment adjustment = IndentationAdjustment.NoOp)
     {
         AdjustIndentation(adjustment);
         var indent = _indentation.ToString();
@@ -169,8 +171,7 @@ internal sealed class SourceBuilder
         var func = $"{_options.Implementation}.{jsMethodName}";
 
         _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.{NewLine}");
-        var rootUrl = "https://developer.mozilla.org/docs/Web/API";
-        var fullUrl = $"{rootUrl}/{_options.TypeName}/{jsMethodName}";
+        var fullUrl = $"https://developer.mozilla.org/docs/Web/API/{_options.TypeName}/{jsMethodName}";
         _builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>{NewLine}");
         _builder.Append($"{indent}/// </summary>{NewLine}");
 
@@ -206,7 +207,7 @@ internal sealed class SourceBuilder
     }
 
     internal SourceBuilder AppendEmptyTripleSlashInheritdocComments(
-        IndentationAdjustment adjustment = IndentationAdjustment.Noop)
+        IndentationAdjustment adjustment = IndentationAdjustment.NoOp)
     {
         AdjustIndentation(adjustment);
         var indent = _indentation.ToString();
@@ -219,7 +220,7 @@ internal sealed class SourceBuilder
     internal SourceBuilder AppendTripleSlashInheritdocComments(
         string csharpTypeName,
         string memberName,
-        IndentationAdjustment adjustment = IndentationAdjustment.Noop)
+        IndentationAdjustment adjustment = IndentationAdjustment.NoOp)
     {
         AdjustIndentation(adjustment);
         var indent = _indentation.ToString();
@@ -231,7 +232,7 @@ internal sealed class SourceBuilder
 
     internal SourceBuilder AppendTripleSlashPropertyComments(
         CSharpProperty property,
-        IndentationAdjustment adjustment = IndentationAdjustment.Noop)
+        IndentationAdjustment adjustment = IndentationAdjustment.NoOp)
     {
         AdjustIndentation(adjustment);
         var indent = _indentation.ToString();
@@ -242,8 +243,7 @@ internal sealed class SourceBuilder
         var func = $"{_options.Implementation}.{jsMethodName}";
 
         _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.\r\n");
-        var rootUrl = "https://developer.mozilla.org/docs/Web/API";
-        var fullUrl = $"{rootUrl}/{_options.TypeName}/{jsMethodName}";
+        var fullUrl = $"\"https://developer.mozilla.org/docs/Web/API\"/{_options.TypeName}/{jsMethodName}";
         _builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>\r\n");
         _builder.Append($"{indent}/// </summary>\r\n");
 
@@ -341,7 +341,7 @@ internal sealed class SourceBuilder
         return this;
     }
 
-    private SourceBuilder AppendParameters(CSharpType param, string fieldName)
+    private void AppendParameters(CSharpType param, string fieldName)
     {
         var args = new List<string>();
         foreach (var (interation, p) in param.ActionDeclation!.ParameterDefinitions!.Select())
@@ -358,8 +358,6 @@ internal sealed class SourceBuilder
                 AppendRaw($"{fieldName}?.Invoke({string.Join(", ", args)});");
             }
         }
-
-        return this;
     }
 
     internal SourceBuilder DecreaseIndentation()
@@ -379,20 +377,19 @@ internal sealed class SourceBuilder
     private void IncreaseIndentationImpl(bool increaseIndentation = false) =>
         AdjustIndentation(increaseIndentation
             ? IndentationAdjustment.Increase
-            : IndentationAdjustment.Noop);
+            : IndentationAdjustment.NoOp);
 
     private void DecreaseIndentationImpl(bool decreaseIndentation = false) =>
         AdjustIndentation(decreaseIndentation
             ? IndentationAdjustment.Decrease
-            : IndentationAdjustment.Noop);
+            : IndentationAdjustment.NoOp);
 
-    private void AdjustIndentation(IndentationAdjustment adjustment) =>
-        _indentation = adjustment switch
-        {
-            IndentationAdjustment.Increase => _indentation.Increase(),
-            IndentationAdjustment.Decrease => _indentation.Decrease(),
-            _ => _indentation
-        };
+    private void AdjustIndentation(IndentationAdjustment adjustment) => _indentation = adjustment switch
+    {
+        IndentationAdjustment.Increase => _indentation.Increase(),
+        IndentationAdjustment.Decrease => _indentation.Decrease(),
+        _ => _indentation
+    };
 
     internal string ToSourceCodeString() => _builder.ToString();
 }

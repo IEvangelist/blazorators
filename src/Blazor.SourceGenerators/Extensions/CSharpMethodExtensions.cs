@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Blazor.SourceGenerators.Builders;
+using Blazor.SourceGenerators.Options;
 
 namespace Blazor.SourceGenerators.Extensions;
 
@@ -65,18 +66,56 @@ internal static class CSharpMethodExtensions
         if (options.IsWebAssembly && !isJavaScriptOverride)
         {
             string returnType;
-            if (isPrimitiveType) returnType = primitiveType;
-            else if (method.IsVoid) returnType = "void";
-            else returnType = method.RawReturnTypeName;
+            if (isPrimitiveType)
+            {
+                returnType = primitiveType;
+            }
+            else if (method.IsVoid)
+            {
+                returnType = "void";
+            }
+            else
+            {
+                if (method.RawReturnTypeName.StartsWith("Promise<"))
+                {
+                    var genericType = method.RawReturnTypeName.ExtractGenericType();
+                    returnType = TypeMap.PrimitiveTypes.IsPrimitiveType(genericType)
+                        ? $"ValueTask<{TypeMap.PrimitiveTypes[genericType]}>"
+                        : $"ValueTask<{genericType}>";
+                }
+                else
+                {
+                    returnType = method.RawReturnTypeName;
+                }
+            }
 
             return (returnType, primitiveType);
         }
         else
         {
             string returnType;
-            if (isPrimitiveType) returnType = $"ValueTask<{primitiveType}>";
-            else if (method.IsVoid) returnType = "ValueTask";
-            else returnType = $"ValueTask<{method.RawReturnTypeName}>";
+            if (isPrimitiveType)
+            {
+                returnType = $"ValueTask<{primitiveType}>";
+            }
+            else if (method.IsVoid)
+            {
+                returnType = "ValueTask";
+            }
+            else
+            {
+                if (method.RawReturnTypeName.StartsWith("Promise<"))
+                {
+                    var genericType = method.RawReturnTypeName.ExtractGenericType();
+                    returnType = TypeMap.PrimitiveTypes.IsPrimitiveType(genericType)
+                        ? $"ValueTask<{TypeMap.PrimitiveTypes[genericType]}>"
+                        : $"ValueTask<{genericType}>";
+                }
+                else
+                {
+                    returnType = $"ValueTask<{method.RawReturnTypeName}>";
+                }
+            }
 
             return (returnType, primitiveType);
         }

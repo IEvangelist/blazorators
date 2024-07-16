@@ -20,8 +20,9 @@ internal sealed partial class TypeDeclarationParser
     internal CSharpObject ToObject(InterfaceDeclaration typescriptInterface)
     {
         var heritage = typescriptInterface.HeritageClauses?
-            .Where(heritage => heritage.Identifier is not " extends EventTarget")
-            .Select(heritage => heritage.Identifier)
+            .SelectMany(heritage => heritage.Types)
+            .Where(type => type.Identifier is not "EventTarget")
+            .Select(type => type.Identifier)
             .ToArray();
 
         var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
@@ -235,7 +236,8 @@ internal sealed partial class TypeDeclarationParser
     private CSharpMethod ToMethod(string methodName, string methodReturnType, IList<CSharpType> csharpParameters, JavaScriptMethod javascriptMethod)
     {
         var csharpMethod = new CSharpMethod(methodName, methodReturnType, csharpParameters, javascriptMethod);
-        var nonArrayMethodReturnType = methodReturnType.Replace("[]", "");
+        var nonGenericMethodReturnType = methodReturnType.ExtractGenericType();
+        var nonArrayMethodReturnType = nonGenericMethodReturnType.Replace("[]", "");
 
         if (TryGetCustomType(nonArrayMethodReturnType, out var typescriptInterface))
         {

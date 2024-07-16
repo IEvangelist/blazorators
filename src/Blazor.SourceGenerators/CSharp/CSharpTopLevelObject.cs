@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Blazor.SourceGenerators.Builders;
+using Blazor.SourceGenerators.Options;
 
 namespace Blazor.SourceGenerators.CSharp;
 
