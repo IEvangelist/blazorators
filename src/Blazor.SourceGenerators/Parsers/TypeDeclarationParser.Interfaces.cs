@@ -270,7 +270,7 @@ internal sealed partial class TypeDeclarationParser
     private bool TryGetCustomType(string typeName, out InterfaceDeclaration typescriptInterface)
     {
         typescriptInterface = default!;
-        return !TypeMap.PrimitiveTypes.IsPrimitiveType(typeName) &&
+        return !Primitives.IsPrimitiveType(typeName) &&
             _reader.TryGetInterface(typeName, out typescriptInterface!) &&
             typescriptInterface is not null;
     }

@@ -49,7 +49,7 @@ internal static class CSharpMethodExtensions
         this CSharpMethod method, GeneratorOptions options, bool isGenericReturnType, bool isPrimitiveType)
     {
         var primitiveType = isPrimitiveType
-            ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
+            ? Primitives.Instance[method.RawReturnTypeName]
             : method.RawReturnTypeName;
 
         if (!method.IsVoid && isGenericReturnType)
@@ -79,8 +79,8 @@ internal static class CSharpMethodExtensions
                 if (method.RawReturnTypeName.StartsWith("Promise<"))
                 {
                     var genericType = method.RawReturnTypeName.ExtractGenericType();
-                    returnType = TypeMap.PrimitiveTypes.IsPrimitiveType(genericType)
-                        ? $"ValueTask<{TypeMap.PrimitiveTypes[genericType]}>"
+                    returnType = Primitives.IsPrimitiveType(genericType)
+                        ? $"ValueTask<{Primitives.Instance[genericType]}>"
                         : $"ValueTask<{genericType}>";
                 }
                 else
@@ -107,8 +107,8 @@ internal static class CSharpMethodExtensions
                 if (method.RawReturnTypeName.StartsWith("Promise<"))
                 {
                     var genericType = method.RawReturnTypeName.ExtractGenericType();
-                    returnType = TypeMap.PrimitiveTypes.IsPrimitiveType(genericType)
-                        ? $"ValueTask<{TypeMap.PrimitiveTypes[genericType]}>"
+                    returnType = Primitives.IsPrimitiveType(genericType)
+                        ? $"ValueTask<{Primitives.Instance[genericType]}>"
                         : $"ValueTask<{genericType}>";
                 }
                 else

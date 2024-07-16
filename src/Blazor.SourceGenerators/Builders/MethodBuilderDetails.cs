@@ -63,7 +63,7 @@ internal readonly record struct MethodBuilderDetails(
     internal static MethodBuilderDetails Create(CSharpMethod method, GeneratorOptions options)
     {
         var isGenericReturnType = method.IsGenericReturnType(options);
-        var isPrimitiveType = TypeMap.PrimitiveTypes.IsPrimitiveType(method.RawReturnTypeName);
+        var isPrimitiveType = Primitives.IsPrimitiveType(method.RawReturnTypeName);
         var containsGenericParameters = method.ParameterDefinitions.Any(p => p.IsGenericParameter(method.RawName, options));
 
         var genericTypeArgs = DetermineGenericTypeArgs(isGenericReturnType, containsGenericParameters);
