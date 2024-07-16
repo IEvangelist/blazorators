@@ -17,8 +17,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
         // Register a syntax receiver that will be created for each generation pass
-        context.RegisterForSyntaxNotifications(
-            JavaScriptInteropSyntaxContextReceiver.Create);
+        context.RegisterForSyntaxNotifications(JavaScriptInteropSyntaxContextReceiver.Create);
     }
 
     public void Execute(GeneratorExecutionContext context) => TryExecute(context);
@@ -30,8 +29,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
             // Add source from text.
             foreach (var (fileName, sourceCode) in _sourceCodeToAdd)
             {
-                context.AddSource(fileName,
-                    SourceText.From(sourceCode, Encoding.UTF8));
+                context.AddSource(fileName, SourceText.From(sourceCode, Encoding.UTF8));
             }
 
             if (context.SyntaxContextReceiver is not JavaScriptInteropSyntaxContextReceiver receiver)
@@ -64,17 +62,15 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                     var result = parser.ParseTargetType(options.TypeName!);
                     if (result is { Status: ParserResultStatus.SuccessfullyParsed, Value: { } })
                     {
-                        var namespaceString =
-                            (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
-                            {
-                                (string { Length: > 0 } containingNamespace, _) => containingNamespace,
-                                (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
-                                _ => null
-                            };
-                        var @interface =
-                            options.Implementation.ToInterfaceName();
-                        var implementation =
-                            options.Implementation.ToImplementationName();
+                        var namespaceString = (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
+                        {
+                            (string { Length: > 0 } containingNamespace, _) => containingNamespace,
+                            (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
+                            _ => null
+                        };
+
+                        var @interface = options.Implementation.ToInterfaceName();
+                        var implementation = options.Implementation.ToImplementationName();
 
                         var topLevelObject = result.Value;
                         context.AddDependentTypesSource(topLevelObject)
@@ -126,8 +122,8 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
 
         if (options.SupportsGenerics &&
-            !context.Compilation.ReferencedAssemblyNames.Any(ai =>
-                ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)))
+            !context.Compilation.ReferencedAssemblyNames.Any(
+                ai => ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)))
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(
