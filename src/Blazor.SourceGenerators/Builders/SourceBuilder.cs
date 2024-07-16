@@ -243,7 +243,7 @@ internal sealed class SourceBuilder
         var func = $"{_options.Implementation}.{jsMethodName}";
 
         _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.\r\n");
-        var fullUrl = $"\"https://developer.mozilla.org/docs/Web/API\"/{_options.TypeName}/{jsMethodName}";
+        var fullUrl = $"https://developer.mozilla.org/docs/Web/API/{_options.TypeName}/{jsMethodName}";
         _builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>\r\n");
         _builder.Append($"{indent}/// </summary>\r\n");
 
