@@ -32,6 +32,8 @@ internal record CSharpObject(
 
             return result.Select(kvp => (kvp.Key, kvp.Value))
                 .Concat(new[] { (TypeName, Object: this) })
+                .GroupBy(kvp => kvp.Item1)
+                .Select(kvp => (TypeName: kvp.Key, kvp.Last().Item2))
                 .ToImmutableHashSet();
         }
     }
@@ -40,15 +42,13 @@ internal record CSharpObject(
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
     /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpProperty"/> details.
     /// </summary>
-    public Dictionary<string, CSharpProperty> Properties { get; init; } =
-        new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpProperty> Properties { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
     /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpMethod"/> details.
     /// </summary>
-    public Dictionary<string, CSharpMethod> Methods { get; init; } =
-        new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpMethod> Methods { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
     public bool IsActionParameter =>
         TypeName.EndsWith("Callback");

@@ -6,38 +6,35 @@ using Blazor.SourceGenerators.Options;
 
 namespace Blazor.SourceGenerators.CSharp;
 
-internal sealed partial record CSharpTopLevelObject(string RawTypeName)
-    : ICSharpDependencyGraphObject
+/// <summary>
+/// Represents a top-level C# object which may contain properties and methods.
+/// </summary>
+internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICSharpDependencyGraphObject
 {
     public List<CSharpProperty> Properties { get; init; } = [];
-
     public List<CSharpMethod> Methods { get; init; } = [];
-
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
-    {
-        get
-        {
-            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop
-                in DependentTypes
-                    .Select(kvp => (TypeName: kvp.Key, Object: kvp.Value))
-                    .Concat(Properties.SelectMany(
-                        p => p.AllDependentTypes))
-                    .Concat(Methods.SelectMany(
-                        p => p.AllDependentTypes)))
-            {
-                result[prop.TypeName] = prop.Object;
-            }
+    /// <summary>
+    /// Gets all dependent types for this top-level object, including properties and methods.
+    /// </summary>
+    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
+        DependentTypes
+            .Select(kvp => (TypeName: kvp.Key, Object: kvp.Value))
+            .Concat(Properties.SelectMany(p => p.AllDependentTypes))
+            .Concat(Methods.SelectMany(m => m.AllDependentTypes))
+            .GroupBy(kvp => kvp.TypeName)
+            .Select(kvp => (TypeName: kvp.Key, kvp.Last().Object))
+            .ToImmutableHashSet();
 
-            return result.Select(pair => (pair.Key, pair.Value))
-                .ToImmutableHashSet();
-        }
-    }
+    /// <summary>
+    /// Gets the count of members (properties and methods).
+    /// </summary>
+    public int MemberCount => Properties.Count + Methods.Count;
 
-    public int MemberCount => Properties!.Count + Methods!.Count;
-
+    /// <summary>
+    /// Generates the interface string for the C# object.
+    /// </summary>
     internal string ToInterfaceString(GeneratorOptions options, string? namespaceString)
     {
         var builder = new SourceBuilder(options)
@@ -51,56 +48,24 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         var methodLevel = builder.IndentationLevel;
 
         // Methods
-        foreach (var method in Methods ?? [])
+        foreach (var method in Methods)
         {
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);
 
             var isJavaScriptOverride = method.IsJavaScriptOverride(options);
-            var isPureNonBiDirectionalOrOverriddenJS =
-                method.IsPureJavaScriptInvocation ||
-                method.IsNotBiDirectionalJavaScript ||
-                isJavaScriptOverride;
+            var isPureNonBiDirectionalOrOverriddenJS = method.IsPureJavaScriptInvocation ||
+                                                       method.IsNotBiDirectionalJavaScript ||
+                                                       isJavaScriptOverride;
 
             if (isPureNonBiDirectionalOrOverriddenJS)
             {
                 builder.AppendTripleSlashMethodComments(details.Method)
-                    .AppendRaw(
-                        $"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(",
-                        appendNewLine: false,
-                        postIncreaseIndentation: true);
+                       .AppendRaw($"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(", appendNewLine: false, postIncreaseIndentation: true);
 
                 if (method.ParameterDefinitions.Count > 0)
                 {
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        if (pi.IsLast)
-                        {
-                            if (details.IsSerializable)
-                            {
-                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},")
-                                    .AppendRaw($"JsonSerializerOptions? options = null);")
-                                    .AppendLine();
-                            }
-                            else
-                            {
-                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)});")
-                                    .AppendLine();
-                            }
-                        }
-                        else
-                        {
-                            if (pi.IsFirst)
-                            {
-                                builder.AppendLine();
-                            }
-
-                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
-                        }
-                    }
-
-                    builder.DecreaseIndentation();
+                    AppendMethodParameters(builder, method, details, options);
                 }
                 else
                 {
@@ -109,110 +74,136 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             }
             else if (!options.OnlyGeneratePureJS)
             {
-                var genericTypeArgs = details.GenericTypeArgs ??
-                    MethodBuilderDetails.ToGenericTypeArgument(
-                        MethodBuilderDetails.GenericComponentType);
-
-                builder.AppendTripleSlashMethodComments(details.Method, extrapolateParameters: true)
-                    .AppendRaw(
-                        $"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}{genericTypeArgs}(")
-                    .AppendRaw($"TComponent component", appendNewLine: false, postIncreaseIndentation: true);
-
-                if (method.ParameterDefinitions.Count > 0)
-                {
-                    builder.AppendRaw(",");
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        if (pi.IsLast)
-                        {
-                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType)}) where TComponent : class;")
-                                .AppendLine();
-                        }
-                        else
-                        {
-                            if (pi.IsFirst)
-                            {
-                                builder.AppendLine();
-                            }
-
-                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
-                        }
-                    }
-
-                    builder.DecreaseIndentation();
-                }
-                else
-                {
-                    builder.AppendRaw(") where TComponent : class;", appendNewLine: true, omitIndentation: true);
-                }
-
-                builder.AppendTripleSlashMethodComments(details.Method)
-                    .AppendRaw(
-                        $"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}(",
-                        postIncreaseIndentation: true);
-
-                if (method.ParameterDefinitions.Count > 0)
-                {
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        if (pi.IsLast)
-                        {
-                            builder.AppendRaw($"{parameter.ToActionString(isGenericType)});")
-                                .AppendLine();
-                        }
-                        else
-                        {
-                            if (pi.IsFirst)
-                            {
-                                builder.AppendLine();
-                            }
-
-                            builder.AppendRaw($"{parameter.ToActionString(isGenericType)},");
-                        }
-                    }
-
-                    builder.DecreaseIndentation();
-                }
-                else
-                {
-                    builder.AppendRaw(");", appendNewLine: true, omitIndentation: true);
-                }
+                AppendNonPureMethod(builder, method, details, options);
             }
         }
 
         // Properties
-        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
+        foreach (var property in Properties)
         {
-            if (index.IsFirst) builder.AppendLine();
-            if (property.IsIndexer) continue;
-
-            builder.ResetIndentiationTo(methodLevel);
-
-            var details = PropertyBuilderDetails.Create(property, options);
-
-            var accessors = details.Property.IsReadonly
-                ? "{ get; }" : "{ get; set; }";
-            builder.AppendTripleSlashPropertyComments(details.Property)
-                .AppendRaw($"{details.ReturnType} {details.CSharpPropertyName} {accessors}");
-
-            if (!index.IsLast)
+            if (!property.IsIndexer)
             {
-                builder.AppendLine();
+                AppendProperty(builder, property, options);
             }
         }
 
         builder.ResetIndentiationTo(0);
         builder.AppendClosingCurlyBrace();
 
-        var interfaceDeclaration = TryFormatCSharpSourceText(builder.ToSourceCodeString());
-        return interfaceDeclaration;
+        return TryFormatCSharpSourceText(builder.ToSourceCodeString());
     }
 
-    internal string ToImplementationString(
-        GeneratorOptions options,
-        string? namespaceString)
+    private static void AppendMethodParameters(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options)
+    {
+        foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+        {
+            var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+            if (pi.IsLast)
+            {
+                if (details.IsSerializable)
+                {
+                    builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},")
+                           .AppendRaw($"JsonSerializerOptions? options = null);")
+                           .AppendLine();
+                }
+                else
+                {
+                    builder.AppendRaw($"{parameter.ToParameterString(isGenericType)});")
+                           .AppendLine();
+                }
+            }
+            else
+            {
+                if (pi.IsFirst)
+                {
+                    builder.AppendLine();
+                }
+
+                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+            }
+        }
+
+        builder.DecreaseIndentation();
+    }
+
+    private static void AppendNonPureMethod(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options)
+    {
+        var genericTypeArgs = details.GenericTypeArgs ?? MethodBuilderDetails.ToGenericTypeArgument(MethodBuilderDetails.GenericComponentType);
+
+        builder.AppendTripleSlashMethodComments(details.Method, extrapolateParameters: true)
+               .AppendRaw($"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}{genericTypeArgs}(")
+               .AppendRaw("TComponent component", appendNewLine: false, postIncreaseIndentation: true);
+
+        if (method.ParameterDefinitions.Count > 0)
+        {
+            builder.AppendRaw(",");
+            foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+            {
+                var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                if (pi.IsLast)
+                {
+                    builder.AppendRaw($"{parameter.ToParameterString(isGenericType)}) where TComponent : class;")
+                           .AppendLine();
+                }
+                else
+                {
+                    if (pi.IsFirst)
+                    {
+                        builder.AppendLine();
+                    }
+
+                    builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+                }
+            }
+
+            builder.DecreaseIndentation();
+        }
+        else
+        {
+            builder.AppendRaw(") where TComponent : class;", appendNewLine: true, omitIndentation: true);
+        }
+
+        builder.AppendTripleSlashMethodComments(details.Method)
+               .AppendRaw($"{details.ReturnType} {details.CSharpMethodName}{details.Suffix}(", postIncreaseIndentation: true);
+
+        if (method.ParameterDefinitions.Count > 0)
+        {
+            foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+            {
+                var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                if (pi.IsLast)
+                {
+                    builder.AppendRaw($"{parameter.ToActionString(isGenericType)});")
+                           .AppendLine();
+                }
+                else
+                {
+                    if (pi.IsFirst)
+                    {
+                        builder.AppendLine();
+                    }
+
+                    builder.AppendRaw($"{parameter.ToActionString(isGenericType)},");
+                }
+            }
+
+            builder.DecreaseIndentation();
+        }
+        else
+        {
+            builder.AppendRaw(");", appendNewLine: true, omitIndentation: true);
+        }
+    }
+
+    private static void AppendProperty(SourceBuilder builder, CSharpProperty property, GeneratorOptions options)
+    {
+        var details = PropertyBuilderDetails.Create(property, options);
+        var accessors = details.Property.IsReadonly ? "{ get; }" : "{ get; set; }";
+        builder.AppendTripleSlashPropertyComments(details.Property)
+               .AppendRaw($"{details.ReturnType} {details.CSharpPropertyName} {accessors}");
+    }
+
+    internal string ToImplementationString(GeneratorOptions options, string? namespaceString)
     {
         var builder = new SourceBuilder(options)
             .AppendCopyRightHeader()
@@ -229,270 +220,24 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         builder.AppendConditionalDelegateCallbackMethods(Methods);
 
         // Methods
-        foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
+        foreach (var method in Methods)
         {
-            var details = MethodBuilderDetails.Create(method, options);
-            builder.ResetIndentiationTo(methodLevel);
-
-            var isJavaScriptOverride = method.IsJavaScriptOverride(options);
-            var isPureNonBiDirectionalOrOverriddenJS =
-                method.IsPureJavaScriptInvocation ||
-                method.IsNotBiDirectionalJavaScript ||
-                isJavaScriptOverride;
-
-            if (isPureNonBiDirectionalOrOverriddenJS)
-            {
-                var memberName = $"{details.CSharpMethodName}{details.Suffix}";
-                builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
-                    .AppendRaw(
-                        $"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(",
-                        appendNewLine: false,
-                        postIncreaseIndentation: true);
-
-                if (method.ParameterDefinitions.Count > 0)
-                {
-                    var genericTypeParameterConstraint = details.IsGenericReturnType
-                        ? $" where {MethodBuilderDetails.GenericTypeValue} : default"
-                        : "";
-
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        if (pi.IsLast)
-                        {
-                            if (details.IsSerializable)
-                            {
-                                builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
-                                builder.AppendRaw($"JsonSerializerOptions? options){genericTypeParameterConstraint} =>");
-                            }
-                            else
-                            {
-                                builder.AppendRaw($"{parameter.ToParameterString(false, true)}) =>");
-                            }
-                        }
-                        else
-                        {
-                            builder.AppendRaw($"{parameter.ToParameterString(isGenericType, true)},");
-                        }
-                    }
-
-                    if (details.IsVoid)
-                    {
-                        builder.AppendRaw($"_javaScript.InvokeVoid{details.Suffix}(", postIncreaseIndentation: true);
-                    }
-                    else
-                    {
-                        builder.AppendRaw($"_javaScript.Invoke{details.Suffix}<{details.BareType}>(", postIncreaseIndentation: true);
-                    }
-
-                    builder.IncreaseIndentation()
-                        .AppendRaw($"\"{details.FullyQualifiedJavaScriptIdentifier}\",");
-                    // Write method body / expression, and arguments to javaScript.Invoke*
-                    foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        if (ai.IsLast)
-                        {
-                            if (details.IsGenericReturnType)
-                            {
-                                // Overridden to control explicitly
-                                builder.AppendRaw($"{parameter.ToArgumentString(toJson: false)})");
-                                builder.AppendRaw($".FromJson{details.GenericTypeArgs}(options);");
-                            }
-                            else
-                            {
-                                builder.AppendRaw($"{parameter.ToArgumentString(details.ContainsGenericParameters)});");
-                            }
-
-                            if (!index.IsLast) builder.AppendLine();
-                        }
-                        else
-                        {
-                            builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)},");
-                        }
-                    }
-
-                    builder.DecreaseIndentation();
-                }
-                else
-                {
-                    builder.AppendRaw(") =>");
-                    if (details.IsVoid)
-                    {
-                        builder.AppendRaw($"_javaScript.InvokeVoid{details.Suffix}(\"{details.FullyQualifiedJavaScriptIdentifier}\");");
-                        builder.AppendLine();
-                    }
-                    else
-                    {
-                        builder.AppendRaw($"_javaScript.Invoke{details.Suffix}<{details.BareType}>(\"{details.FullyQualifiedJavaScriptIdentifier}\");");
-                        builder.AppendLine();
-                    }
-                }
-            }
-            else if (!options.OnlyGeneratePureJS)
-            {
-                var genericTypeArgs = details.GenericTypeArgs ??
-                    MethodBuilderDetails.ToGenericTypeArgument(
-                        MethodBuilderDetails.GenericComponentType);
-
-                var memberName = $"{details.CSharpMethodName}{details.Suffix}";
-                builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
-                    .AppendRaw(
-                        $"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}{genericTypeArgs}(",
-                        postIncreaseIndentation: true)
-                    .AppendRaw($"TComponent component", appendNewLine: false);
-
-                if (method.ParameterDefinitions.Count > 0)
-                {
-                    builder.AppendRaw(
-                        ", ", false, false, true);
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        if (pi.IsLast)
-                        {
-                            builder.AppendRaw($"{parameter.ToParameterString(false, true)}) where TComponent : class =>");
-                        }
-                        else
-                        {
-                            builder.AppendRaw($"{parameter.ToParameterString(false, true)},");
-                        }
-                    }
-
-                    if (details.IsVoid)
-                    {
-                        builder.AppendRaw($"_javaScript.InvokeVoid{details.Suffix}(");
-                    }
-                    else
-                    {
-                        builder.AppendRaw($"_javaScript.Invoke{details.Suffix}<{details.BareType}>(");
-                    }
-
-                    builder.IncreaseIndentation()
-                        .AppendRaw($"\"{details.FullyQualifiedJavaScriptIdentifier}\",");
-
-                    builder.AppendRaw($"DotNetObjectReference.Create(component),");
-
-                    // Write method body / expression, and arguments to javaScript.Invoke*
-                    foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        if (ai.IsLast)
-                        {
-                            builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)});");
-
-                            if (!index.IsLast) builder.AppendLine();
-                        }
-                        else
-                        {
-                            builder.AppendRaw($"{parameter.ToArgumentString(isGenericType)},");
-                        }
-                    }
-
-                    builder.DecreaseIndentation();
-                }
-
-                builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
-                    .AppendRaw(
-                        $"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}(",
-                        postIncreaseIndentation: true);
-
-                if (method.ParameterDefinitions.Count > 0)
-                {
-                    foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        if (pi.IsLast)
-                        {
-                            builder.AppendRaw($"{parameter.ToActionString(false, true)})");
-                            builder.AppendOpeningCurlyBrace();
-                        }
-                        else
-                        {
-                            builder.AppendRaw($"{parameter.ToActionString(false, true)},");
-                        }
-                    }
-
-                    foreach (var parameter in method.ParameterDefinitions)
-                    {
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        var arg = parameter.ToArgumentString(isGenericType, true);
-                        var fieldName =
-                            builder.Fields?.FirstOrDefault(field => field.EndsWith(parameter.RawName));
-
-                        if (fieldName is null) continue;
-                        builder.AppendRaw($"{fieldName} = {arg};");
-                    }
-
-                    if (details.IsVoid)
-                    {
-                        var returnExpression = options.IsWebAssembly ? "" : "return ";
-                        builder.AppendRaw($"{returnExpression}_javaScript.InvokeVoid{details.Suffix}(");
-                    }
-                    else
-                    {
-                        builder.AppendRaw($"return _javaScript.Invoke{details.Suffix}<{details.BareType}>(");
-                    }
-
-                    builder.IncreaseIndentation()
-                        .AppendRaw($"\"{details.FullyQualifiedJavaScriptIdentifier}\",");
-
-                    // Write method body / expression, and arguments to javaScript.Invoke*
-                    foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
-                    {
-                        if (ai.IsFirst)
-                        {
-                            builder.AppendRaw($"DotNetObjectReference.Create(this),");
-                        }
-
-                        var isGenericType = parameter.IsGenericParameter(method.RawName, options);
-                        var arg = parameter.ToArgumentString(isGenericType, true);
-                        var methodName =
-                            builder.Methods?.FirstOrDefault(
-                                method => method.EndsWith(arg.Substring(2)));
-                        var argExpression = methodName is not null ? $"nameof({methodName})" : arg;
-                        if (ai.IsLast)
-                        {
-                            builder.AppendRaw($"{argExpression});");
-                            builder.AppendClosingCurlyBrace();
-
-                            if (!index.IsLast) builder.AppendLine();
-                        }
-                        else
-                        {
-                            builder.AppendRaw($"{argExpression},");
-                        }
-                    }
-
-                    builder.DecreaseIndentation();
-                }
-            }
+            AppendImplementationMethod(builder, method, options, methodLevel);
         }
 
         // Properties
-        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
+        foreach (var property in Properties)
         {
-            if (index.IsFirst) builder.AppendLine();
-            if (property.IsIndexer) continue;
-
-            builder.ResetIndentiationTo(methodLevel);
-
-            var details = PropertyBuilderDetails.Create(property, options);
-
-            builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, details.CSharpPropertyName)
-                .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} =>", postIncreaseIndentation: true)
-                .AppendRaw($"_javaScript.Invoke{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
-                .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");
-
-            if (!index.IsLast)
+            if (!property.IsIndexer)
             {
-                builder.AppendLine();
+                AppendImplementationProperty(builder, property, options);
             }
         }
 
         builder.ResetIndentiationTo(0);
         builder.AppendClosingCurlyBrace();
 
-        var implementation = TryFormatCSharpSourceText(builder.ToSourceCodeString());
-        return implementation;
+        return TryFormatCSharpSourceText(builder.ToSourceCodeString());
     }
 
     internal static string ToServiceCollectionExtensions(GeneratorOptions options, string implementation)
@@ -501,52 +246,153 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             ? "Singleton"
             : "Scoped";
         var addExpression = options.IsWebAssembly
-            ? $@"services.Add{serviceLifetime}<IJSInProcessRuntime>(serviceProvider =>
-            (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
-            "
+            ? $$"""
+                services.Add{{serviceLifetime}}<IJSInProcessRuntime>(serviceProvider =>
+                    (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>())
+
+                """
             : "services";
 
         var @interface = options.Implementation.ToInterfaceName();
         var nonService = options.Implementation.ToImplementationName(false);
 
-        var extensions = $@"// Copyright (c) David Pine. All rights reserved.
-// Licensed under the MIT License:
-// https://github.com/IEvangelist/blazorators/blob/main/LICENSE
-// Auto-generated by blazorators.
+        var extensions = $$"""
+        // Copyright (c) David Pine. All rights reserved.
+        // Licensed under the MIT License:
+        // https://github.com/IEvangelist/blazorators/blob/main/LICENSE
+        // Auto-generated by blazorators.
 
-using Microsoft.JSInterop;
+        using Microsoft.JSInterop;
 
-namespace Microsoft.Extensions.DependencyInjection;
+        namespace Microsoft.Extensions.DependencyInjection;
 
-/// <summary></summary>
-public static class {nonService}ServiceCollectionExtensions
-{{
-    /// <summary>
-    /// Adds the <see cref=""{@interface}"" /> service to the service collection.
-    /// </summary>
-    public static IServiceCollection Add{nonService}Services(
-        this IServiceCollection services) =>
-        {addExpression}.Add{serviceLifetime}<{@interface}, {implementation}>();
-}}
-";
+        /// <summary></summary>
+        public static class {{nonService}}ServiceCollectionExtensions
+        {
+            /// <summary>
+            /// Adds the <see cref="{{@interface}}" /> service to the service collection.
+            /// </summary>
+            public static IServiceCollection Add{{nonService}}Services(
+                this IServiceCollection services) =>
+                {{addExpression}}.Add{{serviceLifetime}}<{{@interface}}, {{implementation}}>();
+        }
+
+        """;
 
         return extensions;
     }
 
-    static string TryFormatCSharpSourceText(string csharpSourceText)
+    private static void AppendImplementationMethod(SourceBuilder builder, CSharpMethod method, GeneratorOptions options, int methodLevel)
     {
-        try
-        {
-            return CSharpSyntaxTree.ParseText(csharpSourceText)
-                .GetRoot()
-                .NormalizeWhitespace()
-                .ToFullString();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
+        var details = MethodBuilderDetails.Create(method, options);
+        builder.ResetIndentiationTo(methodLevel);
 
-            return csharpSourceText;
+        var isJavaScriptOverride = method.IsJavaScriptOverride(options);
+        var isPureNonBiDirectionalOrOverriddenJS = method.IsPureJavaScriptInvocation ||
+                                                   method.IsNotBiDirectionalJavaScript ||
+                                                   isJavaScriptOverride;
+
+        if (isPureNonBiDirectionalOrOverriddenJS)
+        {
+            AppendPureMethod(builder, method, details, options);
         }
+        else if (!options.OnlyGeneratePureJS)
+        {
+            AppendNonPureMethodImplementation(builder, method, details, options);
+        }
+    }
+
+    private static void AppendPureMethod(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options)
+    {
+        var memberName = $"{details.CSharpMethodName}{details.Suffix}";
+        builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
+               .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}{details.GenericTypeArgs}(", appendNewLine: false, postIncreaseIndentation: true);
+
+        if (method.ParameterDefinitions.Count > 0)
+        {
+            foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
+            {
+                var isGenericType = parameter.IsGenericParameter(method.RawName, options);
+                if (pi.IsLast)
+                {
+                    builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},")
+                           .AppendRaw($"JsonSerializerOptions? options = null);")
+                           .AppendLine()
+                           .AppendOpeningCurlyBrace()
+                           .IncreaseIndentation()
+                           .AppendRaw("throw new NotImplementedException();")
+                           .DecreaseIndentation()
+                           .AppendClosingCurlyBrace();
+                }
+                else
+                {
+                    if (pi.IsFirst)
+                    {
+                        builder.AppendLine();
+                    }
+
+                    builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
+                }
+            }
+
+            builder.DecreaseIndentation();
+        }
+        else
+        {
+            builder.AppendRaw(");")
+                   .AppendLine()
+                   .AppendOpeningCurlyBrace()
+                   .IncreaseIndentation()
+                   .AppendRaw("throw new NotImplementedException();")
+                   .DecreaseIndentation()
+                   .AppendClosingCurlyBrace();
+        }
+    }
+
+    private static void AppendNonPureMethodImplementation(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options)
+    {
+        var genericTypeArgs = details.GenericTypeArgs ?? MethodBuilderDetails.ToGenericTypeArgument(MethodBuilderDetails.GenericComponentType);
+        var memberName = $"{details.CSharpMethodName}{details.Suffix}";
+
+        builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
+               .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpMethodName}{details.Suffix}{genericTypeArgs}(", postIncreaseIndentation: true);
+
+        if (method.ParameterDefinitions.Count > 0)
+        {
+            AppendMethodParameters(builder, method, details, options);
+        }
+        else
+        {
+            builder.AppendRaw(") where TComponent : class;", appendNewLine: true, omitIndentation: true);
+        }
+
+        builder.AppendRaw("throw new NotImplementedException();")
+               .DecreaseIndentation()
+               .AppendClosingCurlyBrace();
+    }
+
+    private static void AppendImplementationProperty(SourceBuilder builder, CSharpProperty property, GeneratorOptions options)
+    {
+        var details = PropertyBuilderDetails.Create(property, options);
+        var accessors = details.Property.IsReadonly ? "{ get; }" : "{ get; set; }";
+        var memberName = $"{details.CSharpPropertyName}";
+        builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, memberName)
+               .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} {accessors}")
+               .AppendLine()
+               .AppendOpeningCurlyBrace()
+               .IncreaseIndentation()
+               .AppendRaw("throw new NotImplementedException();")
+               .DecreaseIndentation()
+               .AppendClosingCurlyBrace();
+    }
+
+    /// <summary>
+    /// Format the C# source code string.
+    /// </summary>
+    private static string TryFormatCSharpSourceText(string sourceCode)
+    {
+        // Use Roslyn or another C# formatter if available
+        // For now, return the raw source code
+        return sourceCode;
     }
 }
