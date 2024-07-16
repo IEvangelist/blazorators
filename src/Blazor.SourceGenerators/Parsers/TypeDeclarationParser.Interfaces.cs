@@ -1,496 +1,259 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.TypeScript.Types;
+
 namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class TypeDeclarationParser
 {
-    internal CSharpObject? ToObject(string typeScriptTypeDeclaration)
+    internal CSharpObject ToObject(string typeName)
     {
-        CSharpObject? cSharpObject = null;
-
-        typeScriptTypeDeclaration = FormatInterfaceDeclaration(typeScriptTypeDeclaration);
-
-        var lineTokens = typeScriptTypeDeclaration.Split('\n');
-        foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
+        if (TryGetCustomType(typeName, out var typescriptInterface))
         {
-            if (index == 0)
-            {
-                var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
-
-                // Ignore event targets for now.
-                var seg = segment.Replace(" extends EventTarget", "");
-                var subclass = ExtendsTypeNameRegex.GetMatchGroupValue(seg, "TypeName");
-                if (typeName is not null)
-                {
-                    cSharpObject = new(typeName, subclass);
-                    continue;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if (cSharpObject is null)
-            {
-                break;
-            }
-
-            var line = segment.Trim();
-            if (line.Length == 0)
-            {
-                continue;
-            }
-
-            if (line == "}")
-            {
-                // We're done
-                break;
-            }
-
-            if (IsMethod(line, out var method) && method is not null)
-            {
-                var methodName = method.GetGroupValue("MethodName");
-                var parameters = method.GetGroupValue("Parameters");
-                var returnType = method.GetGroupValue("ReturnType");
-
-                if (methodName is null || parameters is null || returnType is null)
-                {
-                    continue;
-                }
-
-                var (parameterDefinitions, javaScriptMethod) =
-                    ParseParameters(
-                        cSharpObject.TypeName,
-                        methodName,
-                        parameters,
-                        obj => cSharpObject.DependentTypes![obj.TypeName] = obj);
-
-
-                var cSharpMethod =
-                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod);
-                cSharpObject.Methods[cSharpMethod.RawName] = cSharpMethod;
-
-                continue;
-            }
-
-            if (IsProperty(line, out var property) && property is not null)
-            {
-                var name = property.GetGroupValue("Name");
-                var type = property.GetGroupValue("Type");
-
-                if (name is null || type is null)
-                {
-                    continue;
-                }
-
-                var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?") || type.Contains("| null");
-
-                name = name.Replace("?", "").Replace("readonly ", "");
-                type = TryGetPrimitiveType(type);
-
-                CSharpProperty cSharpProperty = new(name, type, isNullable, isReadonly);
-                cSharpObject.Properties[cSharpProperty.RawName] = cSharpProperty;
-
-                var mappedType = cSharpProperty.MappedTypeName;
-
-                // When a property defines a custom type, that type needs to also be parsed
-                // and source generated. This is so that dependent types are known and resolved.
-                if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
-                    _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
-                    typeScriptDefinitionText is not null)
-                {
-                    var obj = ToObject(typeScriptDefinitionText);
-                    if (obj is not null)
-                    {
-                        cSharpObject.DependentTypes![obj.TypeName] = obj;
-                    }
-                }
-
-                continue;
-            }
+            return ToObject(typescriptInterface);
         }
 
-        return cSharpObject;
+        return default!;
     }
 
-    internal CSharpTopLevelObject? ToTopLevelObject(string typeScriptTypeDeclaration)
+    internal CSharpObject ToObject(InterfaceDeclaration typescriptInterface)
     {
-        CSharpTopLevelObject? topLevelObject = null;
+        var heritage = typescriptInterface.HeritageClauses?
+            .Where(heritage => heritage.Identifier is not " extends EventTarget")
+            .Select(heritage => heritage.Identifier)
+            .ToArray();
 
-        typeScriptTypeDeclaration = FormatInterfaceDeclaration(typeScriptTypeDeclaration);
+        var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
 
-        var lineTokens = typeScriptTypeDeclaration.Split('\n');
-        foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
+        var csharpObject = new CSharpObject(typescriptInterface.Identifier, subclass);
+
+        var objectMethods = typescriptInterface.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        var methods = ParseMethods(
+            csharpObject.TypeName,
+            objectMethods,
+            (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
+
+        csharpObject = csharpObject with
         {
-            if (index == 0)
-            {
-                var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
-                if (typeName is not null)
-                {
-                    topLevelObject = new(typeName);
-                    continue;
-                }
-                else
-                {
-                    break;
-                }
-            }
+            Methods = methods
+                .GroupBy(method => method.RawName)
+                .ToDictionary(method => method.Key, method => method.Last())
+        };
 
-            if (topLevelObject is null)
-            {
-                break;
-            }
+        var objectProperties = typescriptInterface.OfKind(TypeScriptSyntaxKind.PropertySignature);
+        var properties = ParseProperties(
+            objectProperties,
+            (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
 
-            var line = segment.Trim();
-            if (line.Length == 0)
+        csharpObject = csharpObject with
+        {
+            Properties = properties
+                .GroupBy(property => property.RawName)
+                .ToDictionary(property => property.Key, method => method.Last())
+        };
+
+        return csharpObject;
+    }
+
+    internal CSharpTopLevelObject ToTopLevelObject(string typeName)
+    {
+        if (TryGetCustomType(typeName, out var typescriptInterface))
+        {
+            return ToTopLevelObject(typescriptInterface);
+        }
+
+        return default!;
+    }
+
+    internal CSharpTopLevelObject ToTopLevelObject(InterfaceDeclaration typescriptInterface)
+    {
+        var csharpTopLevelObject = new CSharpTopLevelObject(typescriptInterface.Identifier);
+
+        var objectMethods = typescriptInterface.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        var methods = ParseMethods(
+            csharpTopLevelObject.RawTypeName,
+            objectMethods,
+            (dependency) => csharpTopLevelObject.DependentTypes[dependency.TypeName] = dependency);
+
+        csharpTopLevelObject.Methods.AddRange(methods);
+
+        var objectProperties = typescriptInterface.OfKind(TypeScriptSyntaxKind.PropertySignature);
+        var properties = ParseProperties(
+            objectProperties,
+            (dependency) => csharpTopLevelObject.DependentTypes[dependency.TypeName] = dependency);
+
+        csharpTopLevelObject.Properties.AddRange(properties);
+
+        return csharpTopLevelObject;
+    }
+
+    private IEnumerable<CSharpMethod> ParseMethods(string rawTypeName, IEnumerable<Node> objectMethods, Action<CSharpObject> appendDependency)
+    {
+        ICollection<CSharpMethod> methods = [];
+        foreach (var method in objectMethods.Cast<MethodSignature>())
+        {
+            var methodName = method.Identifier;
+            var methodParameters = method.Parameters;
+            var methodReturnType = method.Type.GetText().ToString().Trim();
+
+            if (methodName is null || methodParameters is null || string.IsNullOrEmpty(methodReturnType))
             {
                 continue;
             }
 
-            if (line == "}")
-            {
-                // We're done
-                break;
-            }
+            var (csharpParameters, javascriptMethod) = ParseParameters(
+                rawTypeName,
+                methodName,
+                methodParameters,
+                appendDependency);
 
-            if (IsMethod(line, out var method) && method is not null)
-            {
-                var methodName = method.GetGroupValue("MethodName");
-                var parameters = method.GetGroupValue("Parameters");
-                var returnType = method.GetGroupValue("ReturnType");
+            var csharpMethod = ToMethod(methodName, methodReturnType, csharpParameters, javascriptMethod);
 
-                if (methodName is null || parameters is null || returnType is null)
-                {
-                    continue;
-                }
-
-                var (parameterDefinitions, javaScriptMethod) =
-                    ParseParameters(
-                        topLevelObject.RawTypeName,
-                        methodName,
-                        parameters,
-                        obj => topLevelObject.DependentTypes![obj.TypeName] = obj);
-
-                var cSharpMethod =
-                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod);
-
-                topLevelObject.Methods!.Add(cSharpMethod);
-
-                continue;
-            }
-
-            if (IsProperty(line, out var property) && property is not null)
-            {
-                var name = property.GetGroupValue("Name");
-                var type = property.GetGroupValue("Type");
-
-                if (name is null || type is null)
-                {
-                    continue;
-                }
-
-                var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?") || type.Contains("| null");
-
-                name = name.Replace("?", "").Replace("readonly ", "");
-                type = TryGetPrimitiveType(type);
-
-                CSharpProperty cSharpProperty =
-                    new(name,
-                    type,
-                    isNullable,
-                    isReadonly);
-
-                topLevelObject.Properties!.Add(cSharpProperty);
-
-                var mappedType = cSharpProperty.MappedTypeName;
-
-                // When a property defines a custom type, that type needs to also be parsed
-                // and source generated. This is so that dependent types are known and resolved.
-                if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
-                    _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
-                    typeScriptDefinitionText is not null)
-                {
-                    var obj = ToObject(typeScriptDefinitionText);
-                    if (obj is not null)
-                    {
-                        topLevelObject.DependentTypes![obj.TypeName] = obj;
-                    }
-                }
-
-                continue;
-            }
+            methods.Add(csharpMethod);
         }
 
-        return topLevelObject;
+        return methods;
     }
 
-
-
-    private static string FormatInterfaceDeclaration(string typescriptInterfaceDeclaration)
+    private (IList<CSharpType>, JavaScriptMethod) ParseParameters(string rawTypeName, string methodName, NodeArray<ParameterDeclaration> methodParameters, Action<CSharpObject> appendDependency)
     {
-        var typescriptInterfaceDeclarationStart = InterfaceRegex.Match(typescriptInterfaceDeclaration);
-        if (typescriptInterfaceDeclarationStart.Success && typescriptInterfaceDeclarationStart.Index >= 0)
+        IList<CSharpType> parameters = [];
+        var javascriptMethod = new JavaScriptMethod(methodName);
+
+        foreach (var parameter in methodParameters)
         {
-            typescriptInterfaceDeclaration = typescriptInterfaceDeclaration.Substring(typescriptInterfaceDeclarationStart.Index);
-        }
+            var isNullable = parameter.QuestionToken is not null;
+            var parameterName = parameter.Identifier;
 
-        return typescriptInterfaceDeclaration;
-    }
+            var parameterType = parameter.Children[parameter.Children.Count - 1].GetText().ToString().Trim();
+            parameterType = isNullable ? parameterType.Replace(" | null", "") : parameterType;
 
-    private string TryGetPrimitiveType(string type)
-    {
-        if (!TypeMap.PrimitiveTypes.IsPrimitiveType(type) &&
-            _reader.TryGetTypeAlias(type, out var typeAliasLine) &&
-            typeAliasLine is not null && typeAliasLine.Replace(";", "").Split('=')
-                is { Length: 2 } split && split[1].Trim().Split('|')
-                is { Length: > 0 } values &&
-                values.Select(v => v.Trim()).ToList()
-                is { Count: > 0 } list)
-        {
-            var isStringAlias = list.TrueForAll(v => v.StartsWith("\"") && v.EndsWith("\""));
-            if (isStringAlias)
-            {
-                type = "string";
-            }
-        }
-
-        return type;
-    }
-
-    private CSharpMethod ToMethod(
-        string methodName,
-        string returnType,
-        List<CSharpType> parameterDefinitions,
-        JavaScriptMethod? javaScriptMethod)
-    {
-        var methodReturnType = CleanseReturnType(returnType);
-        CSharpMethod cSharpMethod =
-            new(methodName,
-            methodReturnType,
-            parameterDefinitions,
-            javaScriptMethod);
-
-        var nonArrayMethodReturnType = methodReturnType.Replace("[]", "");
-        if (!TypeMap.PrimitiveTypes.IsPrimitiveType(nonArrayMethodReturnType) &&
-            _reader.TryGetDeclaration(nonArrayMethodReturnType, out var typeScriptDefinitionText) &&
-            typeScriptDefinitionText is not null)
-        {
-            var dependentType = ToObject(typeScriptDefinitionText);
-            if (dependentType is not null)
-            {
-                cSharpMethod.DependentTypes![nonArrayMethodReturnType] = dependentType;
-            }
-        }
-
-        return cSharpMethod;
-    }
-
-    internal CSharpAction? ToAction(string typeScriptTypeDeclaration)
-    {
-        CSharpAction? cSharpAction = null;
-
-        typeScriptTypeDeclaration = FormatInterfaceDeclaration(typeScriptTypeDeclaration);
-
-        var lineTokens = typeScriptTypeDeclaration.Split('\n');
-        foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
-        {
-            if (index == 0)
-            {
-                var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
-                if (typeName is not null)
-                {
-                    cSharpAction = new(typeName);
-                    continue;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if (cSharpAction is null)
-            {
-                break;
-            }
-
-            var line = segment.Trim();
-            if (line.Length == 0)
-            {
-                continue;
-            }
-
-            if (line == "}")
-            {
-                // We're done
-                break;
-            }
-
-            if (IsAction(line, out var action) && action is not null)
-            {
-                var parameters = action.GetGroupValue("Parameters");
-                var returnType = action.GetGroupValue("ReturnType");
-
-                if (parameters is null || returnType is null)
-                {
-                    continue;
-                }
-
-                var (parameterDefinitions, _) =
-                    ParseParameters(
-                        cSharpAction.RawName,
-                        cSharpAction.RawName,
-                        parameters,
-                        obj => cSharpAction.DependentTypes![obj.TypeName] = obj);
-
-                cSharpAction = cSharpAction with
-                {
-                    ParameterDefinitions = parameterDefinitions
-                };
-
-                continue;
-            }
-        }
-
-        return cSharpAction;
-    }
-
-    internal static string CleanseReturnType(string returnType) =>
-        // Example inputs:
-        // 1) ": void;"
-        // 2) ": string | null;"
-        returnType.Replace(":", "").Replace(";", "").Trim();
-
-    internal (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
-        string typeName,
-        string rawName,
-        string parametersString,
-        Action<CSharpObject> appendDependentType)
-    {
-        List<CSharpType> parameters = [];
-
-        // Example input:
-        // "(someCallback: CallbackType, someId?: number | null)"
-        var trimmedParameters = parametersString.Replace("(", "").Replace(")", "");
-        var parameterLineTokenizer = trimmedParameters.Split(':', ',');
-
-        JavaScriptMethod? javaScriptMethod = new(rawName);
-        foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
-        {
-            var isNullable = parameterPair[0].EndsWith("?");
-            var parameterName = parameterPair[0].Replace("?", "").Trim();
-            var parameterType = isNullable
-                ? parameterPair[1].Trim().Replace(" | null", "")
-                : parameterPair[1].Trim();
-
-            CSharpAction? action = null;
+            CSharpAction csharpAction = null!;
 
             // When a parameter defines a custom type, that type needs to also be parsed
             // and source generated. This is so that dependent types are known and resolved.
-            if (!TypeMap.PrimitiveTypes.IsPrimitiveType(parameterType) &&
-                _reader.TryGetDeclaration(parameterType, out var typeScriptDefinitionText) &&
-                typeScriptDefinitionText is not null)
+            if (TryGetCustomType(parameterType, out var typescriptInterface))
             {
-                javaScriptMethod = javaScriptMethod with
+                javascriptMethod = javascriptMethod with
                 {
-                    InvokableMethodName = $"blazorators.{typeName.LowerCaseFirstLetter()}.{rawName}"
+                    InvokableMethodName = $"blazorators.{rawTypeName.LowerCaseFirstLetter()}.{methodName}"
                 };
 
-                if (parameterType.EndsWith("Callback"))
+                if (parameterName.EndsWith("Callback"))
                 {
-                    action = ToAction(typeScriptDefinitionText);
-                    javaScriptMethod = javaScriptMethod with
+                    csharpAction = ToAction(typescriptInterface);
+                    javascriptMethod = javascriptMethod with
                     {
-                        IsBiDirectionalJavaScript = true
+                        IsBiDirectionalJavaScript = true,
                     };
                 }
                 else
                 {
-                    var obj = ToObject(typeScriptDefinitionText);
-                    if (obj is not null)
+                    var csharpObject = ToObject(typescriptInterface);
+                    if (csharpObject is not null)
                     {
-                        appendDependentType(obj);
+                        appendDependency.Invoke(csharpObject);
                     }
                 }
             }
 
-            parameters.Add(new(parameterName, parameterType, isNullable, action));
+            parameters.Add(new CSharpType(parameterName, parameterType, isNullable, csharpAction));
         }
 
-        javaScriptMethod = javaScriptMethod with
-        {
-            ParameterDefinitions = parameters
-        };
-
-        return (parameters, javaScriptMethod);
+        return (parameters, javascriptMethod);
     }
 
-    internal static bool IsAction(
-        string line, out Match? match)
+    private IEnumerable<CSharpProperty> ParseProperties(IEnumerable<Node> objectProperties, Action<CSharpObject> appendDependency)
     {
-        match = TypeScriptCallbackRegex.Match(line);
-        return match.Success;
-    }
-
-    internal static bool IsMethod(
-        string line, out Match? match)
-    {
-        match = TypeScriptMethodRegex.Match(line);
-        var isSuccess = match.Success;
-        if (isSuccess)
+        ICollection<CSharpProperty> properties = [];
+        foreach (var property in objectProperties.Cast<PropertySignature>())
         {
-            var methodName = match.GetGroupValue("MethodName");
-            if (methodName is "addEventListener" or "removeEventListener")
+            var isReadonly = property.Modifiers.Exists(modifier => modifier.Kind is TypeScriptSyntaxKind.ReadonlyKeyword);
+            var isNullable = property.QuestionToken is not null;
+
+            var propertyName = property.Identifier;
+            var propertyType = property.Children[property.Children.Count - 1].GetText().ToString().Trim();
+            propertyType = isNullable ? propertyType.Replace(" | null", "") : propertyType;
+
+            if (propertyName is null || string.IsNullOrEmpty(propertyType))
             {
-                return false;
+                continue;
             }
 
-            var returnType = match.GetGroupValue("ReturnType");
-            if (returnType?.Contains("this") ?? false)
-            {
-                return false;
-            }
-        }
+            var csharpProperty = new CSharpProperty(propertyName, propertyType, isNullable, isReadonly);
+            properties.Add(csharpProperty);
 
-        return isSuccess;
-    }
+            var mappedType = csharpProperty.MappedTypeName;
 
-    internal static bool IsProperty(
-        string line,
-        out Match? match)
-    {
-        match = TypeScriptPropertyRegex.Match(line);
-        var isSuccess = match.Success;
-        if (isSuccess)
-        {
-            var name = match.GetGroupValue("Name");
-            if (name is "addEventListener" or "removeEventListener" ||
-                (name is not null && name.Contains("this")))
+            // When a property defines a custom type, that type needs to also be parsed
+            // and source generated. This is so that dependent types are known and resolved.
+            if (TryGetCustomType(mappedType, out var typescriptInterface))
             {
-                return false;
-            }
-
-            if (match.GetGroupValue("Type") is "void")
-            {
-                return false;
+                var csharpObject = ToObject(typescriptInterface);
+                if (csharpObject is not null)
+                {
+                    appendDependency.Invoke(csharpObject);
+                }
             }
         }
 
-        return isSuccess;
+        return properties;
     }
-}
 
-static class EnumerableExtensions
-{
-    internal static IEnumerable<T[]> Chunk<T>(this IEnumerable<T> source, int chunksize)
+    private CSharpAction ToAction(InterfaceDeclaration typescriptInterface)
     {
-        while (source.Any())
+        var csharpAction = new CSharpAction(typescriptInterface.Identifier);
+
+        var callSignatureDeclaration = typescriptInterface.OfKind(TypeScriptSyntaxKind.CallSignature).FirstOrDefault() as CallSignatureDeclaration;
+
+        if (callSignatureDeclaration is not null)
         {
-            yield return source.Take(chunksize).ToArray();
-            source = source.Skip(chunksize);
+            var actionParameters = callSignatureDeclaration.Parameters;
+            var actionReturnType = callSignatureDeclaration.Type.GetText().ToString().Trim();
+
+            if (actionParameters is null || string.IsNullOrEmpty(actionReturnType))
+            {
+                return csharpAction;
+            }
+
+            var (csharpParameters, _) = ParseParameters(
+                csharpAction.RawName,
+                csharpAction.RawName,
+                actionParameters,
+                dependency => csharpAction.DependentTypes[dependency.TypeName] = dependency);
+
+            csharpAction = csharpAction with
+            {
+                ParameterDefinitions = csharpParameters
+            };
         }
+
+        return csharpAction;
+    }
+
+    private CSharpMethod ToMethod(string methodName, string methodReturnType, IList<CSharpType> csharpParameters, JavaScriptMethod javascriptMethod)
+    {
+        var csharpMethod = new CSharpMethod(methodName, methodReturnType, csharpParameters, javascriptMethod);
+        var nonArrayMethodReturnType = methodReturnType.Replace("[]", "");
+
+        if (TryGetCustomType(nonArrayMethodReturnType, out var typescriptInterface))
+        {
+            var csharpObject = ToObject(typescriptInterface);
+            if (csharpObject is not null)
+            {
+                csharpMethod.DependentTypes[nonArrayMethodReturnType] = csharpObject;
+            }
+        }
+
+        return csharpMethod;
+    }
+
+    private bool TryGetCustomType(string typeName, out InterfaceDeclaration typescriptInterface)
+    {
+        typescriptInterface = default!;
+        return !TypeMap.PrimitiveTypes.IsPrimitiveType(typeName) &&
+            _reader.TryGetInterface(typeName, out typescriptInterface!) &&
+            typescriptInterface is not null;
     }
 }

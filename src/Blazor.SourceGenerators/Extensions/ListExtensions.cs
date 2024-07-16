@@ -5,7 +5,7 @@ namespace Blazor.SourceGenerators.Extensions;
 
 static class ListExtensions
 {
-    internal static IEnumerable<(Interation Index, T Item)> Select<T>(this List<T> list)
+    internal static IEnumerable<(Interation Index, T Item)> Select<T>(this IList<T> list)
     {
         var count = list.Count;
         for (var i = 0; i < count; ++i)

@@ -5,13 +5,10 @@ namespace Blazor.SourceGenerators.Extensions;
 
 internal static class GeneratorExecutionContextExtensions
 {
-    internal static GeneratorExecutionContext AddDependentTypesSource(
-        this GeneratorExecutionContext context,
-        CSharpTopLevelObject topLevelObject)
+    internal static GeneratorExecutionContext AddDependentTypesSource(this GeneratorExecutionContext context, CSharpTopLevelObject topLevelObject)
     {
-        foreach (var (type, dependentObj) in
-                    topLevelObject.AllDependentTypes.Where(
-                        t => !t.Object.IsActionParameter))
+        var dependentTypes = topLevelObject.AllDependentTypes.Where(type => !type.Object.IsActionParameter);
+        foreach (var (type, dependentObj) in dependentTypes)
         {
             context.AddSource(type.ToGeneratedFileName(),
                 SourceText.From(dependentObj.ToString(),
@@ -31,9 +28,7 @@ internal static class GeneratorExecutionContextExtensions
         context.AddSource(
             $"{@interface}".ToGeneratedFileName(),
             SourceText.From(
-                topLevelObject.ToInterfaceString(
-                    options,
-                    @namespace),
+                topLevelObject.ToInterfaceString(options, @namespace),
                 Encoding.UTF8));
 
         return context;
@@ -49,9 +44,7 @@ internal static class GeneratorExecutionContextExtensions
         context.AddSource(
             $"{implementation}".ToGeneratedFileName(),
             SourceText.From(
-                topLevelObject.ToImplementationString(
-                    options,
-                    @namespace),
+                topLevelObject.ToImplementationString(options, @namespace),
                 Encoding.UTF8));
 
         return context;
@@ -66,9 +59,7 @@ internal static class GeneratorExecutionContextExtensions
         context.AddSource(
             $"{options.Implementation.ToImplementationName(false)}ServiceCollectionExtensions".ToGeneratedFileName(),
             SourceText.From(
-                topLevelObject.ToServiceCollectionExtensions(
-                    options,
-                    implementation),
+                CSharpTopLevelObject.ToServiceCollectionExtensions(options, implementation),
                 Encoding.UTF8));
 
         return context;
