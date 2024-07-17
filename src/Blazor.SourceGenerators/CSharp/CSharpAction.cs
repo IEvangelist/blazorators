@@ -37,12 +37,4 @@ internal record CSharpAction(
         .Select(kvp => new DependentType(kvp.Key, kvp.Value))
         .Concat(ParameterDefinitions?.SelectMany(parameter => parameter.AllDependentTypes) ?? [])
         .ToImmutableHashSet(DependentTypeComparer.Default);
-
-    /// <summary>
-    /// Adds a dependent type to the collection.
-    /// </summary>
-    /// <param name="typeName">The name of the type.</param>
-    /// <param name="csharpObject">The C# object representing the type.</param>
-    public void AddDependentType(string typeName, CSharpObject csharpObject) =>
-        DependentTypes[typeName] = csharpObject;
 }
