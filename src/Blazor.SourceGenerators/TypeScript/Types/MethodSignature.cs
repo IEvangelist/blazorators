@@ -4,7 +4,7 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public sealed class MethodSignature : Declaration, ISignatureDeclaration, ITypeElement, IFunctionLikeDeclaration
+public sealed class MethodSignature : Declaration, ITypeElement, IFunctionLikeDeclaration
 {
     public MethodSignature()
     {

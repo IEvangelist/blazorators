@@ -4,6 +4,6 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public sealed class FlowType : object
+public sealed class FlowType 
 {
 }

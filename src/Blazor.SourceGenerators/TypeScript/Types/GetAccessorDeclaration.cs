@@ -4,8 +4,7 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public sealed class GetAccessorDeclaration : Declaration, IFunctionLikeDeclaration, IClassElement,
-    IObjectLiteralElement,
+public sealed class GetAccessorDeclaration : Declaration, IFunctionLikeDeclaration, IObjectLiteralElement,
     IAccessorDeclaration
 {
     public GetAccessorDeclaration()

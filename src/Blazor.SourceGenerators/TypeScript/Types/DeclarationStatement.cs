@@ -2,9 +2,10 @@
 // Licensed under the MIT License.
 
 #nullable disable
+
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public class DeclarationStatement : Node, IDeclarationStatement, IDeclaration, IStatement
+public class DeclarationStatement : Node, IDeclarationStatement
 {
     public object DeclarationBrand { get; set; }
     public INode Name { get; set; }
