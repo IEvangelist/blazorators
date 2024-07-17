@@ -6,8 +6,7 @@ namespace Blazor.SourceGenerators.Parsers;
 internal sealed partial class TypeDeclarationParser
 {
     static readonly Lazy<TypeDeclarationParser> s_defaultParser =
-        new(
-            valueFactory: () => new TypeDeclarationParser(TypeDeclarationReader.Default));
+        new(valueFactory: () => new TypeDeclarationParser(TypeDeclarationReader.Default));
 
     readonly TypeDeclarationReader _reader;
 
@@ -19,15 +18,14 @@ internal sealed partial class TypeDeclarationParser
     {
         ParserResult<CSharpTopLevelObject> result = new(ParserResultStatus.Unknown);
 
-        if (_reader.TryGetDeclaration(typeName, out var typeScriptDefinitionText) &&
-            typeScriptDefinitionText is not null)
+        if (_reader.TryGetInterface(typeName, out var typescriptInterface) && typescriptInterface is not null)
         {
             try
             {
                 result = result with
                 {
                     Status = ParserResultStatus.SuccessfullyParsed,
-                    Value = ToTopLevelObject(typeScriptDefinitionText)
+                    Value = ToTopLevelObject(typescriptInterface)
                 };
             }
             catch (Exception ex)

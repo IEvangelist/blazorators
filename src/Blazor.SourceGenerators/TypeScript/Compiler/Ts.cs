@@ -8,6 +8,8 @@ namespace Blazor.SourceGenerators.TypeScript.Compiler;
 
 public sealed class Ts
 {
+    private Ts() { }
+
     public static INode VisitNode(
         Func<INode, INode> nodeCallback, INode node) =>
         node != null ? nodeCallback(node) : null;
@@ -40,11 +42,19 @@ public sealed class Ts
         Func<INode[], INode> nodeArrayCallback = null)
     {
         var nodeList = nodes?.ToList();
-        return nodeList is not null
-            ? nodeArrayCallback is null
-                ? VisitEachNode(nodeCallback, nodeList)
-                : nodeArrayCallback(nodeList.ToArray())
-            : null;
+
+        if (nodeArrayCallback is null && nodeList is not null)
+        {
+            return VisitEachNode(nodeCallback, nodeList);
+        }
+        else if (nodeArrayCallback is not null)
+        {
+            return nodeArrayCallback([.. nodeList]);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public static INode ForEachChild(
@@ -451,7 +461,7 @@ public sealed class Ts
 
             TypeScriptSyntaxKind.ExternalModuleReference =>
                 VisitNode(nodeCallback, (node as ExternalModuleReference)?.Expression),
-                
+
             TypeScriptSyntaxKind.MissingDeclaration =>
                 VisitNodes(node.Decorators, nodeCallback, nodeArrayCallback),
 

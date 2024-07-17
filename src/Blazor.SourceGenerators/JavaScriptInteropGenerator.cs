@@ -1,31 +1,25 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.SourceGenerators.Options;
+
 namespace Blazor.SourceGenerators;
 
 [Generator]
 internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
 {
-    private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd = new()
-    {
+    private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd =
+    [
         (nameof(RecordCompat).ToGeneratedFileName(), RecordCompat),
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
         (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
-    };
+    ];
 
     public void Initialize(GeneratorInitializationContext context)
     {
-#if DEBUG
-        if (!System.Diagnostics.Debugger.IsAttached)
-        {
-            // System.Diagnostics.Debugger.Launch();
-        }
-#endif
-
         // Register a syntax receiver that will be created for each generation pass
-        context.RegisterForSyntaxNotifications(
-            JavaScriptInteropSyntaxContextReceiver.Create);
+        context.RegisterForSyntaxNotifications(JavaScriptInteropSyntaxContextReceiver.Create);
     }
 
     public void Execute(GeneratorExecutionContext context) => TryExecute(context);
@@ -37,8 +31,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
             // Add source from text.
             foreach (var (fileName, sourceCode) in _sourceCodeToAdd)
             {
-                context.AddSource(fileName,
-                    SourceText.From(sourceCode, Encoding.UTF8));
+                context.AddSource(fileName, SourceText.From(sourceCode, Encoding.UTF8));
             }
 
             if (context.SyntaxContextReceiver is not JavaScriptInteropSyntaxContextReceiver receiver)
@@ -71,17 +64,15 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
                     var result = parser.ParseTargetType(options.TypeName!);
                     if (result is { Status: ParserResultStatus.SuccessfullyParsed, Value: { } })
                     {
-                        var namespaceString =
-                            (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
-                            {
-                                (string { Length: > 0 } containingNamespace, _) => containingNamespace,
-                                (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
-                                _ => null
-                            };
-                        var @interface =
-                            options.Implementation.ToInterfaceName();
-                        var implementation =
-                            options.Implementation.ToImplementationName();
+                        var namespaceString = (typeSymbol.ContainingNamespace.ToDisplayString(), classDeclaration.Parent) switch
+                        {
+                            (string { Length: > 0 } containingNamespace, _) => containingNamespace,
+                            (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
+                            _ => null
+                        };
+
+                        var @interface = options.Implementation.ToInterfaceName();
+                        var implementation = options.Implementation.ToImplementationName();
 
                         var topLevelObject = result.Value;
                         context.AddDependentTypesSource(topLevelObject)
@@ -110,7 +101,7 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
     }
 
-    static bool IsDiagnosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
+    private static bool IsDiagnosticError(GeneratorOptions options, GeneratorExecutionContext context, AttributeSyntax attribute)
     {
         if (options.TypeName is null)
         {
@@ -133,8 +124,8 @@ internal sealed partial class JavaScriptInteropGenerator : ISourceGenerator
         }
 
         if (options.SupportsGenerics &&
-            context.Compilation.ReferencedAssemblyNames.Any(ai =>
-            ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)) is false)
+            !context.Compilation.ReferencedAssemblyNames.Any(
+                ai => ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)))
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(

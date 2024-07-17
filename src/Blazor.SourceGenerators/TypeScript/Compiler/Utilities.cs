@@ -70,7 +70,7 @@ internal static class Utilities
                 ? GetTrailingCommentRanges(text, node.Pos ?? 0).Concat(GetLeadingCommentRanges(text, node.Pos ?? 0))
                 : GetLeadingCommentRangesOfNodeFromText(node, text);
 
-        commentRanges ??= new List<CommentRange>();
+        commentRanges ??= [];
         return commentRanges.Where(comment =>
                 text.CharCodeAt((comment.Pos ?? 0) + 1) is CharacterCode.Asterisk &&
                 text.CharCodeAt((comment.Pos ?? 0) + 2) is CharacterCode.Asterisk &&

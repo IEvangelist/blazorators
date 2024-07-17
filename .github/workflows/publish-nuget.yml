@@ -12,7 +12,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Test
       run: dotnet test --filter "Category!=EndToEnd" --configuration Release
     
@@ -22,7 +22,7 @@ jobs:
 
     - name: Install Playwright dependencies
       run: |
-        pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net7.0/playwright.ps1 install --with-deps
+        pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net8.0/playwright.ps1 install --with-deps
 
     - name: Run end-to-end tests
       run: |
@@ -65,11 +65,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
         
     - name: Restore dependencies for ${{ matrix.project }}
       run: |
-        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release
+        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj
       
     - name: Build ${{ matrix.project }}
       run: |

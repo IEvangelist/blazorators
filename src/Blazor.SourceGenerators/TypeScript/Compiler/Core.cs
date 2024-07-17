@@ -20,7 +20,11 @@ internal static class Core
         }
         var low = offset ?? 0;
         var high = array.Length - 1;
-        comparer ??= (v1, v2) => v1 < v2 ? -1 : v1 > v2 ? 1 : 0;
+        comparer ??= (v1, v2) =>
+        {
+            if (v1 < v2) return -1;
+            return v1 > v2 ? 1 : 0;
+        };
         while (low <= high)
         {
             var middle = low + ((high - low) >> 1);
@@ -41,10 +45,16 @@ internal static class Core
         return ~low;
     }
 
+#pragma warning disable S125 // Sections of code should not be commented out
+#pragma warning disable S1940 // Boolean checks should not be inverted
+
     internal static bool PositionIsSynthesized(int pos) =>
-        // This is a fast way of testing the following conditions:
-        //  pos is null || pos is null || isNaN(pos) || pos < 0;
-        !(pos >= 0);
+      // This is a fast way of testing the following conditions:
+      //  pos is null || pos is null || isNaN(pos) || pos < 0;
+      !(pos >= 0);
+
+#pragma warning restore S1940 // Boolean checks should not be inverted
+#pragma warning restore S125 // Sections of code should not be commented out
 
     internal static ScriptKind EnsureScriptKind(string fileName, ScriptKind scriptKind)
     {
@@ -74,7 +84,7 @@ internal static class Core
         var rootLength = GetRootLength(path);
         var root = path.Substring(rootLength);
         var normalized = GetNormalizedParts(path, rootLength);
-        if (normalized.Any())
+        if (normalized.Count != 0)
         {
             var joinedParts = $"{root}{string.Join(DirectorySeparator.ToString(), normalized)}";
             return PathEndsWithDirectorySeparator(path) ? joinedParts + DirectorySeparator : joinedParts;
@@ -119,7 +129,7 @@ internal static class Core
     internal static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
     {
         var parts = normalizedSlashedPath.Substring(rootLength).Split(DirectorySeparator);
-        List<string> normalized = new();
+        List<string> normalized = [];
         foreach (var part in parts)
         {
             if (part != ".")
@@ -143,8 +153,8 @@ internal static class Core
     }
 
     internal static T LastOrUndefined<T>(List<T> array) where T : class =>
-        array != null && array.Any()
-            ? array.Last()
+        array != null && array.Count != 0
+            ? array[array.Count - 1]
             : default;
 
     internal static bool PathEndsWithDirectorySeparator(string path) =>

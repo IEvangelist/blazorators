@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+namespace Blazor.SourceGenerators.Options;
+
 /// <summary>
 /// The options used (and parsed from the <c>JSAutoInteropAttribute</c>) to source-generate JavaScript interop.
 /// </summary>
@@ -28,7 +30,7 @@ internal sealed record GeneratorOptions(
     string[]? TypeDeclarationSources = null,
     bool IsWebAssembly = true)
 {
-    ISet<TypeDeclarationParser>? _parsers;
+    private readonly HashSet<TypeDeclarationParser> _parsers = [];
 
     /// <summary>
     /// Get <see cref="GeneratorOptions"/> instance maps its
@@ -36,16 +38,17 @@ internal sealed record GeneratorOptions(
     /// When <see cref="TypeDeclarationSources"/> is null, or empty,
     /// the default lib.dom.d.ts parser is used.
     /// </summary>
-    internal ISet<TypeDeclarationParser> Parsers
+    internal HashSet<TypeDeclarationParser> Parsers
     {
         get
         {
-            _parsers ??= new HashSet<TypeDeclarationParser>();
+            var sources = TypeDeclarationSources?
+                .Select(TypeDeclarationReader.Factory)
+                .Select(reader => new TypeDeclarationParser(reader));
 
-            foreach (var source in
-                TypeDeclarationSources?.Select(TypeDeclarationReader.Factory)
-                    ?.Select(reader => new TypeDeclarationParser(reader))
-                    ?? new[] { TypeDeclarationParser.Default })
+            sources ??= [TypeDeclarationParser.Default];
+
+            foreach (var source in sources)
             {
                 _parsers.Add(source);
             }

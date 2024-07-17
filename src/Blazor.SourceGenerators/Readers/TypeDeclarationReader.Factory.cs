@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-
 namespace Blazor.SourceGenerators.Readers;
 
 internal sealed partial class TypeDeclarationReader
@@ -17,16 +15,14 @@ internal sealed partial class TypeDeclarationReader
 
     internal static TypeDeclarationReader Factory(string source)
     {
-        return Default;
+        var uri = new Uri(source);
+        var sourceKey = uri.IsFile ? uri.LocalPath : uri.OriginalString;
 
-        //var uri = new Uri(source);
-        //var sourceKey = uri.IsFile ? uri.LocalPath : uri.OriginalString;
+        var reader =
+            s_readerCache.GetOrAdd(
+                sourceKey, _ => new TypeDeclarationReader(uri));
 
-        //var reader =
-        //    s_readerCache.GetOrAdd(
-        //        sourceKey, _ => new TypeDeclarationReader(uri));
-
-        //return reader;
+        return reader;
     }
 
     internal static TypeDeclarationReader Default

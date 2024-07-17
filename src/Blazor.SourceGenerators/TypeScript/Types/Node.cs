@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 #nullable disable
-using System.Diagnostics;
 using Blazor.SourceGenerators.TypeScript.Compiler;
 
 namespace Blazor.SourceGenerators.TypeScript.Types;
@@ -10,19 +9,22 @@ namespace Blazor.SourceGenerators.TypeScript.Types;
 [DebuggerDisplay("{SourceText}")]
 public class Node : TextRange, INode
 {
-    public List<Node> Children { get; set; } = new();
+    public List<Node> Children { get; set; } = [];
     public ITypeScriptAbstractSyntaxTree AbstractSyntaxTree { get; set; }
 
     public string RawSourceText => AbstractSyntaxTree.RawSourceText;
 
     public string SourceText => GetText().ToString();
 
-    public string Identifier => Kind is TypeScriptSyntaxKind.Identifier
-        ? GetText().ToString()
-        : Children.FirstOrDefault(v => v.Kind is TypeScriptSyntaxKind.Identifier)
-            ?.GetText()
-            .Trim()
-            .ToString();
+    public string Identifier
+    {
+        get
+        {
+            if (Kind is TypeScriptSyntaxKind.Identifier) return ((Identifier)this).Text;
+            if (Children.Find(child => child.Kind is TypeScriptSyntaxKind.Identifier) is Identifier identifier) return identifier.Text;
+            return GetText().ToString();
+        }
+    }
 
     public int ParentId { get; set; }
     public int Depth { get; set; }

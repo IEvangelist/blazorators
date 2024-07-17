@@ -2,15 +2,16 @@
 // Licensed under the MIT License.
 
 using Blazor.SourceGenerators.Builders;
+using Blazor.SourceGenerators.Options;
 
 namespace Blazor.SourceGenerators.CSharp;
 
 internal sealed partial record CSharpTopLevelObject(string RawTypeName)
     : ICSharpDependencyGraphObject
 {
-    public List<CSharpProperty>? Properties { get; init; } = new();
+    public List<CSharpProperty> Properties { get; init; } = [];
 
-    public List<CSharpMethod>? Methods { get; init; } = new();
+    public List<CSharpMethod> Methods { get; init; } = [];
 
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -37,9 +38,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
 
     public int MemberCount => Properties!.Count + Methods!.Count;
 
-    internal string ToInterfaceString(
-        GeneratorOptions options,
-        string? namespaceString)
+    internal string ToInterfaceString(GeneratorOptions options, string? namespaceString)
     {
         var builder = new SourceBuilder(options)
             .AppendCopyRightHeader()
@@ -52,7 +51,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         var methodLevel = builder.IndentationLevel;
 
         // Methods
-        foreach (var method in Methods ?? new List<CSharpMethod>())
+        foreach (var method in Methods ?? [])
         {
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);
@@ -108,7 +107,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                     builder.AppendRaw(");", appendNewLine: true, omitIndentation: true);
                 }
             }
-            else if (options.OnlyGeneratePureJS is false)
+            else if (!options.OnlyGeneratePureJS)
             {
                 var genericTypeArgs = details.GenericTypeArgs ??
                     MethodBuilderDetails.ToGenericTypeArgument(
@@ -330,7 +329,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                     }
                 }
             }
-            else if (options.OnlyGeneratePureJS is false)
+            else if (!options.OnlyGeneratePureJS)
             {
                 var genericTypeArgs = details.GenericTypeArgs ??
                     MethodBuilderDetails.ToGenericTypeArgument(
@@ -496,9 +495,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         return implementation;
     }
 
-    internal string ToServiceCollectionExtensions(
-        GeneratorOptions options,
-        string implementation)
+    internal static string ToServiceCollectionExtensions(GeneratorOptions options, string implementation)
     {
         var serviceLifetime = options.IsWebAssembly
             ? "Singleton"

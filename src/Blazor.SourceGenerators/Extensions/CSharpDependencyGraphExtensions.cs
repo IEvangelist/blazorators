@@ -5,14 +5,12 @@ namespace Blazor.SourceGenerators.Extensions;
 
 internal static class CSharpDependencyGraphExtensions
 {
-    internal static IImmutableSet<(string TypeName, CSharpObject Object)> GetAllDependencies(
-        this ICSharpDependencyGraphObject dependencyGraphObject)
+    internal static IImmutableSet<(string TypeName, CSharpObject Object)> GetAllDependencies(this ICSharpDependencyGraphObject dependencyGraphObject)
     {
         Dictionary<string, CSharpObject> map = new(StringComparer.OrdinalIgnoreCase);
-        foreach (var kvp
-            in dependencyGraphObject.DependentTypes?.Flatten(
-                obj => obj.Value.DependentTypes)
-            ?? Enumerable.Empty<KeyValuePair<string, CSharpObject>>())
+        var flattened = dependencyGraphObject.DependentTypes?.Flatten(obj => obj.Value.DependentTypes) ?? [];
+
+        foreach (var kvp in flattened)
         {
             map[kvp.Key] = kvp.Value;
         }

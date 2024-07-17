@@ -16,8 +16,7 @@ internal record CSharpType(
         get
         {
             Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop in ActionDeclation?.DependentTypes
-                ?? Enumerable.Empty<KeyValuePair<string, CSharpObject>>())
+            foreach (var prop in ActionDeclation?.DependentTypes ?? [])
             {
                 result[prop.Key] = prop.Value;
             }
@@ -60,11 +59,11 @@ internal record CSharpType(
         }
 
         var isCallback = ActionDeclation is not null;
-        var typeName = TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName)
-            ? TypeMap.PrimitiveTypes[RawTypeName]
-            : isCallback
-                ? "string" // When the action is a callback, we require `T` instance and callback names.
-                : RawTypeName;
+        string typeName;
+
+        if (Primitives.IsPrimitiveType(RawTypeName)) typeName = Primitives.Instance[RawTypeName];
+        else if (isCallback) typeName = "string"; // When the action is a callback, we require `T` instance and callback names.
+        else typeName = RawTypeName;
 
         var parameterName = ToArgumentString();
         var parameterDefault = overrideNullability ? "" : " = null";

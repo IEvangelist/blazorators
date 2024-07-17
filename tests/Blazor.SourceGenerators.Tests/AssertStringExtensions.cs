@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text.RegularExpressions;
+using Blazor.SourceGenerators.Builders;
 
 namespace Blazor.SourceGenerators.Tests;
 

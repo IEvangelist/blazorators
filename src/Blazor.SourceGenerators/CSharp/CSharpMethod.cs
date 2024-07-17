@@ -6,7 +6,7 @@ namespace Blazor.SourceGenerators.CSharp;
 internal record CSharpMethod(
     string RawName,
     string RawReturnTypeName,
-    List<CSharpType> ParameterDefinitions,
+    IList<CSharpType> ParameterDefinitions,
     JavaScriptMethod? JavaScriptMethodDependency = null) : ICSharpDependencyGraphObject
 {
     public bool IsPureJavaScriptInvocation =>
@@ -20,8 +20,7 @@ internal record CSharpMethod(
 
     public bool IsVoid => RawReturnTypeName is "void";
 
-    public Dictionary<string, CSharpObject> DependentTypes { get; init; }
-        = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
     public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
     {

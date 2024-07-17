@@ -1,0 +1,19 @@
+﻿@using System.Runtime.InteropServices
+@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4 text-muted">
+            Powered by @RuntimeInformation.FrameworkDescription
+        </div>
+
+        <article class="content px-4 col-xl-8">
+            @Body
+        </article>
+
+    </main>
+</div>

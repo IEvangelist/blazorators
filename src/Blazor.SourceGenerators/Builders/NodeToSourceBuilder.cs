@@ -1,7 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics;
+using Blazor.SourceGenerators.Options;
 using Blazor.SourceGenerators.TypeScript.Types;
 
 namespace Blazor.SourceGenerators.Builders;
@@ -50,12 +50,12 @@ internal sealed class NodeToSourceBuilder
     private void IncreaseIndentationImpl(bool increaseIndentation = false) =>
         AdjustIndentation(increaseIndentation
             ? IndentationAdjustment.Increase
-            : IndentationAdjustment.Noop);
+            : IndentationAdjustment.NoOp);
 
     private void DecreaseIndentationImpl(bool decreaseIndentation = false) =>
         AdjustIndentation(decreaseIndentation
             ? IndentationAdjustment.Decrease
-            : IndentationAdjustment.Noop);
+            : IndentationAdjustment.NoOp);
 
     private void AdjustIndentation(IndentationAdjustment adjustment) =>
         _indentation = adjustment switch
