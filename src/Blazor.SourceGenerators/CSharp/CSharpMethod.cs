@@ -40,37 +40,7 @@ internal record CSharpMethod(
     /// <summary>
     /// Gets all dependent types of this C# method, including those from parameters and JavaScript dependencies.
     /// </summary>
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
-    {
-        get
-        {
-            var dependentTypes = new Dictionary<string, CSharpObject>(StringComparer.OrdinalIgnoreCase);
-
-            if (ParameterDefinitions?.Count > 0)
-            {
-                var dependencies = ParameterDefinitions
-                    .SelectMany(pd => pd.DependentTypes.Flatten(pair => pair.Value.DependentTypes));
-
-                foreach (var dependency in dependencies)
-                {
-                    dependentTypes[dependency.Key] = dependency.Value;
-                }
-            }
-
-            if (JavaScriptMethodDependency?.ParameterDefinitions?.Count > 0)
-            {
-                var dependencies = JavaScriptMethodDependency.ParameterDefinitions
-                    .SelectMany(pd => pd.DependentTypes.Flatten(pair => pair.Value.DependentTypes));
-
-                foreach (var dependency in dependencies)
-                {
-                    dependentTypes[dependency.Key] = dependency.Value;
-                }
-            }
-
-            return dependentTypes
-                .Select(kvp => (kvp.Key, kvp.Value))
-                .ToImmutableHashSet();
-        }
-    }
+    public IImmutableSet<DependentType> AllDependentTypes => ParameterDefinitions.GetDependentTypes()
+        .Concat(JavaScriptMethodDependency?.ParameterDefinitions.GetDependentTypes())
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 }

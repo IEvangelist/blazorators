@@ -18,14 +18,11 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
     /// <summary>
     /// Gets all dependent types for this top-level object, including properties and methods.
     /// </summary>
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
-        DependentTypes
-            .Select(kvp => (TypeName: kvp.Key, Object: kvp.Value))
-            .Concat(Properties.SelectMany(p => p.AllDependentTypes))
-            .Concat(Methods.SelectMany(m => m.AllDependentTypes))
-            .GroupBy(kvp => kvp.TypeName)
-            .Select(kvp => (TypeName: kvp.Key, kvp.Last().Object))
-            .ToImmutableHashSet();
+    public IImmutableSet<DependentType> AllDependentTypes => DependentTypes
+        .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+        .Concat(Methods.SelectMany(method => method.AllDependentTypes))
+        .Concat(Properties.SelectMany(method => method.AllDependentTypes))
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 
     /// <summary>
     /// Gets the count of members (properties and methods).

@@ -5,17 +5,18 @@ namespace Blazor.SourceGenerators.Extensions;
 
 internal static class CSharpDependencyGraphExtensions
 {
-    internal static IImmutableSet<(string TypeName, CSharpObject Object)> GetAllDependencies(this ICSharpDependencyGraphObject dependencyGraphObject)
+    internal static IImmutableSet<DependentType> GetAllDependencies(this ICSharpDependencyGraphObject dependencyGraphObject)
     {
-        Dictionary<string, CSharpObject> map = new(StringComparer.OrdinalIgnoreCase);
-        var flattened = dependencyGraphObject.DependentTypes?.Flatten(obj => obj.Value.DependentTypes) ?? [];
+        return (dependencyGraphObject.DependentTypes?.Flatten(obj => obj.Value.DependentTypes) ?? [])
+            .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+            .ToImmutableHashSet(DependentTypeComparer.Default);
+    }
 
-        foreach (var kvp in flattened)
-        {
-            map[kvp.Key] = kvp.Value;
-        }
-
-        return map.Select(kvp => (kvp.Key, kvp.Value))
-            .ToImmutableHashSet();
+    internal static IEnumerable<DependentType> GetDependentTypes(this IEnumerable<CSharpType>? parameterDefinitions)
+    {
+        if (parameterDefinitions == null) return [];
+        return parameterDefinitions
+            .SelectMany(pd => pd.DependentTypes.Flatten(pair => pair.Value.DependentTypes))
+            .Select(kvp => new DependentType(kvp.Key, kvp.Value));
     }
 }

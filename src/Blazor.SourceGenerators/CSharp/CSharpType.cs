@@ -38,10 +38,9 @@ internal record CSharpType(
         }
     }
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
-        DependentTypes
-            .Select(kvp => (TypeName: kvp.Key, Object: kvp.Value))
-            .ToImmutableHashSet();
+    public IImmutableSet<DependentType> AllDependentTypes => DependentTypes
+        .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 
     /// <summary>
     /// Gets a string representation of the C# type as a parameter declaration.

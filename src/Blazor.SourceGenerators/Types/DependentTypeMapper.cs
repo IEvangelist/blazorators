@@ -8,7 +8,7 @@ namespace Blazor.SourceGenerators.Types;
 
 internal static class DependentTypeMapper
 {
-    private static readonly Lazy<ITypeScriptAbstractSyntaxTree> s_lazyDefaultAst = new(() =>
+    private static readonly Lazy<ITypeScriptAbstractSyntaxTree> _defaultAst = new(() =>
     {
         var reader = TypeDeclarationReader.Default;
         return TypeScriptAbstractSyntaxTree.FromSourceText(reader.RawSourceText);
@@ -28,7 +28,7 @@ internal static class DependentTypeMapper
     /// </returns>
     public static Dictionary<string, Node> GetDependentTypeMap(string interfaceName)
     {
-        var ast = s_lazyDefaultAst.Value;
+        var ast = _defaultAst.Value;
         if (ast is null or { RootNode: null })
         {
             return [];

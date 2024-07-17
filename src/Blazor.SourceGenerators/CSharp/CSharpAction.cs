@@ -33,13 +33,10 @@ internal record CSharpAction(
     /// <summary>
     /// Gets all dependent types of this C# action.
     /// </summary>
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
-        DependentTypes
-            .Select(kvp => (TypeName: kvp.Key, Object: kvp.Value))
-            .Concat(ParameterDefinitions?.SelectMany(parameter => parameter.AllDependentTypes) ?? [])
-            .GroupBy(kvp => kvp.TypeName)
-            .Select(kvp => (TypeName: kvp.Key, kvp.Last().Object))
-            .ToImmutableHashSet();
+    public IImmutableSet<DependentType> AllDependentTypes => DependentTypes
+        .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+        .Concat(ParameterDefinitions?.SelectMany(parameter => parameter.AllDependentTypes) ?? [])
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 
     /// <summary>
     /// Adds a dependent type to the collection.
