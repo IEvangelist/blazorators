@@ -3,9 +3,9 @@
 
 namespace Blazor.SourceGenerators.Extensions;
 
-static class ListExtensions
+internal static class ListExtensions
 {
-    internal static IEnumerable<(Interation Index, T Item)> Select<T>(this IList<T> list)
+    internal static IEnumerable<(Iteration Index, T Item)> Select<T>(this IList<T> list)
     {
         var count = list.Count;
         for (var i = 0; i < count; ++i)
@@ -15,9 +15,7 @@ static class ListExtensions
     }
 }
 
-readonly record struct Interation(
-    int Index,
-    int Count)
+readonly record struct Iteration(int Index, int Count)
 {
     internal bool IsFirst => Index is 0;
     internal bool IsLast => Index == Count - 1;

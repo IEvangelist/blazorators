@@ -4,7 +4,7 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public class LiteralExpression : Node, ILiteralExpression, IPrimaryExpression
+public class LiteralExpression : Node, ILiteralExpression
 {
     public object LiteralExpressionBrand { get; set; }
     public string Text { get; set; }

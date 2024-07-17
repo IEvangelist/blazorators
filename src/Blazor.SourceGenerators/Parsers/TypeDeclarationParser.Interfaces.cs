@@ -17,19 +17,21 @@ internal sealed partial class TypeDeclarationParser
         return default!;
     }
 
-    internal CSharpObject ToObject(InterfaceDeclaration typescriptInterface)
+    internal CSharpObject ToObject(DeclarationStatement declaration)
     {
-        var heritage = typescriptInterface.HeritageClauses?
-            .SelectMany(heritage => heritage.Types)
-            .Where(type => type.Identifier is not "EventTarget")
-            .Select(type => type.Identifier)
-            .ToArray();
+        var heritage = declaration is InterfaceDeclaration @interface
+            ? @interface.HeritageClauses?
+                .SelectMany(heritage => heritage.Types)
+                .Where(type => type.Identifier is not "EventTarget")
+                .Select(type => type.Identifier)
+                .ToArray()
+            : [];
 
         var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
 
-        var csharpObject = new CSharpObject(typescriptInterface.Identifier, subclass);
+        var csharpObject = new CSharpObject(declaration.Identifier, subclass);
 
-        var objectMethods = typescriptInterface.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        var objectMethods = declaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
         var methods = ParseMethods(
             csharpObject.TypeName,
             objectMethods,
@@ -42,7 +44,7 @@ internal sealed partial class TypeDeclarationParser
                 .ToDictionary(method => method.Key, method => method.Last())
         };
 
-        var objectProperties = typescriptInterface.OfKind(TypeScriptSyntaxKind.PropertySignature);
+        var objectProperties = declaration.OfKind(TypeScriptSyntaxKind.PropertySignature);
         var properties = ParseProperties(
             objectProperties,
             (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
@@ -59,19 +61,19 @@ internal sealed partial class TypeDeclarationParser
 
     internal CSharpTopLevelObject ToTopLevelObject(string typeName)
     {
-        if (TryGetCustomType(typeName, out var typescriptInterface))
+        if (TryGetCustomType(typeName, out var declaration))
         {
-            return ToTopLevelObject(typescriptInterface);
+            return ToTopLevelObject(declaration);
         }
 
         return default!;
     }
 
-    internal CSharpTopLevelObject ToTopLevelObject(InterfaceDeclaration typescriptInterface)
+    internal CSharpTopLevelObject ToTopLevelObject(DeclarationStatement declaration)
     {
-        var csharpTopLevelObject = new CSharpTopLevelObject(typescriptInterface.Identifier);
+        var csharpTopLevelObject = new CSharpTopLevelObject(declaration.Identifier);
 
-        var objectMethods = typescriptInterface.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        var objectMethods = declaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
         var methods = ParseMethods(
             csharpTopLevelObject.RawTypeName,
             objectMethods,
@@ -79,7 +81,7 @@ internal sealed partial class TypeDeclarationParser
 
         csharpTopLevelObject.Methods.AddRange(methods);
 
-        var objectProperties = typescriptInterface.OfKind(TypeScriptSyntaxKind.PropertySignature);
+        var objectProperties = declaration.OfKind(TypeScriptSyntaxKind.PropertySignature);
         var properties = ParseProperties(
             objectProperties,
             (dependency) => csharpTopLevelObject.DependentTypes[dependency.TypeName] = dependency);
@@ -218,11 +220,11 @@ internal sealed partial class TypeDeclarationParser
         return properties;
     }
 
-    private CSharpAction ToAction(InterfaceDeclaration typescriptInterface)
+    private CSharpAction ToAction(DeclarationStatement declaration)
     {
-        var csharpAction = new CSharpAction(typescriptInterface.Identifier);
+        var csharpAction = new CSharpAction(declaration.Identifier);
 
-        var callSignatureDeclaration = typescriptInterface.OfKind(TypeScriptSyntaxKind.CallSignature).FirstOrDefault() as CallSignatureDeclaration;
+        var callSignatureDeclaration = declaration.OfKind(TypeScriptSyntaxKind.CallSignature).FirstOrDefault() as CallSignatureDeclaration;
 
         if (callSignatureDeclaration is not null)
         {
@@ -255,9 +257,9 @@ internal sealed partial class TypeDeclarationParser
         var nonGenericMethodReturnType = methodReturnType.ExtractGenericType();
         var nonArrayMethodReturnType = nonGenericMethodReturnType.Replace("[]", "");
 
-        if (TryGetCustomType(nonArrayMethodReturnType, out var typescriptInterface))
+        if (TryGetCustomType(nonArrayMethodReturnType, out var declaration))
         {
-            var csharpObject = ToObject(typescriptInterface);
+            var csharpObject = ToObject(declaration);
             if (csharpObject is not null)
             {
                 csharpMethod.DependentTypes[nonArrayMethodReturnType] = csharpObject;
@@ -267,11 +269,27 @@ internal sealed partial class TypeDeclarationParser
         return csharpMethod;
     }
 
-    private bool TryGetCustomType(string typeName, out InterfaceDeclaration typescriptInterface)
+    private bool TryGetCustomType(string typeName, out DeclarationStatement declaration)
     {
-        typescriptInterface = default!;
-        return !Primitives.IsPrimitiveType(typeName) &&
-            _reader.TryGetInterface(typeName, out typescriptInterface!) &&
-            typescriptInterface is not null;
+        declaration = default!;
+
+        if (Primitives.IsPrimitiveType(typeName)) return false;
+
+        var success = _reader.TryGetInterface(typeName, out var @interface) && @interface is not null;
+        if (success)
+        {
+            declaration = @interface!;
+            return true;
+        }
+
+        // TODO: Add typealiases as type to find inside the dependencies
+        //success = _reader.TryGetTypeAlias(typeName, out var @type) && @type is not null;
+        //if (success)
+        //{
+        //    declaration = @type!;
+        //    return true;
+        //}
+
+        return false;
     }
 }

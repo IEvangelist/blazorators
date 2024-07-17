@@ -4,6 +4,6 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public interface INamedImportBindings : INode, INamedImportsOrExports
+public interface INamedImportBindings : INamedImportsOrExports
 {
 }

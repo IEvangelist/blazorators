@@ -15,19 +15,19 @@ internal record CSharpType(
     {
         get
         {
-            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop in ActionDeclation?.DependentTypes ?? [])
-            {
-                result[prop.Key] = prop.Value;
-            }
+            var result = new Dictionary<string, CSharpObject>(StringComparer.OrdinalIgnoreCase);
 
-            if (ActionDeclation is { ParameterDefinitions.Count: > 0 })
+            // Add dependent types from ActionDeclation
+            if (ActionDeclation is not null)
             {
-                foreach (var type in ActionDeclation.ParameterDefinitions)
+                foreach (var prop in ActionDeclation.DependentTypes)
                 {
-                    foreach (var pair
-                        in type.DependentTypes.SelectMany(
-                            dt => dt.Value.AllDependentTypes))
+                    result[prop.Key] = prop.Value;
+                }
+
+                foreach (var type in ActionDeclation.ParameterDefinitions ?? [])
+                {
+                    foreach (var pair in type.DependentTypes.SelectMany(dt => dt.Value.AllDependentTypes))
                     {
                         result[pair.TypeName] = pair.Object;
                     }
@@ -38,31 +38,25 @@ internal record CSharpType(
         }
     }
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
-        DependentTypes
-            .SelectMany(kvp => kvp.Value.AllDependentTypes)
-            .ToImmutableHashSet();
+    public IImmutableSet<DependentType> AllDependentTypes => DependentTypes
+        .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 
     /// <summary>
-    /// Gets a string representation of the C# type as a parameter declaration. For example,
-    /// <c>"DateTime date"</c> might be returned from a <see cref="CSharpType"/> with
-    /// <c>"date"</c> as its <see cref="RawName"/> and <c>"DateTime"</c>
-    /// as its <see cref="RawTypeName"/>.
+    /// Gets a string representation of the C# type as a parameter declaration.
     /// </summary>
     public string ToParameterString(bool isGenericType = false, bool overrideNullability = false)
     {
         if (isGenericType)
         {
-            return IsNullable
-                ? $"{MethodBuilderDetails.GenericTypeValue}? {ToArgumentString()}"
-                : $"{MethodBuilderDetails.GenericTypeValue} {ToArgumentString()}";
+            return $"{MethodBuilderDetails.GenericTypeValue}{(IsNullable ? "?" : "")} {ToArgumentString()}";
         }
 
         var isCallback = ActionDeclation is not null;
         string typeName;
 
         if (Primitives.IsPrimitiveType(RawTypeName)) typeName = Primitives.Instance[RawTypeName];
-        else if (isCallback) typeName = "string"; // When the action is a callback, we require `T` instance and callback names.
+        else if (isCallback) typeName = "string";
         else typeName = RawTypeName;
 
         var parameterName = ToArgumentString();
@@ -73,22 +67,28 @@ internal record CSharpType(
             : $"{typeName} {parameterName}";
     }
 
+    /// <summary>
+    /// Gets a string representation of the C# type as an action declaration.
+    /// </summary>
     public string ToActionString(bool isGenericType = false, bool overrideNullability = false)
     {
         if (ActionDeclation is not null)
         {
             var parameterName = ToArgumentString(asDelegate: true);
-            var dependentTypes = ActionDeclation.DependentTypes.Keys;
+            var dependentTypes = string.Join(", ", ActionDeclation.DependentTypes.Keys);
             var parameterDefault = overrideNullability ? "" : " = null";
 
             return IsNullable
-                ? $"Action<{string.Join(", ", dependentTypes)}>? {parameterName}{parameterDefault}"
-                : $"Action<{string.Join(", ", dependentTypes)}> {parameterName}";
+                ? $"Action<{dependentTypes}>? {parameterName}{parameterDefault}"
+                : $"Action<{dependentTypes}> {parameterName}";
         }
 
         return ToParameterString(isGenericType, overrideNullability);
     }
 
+    /// <summary>
+    /// Gets the argument string representation of the C# type.
+    /// </summary>
     public string ToArgumentString(bool toJson = false, bool asDelegate = false)
     {
         var isCallback = ActionDeclation is not null;
@@ -97,8 +97,6 @@ internal record CSharpType(
             ? $"on{RawName.CapitalizeFirstLetter()}{suffix}"
             : RawName.LowerCaseFirstLetter();
 
-        return toJson
-            ? $"{parameterName}.ToJson(options)"
-            : parameterName;
+        return toJson ? $"{parameterName}.ToJson(options)" : parameterName;
     }
 }

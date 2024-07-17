@@ -13,42 +13,25 @@ internal record CSharpObject(
     /// <summary>
     /// The collection of types that this object depends on.
     /// </summary>
-    public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
-        new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
-    {
-        get
-        {
-            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            var members = this.GetAllDependencies()
+    public IImmutableSet<DependentType> AllDependentTypes => this.GetAllDependencies()
                 .Concat(Properties.SelectMany(p => p.Value.AllDependentTypes))
-                .Concat(Methods.SelectMany(p => p.Value.AllDependentTypes));
-
-            foreach (var member in members)
-            {
-                result[member.TypeName] = member.Object;
-            }
-
-            return result.Select(kvp => (kvp.Key, kvp.Value))
-                .Concat(new[] { (TypeName, Object: this) })
-                .ToImmutableHashSet();
-        }
-    }
+                .Concat(Methods.SelectMany(p => p.Value.AllDependentTypes))
+                .Concat([new DependentType(TypeName, this)])
+                .ToImmutableHashSet(DependentTypeComparer.Default);
 
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
     /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpProperty"/> details.
     /// </summary>
-    public Dictionary<string, CSharpProperty> Properties { get; init; } =
-        new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpProperty> Properties { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// The <see cref="Dictionary{TKey, TValue}.Keys"/> represent the raw parsed member name, while the
     /// corresponding <see cref="Dictionary{TKey, TValue}.Values"/> are the <see cref="CSharpMethod"/> details.
     /// </summary>
-    public Dictionary<string, CSharpMethod> Methods { get; init; } =
-        new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpMethod> Methods { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
     public bool IsActionParameter =>
         TypeName.EndsWith("Callback");

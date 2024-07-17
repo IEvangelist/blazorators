@@ -4,7 +4,7 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public sealed class NamedImports : Node, INamedImportsOrExports, INamedImportBindings
+public sealed class NamedImports : Node, INamedImportBindings
 {
     public NamedImports()
     {
