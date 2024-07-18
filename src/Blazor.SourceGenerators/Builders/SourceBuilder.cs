@@ -314,7 +314,6 @@ internal sealed class SourceBuilder
             _builder.Append($"using System.Threading.Tasks;{NewLine}");
         }
 
-        _builder.Append($"#nullable enable{NewLine}");
         _builder.Append(NewLine);
 
         return this;

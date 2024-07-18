@@ -122,6 +122,8 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
                 builder.AppendRaw($"{parameterString},");
             }
         }
+
+        builder.DecreaseIndentation();
     }
 
     private static void AppendNonPureMethod(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options)

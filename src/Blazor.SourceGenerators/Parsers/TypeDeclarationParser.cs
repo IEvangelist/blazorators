@@ -5,12 +5,12 @@ namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class TypeDeclarationParser
 {
-    static readonly Lazy<TypeDeclarationParser> s_defaultParser =
+    static readonly Lazy<TypeDeclarationParser> _parser =
         new(valueFactory: () => new TypeDeclarationParser(TypeDeclarationReader.Default));
 
     readonly TypeDeclarationReader _reader;
 
-    internal static TypeDeclarationParser Default => s_defaultParser.Value;
+    internal static TypeDeclarationParser Default => _parser.Value;
 
     internal TypeDeclarationParser(TypeDeclarationReader reader) => _reader = reader;
 

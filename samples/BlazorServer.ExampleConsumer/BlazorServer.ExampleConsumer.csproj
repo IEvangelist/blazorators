@@ -16,7 +16,7 @@
     <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
     <ProjectReference Include="..\..\src\Blazor.SessionStorage\Blazor.SessionStorage.csproj" />
     <ProjectReference Include="..\..\src\Blazor.SpeechRecognition\Blazor.SpeechRecognition.csproj" />
-    <!--<ProjectReference Include="..\..\src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj" />-->
+    <ProjectReference Include="..\..\src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj" />
   </ItemGroup>
 
 </Project>
