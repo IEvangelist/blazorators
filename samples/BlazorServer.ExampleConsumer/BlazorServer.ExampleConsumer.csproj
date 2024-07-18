@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Blazor.Clipboard\Blazor.Clipboard.csproj" />
     <ProjectReference Include="..\..\src\Blazor.Geolocation\Blazor.Geolocation.csproj" />
     <ProjectReference Include="..\..\src\Blazor.LocalStorage\Blazor.LocalStorage.csproj" />
     <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
