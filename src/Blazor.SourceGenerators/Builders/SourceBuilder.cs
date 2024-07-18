@@ -175,12 +175,17 @@ internal sealed class SourceBuilder
         return this;
     }
 
-    internal SourceBuilder AppendLine()
+    internal SourceBuilder AppendLine(bool postIncreaseIndentation = false)
     {
         // We use a hard-coded new line instead of:
         // _builder.AppendLine() as the new line value changes by environment.
         // For consistency, we'll always generate the exact same new line.
         _builder.Append(NewLine);
+
+        if (postIncreaseIndentation)
+        {
+            IncreaseIndentation();
+        }
 
         return this;
     }

@@ -48,10 +48,9 @@ internal record CSharpObject(
         builder.Append($"/// </summary>\r\n");
         builder.Append($"public class {TypeName}\r\n{{\r\n");
 
-        foreach (var (index, kvp)
-            in Properties.Select((kvp, index) => (index, kvp)))
+        foreach (var (index, property) in Properties.Select((property, index) => (index, property)))
         {
-            var (memberName, member) = (kvp.Key, kvp.Value);
+            var (memberName, member) = (property.Key, property.Value);
             var typeName = member.MappedTypeName;
             var nullableExpression = member.IsNullable && !typeName.EndsWith("?") ? "?" : "";
             var trivia = member.IsArray ? "[]" : "";
@@ -66,9 +65,15 @@ internal record CSharpObject(
             builder.Append($"    [JsonPropertyName(\"{memberName}\")]\r\n");
             builder.Append($"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\r\n");
 
+            var isTimestamp = member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null" or "EpochTimeStamp" or "EpochTimeStamp | null";
+
+            if (index <= Properties.Count - 2 || isTimestamp)
+            {
+                builder.Append($"\r\n");
+            }
+
             // Add readonly property for converting DOMTimeStamp (long) to DateTime.
-            if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null"
-                or "EpochTimeStamp" or "EpochTimeStamp | null")
+            if (isTimestamp)
             {
                 builder.Append($"    /// <summary>\r\n");
                 builder.Append($"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value, \r\n");

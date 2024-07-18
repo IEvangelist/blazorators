@@ -29,31 +29,37 @@ public class LibDomParserInterfacesTests
                 /// </summary>
                 [JsonPropertyName("audioCapabilities")]
                 public MediaKeySystemMediaCapability[]? AudioCapabilities { get; set; } = default!;
+
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.distinctiveIdentifier</c> value.
                 /// </summary>
                 [JsonPropertyName("distinctiveIdentifier")]
                 public MediaKeysRequirement? DistinctiveIdentifier { get; set; } = default!;
+
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.initDataTypes</c> value.
                 /// </summary>
                 [JsonPropertyName("initDataTypes")]
                 public string[]? InitDataTypes { get; set; } = default!;
+
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.label</c> value.
                 /// </summary>
                 [JsonPropertyName("label")]
                 public string? Label { get; set; } = default!;
+
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.persistentState</c> value.
                 /// </summary>
                 [JsonPropertyName("persistentState")]
                 public MediaKeysRequirement? PersistentState { get; set; } = default!;
+
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.sessionTypes</c> value.
                 /// </summary>
                 [JsonPropertyName("sessionTypes")]
                 public string[]? SessionTypes { get; set; } = default!;
+
                 /// <summary>
                 /// Source-generated property representing the <c>MediaKeySystemConfiguration.videoCapabilities</c> value.
                 /// </summary>

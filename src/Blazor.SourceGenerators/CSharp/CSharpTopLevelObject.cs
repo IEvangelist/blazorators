@@ -45,7 +45,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
         var methodLevel = builder.IndentationLevel;
 
         // Methods
-        foreach (var method in Methods)
+        foreach (var (index, method) in Methods.Select())
         {
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);
@@ -66,7 +66,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
 
                 if (hasParameters)
                 {
-                    AppendMethodParameters(builder, method, details, options, suffix: ");");
+                    AppendMethodParameters(builder, method, details, options, suffix: ");", appendNewLine: true);
                 }
                 else
                 {
@@ -78,15 +78,25 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
                 AppendNonPureMethod(builder, method, details, options);
             }
 
-            builder.AppendLine();
+            if (!index.IsLast)
+            {
+                builder.AppendLine();
+            }
         }
 
         // Properties
-        foreach (var property in Properties)
+        foreach (var (index, property) in Properties.Select())
         {
-            if (!property.IsIndexer)
+            if (property.IsIndexer)
             {
-                AppendProperty(builder, property, options);
+                continue;
+            }
+
+            AppendProperty(builder, property, options);
+
+            if (!index.IsLast)
+            {
+                builder.AppendLine();
             }
         }
 
@@ -96,7 +106,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
         return TryFormatCSharpSourceText(builder.ToSourceCodeString());
     }
 
-    private static void AppendMethodParameters(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options, string suffix = "", bool asDelegate = false)
+    private static void AppendMethodParameters(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options, string suffix = "", bool asDelegate = false, bool appendNewLine = false)
     {
         foreach (var (pi, parameter) in method.ParameterDefinitions.Select())
         {
@@ -110,11 +120,11 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
                 if (details.IsSerializable)
                 {
                     builder.AppendRaw($"{parameterString},")
-                           .AppendRaw($"JsonSerializerOptions? options = null{suffix}", appendNewLine: false);
+                           .AppendRaw($"JsonSerializerOptions? options = null{suffix}", appendNewLine);
                 }
                 else
                 {
-                    builder.AppendRaw($"{parameterString}{suffix}", appendNewLine: false);
+                    builder.AppendRaw($"{parameterString}{suffix}", appendNewLine);
                 }
             }
             else
@@ -168,8 +178,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
                 var isGenericType = parameter.IsGenericParameter(method.RawName, options);
                 if (pi.IsLast)
                 {
-                    builder.AppendRaw($"{parameter.ToActionString(isGenericType)});")
-                           .AppendLine();
+                    builder.AppendRaw($"{parameter.ToActionString(isGenericType)});");
                 }
                 else
                 {
@@ -210,17 +219,29 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
         builder.AppendConditionalDelegateCallbackMethods(Methods);
 
         // Methods
-        foreach (var method in Methods)
+        foreach (var (index, method) in Methods.Select())
         {
             AppendImplementationMethod(builder, method, options, methodLevel);
+
+            if (!index.IsLast)
+            {
+                builder.AppendLine();
+            }
         }
 
         // Properties
         foreach (var (index, property) in Properties.Select())
         {
-            if (!property.IsIndexer)
+            if (property.IsIndexer)
             {
-                AppendImplementationProperty(builder, property, options, methodLevel, index);
+                continue;
+            }
+
+            AppendImplementationProperty(builder, property, options, methodLevel);
+
+            if (!index.IsLast)
+            {
+                builder.AppendLine();
             }
         }
 
@@ -293,8 +314,6 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
 
             AppendActionCallbackMethodImplementation(builder, method, details, options);
         }
-
-        builder.AppendLine();
     }
 
     private static void AppendActionCallbackMethodImplementation(SourceBuilder builder, CSharpMethod method, MethodBuilderDetails details, GeneratorOptions options)
@@ -314,7 +333,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
             builder.AppendRaw(") =>", appendNewLine: true, omitIndentation: true);
         }
 
-        builder.AppendLine();
+        builder.AppendLine(postIncreaseIndentation: true);
 
         if (details.IsVoid)
         {
@@ -477,7 +496,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
             builder.AppendRaw(") where TComponent : class =>", appendNewLine: true, omitIndentation: true);
         }
 
-        builder.AppendLine();
+        builder.AppendLine(postIncreaseIndentation: true);
 
         if (details.IsVoid)
         {
@@ -516,11 +535,8 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
         builder.DecreaseIndentation();
     }
 
-    private static void AppendImplementationProperty(SourceBuilder builder, CSharpProperty property, GeneratorOptions options, int methodLevel, Iteration index)
+    private static void AppendImplementationProperty(SourceBuilder builder, CSharpProperty property, GeneratorOptions options, int methodLevel)
     {
-        if (index.IsFirst) builder.AppendLine();
-        if (property.IsIndexer) return;
-
         builder.ResetIndentiationTo(methodLevel);
 
         var details = PropertyBuilderDetails.Create(property, options);
@@ -529,11 +545,6 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
             .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} =>", postIncreaseIndentation: true)
             .AppendRaw($"_javaScript.Invoke{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
             .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");
-
-        if (!index.IsLast)
-        {
-            builder.AppendLine();
-        }
     }
 
     /// <summary>

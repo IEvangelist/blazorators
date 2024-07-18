@@ -30,7 +30,12 @@ internal record CSharpMethod(
     /// <summary>
     /// Indicates whether the method returns void.
     /// </summary>
-    public bool IsVoid => RawReturnTypeName == "void";
+    public bool IsVoid => (IsAsync ? RawReturnTypeName.ExtractGenericType() : RawReturnTypeName) == "void";
+
+    /// <summary>
+    /// Indicates wether the method needs an async invocation
+    /// </summary>
+    public bool IsAsync => RawReturnTypeName.StartsWith("Promise");
 
     /// <summary>
     /// The collection of types that this object depends on.

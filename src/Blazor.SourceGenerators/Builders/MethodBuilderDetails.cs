@@ -23,6 +23,7 @@ namespace Blazor.SourceGenerators.Builders;
 internal readonly record struct MethodBuilderDetails(
     CSharpMethod Method,
     bool IsVoid,
+    bool IsAsync,
     bool IsPrimitiveType,
     bool IsGenericReturnType,
     bool ContainsGenericParameters,
@@ -74,6 +75,7 @@ internal readonly record struct MethodBuilderDetails(
         return new MethodBuilderDetails(
             Method: method,
             IsVoid: method.IsVoid,
+            IsAsync: method.IsAsync,
             IsPrimitiveType: isPrimitiveType,
             IsGenericReturnType: isGenericReturnType,
             ContainsGenericParameters: containsGenericParameters,
@@ -113,6 +115,17 @@ internal readonly record struct MethodBuilderDetails(
         {
             return ("Async", "IJSRuntime");
         }
-        return options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
+
+        if (!options.IsWebAssembly)
+        {
+            return ("Async", "IJSRuntime");
+        }
+
+        if (options.IsWebAssembly && method.IsAsync)
+        {
+            return ("Async", "IJSInProcessRuntime");
+        }
+
+        return ("", "IJSInProcessRuntime");
     }
 }
