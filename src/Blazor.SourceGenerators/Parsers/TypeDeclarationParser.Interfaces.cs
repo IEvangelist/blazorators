@@ -1,13 +1,14 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Reflection;
 using Blazor.SourceGenerators.TypeScript.Types;
 
 namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class TypeDeclarationParser
 {
+    private readonly TypeDeclarationParserCache _cache = new();
+
     internal CSharpObject ToObject(string typeName)
     {
         if (TryGetCustomType(typeName, out var typescriptInterface))
@@ -20,43 +21,51 @@ internal sealed partial class TypeDeclarationParser
 
     internal CSharpObject ToObject(DeclarationStatement declaration)
     {
-        var heritage = declaration is InterfaceDeclaration @interface
-            ? @interface.HeritageClauses?
+        var typeName = declaration.Identifier;
+
+        if (_cache.IsProcessed(typeName)) return _cache.ProcessedTypes[typeName];
+        if ( _cache.IsProcessing(typeName)) return default!;
+
+        CSharpObject csharpObject;
+        using (_cache.Process(typeName))
+        {
+            var heritage = declaration is InterfaceDeclaration @interface ? @interface.HeritageClauses?
                 .SelectMany(heritage => heritage.Types)
                 .Where(type => type.Identifier is not "EventTarget")
                 .Select(type => type.Identifier)
-                .ToArray()
-            : [];
+                .ToArray() : null;
 
-        var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
+            var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
 
-        var csharpObject = new CSharpObject(declaration.Identifier, subclass);
+            csharpObject = new CSharpObject(declaration.Identifier, subclass);
 
-        var objectMethods = declaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
-        var methods = ParseMethods(
-            csharpObject.TypeName,
-            objectMethods,
-            (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
+            var objectMethods = declaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
+            var methods = ParseMethods(
+                csharpObject.TypeName,
+                objectMethods,
+                (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
 
-        csharpObject = csharpObject with
-        {
-            Methods = methods
-                .GroupBy(method => method.RawName)
-                .ToDictionary(method => method.Key, method => method.Last())
-        };
+            csharpObject = csharpObject with
+            {
+                Methods = methods
+                    .GroupBy(method => method.RawName)
+                    .ToDictionary(method => method.Key, method => method.Last())
+            };
 
-        var objectProperties = declaration.OfKind(TypeScriptSyntaxKind.PropertySignature);
-        var properties = ParseProperties(
-            objectProperties,
-            (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
+            var objectProperties = declaration.OfKind(TypeScriptSyntaxKind.PropertySignature);
+            var properties = ParseProperties(
+                objectProperties,
+                (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
 
-        csharpObject = csharpObject with
-        {
-            Properties = properties
-                .GroupBy(property => property.RawName)
-                .ToDictionary(property => property.Key, method => method.Last())
-        };
+            csharpObject = csharpObject with
+            {
+                Properties = properties
+                    .GroupBy(property => property.RawName)
+                    .ToDictionary(property => property.Key, method => method.Last())
+            };
+        }
 
+        _cache.MarkProcessed(typeName, csharpObject);
         return csharpObject;
     }
 
@@ -88,6 +97,8 @@ internal sealed partial class TypeDeclarationParser
             (dependency) => csharpTopLevelObject.DependentTypes[dependency.TypeName] = dependency);
 
         csharpTopLevelObject.Properties.AddRange(properties);
+
+        _cache.Reset();
 
         return csharpTopLevelObject;
     }
