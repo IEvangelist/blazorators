@@ -1,0 +1,17 @@
+﻿@page "/copyandpaste"
+
+@inject IClipboardService Clipboard
+
+<div class="mb-3">
+    <label for="clipboard-content" class="form-label">Your clipboard</label>
+    <textarea @bind=_content class="form-control" id="clipboard-content" rows="3"></textarea>
+</div>
+
+<div class="btn-group btn-group-lg">
+    <button type="button" class="btn btn-lg btn-primary" @onclick=@ReadAsync>
+        Read
+    </button>
+    <button type="button" class="btn btn-lg btn-danger" title="Stop" @onclick=@WriteAsync>
+        Write
+    </button>
+</div>
