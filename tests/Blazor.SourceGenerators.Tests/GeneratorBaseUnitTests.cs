@@ -26,7 +26,7 @@ public abstract class GeneratorBaseUnitTests
             assemblyName: "TestAssembly",
             syntaxTrees: syntaxTrees,
             options: options)
-            .WithReferenceAssemblies(ReferenceAssemblyKind.Net60);
+            .WithReferenceAssemblies(ReferenceAssemblyKind.Net80);
 
         return compilation;
     }

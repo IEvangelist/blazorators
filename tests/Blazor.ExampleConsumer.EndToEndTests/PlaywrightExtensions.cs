@@ -10,6 +10,7 @@ internal static class PlaywrightExtensions
         {
             BrowserType.Chromium => playwright.Chromium,
             BrowserType.Firefox => playwright.Firefox,
+            BrowserType.WebKit => playwright.Webkit,
             _ => throw new ArgumentException($"Unknown browser: {browser}")
         };
 }
