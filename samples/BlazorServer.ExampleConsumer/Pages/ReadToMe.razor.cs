@@ -10,7 +10,7 @@ public sealed partial class ReadToMe : IAsyncDisposable
     const string TextKey = "read-to-me-text";
 
     string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor. JavaScript interoperability is possible by parsing TypeScript type declarations and using this metadata to output corresponding C# types.";
-    SpeechSynthesisVoice[] _voices = Array.Empty<SpeechSynthesisVoice>();
+    SpeechSynthesisVoice[] _voices = [];
     readonly IList<double> _voiceSpeeds =
         Enumerable.Range(0, 12).Select(i => (i + 1) * .25).ToList();
     double _voiceSpeed = 1.5;
@@ -23,7 +23,7 @@ public sealed partial class ReadToMe : IAsyncDisposable
         Rate = _voiceSpeed,
         Volume = 1,
         Voice = _selectedVoice is { Length: > 0 }
-            ? _voices?.FirstOrDefault(voice => voice.Name == _selectedVoice)
+            ? Array.Find(_voices, voice => voice.Name == _selectedVoice)
             : null
     };
 
@@ -41,45 +41,41 @@ public sealed partial class ReadToMe : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender is false)
+        if (firstRender)
         {
-            return;
-        }
+            await GetVoicesAsync();
 
-        await GetVoicesAsync();
+            if (await LocalStorage.GetItemAsync(PreferredVoiceKey)
+                is { Length: > 0 } voice)
+            {
+                _selectedVoice = voice;
+            }
+            if (await LocalStorage.GetItemAsync(PreferredSpeedKey)
+                is { Length: > 0 } s &&
+                double.TryParse(s, out var speed) && speed > 0)
+            {
+                _voiceSpeed = speed;
+            }
+            if (await SessionStorage.GetItemAsync(TextKey)
+                is { Length: > 0 } text)
+            {
+                _text = text;
+            }
 
-        if (await LocalStorage.GetItemAsync(PreferredVoiceKey)
-            is { Length: > 0 } voice)
-        {
-            _selectedVoice = voice;
-        }
-        if (await LocalStorage.GetItemAsync(PreferredSpeedKey)
-            is { Length: > 0 } s &&
-            double.TryParse(s, out var speed) && speed > 0)
-        {
-            _voiceSpeed = speed;
-        }
-        if (await SessionStorage.GetItemAsync(TextKey)
-            is { Length: > 0 } text)
-        {
-            _text = text;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     async Task GetVoicesAsync(bool isFromCallback = false)
     {
         _voices = await SpeechSynthesis.GetVoicesAsync();
-        if (_voices is { } && isFromCallback)
+        if (_voices is not null && isFromCallback)
         {
             StateHasChanged();
         }
     }
 
     void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
-
-    void OnVoiceSpeedChange(ChangeEventArgs args) =>
-        _voiceSpeed = double.TryParse(args.Value?.ToString() ?? "1.5", out var speed)
-            ? speed : 1.5;
 
     ValueTask Speak() => SpeechSynthesis.SpeakAsync(Utterance);
 
