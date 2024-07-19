@@ -20,4 +20,10 @@
     <ProjectReference Include="..\..\src\Blazor.SpeechSynthesis\Blazor.SpeechSynthesis.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\CopyAndPaste.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

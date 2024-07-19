@@ -542,9 +542,9 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName) : ICShar
         var details = PropertyBuilderDetails.Create(property, options);
 
         builder.AppendTripleSlashInheritdocComments(builder.InterfaceName, details.CSharpPropertyName)
-            .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} =>", postIncreaseIndentation: true)
-            .AppendRaw($"_javaScript.Invoke{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
-            .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");
+               .AppendRaw($"{details.ReturnType} {builder.InterfaceName}.{details.CSharpPropertyName} =>", postIncreaseIndentation: true)
+               .AppendRaw($"_javaScript.Invoke{details.Suffix}{details.GenericTypeArgs}(", postIncreaseIndentation: true)
+               .AppendRaw($"\"eval\", \"{details.FullyQualifiedJavaScriptIdentifier}\");");
     }
 
     /// <summary>
