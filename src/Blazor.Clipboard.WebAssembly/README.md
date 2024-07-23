@@ -1,6 +1,6 @@
 ﻿# Blazorators: The Source Generated `clipboard` JavaScript Interop library for Blazor
 
-The [`Blazor.Clipboard`](https://www.nuget.org/packages/Blazor.Clipboard) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IClipboard` interface specific to Blazor WebAssembly and the [`clipboard`](https://developer.mozilla.org/docs/Web/API/Clipboard) Web API.
+The [`Blazor.Clipboard.WebAssembly`](https://www.nuget.org/packages/Blazor.Clipboard.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IClipboardService` interface specific to Blazor WebAssembly and the [`clipboard`](https://developer.mozilla.org/docs/Web/API/Clipboard) Web API.
 
 ## Get started
 
