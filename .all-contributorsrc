@@ -102,6 +102,17 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "Denny09310",
+      "name": "Denny09310",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50493437?v=4",
+      "profile": "https://github.com/Denny09310",
+      "contributions": [
+        "code",
+        "test",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -110,5 +121,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }

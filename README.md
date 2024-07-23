@@ -5,7 +5,7 @@
 
 [![build](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml/badge.svg)](https://github.com/IEvangelist/blazorators/actions/workflows/build-validation.yml)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!--
@@ -781,6 +781,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/fabiansanchez18"><img src="https://avatars.githubusercontent.com/u/106093861?v=4?s=100" width="100px;" alt="fabiansanchez18"/><br /><sub><b>fabiansanchez18</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3Afabiansanchez18" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://weblogs.asp.net/sfeldman"><img src="https://avatars.githubusercontent.com/u/1309622?v=4?s=100" width="100px;" alt="Sean Feldman"/><br /><sub><b>Sean Feldman</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/issues?q=author%3ASeanFeldman" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/daver77"><img src="https://avatars.githubusercontent.com/u/2369739?v=4?s=100" width="100px;" alt="daver77"/><br /><sub><b>daver77</b></sub></a><br /><a href="#ideas-daver77" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Denny09310"><img src="https://avatars.githubusercontent.com/u/50493437?v=4?s=100" width="100px;" alt="Denny09310"/><br /><sub><b>Denny09310</b></sub></a><br /><a href="https://github.com/IEvangelist/blazorators/commits?author=Denny09310" title="Code">💻</a> <a href="https://github.com/IEvangelist/blazorators/commits?author=Denny09310" title="Tests">⚠️</a> <a href="#ideas-Denny09310" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
