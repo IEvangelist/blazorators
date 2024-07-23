@@ -1,16 +1,16 @@
-﻿# Blazorators: The Source Generated `geolocation` JavaScript Interop library for Blazor
+﻿# Blazorators: The Source Generated `clipboard` JavaScript Interop library for Blazor
 
-The [`Blazor.Geolocation`](https://www.nuget.org/packages/Blazor.Geolocation) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IGeolocation` interface specific to Blazor WebAssembly and the [`geolocation`](https://developer.mozilla.org/docs/Web/API/Geolocation) Web API.
+The [`Blazor.Clipboard`](https://www.nuget.org/packages/Blazor.Clipboard) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IClipboard` interface specific to Blazor WebAssembly and the [`clipboard`](https://developer.mozilla.org/docs/Web/API/Clipboard) Web API.
 
 ## Get started
 
-After the NuGet package is added as a reference, call the `AddGeolocationServices` method to register the `IGeolocationService` service type.
+After the NuGet package is added as a reference, call the `AddClipboardServices` method to register the `IClipboardService` service type.
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddGeolocationServices();
+builder.Services.AddClipboardServices();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
@@ -27,67 +27,41 @@ app.MapFallbackToPage("/_Host");
 app.Run();
 ```
 
-Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IGeolocationService` type. The interface takes the following shape:
+Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IClipboardService` type. The interface takes the following shape:
 
 ```csharp
 #nullable enable
 namespace Microsoft.JSInterop;
 
 /// <summary>
-/// Source generated interface definition of the <c>Geolocation</c> type.
+/// Source generated interface definition of the <c>Clipboard</c> type.
 /// </summary>
-public interface IGeolocationService
+public partial interface IClipboardService
 {
-	/// <summary>
-	/// Source generated implementation of <c>window.navigator.geolocation.clearWatch</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/clearWatch"></a>
-	/// </summary>
-	ValueTask ClearWatchAsync(double watchId);
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.clipboard.read</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Clipboard/read"></a>
+    /// </summary>
+    ValueTask<ClipboardItems> ReadAsync();
 
-	/// <summary>
-	/// Source generated implementation of <c>window.navigator.geolocation.getCurrentPosition</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/getCurrentPosition"></a>
-	/// </summary>
-	/// <param name="component">The calling Razor (or Blazor) component.</param>
-	/// <param name="onSuccessCallbackMethodName">Expects the name of a 
-    /// <c>"JSInvokableAttribute"</c> C# method with the following 
-    /// <c>System.Action{GeolocationPosition}"</c>.</param>
-	/// <param name="onErrorCallbackMethodName">Expects the name of a 
-    /// <c>"JSInvokableAttribute"</c> C# method with the following 
-    /// <c>System.Action{GeolocationPositionError}"</c>.</param>
-	/// <param name="options">The <c>PositionOptions</c> value.</param>
-	ValueTask GetCurrentPositionAsync<TComponent>(
-        TComponent component, 
-        string onSuccessCallbackMethodName, 
-        string? onErrorCallbackMethodName = null, 
-        PositionOptions? options = null) 
-        where TComponent : class;
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.clipboard.readText</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Clipboard/readText"></a>
+    /// </summary>
+    ValueTask<string> ReadTextAsync();
 
-	/// <summary>
-	/// Source generated implementation of <c>window.navigator.geolocation.watchPosition</c>.
-	/// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/watchPosition"></a>
-	/// </summary>
-	/// <param name="component">The calling Razor (or Blazor) component.</param>
-	/// <param name="onSuccessCallbackMethodName">Expects the name of a 
-    /// <c>"JSInvokableAttribute"</c> C# method with the following 
-    /// <c>System.Action{GeolocationPosition}"</c>.</param>
-	/// <param name="onErrorCallbackMethodName">Expects the name of a 
-    /// <c>"JSInvokableAttribute"</c> C# method with the following 
-    /// <c>System.Action{GeolocationPositionError}"</c>.</param>
-	/// <param name="options">The <c>PositionOptions</c> value.</param>
-	ValueTask<double> WatchPositionAsync<TComponent>(
-        TComponent component, 
-        string onSuccessCallbackMethodName, 
-        string? onErrorCallbackMethodName = null, 
-        PositionOptions? options = null) 
-        where TComponent : class;
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.clipboard.write</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Clipboard/write"></a>
+    /// </summary>
+    ValueTask WriteAsync(
+        ClipboardItems data);
+
+    /// <summary>
+    /// Source generated implementation of <c>window.navigator.clipboard.writeText</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Clipboard/writeText"></a>
+    /// </summary>
+    ValueTask WriteTextAsync(
+        string data);
 }
-```
-
-### Add JavaScript dependency
-
-In the *_Host.cshtml* file, add the following:
-
-```html
-<script src="_content/Blazor.Geolocation/blazorators.geolocation.g.js"></script>
 ```
