@@ -10,8 +10,8 @@ namespace Microsoft.JSInterop;
 /// </summary>
 public static class SpeechSynthesisServiceExtensions
 {
-    readonly static ConcurrentDictionary<Guid, Func<Task>> s_callbackRegistry = new();
-    readonly static ConcurrentDictionary<string, Action<double>> s_utteranceEndedCallbackRegistry = new();
+    private static readonly ConcurrentDictionary<Guid, Func<Task>> s_callbackRegistry = new();
+    private static readonly ConcurrentDictionary<string, Action<double>> s_utteranceEndedCallbackRegistry = new();
 
     /// <summary>
     /// This extension wraps the <see cref="ISpeechSynthesisService.Speak(SpeechSynthesisUtterance)" />
@@ -27,7 +27,7 @@ public static class SpeechSynthesisServiceExtensions
         SpeechSynthesisUtterance utterance,
         Action<double> onUtteranceEnded)
     {
-        if (service is SpeechSynthesisService and { _javaScript: { } } svc)
+        if (service is SpeechSynthesisService and { _javaScript: { } })
         {
             s_utteranceEndedCallbackRegistry[utterance.Text] = onUtteranceEnded;
             service.Speak(utterance);
