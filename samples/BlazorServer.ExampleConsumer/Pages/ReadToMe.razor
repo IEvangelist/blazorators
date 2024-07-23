@@ -22,7 +22,8 @@
     <label for="range" class="form-label">Voice speed: @_voiceSpeed</label>
     <input type="range" min="@_voiceSpeeds.Min()" max="@_voiceSpeeds.Max()"
            step=".25" class="form-range" id="range" list="speeds"
-           @bind="@_voiceSpeed">
+           @bind="@_voiceSpeed"
+           @bind:culture="System.Globalization.CultureInfo.InvariantCulture">
     <datalist id="speeds">
         @foreach (var speed in _voiceSpeeds)
         {
