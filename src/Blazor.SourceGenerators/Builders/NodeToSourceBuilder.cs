@@ -46,7 +46,15 @@ internal sealed class NodeToSourceBuilder
         return this;
     }
 
-    public override string ToString() => _builder.ToString();
+    private void IncreaseIndentationImpl(bool increaseIndentation = false) =>
+        AdjustIndentation(increaseIndentation
+            ? IndentationAdjustment.Increase
+            : IndentationAdjustment.NoOp);
+
+    private void DecreaseIndentationImpl(bool decreaseIndentation = false) =>
+        AdjustIndentation(decreaseIndentation
+            ? IndentationAdjustment.Decrease
+            : IndentationAdjustment.NoOp);
 
     private void AdjustIndentation(IndentationAdjustment adjustment)
     {

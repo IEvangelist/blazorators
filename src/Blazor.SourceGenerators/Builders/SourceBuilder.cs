@@ -35,6 +35,10 @@ internal sealed class SourceBuilder
     /// <summary>
     /// Gets the implementation name, which is lazily initialized the first time it is accessed.
     /// </summary>
+
+    /// <summary>
+    /// Gets the implementation name, which is lazily initialized the first time it is accessed.
+    /// </summary>
     internal string ImplementationName => _implementationName ??=
         _options.Implementation.ToImplementationName(_isService);
 
