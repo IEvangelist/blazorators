@@ -23,6 +23,7 @@ namespace Blazor.SourceGenerators.Builders;
 internal readonly record struct MethodBuilderDetails(
     CSharpMethod Method,
     bool IsVoid,
+    bool IsAsync,
     bool IsPrimitiveType,
     bool IsGenericReturnType,
     bool ContainsGenericParameters,
@@ -47,7 +48,7 @@ internal readonly record struct MethodBuilderDetails(
     /// <summary>
     /// Returns a string representing a generic type argument with the specified value.
     /// </summary>
-    internal static readonly Func<string, string> ToGenericTypeArgument = static string (string value) => $"<{value}>";
+    internal static readonly Func<string, string> ToGenericTypeArgument = static value => $"<{value}>";
 
     /// <summary>
     /// Gets a value indicating whether the method's return type is serializable.
@@ -68,12 +69,13 @@ internal readonly record struct MethodBuilderDetails(
 
         var genericTypeArgs = DetermineGenericTypeArgs(isGenericReturnType, containsGenericParameters);
         var fullyQualifiedJavaScriptIdentifier = DetermineJavaScriptIdentifier(method, options);
-        (var suffix, var extendingType) = DetermineSuffixAndExtendingType(method, options);
-        (var returnType, var bareType) = method.GetMethodTypes(options, isGenericReturnType, isPrimitiveType);
+        var (suffix, extendingType) = DetermineSuffixAndExtendingType(method, options);
+        var (returnType, bareType) = method.GetMethodTypes(options, isGenericReturnType, isPrimitiveType);
 
         return new MethodBuilderDetails(
             Method: method,
             IsVoid: method.IsVoid,
+            IsAsync: method.IsAsync,
             IsPrimitiveType: isPrimitiveType,
             IsGenericReturnType: isGenericReturnType,
             ContainsGenericParameters: containsGenericParameters,
@@ -89,8 +91,10 @@ internal readonly record struct MethodBuilderDetails(
 
     private static string? DetermineGenericTypeArgs(bool isGenericReturnType, bool containsGenericParameters)
     {
-        if (isGenericReturnType) return ToGenericTypeArgument(GenericTypeValue);
-        if (containsGenericParameters) return ToGenericTypeArgument(GenericTypeValue);
+        if (isGenericReturnType || containsGenericParameters)
+        {
+            return ToGenericTypeArgument(GenericTypeValue);
+        }
         return null;
     }
 
@@ -102,7 +106,7 @@ internal readonly record struct MethodBuilderDetails(
             return $"blazorators.{impl}.{method.RawName}";
         }
         return method.JavaScriptMethodDependency?.InvokableMethodName ??
-            (options.Implementation is not null ? $"{options.Implementation}.{method.RawName}" : method.RawName);
+               (options.Implementation is not null ? $"{options.Implementation}.{method.RawName}" : method.RawName);
     }
 
     private static (string Suffix, string ExtendingType) DetermineSuffixAndExtendingType(CSharpMethod method, GeneratorOptions options)
@@ -111,6 +115,17 @@ internal readonly record struct MethodBuilderDetails(
         {
             return ("Async", "IJSRuntime");
         }
-        return options.IsWebAssembly ? ("", "IJSInProcessRuntime") : ("Async", "IJSRuntime");
+
+        if (!options.IsWebAssembly)
+        {
+            return ("Async", "IJSRuntime");
+        }
+
+        if (options.IsWebAssembly && method.IsAsync)
+        {
+            return ("Async", "IJSInProcessRuntime");
+        }
+
+        return ("", "IJSInProcessRuntime");
     }
 }

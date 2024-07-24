@@ -6,14 +6,14 @@
 
 <div class="input-group w-75 mb-3">
     <select class="form-select" aria-label="Voice selection"
-        @bind="_selectedVoice" disabled=@(_voices?.Any() is false)>
-        @foreach (var voice in _voices ?? Array.Empty<SpeechSynthesisVoice>())
+            @bind="_selectedVoice" disabled=@(_voices is null || _voices.Length == 0)>
+        @foreach (var voice in _voices ?? [])
         {
             <option value="@voice.Name">@voice.Name</option>
         }
     </select>
-    <button class="btn btn-primary" type="button" 
-        title="Refresh voices?" @onclick=@(async () => await GetVoicesAsync())>
+    <button class="btn btn-primary" type="button"
+            title="Refresh voices?" @onclick=@(() => GetVoicesAsync())>
         <span class="oi oi-reload"></span>
     </button>
 </div>
@@ -21,14 +21,14 @@
 <div class="input-group mb-3 w-75">
     <label for="range" class="form-label">Voice speed: @_voiceSpeed</label>
     <input type="range" min="@_voiceSpeeds.Min()" max="@_voiceSpeeds.Max()"
-        step=".25" class="form-range" id="range" list="speeds"
-        value="@_voiceSpeed"
-        @onchange=@OnVoiceSpeedChange>
+           step=".25" class="form-range" id="range" list="speeds"
+           @bind="@_voiceSpeed"
+           @bind:culture="System.Globalization.CultureInfo.InvariantCulture">
     <datalist id="speeds">
-    @foreach (var speed in _voiceSpeeds)
-    {
-        <option value="@speed">speed</option>
-    }
+        @foreach (var speed in _voiceSpeeds)
+        {
+            <option value="@speed">speed</option>
+        }
     </datalist>
 </div>
 
@@ -37,12 +37,12 @@
         Text-to-speech @(_elapsedTimeMessage is { Length: > 0 } ? $"({_elapsedTimeMessage})" : "")
     </label>
     <textarea class="form-control" id="text"
-        @oninput=@OnTextChanged rows="3" value=@_text>
+              @oninput=@OnTextChanged rows="3" value=@_text>
     </textarea>
 </div>
 
 <div class="btn-group btn-group-lg">
-    <button type="button" class="btn btn-lg btn-primary" @onclick=@(async () => await Speak())>
+    <button type="button" class="btn btn-lg btn-primary" @onclick=@(() => Speak())>
         <span class="oi oi-audio"></span>
         <span class="ps-2">Speak</span>
     </button>

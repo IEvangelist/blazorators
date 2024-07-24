@@ -4,6 +4,6 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public sealed class VisitResult : object
+public sealed class VisitResult 
 {
 }

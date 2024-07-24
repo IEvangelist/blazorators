@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+namespace Blazor.SourceGenerators.Builders;
+
 /// <summary>
 /// Represents the indentation level and spaces for generating code.
 /// </summary>

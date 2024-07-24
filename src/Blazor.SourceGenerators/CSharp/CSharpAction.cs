@@ -4,7 +4,8 @@
 namespace Blazor.SourceGenerators.CSharp;
 
 /// <summary>
-/// Represents a C# delegate based on a TypeScript callback interface:
+/// Represents a C# delegate based on a TypeScript callback interface.
+/// </summary>
 /// <example>
 /// For example:
 /// <code>
@@ -12,14 +13,13 @@ namespace Blazor.SourceGenerators.CSharp;
 ///     (position: GeolocationPosition): void;
 /// }
 /// </code>
-/// </example>
 /// Would be represented as:
 /// <list type="bullet">
 /// <item><c>RawName</c>: <c>PositionCallback</c></item>
 /// <item><c>RawReturnTypeName</c>: <c>void</c></item>
-/// <item><c>ParameterDefinitions</c>: <code>new List&lt;CSharpObject&gt; { new(RawName: "position", RawTypeName: "GeolocationPosition") }</code></item>
+/// <item><c>ParameterDefinitions</c>: <code>new List&lt;CSharpType&gt; { new("position", "GeolocationPosition") }</code></item>
 /// </list>
-/// </summary>
+/// </example>
 internal record CSharpAction(
     string RawName,
     string? RawReturnTypeName = "void",
@@ -28,25 +28,13 @@ internal record CSharpAction(
     /// <summary>
     /// The collection of types that this object depends on.
     /// </summary>
-    public Dictionary<string, CSharpObject> DependentTypes { get; init; }
-        = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
-    {
-        get
-        {
-            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop
-                in DependentTypes.Select(
-                        kvp => (TypeName: kvp.Key, Object: kvp.Value))
-                    .Concat(ParameterDefinitions.SelectMany(
-                        p => p.AllDependentTypes)))
-            {
-                result[prop.TypeName] = prop.Object;
-            }
-
-            return result.Select(kvp => (kvp.Key, kvp.Value))
-                .ToImmutableHashSet();
-        }
-    }
+    /// <summary>
+    /// Gets all dependent types of this C# action.
+    /// </summary>
+    public IImmutableSet<DependentType> AllDependentTypes => DependentTypes
+        .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+        .Concat(ParameterDefinitions?.SelectMany(parameter => parameter.AllDependentTypes) ?? [])
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 }

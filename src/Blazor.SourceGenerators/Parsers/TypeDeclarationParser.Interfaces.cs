@@ -7,6 +7,8 @@ namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class TypeDeclarationParser
 {
+    private readonly TypeDeclarationParserCache _cache = new();
+
     internal CSharpObject ToObject(string typeName)
     {
         if (TryGetCustomType(typeName, out var typescriptInterface))
@@ -17,61 +19,71 @@ internal sealed partial class TypeDeclarationParser
         return default!;
     }
 
-    internal CSharpObject ToObject(InterfaceDeclaration typescriptInterface)
+    internal CSharpObject ToObject(DeclarationStatement declaration)
     {
-        var heritage = typescriptInterface.HeritageClauses?
-            .SelectMany(heritage => heritage.Types)
-            .Where(type => type.Identifier is not "EventTarget")
-            .Select(type => type.Identifier)
-            .ToArray();
+        var typeName = declaration.Identifier;
 
-        var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
+        if (_cache.IsProcessed(typeName)) return _cache.ProcessedTypes[typeName];
+        if ( _cache.IsProcessing(typeName)) return default!;
 
-        var csharpObject = new CSharpObject(typescriptInterface.Identifier, subclass);
-
-        var objectMethods = typescriptInterface.OfKind(TypeScriptSyntaxKind.MethodSignature);
-        var methods = ParseMethods(
-            csharpObject.TypeName,
-            objectMethods,
-            (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
-
-        csharpObject = csharpObject with
+        CSharpObject csharpObject;
+        using (_cache.Process(typeName))
         {
-            Methods = methods
-                .GroupBy(method => method.RawName)
-                .ToDictionary(method => method.Key, method => method.Last())
-        };
+            var heritage = declaration is InterfaceDeclaration @interface ? @interface.HeritageClauses?
+                .SelectMany(heritage => heritage.Types)
+                .Where(type => type.Identifier is not "EventTarget")
+                .Select(type => type.Identifier)
+                .ToArray() : null;
 
-        var objectProperties = typescriptInterface.OfKind(TypeScriptSyntaxKind.PropertySignature);
-        var properties = ParseProperties(
-            objectProperties,
-            (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
+            var subclass = heritage is null || heritage.Length == 0 ? "" : string.Join(", ", heritage);
 
-        csharpObject = csharpObject with
-        {
-            Properties = properties
-                .GroupBy(property => property.RawName)
-                .ToDictionary(property => property.Key, method => method.Last())
-        };
+            csharpObject = new CSharpObject(declaration.Identifier, subclass);
 
+            var objectMethods = declaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
+            var methods = ParseMethods(
+                csharpObject.TypeName,
+                objectMethods,
+                (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
+
+            csharpObject = csharpObject with
+            {
+                Methods = methods
+                    .GroupBy(method => method.RawName)
+                    .ToDictionary(method => method.Key, method => method.Last())
+            };
+
+            var objectProperties = declaration.OfKind(TypeScriptSyntaxKind.PropertySignature);
+            var properties = ParseProperties(
+                objectProperties,
+                (dependency) => csharpObject.DependentTypes[dependency.TypeName] = dependency);
+
+            csharpObject = csharpObject with
+            {
+                Properties = properties
+                    .GroupBy(property => property.RawName)
+                    .ToDictionary(property => property.Key, method => method.Last())
+            };
+        }
+
+        _cache.MarkProcessed(typeName, csharpObject);
         return csharpObject;
     }
 
     internal CSharpTopLevelObject ToTopLevelObject(string typeName)
     {
-        if (TryGetCustomType(typeName, out var typescriptInterface))
+        if (TryGetCustomType(typeName, out var declaration))
         {
-            return ToTopLevelObject(typescriptInterface);
+            return ToTopLevelObject(declaration);
         }
 
         return default!;
     }
 
-    internal CSharpTopLevelObject ToTopLevelObject(InterfaceDeclaration typescriptInterface)
+    internal CSharpTopLevelObject ToTopLevelObject(DeclarationStatement declaration)
     {
-        var csharpTopLevelObject = new CSharpTopLevelObject(typescriptInterface.Identifier);
+        var csharpTopLevelObject = new CSharpTopLevelObject(declaration.Identifier);
 
-        var objectMethods = typescriptInterface.OfKind(TypeScriptSyntaxKind.MethodSignature);
+        var objectMethods = declaration.OfKind(TypeScriptSyntaxKind.MethodSignature);
         var methods = ParseMethods(
             csharpTopLevelObject.RawTypeName,
             objectMethods,
@@ -79,19 +91,33 @@ internal sealed partial class TypeDeclarationParser
 
         csharpTopLevelObject.Methods.AddRange(methods);
 
-        var objectProperties = typescriptInterface.OfKind(TypeScriptSyntaxKind.PropertySignature);
+        var objectProperties = declaration.OfKind(TypeScriptSyntaxKind.PropertySignature);
         var properties = ParseProperties(
             objectProperties,
             (dependency) => csharpTopLevelObject.DependentTypes[dependency.TypeName] = dependency);
 
         csharpTopLevelObject.Properties.AddRange(properties);
 
+        _cache.Reset();
+
         return csharpTopLevelObject;
     }
 
-    private static string GetNodeText(INode propertyTypeNode)
+    private static string CleanseType(string type)
     {
-        return propertyTypeNode.GetText().ToString().Trim();
+        return type
+            .Replace(" | null", "")
+            .Replace(" | undefined", "");
+    }
+
+    private static string GetNodeText(INode node)
+    {
+        return node.GetText().ToString().Trim();
+    }
+
+    private static bool IsNullableType(string type)
+    {
+        return type.EndsWith(" | null") || type.EndsWith(" | undefined");
     }
 
     private IEnumerable<CSharpMethod> ParseMethods(string rawTypeName, IEnumerable<Node> objectMethods, Action<CSharpObject> appendDependency)
@@ -104,6 +130,12 @@ internal sealed partial class TypeDeclarationParser
             var methodReturnType = GetNodeText(method.Type);
 
             if (methodName is null || methodParameters is null || string.IsNullOrEmpty(methodReturnType))
+            {
+                continue;
+            }
+
+            // FIXME: For now ignore all method that has "EventListener" in the name
+            if (methodName.EndsWith("EventListener"))
             {
                 continue;
             }
@@ -129,11 +161,15 @@ internal sealed partial class TypeDeclarationParser
 
         foreach (var parameter in methodParameters)
         {
-            var isNullable = parameter.QuestionToken is not null;
             var parameterName = parameter.Identifier;
-
             var parameterType = GetNodeText(parameter.Children[parameter.Children.Count - 1]);
-            parameterType = isNullable ? parameterType.Replace(" | null", "") : parameterType;
+
+            var isNullable = parameter.QuestionToken is not null || IsNullableType(parameterType);
+
+            if (isNullable)
+            {
+                parameterType = CleanseType(parameterType);
+            }
 
             CSharpAction csharpAction = null!;
 
@@ -175,9 +211,6 @@ internal sealed partial class TypeDeclarationParser
         ICollection<CSharpProperty> properties = [];
         foreach (var property in objectProperties.Cast<PropertySignature>())
         {
-            var isReadonly = property.Modifiers.Exists(modifier => modifier.Kind is TypeScriptSyntaxKind.ReadonlyKeyword);
-            var isNullable = property.QuestionToken is not null;
-
             var propertyName = property.Identifier;
 
             var propertyTypeNode = property.Children[property.Children.Count - 1];
@@ -189,11 +222,24 @@ internal sealed partial class TypeDeclarationParser
 
             var propertyType = propertyTypeNode switch
             {
-                _ when isNullable => GetNodeText(propertyTypeNode).Replace(" | null", ""),
                 _ => GetNodeText(propertyTypeNode)
             };
 
+            var isReadonly = property.Modifiers.Exists(modifier => modifier.Kind is TypeScriptSyntaxKind.ReadonlyKeyword);
+            var isNullable = property.QuestionToken is not null || IsNullableType(propertyType);
+
+            if (isNullable)
+            {
+                propertyType = CleanseType(propertyType);
+            }
+
             if (propertyName is null || string.IsNullOrEmpty(propertyType))
+            {
+                continue;
+            }
+
+            // FIXME: For now ignore all properties that starts with "on"
+            if (propertyName.StartsWith("on"))
             {
                 continue;
             }
@@ -218,11 +264,11 @@ internal sealed partial class TypeDeclarationParser
         return properties;
     }
 
-    private CSharpAction ToAction(InterfaceDeclaration typescriptInterface)
+    private CSharpAction ToAction(DeclarationStatement declaration)
     {
-        var csharpAction = new CSharpAction(typescriptInterface.Identifier);
+        var csharpAction = new CSharpAction(declaration.Identifier);
 
-        var callSignatureDeclaration = typescriptInterface.OfKind(TypeScriptSyntaxKind.CallSignature).FirstOrDefault() as CallSignatureDeclaration;
+        var callSignatureDeclaration = declaration.OfKind(TypeScriptSyntaxKind.CallSignature).FirstOrDefault() as CallSignatureDeclaration;
 
         if (callSignatureDeclaration is not null)
         {
@@ -255,9 +301,9 @@ internal sealed partial class TypeDeclarationParser
         var nonGenericMethodReturnType = methodReturnType.ExtractGenericType();
         var nonArrayMethodReturnType = nonGenericMethodReturnType.Replace("[]", "");
 
-        if (TryGetCustomType(nonArrayMethodReturnType, out var typescriptInterface))
+        if (TryGetCustomType(nonArrayMethodReturnType, out var declaration))
         {
-            var csharpObject = ToObject(typescriptInterface);
+            var csharpObject = ToObject(declaration);
             if (csharpObject is not null)
             {
                 csharpMethod.DependentTypes[nonArrayMethodReturnType] = csharpObject;
@@ -267,11 +313,27 @@ internal sealed partial class TypeDeclarationParser
         return csharpMethod;
     }
 
-    private bool TryGetCustomType(string typeName, out InterfaceDeclaration typescriptInterface)
+    private bool TryGetCustomType(string typeName, out DeclarationStatement declaration)
     {
-        typescriptInterface = default!;
-        return !Primitives.IsPrimitiveType(typeName) &&
-            _reader.TryGetInterface(typeName, out typescriptInterface!) &&
-            typescriptInterface is not null;
+        declaration = default!;
+
+        if (Primitives.IsPrimitiveType(typeName)) return false;
+
+        var success = _reader.TryGetInterface(typeName, out var @interface) && @interface is not null;
+        if (success)
+        {
+            declaration = @interface!;
+            return true;
+        }
+
+        // TODO: Add typealiases as type to find inside the dependencies
+        //success = _reader.TryGetTypeAlias(typeName, out var @type) && @type is not null;
+        //if (success)
+        //{
+        //    declaration = @type!;
+        //    return true;
+        //}
+
+        return false;
     }
 }

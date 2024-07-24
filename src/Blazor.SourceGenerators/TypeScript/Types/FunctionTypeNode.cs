@@ -4,7 +4,7 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public sealed class FunctionTypeNode : Node, ITypeNode, IFunctionOrConstructorTypeNode
+public sealed class FunctionTypeNode : Node, IFunctionOrConstructorTypeNode
 {
     public FunctionTypeNode()
     {

@@ -20,7 +20,7 @@ public sealed partial class ListenToMe : IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender is false)
+        if (!firstRender)
         {
             return;
         }

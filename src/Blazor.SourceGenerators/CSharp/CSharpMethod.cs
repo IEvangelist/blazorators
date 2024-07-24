@@ -3,52 +3,51 @@
 
 namespace Blazor.SourceGenerators.CSharp;
 
+/// <summary>
+/// Represents a C# method which might have dependencies on JavaScript methods.
+/// </summary>
 internal record CSharpMethod(
     string RawName,
     string RawReturnTypeName,
     IList<CSharpType> ParameterDefinitions,
     JavaScriptMethod? JavaScriptMethodDependency = null) : ICSharpDependencyGraphObject
 {
-    public bool IsPureJavaScriptInvocation =>
-        JavaScriptMethodDependency is { IsPure: true };
+    /// <summary>
+    /// Indicates whether the method is a pure JavaScript invocation.
+    /// </summary>
+    public bool IsPureJavaScriptInvocation => JavaScriptMethodDependency?.IsPure == true;
 
-    public bool IsNotBiDirectionalJavaScript =>
-        JavaScriptMethodDependency is { IsBiDirectionalJavaScript: false };
+    /// <summary>
+    /// Indicates whether the method is not bi-directional JavaScript.
+    /// </summary>
+    public bool IsNotBiDirectionalJavaScript => JavaScriptMethodDependency?.IsBiDirectionalJavaScript == false;
 
-    public bool IsReturnTypeNullable =>
-        RawReturnTypeName.Contains("null");
+    /// <summary>
+    /// Indicates whether the return type of the method is nullable.
+    /// </summary>
+    public bool IsReturnTypeNullable => RawReturnTypeName.Contains("null");
 
-    public bool IsVoid => RawReturnTypeName is "void";
+    /// <summary>
+    /// Indicates whether the method returns void.
+    /// </summary>
+    public bool IsVoid => (IsAsync ? RawReturnTypeName.ExtractGenericType() : RawReturnTypeName) == "void";
 
+    /// <summary>
+    /// Indicates wether the method needs an async invocation
+    /// </summary>
+    public bool IsAsync => RawReturnTypeName.StartsWith("Promise");
+
+    /// <summary>
+    /// The collection of types that this object depends on.
+    /// </summary>
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
-    {
-        get
-        {
-            Dictionary<string, CSharpObject> dependentTypes = new(StringComparer.OrdinalIgnoreCase);
-            if (ParameterDefinitions is { Count: > 0 })
-            {
-                foreach (var kvp
-                    in ParameterDefinitions.SelectMany(pd => pd.DependentTypes)
-                        .Flatten(pair => pair.Value.DependentTypes))
-                {
-                    dependentTypes[kvp.Key] = kvp.Value;
-                }
-            }
-            if (JavaScriptMethodDependency is { ParameterDefinitions.Count: > 0 })
-            {
-                foreach (var dependency
-                    in JavaScriptMethodDependency.ParameterDefinitions.SelectMany(pd => pd.DependentTypes)
-                        .Flatten(pair => pair.Value.DependentTypes))
-                {
-                    dependentTypes[dependency.Key] = dependency.Value;
-                }
-            }
-
-            return dependentTypes.Select(kvp => (kvp.Key, kvp.Value))
-                .Concat(this.GetAllDependencies())
-                .ToImmutableHashSet();
-        }
-    }
+    /// <summary>
+    /// Gets all dependent types of this C# method, including those from parameters and JavaScript dependencies.
+    /// </summary>
+    public IImmutableSet<DependentType> AllDependentTypes => DependentTypes
+        .Select(kvp => new DependentType(kvp.Key, kvp.Value))
+        .Concat(ParameterDefinitions.GetDependentTypes())
+        .Concat(JavaScriptMethodDependency?.ParameterDefinitions.GetDependentTypes())
+        .ToImmutableHashSet(DependentTypeComparer.Default);
 }

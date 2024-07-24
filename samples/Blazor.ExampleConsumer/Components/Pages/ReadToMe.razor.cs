@@ -74,10 +74,6 @@ public sealed partial class ReadToMe : IDisposable
 
     void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
 
-    void OnVoiceSpeedChange(ChangeEventArgs args) =>
-        _voiceSpeed = double.TryParse(args.Value?.ToString() ?? "1.5", out var speed)
-            ? speed : 1.5;
-
     void Speak() => SpeechSynthesis.Speak(
         Utterance,
         elapsedTime =>

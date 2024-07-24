@@ -4,7 +4,7 @@
 #nullable disable
 namespace Blazor.SourceGenerators.TypeScript.Types;
 
-public interface IDeclarationStatement : INode, IDeclaration, IStatement
+public interface IDeclarationStatement : IDeclaration, IStatement
 {
     // Node Name { get; set; } // Identifier | StringLiteral | NumericLiteral
 }
