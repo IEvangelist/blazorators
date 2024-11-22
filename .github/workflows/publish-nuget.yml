@@ -12,7 +12,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
     - name: Test
       run: dotnet test --filter "Category!=EndToEnd" --configuration Release
     
@@ -65,7 +65,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
         
     - name: Restore dependencies for ${{ matrix.project }}
       run: |

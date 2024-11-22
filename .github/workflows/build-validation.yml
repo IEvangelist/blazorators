@@ -41,7 +41,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
 
     - name: Restore dependencies for ${{ matrix.project }}
       run: |
@@ -62,7 +62,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
 
     - name: Run tests
       run: |
