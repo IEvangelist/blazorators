@@ -3,7 +3,9 @@
 
 namespace Blazor.ExampleConsumer.Components.Pages;
 
-public sealed partial class ListenToMe : IDisposable
+public sealed partial class ListenToMe(
+    ISpeechRecognitionService speechRecognition,
+    ISessionStorageService sessionStorage) : IDisposable
 {
     const string TranscriptKey = "listen-to-me-page-transcript";
 
@@ -12,20 +14,14 @@ public sealed partial class ListenToMe : IDisposable
     SpeechRecognitionErrorEvent? _errorEvent;
     string? _transcript;
 
-    [Inject]
-    public ISpeechRecognitionService SpeechRecognition { get; set; } = null!;
-
-    [Inject]
-    public ISessionStorageService SessionStorage { get; set; } = null!;
-
     protected override void OnInitialized() =>
-        _transcript = SessionStorage.GetItem<string>(TranscriptKey);
+        _transcript = sessionStorage.GetItem<string>(TranscriptKey);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await SpeechRecognition.InitializeModuleAsync();
+            await speechRecognition.InitializeModuleAsync();
         }
     }
 
@@ -33,14 +29,14 @@ public sealed partial class ListenToMe : IDisposable
     {
         if (_isRecognizingSpeech)
         {
-            SpeechRecognition.CancelSpeechRecognition(false);
+            speechRecognition.CancelSpeechRecognition(false);
         }
         else
         {
             var bcp47Tag = CurrentUICulture.Name;
 
             _recognitionSubscription?.Dispose();
-            _recognitionSubscription = SpeechRecognition.RecognizeSpeech(
+            _recognitionSubscription = speechRecognition.RecognizeSpeech(
                 bcp47Tag,
                 OnRecognized,
                 OnError,
@@ -75,7 +71,7 @@ public sealed partial class ListenToMe : IDisposable
             _ => $"{_transcript.Trim()} {transcript}".Trim()
         };
 
-        SessionStorage.SetItem(TranscriptKey, _transcript);
+        sessionStorage.SetItem(TranscriptKey, _transcript);
         StateHasChanged();
     }
 

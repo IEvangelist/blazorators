@@ -32,7 +32,7 @@ internal record CSharpObject(
             }
 
             return result.Select(kvp => (kvp.Key, kvp.Value))
-                .Concat(new[] { (TypeName, Object: this) })
+                .Concat([(TypeName, this)])
                 .ToImmutableHashSet();
         }
     }

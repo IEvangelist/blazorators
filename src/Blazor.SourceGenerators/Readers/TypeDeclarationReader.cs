@@ -7,16 +7,15 @@ internal sealed partial class TypeDeclarationReader
 {
     readonly Lazy<string> _typeDeclarationText;
 
-    IDictionary<string, string>? _typeDeclarationMap;
-    IDictionary<string, string>? _typeAliasMap;
-
     private IDictionary<string, string> TypeDeclarationMap =>
-        _typeDeclarationMap ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
+        field ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
 
     private IDictionary<string, string> TypeAliasMap =>
-        _typeAliasMap ??= ReadTypeAliasMap(_typeDeclarationText.Value);
+        field ??= ReadTypeAliasMap(_typeDeclarationText.Value);
 
+#pragma warning disable CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     private TypeDeclarationReader()
+#pragma warning restore CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     {
         _typeDeclarationText = new Lazy<string>(
             valueFactory: () => GetEmbeddedResourceText());
@@ -46,7 +45,7 @@ internal sealed partial class TypeDeclarationReader
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error initializing lib dom parser. {ex}");
+            Trace.WriteLine($"Error initializing lib dom parser. {ex}");
         }
 
         return map;
@@ -76,7 +75,7 @@ internal sealed partial class TypeDeclarationReader
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error initializing lib dom parser. {ex}");
+            Trace.WriteLine($"Error initializing lib dom parser. {ex}");
         }
 
         return map;

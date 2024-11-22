@@ -8,8 +8,8 @@ namespace Blazor.SourceGenerators.Tests;
 
 public class JavaScriptInteropTests : GeneratorBaseUnitTests
 {
-    public override IEnumerable<ISourceGenerator> SourceGenerators =>
-        new[] { new JavaScriptInteropGenerator() };
+    public override IIncrementalGenerator[] SourceGenerators =>
+        [new JavaScriptInteropGenerator()];
 
     public SyntaxTree GetGeneratedTree(string sourceCode)
     {

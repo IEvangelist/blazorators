@@ -12,7 +12,7 @@ internal static class CSharpDependencyGraphExtensions
         foreach (var kvp
             in dependencyGraphObject.DependentTypes?.Flatten(
                 obj => obj.Value.DependentTypes)
-            ?? Enumerable.Empty<KeyValuePair<string, CSharpObject>>())
+            ?? [])
         {
             map[kvp.Key] = kvp.Value;
         }

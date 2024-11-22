@@ -17,8 +17,6 @@ internal sealed class SourceBuilder
     private readonly bool _isService;
 
     private Indentation _indentation = new(0);
-    private string? _implementationName;
-    private string? _interfaceName;
 
     /// <summary>
     /// Gets or sets the set of fields used by the source builder.
@@ -38,16 +36,18 @@ internal sealed class SourceBuilder
     /// <summary>
     /// Gets the implementation name, which is lazily initialized the first time it is accessed.
     /// </summary>
-    internal string ImplementationName => _implementationName ??=
+    internal string ImplementationName => field ??=
         _options.Implementation.ToImplementationName(_isService);
 
     /// <summary>
     /// Gets the interface name, which is lazily initialized the first time it is accessed.
     /// </summary>
-    internal string InterfaceName => _interfaceName ??=
+    internal string InterfaceName => field ??=
         _options.Implementation.ToInterfaceName(_isService);
 
+#pragma warning disable CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     internal SourceBuilder(GeneratorOptions options, bool isService = true)
+#pragma warning restore CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     {
         _options = options;
         _isService = isService;

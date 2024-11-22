@@ -10,7 +10,7 @@ public sealed partial class ReadToMe : IAsyncDisposable
     const string TextKey = "read-to-me-text";
 
     string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor. JavaScript interoperability is possible by parsing TypeScript type declarations and using this metadata to output corresponding C# types.";
-    SpeechSynthesisVoice[] _voices = Array.Empty<SpeechSynthesisVoice>();
+    SpeechSynthesisVoice[] _voices = [];
     readonly IList<double> _voiceSpeeds =
         Enumerable.Range(0, 12).Select(i => (i + 1) * .25).ToList();
     double _voiceSpeed = 1.5;

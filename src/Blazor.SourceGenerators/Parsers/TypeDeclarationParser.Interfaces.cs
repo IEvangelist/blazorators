@@ -9,7 +9,7 @@ internal sealed partial class TypeDeclarationParser
     {
         CSharpObject? cSharpObject = null;
 
-        var lineTokens = typeScriptTypeDeclaration.Split(new[] { '\n' });
+        var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
         {
             if (index == 0)
@@ -118,7 +118,7 @@ internal sealed partial class TypeDeclarationParser
     {
         CSharpTopLevelObject? topLevelObject = null;
 
-        var lineTokens = typeScriptTypeDeclaration.Split(new[] { '\n' });
+        var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
         {
             if (index == 0)
@@ -282,7 +282,7 @@ internal sealed partial class TypeDeclarationParser
     {
         CSharpAction? cSharpAction = null;
 
-        var lineTokens = typeScriptTypeDeclaration.Split(new[] { '\n' });
+        var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
         {
             if (index == 0)
@@ -364,7 +364,7 @@ internal sealed partial class TypeDeclarationParser
         // Example input:
         // "(someCallback: CallbackType, someId?: number | null)"
         var trimmedParameters = parametersString.Replace("(", "").Replace(")", "");
-        var parameterLineTokenizer = trimmedParameters.Split(new[] { ':', ',', });
+        var parameterLineTokenizer = trimmedParameters.Split([':', ',',]);
 
         JavaScriptMethod? javaScriptMethod = new(rawName);
         foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))

@@ -184,7 +184,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         }
 
         // Properties
-        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
+        foreach (var (index, property) in (Properties ?? []).Select())
         {
             if (index.IsFirst) builder.AppendLine();
             if (property.IsIndexer) continue;
@@ -230,7 +230,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         builder.AppendConditionalDelegateCallbackMethods(Methods);
 
         // Methods
-        foreach (var (index, method) in (Methods ?? new List<CSharpMethod>()).Select())
+        foreach (var (index, method) in (Methods ?? []).Select())
         {
             var details = MethodBuilderDetails.Create(method, options);
             builder.ResetIndentiationTo(methodLevel);
@@ -469,7 +469,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         }
 
         // Properties
-        foreach (var (index, property) in (Properties ?? new List<CSharpProperty>()).Select())
+        foreach (var (index, property) in (Properties ?? []).Select())
         {
             if (index.IsFirst) builder.AppendLine();
             if (property.IsIndexer) continue;
@@ -547,7 +547,7 @@ public static class {nonService}ServiceCollectionExtensions
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Trace.WriteLine(ex);
 
             return csharpSourceText;
         }

@@ -7,11 +7,11 @@ namespace Microsoft.JSInterop;
     TypeName = "Storage",
     Implementation = "window.localStorage",
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
-    GenericMethodDescriptors = new[]
-    {
+    GenericMethodDescriptors =
+    [
         "getItem",
         "setItem:value"
-    })]
+    ])]
 public partial interface ILocalStorageService
 {
 }

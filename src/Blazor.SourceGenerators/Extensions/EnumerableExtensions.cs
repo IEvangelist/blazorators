@@ -10,6 +10,6 @@ internal static class EnumerableExtensions
         Func<T, IEnumerable<T>> childSelector) =>
         source?.SelectMany(
             child => childSelector(child).Flatten(childSelector))
-            .Concat(source ?? Enumerable.Empty<T>())
-        ?? Enumerable.Empty<T>();
+            .Concat(source ?? [])
+        ?? [];
 }

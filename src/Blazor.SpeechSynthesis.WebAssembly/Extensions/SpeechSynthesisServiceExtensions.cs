@@ -27,7 +27,7 @@ public static class SpeechSynthesisServiceExtensions
         SpeechSynthesisUtterance utterance,
         Action<double> onUtteranceEnded)
     {
-        if (service is SpeechSynthesisService and { _javaScript: { } } svc)
+        if (service is SpeechSynthesisService and { _javaScript: { } } _)
         {
             s_utteranceEndedCallbackRegistry[utterance.Text] = onUtteranceEnded;
             service.Speak(utterance);

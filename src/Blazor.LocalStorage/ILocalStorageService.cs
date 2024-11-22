@@ -9,10 +9,10 @@ namespace Microsoft.JSInterop;
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage",
-    TypeDeclarationSources = new[]
-    {
+    TypeDeclarationSources =
+    [
         "https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts"
-    })]
+    ])]
 public partial interface ILocalStorageService
 {
 }

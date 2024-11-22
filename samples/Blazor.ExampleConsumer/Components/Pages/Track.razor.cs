@@ -3,7 +3,7 @@
 
 namespace Blazor.ExampleConsumer.Components.Pages;
 
-public partial class Track : IDisposable
+public sealed partial class Track(IGeolocationService geolocation) : IDisposable
 {
     readonly JsonSerializerOptions _opts = new()
     {
@@ -24,14 +24,14 @@ public partial class Track : IDisposable
     bool _isLoading = true;
 
     protected override void OnInitialized() =>
-        _watchId = Geolocation.WatchPosition(
+        _watchId = geolocation.WatchPosition(
             component: this,
-            onSuccessCallbackMethodName: nameof(OnPositionRecieved),
+            onSuccessCallbackMethodName: nameof(OnPositionReceived),
             onErrorCallbackMethodName: nameof(OnPositionError),
             options: _options);
 
     [JSInvokable]
-    public void OnPositionRecieved(GeolocationPosition position)
+    public void OnPositionReceived(GeolocationPosition position)
     {
         _isLoading = false;
         _position = position;
@@ -46,5 +46,5 @@ public partial class Track : IDisposable
         StateHasChanged();
     }
 
-    public void Dispose() => Geolocation.ClearWatch(_watchId);
+    public void Dispose() => geolocation.ClearWatch(_watchId);
 }

@@ -8,11 +8,11 @@ namespace Microsoft.JSInterop;
     TypeName = "Storage",
     Implementation = "window.sessionStorage",
     Url = "https://developer.mozilla.org/docs/Web/API/Window/sessionStorage",
-    GenericMethodDescriptors = new[]
-    {
+    GenericMethodDescriptors =
+    [
         "getItem",
         "setItem:value"
-    })]
+    ])]
 public partial interface ISessionStorageService
 {
 }

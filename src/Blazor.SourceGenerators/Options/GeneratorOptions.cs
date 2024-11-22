@@ -4,7 +4,7 @@
 /// <summary>
 /// The options used (and parsed from the <c>JSAutoInteropAttribute</c>) to source-generate JavaScript interop.
 /// </summary>
-/// <param name="SupportsGenerics">Indicates wether the generator supports generics.</param>
+/// <param name="SupportsGenerics">Indicates whether the generator supports generics.</param>
 /// <param name="TypeName">The type name that corresponds to the lib.dom.d.ts interface. For example, <c>"Geolocation"</c></param>
 /// <param name="Implementation">The path from the <c>window</c> object. For example, <c>"window.navigator.geolocation"</c> (or <c>"navigator.geolocation"</c>)</param>
 /// <param name="OnlyGeneratePureJS">Whether to generate only pure JavaScript functions that do not require callbacks. For example, <c>Geolocation.clearWatch</c> is consider pure, but <c>Geolocation.watchPosition</c> is not.</param>
@@ -28,29 +28,29 @@ internal sealed record GeneratorOptions(
     string[]? TypeDeclarationSources = null,
     bool IsWebAssembly = true)
 {
-    ISet<TypeDeclarationParser>? _parsers;
-
     /// <summary>
     /// Get <see cref="GeneratorOptions"/> instance maps its
     /// <see cref="TypeDeclarationSources"/> into a set of parsers.
     /// When <see cref="TypeDeclarationSources"/> is null, or empty,
-    /// the default lib.dom.d.ts parser is used.
+    /// the default <i>lib.dom.d.ts</i> parser is used.
     /// </summary>
+#pragma warning disable CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     internal ISet<TypeDeclarationParser> Parsers
+#pragma warning restore CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     {
         get
         {
-            _parsers ??= new HashSet<TypeDeclarationParser>();
+            field ??= new HashSet<TypeDeclarationParser>();
 
             foreach (var source in
                 TypeDeclarationSources?.Select(TypeDeclarationReader.Factory)
                     ?.Select(reader => new TypeDeclarationParser(reader))
-                    ?? new[] { TypeDeclarationParser.Default })
+                    ?? [TypeDeclarationParser.Default])
             {
-                _parsers.Add(source);
+                field.Add(source);
             }
 
-            return _parsers;
+            return field;
         }
     }
 }

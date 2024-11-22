@@ -1,20 +1,13 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics.CodeAnalysis;
-using Blazor.ExampleConsumer.Models;
-using Microsoft.AspNetCore.Components.Web;
-
 namespace Blazor.ExampleConsumer.Components.Pages;
 
-public sealed partial class TodoList
+public sealed partial class TodoList(ILocalStorageService localStorage)
 {
     readonly Dictionary<string, string> _localStorageItems = [];
     HashSet<TodoItem> _todos = [];
     string? _todoValue;
-
-    [Inject]
-    public ILocalStorageService LocalStorage { get; set; } = null!;
 
     protected override void OnInitialized() => UpdateTodoItems();
 
@@ -22,7 +15,7 @@ public sealed partial class TodoList
     {
         var todos = GetLocalStorageKeys()
             .Where(key => key.StartsWith(TodoItem.IdPrefix))
-            .Select(key => LocalStorage.GetItem<TodoItem>(key))
+            .Select(key => localStorage.GetItem<TodoItem>(key))
             .Where(todo => todo is not null)
             .ToHashSet() ?? [];
 
@@ -56,7 +49,7 @@ public sealed partial class TodoList
         {
             try
             {
-                value = LocalStorage.GetItem<T>(key);
+                value = localStorage.GetItem<T>(key);
                 return value is not null;
             }
             catch
@@ -69,10 +62,10 @@ public sealed partial class TodoList
 
     IEnumerable<string> GetLocalStorageKeys()
     {
-        var length = LocalStorage.Length;
+        var length = localStorage.Length;
         for (var i = 0; i < length; ++i)
         {
-            if (LocalStorage.Key(i) is { Length: > 0 } key)
+            if (localStorage.Key(i) is { Length: > 0 } key)
             {
                 yield return key;
             }
@@ -84,7 +77,7 @@ public sealed partial class TodoList
         if (_todoValue is not null)
         {
             var todo = new TodoItem(_todoValue, false);
-            LocalStorage.SetItem(todo.Id, todo);
+            localStorage.SetItem(todo.Id, todo);
             UpdateTodoItems();
             _todoValue = null;
         }
@@ -100,14 +93,14 @@ public sealed partial class TodoList
 
     void Delete(TodoItem todo)
     {
-        LocalStorage.RemoveItem(todo.Id);
+        localStorage.RemoveItem(todo.Id);
         _todos.RemoveWhere(t => t.Id == todo.Id);
         _localStorageItems.Remove(todo.Id);
     }
 
     void ClearAll()
     {
-        LocalStorage.Clear();
+        localStorage.Clear();
         _todos.Clear();
         _localStorageItems.Clear();
     }

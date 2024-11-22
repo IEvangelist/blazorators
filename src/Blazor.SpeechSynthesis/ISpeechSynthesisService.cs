@@ -9,10 +9,10 @@ namespace Microsoft.JSInterop;
     HostingModel = BlazorHostingModel.Server,
     Url = "https://developer.mozilla.org/docs/Web/API/SpeechSynthesis",
     OnlyGeneratePureJS = true,
-    PureJavaScriptOverrides = new[]
-    {
+    PureJavaScriptOverrides =
+    [
         "getVoices"
-    })]
+    ])]
 public partial interface ISpeechSynthesisService
 {
 }

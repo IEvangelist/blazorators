@@ -3,7 +3,7 @@
 
 namespace Blazor.ExampleConsumer.Components.Pages;
 
-public sealed partial class ClientPosition
+public sealed partial class ClientPosition(IGeolocationService geolocation)
 {
     readonly JsonSerializerOptions _opts = new()
     {
@@ -23,7 +23,7 @@ public sealed partial class ClientPosition
     bool _isLoading = true;
 
     protected override void OnInitialized() =>
-        Geolocation.GetCurrentPosition(
+        geolocation.GetCurrentPosition(
             component: this,
             onSuccessCallbackMethodName: nameof(OnPositionReceived),
             onErrorCallbackMethodName: nameof(OnPositionError),
