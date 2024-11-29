@@ -13,6 +13,4 @@ namespace Microsoft.JSInterop;
         "getItem",
         "setItem:value"
     ])]
-public partial interface ISessionStorageService
-{
-}
+public partial interface ISessionStorageService;

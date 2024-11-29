@@ -7,6 +7,4 @@ namespace Microsoft.JSInterop;
     TypeName = "Geolocation",
     Implementation = "window.navigator.geolocation",
     Url = "https://developer.mozilla.org/docs/Web/API/Geolocation")]
-public partial interface IGeolocationService
-{
-}
+public partial interface IGeolocationService;

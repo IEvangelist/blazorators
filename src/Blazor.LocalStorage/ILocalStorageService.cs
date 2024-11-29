@@ -13,6 +13,4 @@ namespace Microsoft.JSInterop;
     [
         "https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts"
     ])]
-public partial interface ILocalStorageService
-{
-}
+public partial interface ILocalStorageService;

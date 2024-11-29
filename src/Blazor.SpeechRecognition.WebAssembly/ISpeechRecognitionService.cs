@@ -19,7 +19,16 @@ public interface ISpeechRecognitionService : IAsyncDisposable
     Task InitializeModuleAsync(bool logModuleDetails = true);
 
     /// <summary>
-    /// Cancels the active speech recognition session.
+    /// Cancels the active speech recognition session. Based on the <paramref name="isAborted"/>
+    /// flag, calls the corresponding native JavaScript API when:
+    /// <list type="bullet">
+    /// <item>
+    /// <see langword="true"/>: Calls <c>speechRecognition.abort</c> which will send an <c>"aborted"</c> error message.
+    /// </item>
+    /// <item>
+    /// <see langword="false"/>: Calls <c>speechRecognition.stop</c> which gracefully stops recognition.
+    /// </item>
+    /// </list>
     /// </summary>
     /// <param name="isAborted">
     /// Is aborted controls which API to call,

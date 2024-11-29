@@ -8,6 +8,4 @@ namespace Microsoft.JSInterop;
 //    TypeName = "Permissions",
 //    Implementation = "window.navigator.permissions",
 //    Url = "https://developer.mozilla.org/docs/Web/API/Navigator/permissions")]
-public partial interface IPermissionsService
-{
-}
+public partial interface IPermissionsService;

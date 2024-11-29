@@ -12,6 +12,4 @@ namespace Microsoft.JSInterop;
     [
         "getVoices"
     ])]
-public partial interface ISpeechSynthesisService
-{
-}
+public partial interface ISpeechSynthesisService;

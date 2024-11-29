@@ -12,6 +12,4 @@ namespace Microsoft.JSInterop;
         "getItem",
         "setItem:value"
     ])]
-public partial interface ILocalStorageService
-{
-}
+public partial interface ILocalStorageService;
