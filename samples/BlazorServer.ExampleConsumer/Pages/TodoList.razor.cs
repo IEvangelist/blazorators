@@ -32,26 +32,11 @@ public sealed partial class TodoList
         {
             if (key.StartsWith(TodoItem.IdPrefix))
             {
-                var rawValue = await LocalStorage.GetItemAsync(key);
-                if (rawValue.FromJson<TodoItem>() is TodoItem todo)
+                var todo = await LocalStorage.GetItemAsync<TodoItem?>(key);
+                if (todo is not null)
                 {
                     todos.Add(todo);
                     _localStorageItems[key] = todo.ToString();
-                    continue;
-                }
-                if (rawValue is not null)
-                {
-                    _localStorageItems[key] = rawValue;
-                    continue;
-                }
-                if (bool.TryParse(rawValue, out var @bool))
-                {
-                    _localStorageItems[key] = @bool.ToString();
-                    continue;
-                }
-                if (decimal.TryParse(rawValue, out var num))
-                {
-                    _localStorageItems[key] = num.ToString();
                     continue;
                 }
             }

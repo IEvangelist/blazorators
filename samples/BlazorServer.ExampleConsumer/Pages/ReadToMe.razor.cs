@@ -12,7 +12,7 @@ public sealed partial class ReadToMe : IAsyncDisposable
     string? _text = "Blazorators is an open-source project that strives to simplify JavaScript interop in Blazor. JavaScript interoperability is possible by parsing TypeScript type declarations and using this metadata to output corresponding C# types.";
     SpeechSynthesisVoice[] _voices = [];
     readonly IList<double> _voiceSpeeds =
-        Enumerable.Range(0, 12).Select(i => (i + 1) * .25).ToList();
+        [.. Enumerable.Range(0, 12).Select(i => (i + 1) * .25)];
     double _voiceSpeed = 1.5;
     string? _selectedVoice;
     string? _elapsedTimeMessage = null;
@@ -48,18 +48,18 @@ public sealed partial class ReadToMe : IAsyncDisposable
 
         await GetVoicesAsync();
 
-        if (await LocalStorage.GetItemAsync(PreferredVoiceKey)
+        if (await LocalStorage.GetItemAsync<string?>(PreferredVoiceKey)
             is { Length: > 0 } voice)
         {
             _selectedVoice = voice;
         }
-        if (await LocalStorage.GetItemAsync(PreferredSpeedKey)
+        if (await LocalStorage.GetItemAsync<string?>(PreferredSpeedKey)
             is { Length: > 0 } s &&
             double.TryParse(s, out var speed) && speed > 0)
         {
             _voiceSpeed = speed;
         }
-        if (await SessionStorage.GetItemAsync(TextKey)
+        if (await SessionStorage.GetItemAsync<string?>(TextKey)
             is { Length: > 0 } text)
         {
             _text = text;

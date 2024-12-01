@@ -99,7 +99,7 @@ internal record CSharpType(
             : RawName.LowerCaseFirstLetter();
 
         return toJson
-            ? $"{parameterName}.ToJson(options)"
+            ? $"{parameterName}.ToJson(jsonTypeInfo)"
             : parameterName;
     }
 }

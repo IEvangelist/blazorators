@@ -75,8 +75,9 @@ internal sealed class SourceBuilder
     {
         if (_options is { SupportsGenerics: true })
         {
-            _builder.Append($"using Blazor.Serialization.Extensions;{NewLine}");
-            _builder.Append($"using System.Text.Json;{NewLine}");
+            _builder.Append(value: $"using Blazor.Serialization.Extensions;{NewLine}");
+            _builder.Append(value: $"using System.Text.Json;{NewLine}");
+            _builder.Append(value: $"using System.Text.Json.Serialization.Metadata;{NewLine}");
         }
 
         if (!_options.IsWebAssembly)

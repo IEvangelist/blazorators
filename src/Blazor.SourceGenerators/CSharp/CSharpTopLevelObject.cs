@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazor.SourceGenerators.Builders;
-
 namespace Blazor.SourceGenerators.CSharp;
 
 internal sealed partial record CSharpTopLevelObject(string RawTypeName)
@@ -81,7 +79,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                             if (details.IsSerializable)
                             {
                                 builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},")
-                                    .AppendRaw($"JsonSerializerOptions? options = null);")
+                                    .AppendRaw($"JsonTypeInfo<{MethodBuilderDetails.GenericTypeValue}>? typeInfo = null);")
                                     .AppendLine();
                             }
                             else
@@ -264,7 +262,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                             if (details.IsSerializable)
                             {
                                 builder.AppendRaw($"{parameter.ToParameterString(isGenericType)},");
-                                builder.AppendRaw($"JsonSerializerOptions? options){genericTypeParameterConstraint} =>");
+                                builder.AppendRaw($"JsonTypeInfo<{MethodBuilderDetails.GenericTypeValue}>? jsonTypeInfo){genericTypeParameterConstraint} =>");
                             }
                             else
                             {
@@ -288,6 +286,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
 
                     builder.IncreaseIndentation()
                         .AppendRaw($"\"{details.FullyQualifiedJavaScriptIdentifier}\",");
+
                     // Write method body / expression, and arguments to javaScript.Invoke*
                     foreach (var (ai, parameter) in method.ParameterDefinitions.Select())
                     {
@@ -298,7 +297,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                             {
                                 // Overridden to control explicitly
                                 builder.AppendRaw($"{parameter.ToArgumentString(toJson: false)})");
-                                builder.AppendRaw($".FromJson{details.GenericTypeArgs}(options);");
+                                builder.AppendRaw($".FromJson{details.Suffix}{details.GenericTypeArgs}(jsonTypeInfo);");
                             }
                             else
                             {

@@ -78,15 +78,14 @@ static class AttributeSyntaxExtensions
             var trimmed = values.Trim();
             var descriptors = trimmed.Split(',');
 
-            return descriptors
+            return [.. descriptors
                 .Select(descriptor =>
                 {
                     descriptor = descriptor
                         .Replace("\"", "")
                         .Trim();
                     return descriptor;
-                })
-                .ToArray();
+                })];
         }
 
         return default;

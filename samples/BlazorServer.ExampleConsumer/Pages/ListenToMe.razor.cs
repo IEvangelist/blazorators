@@ -25,7 +25,7 @@ public sealed partial class ListenToMe : IDisposable
             return;
         }
 
-        _transcript = await SessionStorage.GetItemAsync(TranscriptKey);
+        _transcript = await SessionStorage.GetItemAsync<string?>(TranscriptKey);
     }
 
     async Task OnRecognizeSpeechClick()
