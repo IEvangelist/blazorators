@@ -43,7 +43,7 @@ console.log('%O %cfunction %cdefined ✅.', speak, 'color: magenta;', 'color: in
 
 const getVoices = () => {
     const mapVoices = (voices) => {
-        return voices.map(voice => {
+        var result = voices.map(voice => {
             // HACK: Blazor isn't correctly deserializing these.
             // It ignores the `JsonPropertyNameAttribute` :(
             return {
@@ -54,18 +54,34 @@ const getVoices = () => {
                 VoiceURI: voice.voiceURI
             };
         });
+
+        return result;
     };
 
     return new Promise((resolve, reject) => {
-        let voices = window.speechSynthesis.getVoices();
-        if (voices.length !== 0) {
-            resolve(mapVoices(voices));
-        } else {
-            window.speechSynthesis.onvoiceschanged = () => {
-                voices = window.speechSynthesis.getVoices();
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        const tryGettingVoices = () => {
+            const voices = window.speechSynthesis.getVoices();
+            console.log(`[getVoices] Attempt ${attempts + 1}: Found ${voices.length} voices.`);
+
+            if (voices.length > 0) {
                 resolve(mapVoices(voices));
-            };
-        }
+            } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(tryGettingVoices, 250); // wait 250ms, then try again
+            } else {
+                console.log("[getVoices] Max attempts reached. Waiting for 'onvoiceschanged' event...");
+                window.speechSynthesis.onvoiceschanged = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    console.log(`[getVoices] onvoiceschanged event fired. Found ${voices.length} voices.`);
+                    resolve(mapVoices(voices));
+                };
+            }
+        };
+
+        tryGettingVoices();
     });
 };
 
