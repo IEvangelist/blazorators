@@ -3,7 +3,7 @@
 
 namespace BlazorServer.ExampleConsumer.Pages;
 
-public sealed partial class ReadToMe : IAsyncDisposable
+public sealed partial class ReadToMe
 {
     const string PreferredVoiceKey = "preferred-voice";
     const string PreferredSpeedKey = "preferred-speed";
@@ -47,6 +47,7 @@ public sealed partial class ReadToMe : IAsyncDisposable
         }
 
         await GetVoicesAsync();
+        await SpeechSynthesis.OnVoicesChangedAsync(async () => await GetVoicesAsync(true));
 
         if (await LocalStorage.GetItemAsync<string?>(PreferredVoiceKey)
             is { Length: > 0 } voice)
@@ -66,27 +67,37 @@ public sealed partial class ReadToMe : IAsyncDisposable
         }
     }
 
-    async Task GetVoicesAsync(bool isFromCallback = false)
+    async Task GetVoicesAsync(bool isFromCallback = false) => await InvokeAsync(async () =>
     {
         _voices = await SpeechSynthesis.GetVoicesAsync();
-        if (_voices is { } && isFromCallback)
+
+        Logger.LogWarning("Voices found: {Count}", _voices.Length);
+
+        if (_voices is { })
         {
             StateHasChanged();
         }
-    }
+    });
 
-    void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
+    Task OnTextChanged(ChangeEventArgs args) =>
+        InvokeAsync(async () =>
+        {
+            _text = args.Value?.ToString();
+            if (_text is not null)
+            {
+                await SessionStorage.SetItemAsync(TextKey, _text!);
+            }
+        });
 
-    void OnVoiceSpeedChange(ChangeEventArgs args) =>
-        _voiceSpeed = double.TryParse(args.Value?.ToString() ?? "1.5", out var speed)
-            ? speed : 1.5;
+    Task OnVoiceSpeedChange(ChangeEventArgs args) =>
+        InvokeAsync(async () =>
+        {
+            _voiceSpeed = double.TryParse(args.Value?.ToString() ?? "1.5", out var speed)
+                ? speed : 1.5;
+
+            await LocalStorage.SetItemAsync(PreferredSpeedKey, _voiceSpeed.ToString());
+        });
+        
 
     ValueTask Speak() => SpeechSynthesis.SpeakAsync(Utterance);
-
-    async ValueTask IAsyncDisposable.DisposeAsync()
-    {
-        await LocalStorage.SetItemAsync(PreferredVoiceKey, _selectedVoice!);
-        await LocalStorage.SetItemAsync(PreferredSpeedKey, _voiceSpeed.ToString());
-        await SessionStorage.SetItemAsync(TextKey, _text!);
-    }
 }

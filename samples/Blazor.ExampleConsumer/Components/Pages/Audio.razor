@@ -1,21 +1,18 @@
-﻿@page "/listen"
+﻿@page "/audio"
 
-<PageTitle>Speech-to-text</PageTitle>
-<p>This page demonstrates the source generated <code>Blazor.SpeechRecognition.WebAssembly</code> package.</p>
+<PageTitle>Audio</PageTitle>
+
+<p>This page demonstrates the source generated <code>Blazor.SpeechRecognition.WebAssembly</code> and <code>Blazor.SpeechSynthesis.WebAssembly</code> packages package.</p>
 
 <div class="mb-3 w-75">
     <label for="text" class="form-label">
         Speech-to-text
     </label>
-    <textarea class="form-control" id="text" 
-        readonly=@_isRecognizingSpeech rows="6" @bind=@_transcript>
+    <textarea class="form-control" id="text"
+              readonly=@_isRecognizingSpeech rows="6" @bind=@_transcript>
     </textarea>
 </div>
 <Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
-
-<!--
-    Does this work?
--->
 
 <button type="button" class="btn btn-lg btn-primary"
         @onclick=@OnRecognizeSpeechClick>

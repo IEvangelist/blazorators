@@ -54,14 +54,14 @@ public sealed partial class ReadToMe(
         }
     }
 
-    async Task GetVoicesAsync(bool isFromCallback = false)
+    async Task GetVoicesAsync(bool isFromCallback = false) => await InvokeAsync(async () =>
     {
         _voices = await speechSynthesis.GetVoicesAsync();
         if (_voices is { } && isFromCallback)
         {
             StateHasChanged();
         }
-    }
+    });
 
     void OnTextChanged(ChangeEventArgs args) => _text = args.Value?.ToString();
 
