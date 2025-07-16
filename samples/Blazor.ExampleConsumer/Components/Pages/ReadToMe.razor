@@ -2,57 +2,67 @@
 
 <PageTitle>Text-to-speech</PageTitle>
 
-<p>This page demonstrates the source generated <code>Blazor.SpeechSynthesis.WebAssembly</code> package.</p>
+<MudText Typo="Typo.h4" GutterBottom="true">Text-to-speech</MudText>
 
-<div class="input-group w-75 mb-3">
-    <select class="form-select" aria-label="Voice selection"
-        @bind="_selectedVoice" disabled=@(_voices?.Any() is false)>
-        @foreach (var voice in _voices ?? Array.Empty<SpeechSynthesisVoice>())
-        {
-            <option value="@voice.Name">@voice.Name</option>
-        }
-    </select>
-    <button class="btn btn-primary" type="button" 
-        title="Refresh voices?" @onclick=@(async () => await GetVoicesAsync())>
-        <span class="oi oi-reload"></span>
-    </button>
-</div>
+<MudText Typo="Typo.body1" Class="mb-4">
+    This page demonstrates the source generated <code>Blazor.SpeechSynthesis.WebAssembly</code> package.
+</MudText>
 
-<div class="input-group mb-3 w-75">
-    <label for="range" class="form-label">Voice speed: @_voiceSpeed</label>
-    <input type="range" min="@_voiceSpeeds.Min()" max="@_voiceSpeeds.Max()"
-        step=".25" class="form-range" id="range" list="speeds"
-        value="@_voiceSpeed"
-        @onchange=@OnVoiceSpeedChange>
-    <datalist id="speeds">
-    @foreach (var speed in _voiceSpeeds)
-    {
-        <option value="@speed">speed</option>
-    }
-    </datalist>
-</div>
+<MudGrid>
+    <MudItem xs="12" md="8">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <MudSelect T="string" @bind-Value="_selectedVoice" 
+                       Label="Voice selection" 
+                       Variant="Variant.Outlined"
+                       Disabled="@(_voices?.Any() is false)"
+                       Style="flex: 1;">
+                @foreach (var voice in _voices ?? Array.Empty<SpeechSynthesisVoice>())
+                {
+                    <MudSelectItem Value="@voice.Name">@voice.Name</MudSelectItem>
+                }
+            </MudSelect>
+            <MudIconButton Icon="Icons.Material.Filled.Refresh"
+                          Color="Color.Primary"
+                          Title="Refresh voices?"
+                          OnClick="@(async () => await GetVoicesAsync())" />
+        </div>
 
-<div class="mb-3 w-75">
-    <label for="text" class="form-label">
-        Text-to-speech @(_elapsedTimeMessage is { Length: > 0 } ? $"({_elapsedTimeMessage})" : "")
-    </label>
-    <textarea class="form-control" id="text"
-        @oninput=@OnTextChanged rows="3" value=@_text>
-    </textarea>
-</div>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Voice speed: @_voiceSpeed</MudText>
+        <MudSlider @bind-Value="_voiceSpeed"
+                   Min="@_voiceSpeeds.Min()"
+                   Max="@_voiceSpeeds.Max()"
+                   Step="0.25"
+                   Color="Color.Primary"
+                   Class="mb-4" />
 
-<div class="btn-group btn-group-lg">
-    <button type="button" class="btn btn-lg btn-primary" @onclick=@Speak>
-        <span class="oi oi-audio"></span>
-        <span class="ps-2">Speak</span>
-    </button>
-    <button type="button" class="btn btn-lg btn-warning" title="Pause" @onclick=@speechSynthesis.Pause>
-        <span class="oi oi-media-pause"></span>
-    </button>
-    <button type="button" class="btn btn-lg btn-info"title="Play" @onclick=@speechSynthesis.Resume>
-        <span class="oi oi-media-play"></span>
-    </button>
-    <button type="button" class="btn btn-lg btn-danger" title="Stop" @onclick=@speechSynthesis.Cancel>
-        <span class="oi oi-media-stop"></span>
-    </button>
-</div>
+        <MudTextField @bind-Value="_text"
+                     Label="@($"Text-to-speech {(_elapsedTimeMessage is { Length: > 0 } ? $"({_elapsedTimeMessage})" : "")}")"
+                     Variant="Variant.Outlined"
+                     Lines="3"
+                     FullWidth="true"
+                     Class="mb-4" />
+
+        <MudButtonGroup Variant="Variant.Filled" Size="Size.Large">
+            <MudButton Color="Color.Primary" 
+                      StartIcon="Icons.Material.Filled.VolumeUp"
+                      OnClick="Speak">
+                Speak
+            </MudButton>
+            <MudButton Color="Color.Warning" 
+                      StartIcon="Icons.Material.Filled.Pause"
+                      OnClick="speechSynthesis.Pause">
+                Pause
+            </MudButton>
+            <MudButton Color="Color.Info" 
+                      StartIcon="Icons.Material.Filled.PlayArrow"
+                      OnClick="speechSynthesis.Resume">
+                Play
+            </MudButton>
+            <MudButton Color="Color.Error" 
+                      StartIcon="Icons.Material.Filled.Stop"
+                      OnClick="speechSynthesis.Cancel">
+                Stop
+            </MudButton>
+        </MudButtonGroup>
+    </MudItem>
+</MudGrid>

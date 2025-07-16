@@ -1,32 +1,31 @@
 ﻿@page "/listen"
 
 <PageTitle>Speech-to-text</PageTitle>
-<p>This page demonstrates the source generated <code>Blazor.SpeechRecognition.WebAssembly</code> package.</p>
 
-<div class="mb-3 w-75">
-    <label for="text" class="form-label">
-        Speech-to-text
-    </label>
-    <textarea class="form-control" id="text" 
-        readonly=@_isRecognizingSpeech rows="6" @bind=@_transcript>
-    </textarea>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">Speech-to-text</MudText>
+
+<MudText Typo="Typo.body1" Class="mb-4">
+    This page demonstrates the source generated <code>Blazor.SpeechRecognition.WebAssembly</code> package.
+</MudText>
+
+<MudGrid>
+    <MudItem xs="12" md="8">
+        <MudTextField @bind-Value="_transcript"
+                     Label="Speech-to-text"
+                     Variant="Variant.Outlined"
+                     Lines="6"
+                     FullWidth="true"
+                     ReadOnly="_isRecognizingSpeech"
+                     Class="mb-4" />
+
+        <MudButton Color="@(_isRecognizingSpeech ? Color.Error : Color.Primary)"
+                  Variant="Variant.Filled"
+                  Size="Size.Large"
+                  StartIcon="@(_isRecognizingSpeech ? Icons.Material.Filled.Stop : Icons.Material.Filled.Mic)"
+                  OnClick="OnRecognizeSpeechClick">
+            @(_isRecognizingSpeech ? "Stop" : "Listen")
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
 <Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
-
-<!--
-    Does this work?
--->
-
-<button type="button" class="btn btn-lg btn-primary"
-        @onclick=@OnRecognizeSpeechClick>
-    @if (_isRecognizingSpeech)
-    {
-        <span class="oi oi-media-stop"></span>
-        <span class="ps-2">Stop</span>
-    }
-    else
-    {
-        <span class="oi oi-microphone"></span>
-        <span class="ps-2">Listen</span>
-    }
-</button>

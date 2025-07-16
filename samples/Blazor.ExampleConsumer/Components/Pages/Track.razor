@@ -1,31 +1,31 @@
 ﻿@page "/track"
 
 <PageTitle>Track</PageTitle>
-<h1>
-    Geolocation
+
+<div class="d-flex align-items-center mb-3">
+    <MudText Typo="Typo.h4" Class="mr-2">Geolocation Tracking</MudText>
     @if (_isLoading)
     {
-        <span class="spinner-border text-primary" style="border-width: .12em;" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </span>
+        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
     }
     @if (_position is not null)
     {
-        <span class="pe-1">: 
-            <code>
-                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
-            </code>
-        </span>
-        <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
-            rel="noopener noreferrer nofollow">
-            <span class="oi oi-external-link"></span>
-        </a>
+        <MudChip Color="Color.Primary" Size="Size.Small" Icon="Icons.Material.Filled.Schedule">
+            @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"))
+        </MudChip>
+        <MudIconButton Icon="Icons.Material.Filled.OpenInNew" 
+                       Color="Color.Primary" 
+                       Size="Size.Small"
+                       Href="https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly" 
+                       Target="_blank" />
     }
-</h1>
+</div>
 
 @if (_isLoading)
 {
-    <p>This page demonstrates the source generated <code>Blazor.Geolocation.WebAssembly</code> package.</p>
+    <MudText Typo="Typo.body1" Class="mb-4">
+        This page demonstrates the source generated <code>Blazor.Geolocation.WebAssembly</code> package.
+    </MudText>
 }
 
 @{
