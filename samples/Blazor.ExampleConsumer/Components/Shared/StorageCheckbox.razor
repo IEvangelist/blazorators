@@ -1,39 +1,29 @@
 ﻿@inject ILocalStorageService LocalStorage
 
-<label class="ps-2 fs-5 selectable flex-fill" for="@Item.Id">
-    <input type="checkbox" class="form-check-input"
-        value=@Item.IsCompleted
-        checked=@Item.IsCompleted
-        id="@Item.Id" @onchange=@OnIsCompletedChanged />
-    <span class="ps-3">@Item.Task</span>
-</label>
-@if (EndContent is not null)
-{
-    @EndContent
-}
+<div class="d-flex align-items-center">
+    <MudCheckBox @bind-Checked="Item.IsCompleted" 
+                 Color="Color.Primary"
+                 T="bool"
+                 ValueChanged="@OnIsCompletedChanged" />
+    <MudText Class="ml-2 flex-grow-1">@Item.Task</MudText>
+</div>
 
 @code {
     [Parameter, EditorRequired]
     public TodoItem Item { get; set; } = null!;
 
     [Parameter]
-    public RenderFragment EndContent { get; set; } = null!;
-
-    [Parameter]
     public EventCallback<TodoItem> ItemChanged { get; set; }
 
-    Task OnIsCompletedChanged(ChangeEventArgs args)
+    Task OnIsCompletedChanged(bool isCompleted)
     {
-        if (bool.TryParse(args?.Value?.ToString(), out var isCompleted))
-        {
-            LocalStorage.SetItem(
-                Item.Id,
-                Item = Item with { IsCompleted = isCompleted });
+        LocalStorage.SetItem(
+            Item.Id,
+            Item = Item with { IsCompleted = isCompleted });
 
-            if (ItemChanged.HasDelegate)
-            {
-                return ItemChanged.InvokeAsync(Item);
-            }
+        if (ItemChanged.HasDelegate)
+        {
+            return ItemChanged.InvokeAsync(Item);
         }
 
         return Task.CompletedTask;

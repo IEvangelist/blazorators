@@ -2,82 +2,88 @@
 
 <PageTitle>Tasks</PageTitle>
 
-<h1>
-    <span class="pe-1">Local Storage</span>
-    <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
-       rel="noopener noreferrer nofollow">
-        <span class="oi oi-external-link"></span>
-    </a>
-</h1>
-<p>This page demonstrates the source generated <code>Blazor.LocalStorage.WebAssembly</code> package.</p>
+<div class="d-flex align-items-center mb-3">
+    <MudText Typo="Typo.h4" Class="mr-2">Local Storage</MudText>
+    <MudIconButton Icon="Icons.Material.Filled.OpenInNew" 
+                   Color="Color.Primary" 
+                   Size="Size.Small"
+                   Href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" 
+                   Target="_blank" />
+</div>
 
-<div class="card">
-    <div class="card-body p-5">
-        <div class="d-flex justify-content-center align-items-center">
-            <div class="form-outline flex-fill">
-                <div class="input-group">
-                    <input id="todo" type="text" class="form-control form-control-lg"
-                           @bind=_todoValue
-                           @onkeyup="@OnKeyUp"
-                           autocomplete="off"
-                           placeholder="New task..." />
-                    <button id="add" type="button" class="btn btn-primary"
-                            @onclick="AddNewTodo">
-                        Add
-                    </button>
-                    <button id="clearall" type="button" class="btn btn-danger"
-                            @onclick="ClearAll">
-                        Clear All
-                    </button>
-                </div>
-            </div>
+<MudText Typo="Typo.body1" Class="mb-4">
+    This page demonstrates the source generated <code>Blazor.LocalStorage.WebAssembly</code> package.
+</MudText>
+
+<MudCard Elevation="2">
+    <MudCardContent Class="pa-6">
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <MudTextField @bind-Value="_todoValue" 
+                         Label="New task..."
+                         Variant="Variant.Outlined"
+                         FullWidth="true"
+                         @onkeyup="@OnKeyUp"
+                         AutoFocus="true" />
+            <MudButton Color="Color.Primary" 
+                      Variant="Variant.Filled" 
+                      OnClick="AddNewTodo"
+                      StartIcon="Icons.Material.Filled.Add">
+                Add
+            </MudButton>
+            <MudButton Color="Color.Error" 
+                      Variant="Variant.Outlined" 
+                      OnClick="ClearAll"
+                      StartIcon="Icons.Material.Filled.Clear">
+                Clear All
+            </MudButton>
         </div>
+        
         @if (_todos is { Count: > 0 })
         {
-            <ul id="todo-list" class="list-group mb-0 pt-5">
+            <MudList Clickable="false">
                 @foreach (var todo in _todos)
                 {
-                    <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded bg-light">
-                        <StorageCheckbox Item=@todo ItemChanged=@OnItemChanged>
-                            <EndContent>
-                                <button class="btn btn-danger" type="button" 
-                                    @onclick=@(_ => Delete(todo))>
-                                    <span class="oi oi-trash"></span>
-                                </button>
-                            </EndContent>
-                        </StorageCheckbox>
-                    </li>
+                    <MudListItem Class="pa-2">
+                        <div class="d-flex align-items-center justify-space-between w-100">
+                            <StorageCheckbox Item="@todo" ItemChanged="@OnItemChanged" />
+                            <MudIconButton Icon="Icons.Material.Filled.Delete" 
+                                          Color="Color.Error" 
+                                          Size="Size.Small"
+                                          OnClick="@(_ => Delete(todo))" />
+                        </div>
+                    </MudListItem>
                 }
-            </ul>
+            </MudList>
         }
-    </div>
-</div>
+    </MudCardContent>
+</MudCard>
+
 @if (_localStorageItems is { Count: > 0 })
 {
-    <div class="card mt-4">
-        <div class="card-body">
-            <details>
-                <summary>Raw <code>window.localStorage</code> values</summary>
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Key</th>
-                            <th scope="col">Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var (i, key, value) in _localStorageItems.Select((kvp, i) => (i, kvp.Key, kvp.Value)))
-                    {
-                        <tr>
-                            <th scope="row">@i.ToString()</th>
-                            <td><code>@key.ToString()</code></td>
-                            <td><code>@value.ToString()</code></td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </details>
-        </div>
-    </div>
+    <MudCard Elevation="1" Class="mt-4">
+        <MudExpansionPanels Elevation="0">
+            <MudExpansionPanel>
+                <TitleContent>
+                    <div class="d-flex align-items-center">
+                        <MudIcon Icon="Icons.Material.Filled.Storage" Class="mr-3" />
+                        <MudText>Raw <code>window.localStorage</code> values</MudText>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <MudTable Items="_localStorageItems" Hover="true" Striped="true">
+                        <HeaderContent>
+                            <MudTh>#</MudTh>
+                            <MudTh>Key</MudTh>
+                            <MudTh>Value</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="#">@((_localStorageItems.ToList().IndexOf(context)) + 1)</MudTd>
+                            <MudTd DataLabel="Key"><code>@context.Key</code></MudTd>
+                            <MudTd DataLabel="Value"><code>@context.Value</code></MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudCard>
 }

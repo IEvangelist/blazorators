@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Blazorators Demo</title>
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="Blazor.ExampleConsumer.styles.css" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -28,11 +29,17 @@
     </a>
 
     <div id="app">
-        <div class="d-flex vh-100 align-items-center justify-content-center">
-            <div class="d-flex display-4 mt-5 fw-bold justify-content-center align-items-center">
-                <strong class="p-5">🤖 Loading...</strong>
-                <div class="loading-progress-text"></div>
-                <div class="spinner-grow ms-auto" role="status" aria-hidden="true"></div>
+        <div style="position: absolute; top: 30vh; width: 100%; text-align: center;">
+            <div class="mud-text mud-typography-h4" style="margin-bottom: 16px;">
+                🤖 Loading...
+            </div>
+            <div class="mud-progress-circular mud-progress-medium mud-progress-indeterminate mud-progress-circular-primary" style="margin: 16px auto;">
+                <svg class="mud-progress-circular-svg" viewBox="22 22 44 44">
+                    <circle class="mud-progress-circular-circle" cx="44" cy="44" r="20.2" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="126.920" stroke-dashoffset="126.920">
+                        <animate attributeName="stroke-dasharray" dur="1.4s" values="0 126.920;63.460 63.460;0 126.920" repeatCount="indefinite"></animate>
+                        <animate attributeName="stroke-dashoffset" dur="1.4s" values="0;-31.730;-126.920" repeatCount="indefinite"></animate>
+                    </circle>
+                </svg>
             </div>
         </div>
     </div>
@@ -46,6 +53,7 @@
     <script src="_content/Blazor.SpeechSynthesis.WebAssembly/blazorators.speechSynthesis.g.js"></script>
     <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AuFFokbS0x6puH-xXz-ADH1ZcMnPC1JkdSyRidoWCGYpVYTlnivpswV0D-OtfxGb" async defer></script>
     <script src="app.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
