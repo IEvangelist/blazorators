@@ -36,6 +36,7 @@
                    Class="mb-4" />
 
         <MudTextField @bind-Value="_text"
+                     T="string"
                      Label="@($"Text-to-speech {(_elapsedTimeMessage is { Length: > 0 } ? $"({_elapsedTimeMessage})" : "")}")"
                      Variant="Variant.Outlined"
                      Lines="3"
