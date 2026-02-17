@@ -1,8 +1,6 @@
 // Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using MudBlazor.Services;
-
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -14,6 +12,8 @@ builder.Services.AddScoped(_ => new HttpClient
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
+
+builder.Services.AddSingleton<LayoutService>();
 
 // Use source-generated DI bits...
 builder.Services.AddLocalStorageServices();

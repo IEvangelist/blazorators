@@ -5,10 +5,12 @@ using System.Text.RegularExpressions;
 
 namespace Blazor.ExampleConsumer.Models;
 
-public partial record class TodoItem(
-    string Task,
-    bool IsCompleted)
+public partial record class TodoItem
 {
+    public string Task { get; set; } = "";
+
+    public bool IsCompleted { get; set; }
+
     internal const string IdPrefix = "todo";
 
     [JsonIgnore]

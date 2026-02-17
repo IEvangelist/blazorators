@@ -1,0 +1,19 @@
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633784636 + 512882.28ms: Parent started connecting. Reading handshake from parent
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633786133 +    0.1497ms: Building handshake for node type X64, NodeReuse, (version 1): options 16777228.
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633786667 +    0.0534ms: Handshake salt is 
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633787801 +    0.1134ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.302
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633845005 +    5.7204ms: Successfully connected to parent.
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633845991 +    0.0986ms: Changing link status from Inactive to Active
+OutOfProc Endpoint Packet Pump (TID 22) 638888054633846454 +    0.0463ms: Entering read loop.
+ (TID 1) 638888054836294215 + 20244.775ms: Shutting down with reason: BuildCompleteReuse, and exception: .
+OutOfProc Endpoint Packet Pump (TID 22) 638888054836370038 +    7.5823ms: Disconnecting voluntarily
+OutOfProc Endpoint Packet Pump (TID 22) 638888054836371021 +    0.0983ms: Changing link status from Active to Failed
+OutOfProc Endpoint Packet Pump (TID 22) 638888054836372147 +    0.1126ms: Ending read loop
+ (TID 1) 638888054836373640 +    0.1493ms: Changing link status from Failed to Inactive
+ (TID 1) 638888054836474483 +   10.0843ms: Shut down complete.
+OutOfProc Endpoint Packet Pump (TID 29) 638888054836478851 +    0.4368ms: Waiting for connection 900000 ms...
+OutOfProc Endpoint Packet Pump (TID 29) 638888063836517137 +  900003.8ms: Connection timed out waiting a host to contact us.  Exiting comm thread.
+OutOfProc Endpoint Packet Pump (TID 29) 638888063836598319 +    8.1182ms: Changing link status from Inactive to ConnectionFailed
+ (TID 1) 638888063836599893 +    0.1574ms: Shutting down with reason: ConnectionFailed, and exception: .
+ (TID 1) 638888063836602750 +    0.2857ms: Changing link status from ConnectionFailed to Inactive
+ (TID 1) 638888063836666081 +    6.3331ms: Shut down complete.

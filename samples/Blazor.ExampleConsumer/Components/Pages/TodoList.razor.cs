@@ -76,7 +76,7 @@ public sealed partial class TodoList(ILocalStorageService localStorage)
     {
         if (_todoValue is not null)
         {
-            var todo = new TodoItem(_todoValue, false);
+            var todo = new TodoItem { Task = _todoValue, IsCompleted = false };
             localStorage.SetItem(todo.Id, todo);
             UpdateTodoItems();
             _todoValue = null;
@@ -103,6 +103,17 @@ public sealed partial class TodoList(ILocalStorageService localStorage)
         localStorage.Clear();
         _todos.Clear();
         _localStorageItems.Clear();
+    }
+
+    void ClearCompleted()
+    {
+        var completedTodos = _todos.Where(t => t.IsCompleted).ToList();
+        foreach (var todo in completedTodos)
+        {
+            localStorage.RemoveItem(todo.Id);
+            _todos.Remove(todo);
+            _localStorageItems.Remove(todo.Id);
+        }
     }
 
     async Task OnItemChanged(TodoItem _)

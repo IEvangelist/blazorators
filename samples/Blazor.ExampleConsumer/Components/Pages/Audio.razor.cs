@@ -5,9 +5,7 @@ namespace Blazor.ExampleConsumer.Components.Pages;
 
 public sealed partial class Audio(
     ISpeechRecognitionService speechRecognition,
-    ISpeechSynthesisService speechSynthesis,
-    ILocalStorageService localStorage,
-    ISessionStorageService sessionStorage) : IDisposable
+    ISpeechSynthesisService speechSynthesis) : IDisposable
 {
     IDisposable? _recognitionSubscription;
     bool _isRecognizingSpeech = false;

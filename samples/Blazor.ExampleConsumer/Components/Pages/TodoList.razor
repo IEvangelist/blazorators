@@ -2,87 +2,197 @@
 
 <PageTitle>Tasks</PageTitle>
 
-<div class="d-flex align-items-center mb-3">
-    <MudText Typo="Typo.h4" Class="mr-2">Local Storage</MudText>
-    <MudIconButton Icon="Icons.Material.Filled.OpenInNew" 
-                   Color="Color.Primary" 
-                   Size="Size.Small"
-                   Href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" 
-                   Target="_blank" />
+<div class="d-flex align-items-center justify-space-between mb-4">
+    <div class="d-flex align-items-center">
+        <MudText Typo="Typo.h4" Class="mr-3">Todo List</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" 
+                       Color="Color.Primary" 
+                       Size="Size.Small"
+                       Href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" 
+                       Target="_blank" />
+    </div>
+    @if (_todos.Any())
+    {
+        <MudChip T="string"
+                 Icon="@Icons.Material.Filled.Task" 
+                 Color="Color.Primary" 
+                 Variant="Variant.Text">
+            @(_todos.Count(t => t.IsCompleted))/@(_todos.Count) completed
+        </MudChip>
+    }
 </div>
 
-<MudText Typo="Typo.body1" Class="mb-4">
-    This page demonstrates the source generated <code>Blazor.LocalStorage.WebAssembly</code> package.
+<MudText Typo="Typo.body2" Class="mb-6 text-muted">
+    Manage your tasks with local storage persistence using the <code>Blazor.LocalStorage.WebAssembly</code> package.
 </MudText>
 
-<MudCard Elevation="2">
-    <MudCardContent Class="pa-6">
-        <div class="d-flex align-items-center gap-2 mb-4">
+<!-- Add Task Section -->
+<MudCard Elevation="2" Class="mb-4">
+    <MudCardContent Class="pa-4">
+        <div class="d-flex flex-column flex-sm-row align-center gap-3">
             <MudTextField @bind-Value="_todoValue" 
                          T="string"
-                         Label="New task..."
+                         Label="What needs to be done?"
+                         Placeholder="Enter a new task..."
                          Variant="Variant.Outlined"
                          FullWidth="true"
                          @onkeyup="@OnKeyUp"
-                         AutoFocus="true" />
-            <MudButton Color="Color.Primary" 
-                      Variant="Variant.Filled" 
-                      OnClick="AddNewTodo"
-                      StartIcon="Icons.Material.Filled.Add">
-                Add
-            </MudButton>
-            <MudButton Color="Color.Error" 
-                      Variant="Variant.Outlined" 
-                      OnClick="ClearAll"
-                      StartIcon="Icons.Material.Filled.Clear">
-                Clear All
-            </MudButton>
-        </div>
-        
-        @if (_todos is { Count: > 0 })
-        {
-            <MudList Clickable="false">
-                @foreach (var todo in _todos)
+                         AutoFocus="true"
+                         Class="flex-grow-1" />
+            <div class="d-flex gap-2">
+                <MudButton Color="Color.Primary" 
+                          Variant="Variant.Filled" 
+                          OnClick="AddNewTodo"
+                          StartIcon="@Icons.Material.Filled.Add"
+                          Disabled="@(string.IsNullOrWhiteSpace(_todoValue))">
+                    Add Task
+                </MudButton>
+                @if (_todos.Any())
                 {
-                    <MudListItem Class="pa-2">
-                        <div class="d-flex align-items-center justify-space-between w-100">
-                            <StorageCheckbox Item="@todo" ItemChanged="@OnItemChanged" />
-                            <MudIconButton Icon="Icons.Material.Filled.Delete" 
-                                          Color="Color.Error" 
-                                          Size="Size.Small"
-                                          OnClick="@(_ => Delete(todo))" />
-                        </div>
-                    </MudListItem>
+                    <MudButton Color="Color.Error" 
+                              Variant="Variant.Outlined" 
+                              OnClick="ClearAll"
+                              StartIcon="@Icons.Material.Filled.DeleteSweep">
+                        Clear All
+                    </MudButton>
                 }
-            </MudList>
-        }
+            </div>
+        </div>
     </MudCardContent>
 </MudCard>
 
-@if (_localStorageItems is { Count: > 0 })
+<!-- Tasks List Section -->
+@if (_todos.Any())
 {
-    <MudCard Elevation="1" Class="mt-4">
+    <MudCard Elevation="1">
+        <MudCardHeader Class="pb-2">
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">
+                    <MudIcon Icon="@Icons.Material.Filled.List" Class="mr-2" />
+                    Your Tasks
+                </MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                @if (_todos.Any(t => t.IsCompleted))
+                {
+                    <MudButton Color="Color.Warning" 
+                              Variant="Variant.Text" 
+                              Size="Size.Small"
+                              OnClick="ClearCompleted"
+                              StartIcon="@Icons.Material.Filled.CheckCircle">
+                        Clear Completed
+                    </MudButton>
+                }
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent Class="pa-0">
+            <MudList T="TodoItem" Clickable="false">
+                @foreach (var todo in _todos.OrderBy(t => t.IsCompleted).ThenBy(t => t.Task))
+                {
+                    <MudListItem Class="px-4 py-3">
+                        <div class="d-flex align-items-center w-100">
+                            <div class="flex-grow-1">
+                                <StorageCheckbox Item="@todo" ItemChanged="@OnItemChanged" />
+                            </div>
+                            <div class="d-flex align-items-center ml-3">
+                                <MudButton Variant="Variant.Text" 
+                                          Color="Color.Error" 
+                                          Size="Size.Small"
+                                          OnClick="@(_ => Delete(todo))"
+                                          StartIcon="@Icons.Material.Filled.Delete"
+                                          Class="d-none d-sm-flex">
+                                    Delete
+                                </MudButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                              Color="Color.Error" 
+                                              Size="Size.Small"
+                                              OnClick="@(_ => Delete(todo))"
+                                              Class="d-flex d-sm-none"
+                                              Title="Delete task" />
+                            </div>
+                        </div>
+                    </MudListItem>
+                    @if (todo != _todos.OrderBy(t => t.IsCompleted).ThenBy(t => t.Task).Last())
+                    {
+                        <MudDivider />
+                    }
+                }
+            </MudList>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <!-- Empty State -->
+    <MudCard Elevation="0" Class="pa-8 text-center">
+        <MudCardContent>
+            <MudIcon Icon="@Icons.Material.Outlined.TaskAlt" 
+                     Size="Size.Large" 
+                     Color="Color.Default" 
+                     Class="mb-4" 
+                     Style="font-size: 4rem; opacity: 0.3;" />
+            <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Default">
+                No tasks yet
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Default" Class="opacity-75">
+                Add your first task above to get started organizing your day!
+            </MudText>
+        </MudCardContent>
+    </MudCard>
+}
+
+<!-- Raw Local Storage Data -->
+@if (_localStorageItems.Any())
+{
+    <MudCard Elevation="0" Class="mt-6">
         <MudExpansionPanels Elevation="0">
             <MudExpansionPanel>
                 <TitleContent>
                     <div class="d-flex align-items-center">
-                        <MudIcon Icon="Icons.Material.Filled.Storage" Class="mr-3" />
-                        <MudText>Raw <code>window.localStorage</code> values</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Storage" Class="mr-3" Color="Color.Default" />
+                        <MudText Typo="Typo.subtitle1">
+                            Raw Local Storage Data
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Class="ml-2">
+                                @(_localStorageItems.Count) items
+                            </MudChip>
+                        </MudText>
                     </div>
                 </TitleContent>
                 <ChildContent>
-                    <MudTable Items="_localStorageItems" Hover="true" Striped="true">
-                        <HeaderContent>
-                            <MudTh>#</MudTh>
-                            <MudTh>Key</MudTh>
-                            <MudTh>Value</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="#">@((_localStorageItems.ToList().IndexOf(context)) + 1)</MudTd>
-                            <MudTd DataLabel="Key"><code>@context.Key</code></MudTd>
-                            <MudTd DataLabel="Value"><code>@context.Value</code></MudTd>
-                        </RowTemplate>
-                    </MudTable>
+                    <div Class="mt-4">
+                        <MudText Typo="Typo.body2" Class="mb-3 text-muted">
+                            This shows all data stored in <code>window.localStorage</code> by this application.
+                        </MudText>
+                        <MudTable Items="_localStorageItems" 
+                                  Hover="true" 
+                                  Striped="true" 
+                                  Dense="true"
+                                  Breakpoint="Breakpoint.Sm">
+                            <HeaderContent>
+                                <MudTh Style="width: 60px;">#</MudTh>
+                                <MudTh Style="width: 30%;">Key</MudTh>
+                                <MudTh>Value</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="#">
+                                    <MudText Typo="Typo.body2" Class="text-muted">
+                                        @((_localStorageItems.ToList().IndexOf(context)) + 1)
+                                    </MudText>
+                                </MudTd>
+                                <MudTd DataLabel="Key">
+                                    <MudText Typo="Typo.body2" Style="font-family: monospace; font-size: 0.875rem;">
+                                        @context.Key
+                                    </MudText>
+                                </MudTd>
+                                <MudTd DataLabel="Value">
+                                    <MudText Typo="Typo.body2" 
+                                             Style="font-family: monospace; font-size: 0.875rem; word-break: break-all;">
+                                        @(context.Value.Length > 100 ? context.Value[..100] + "..." : context.Value)
+                                    </MudText>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </div>
                 </ChildContent>
             </MudExpansionPanel>
         </MudExpansionPanels>

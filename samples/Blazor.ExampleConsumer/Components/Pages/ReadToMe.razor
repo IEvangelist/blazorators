@@ -23,8 +23,9 @@
             </MudSelect>
             <MudIconButton Icon="Icons.Material.Filled.Refresh"
                           Color="Color.Primary"
-                          Title="Refresh voices?"
-                          OnClick="@(async () => await GetVoicesAsync())" />
+                          OnClick="@(async () => await GetVoicesAsync())">
+                          Refresh voices?
+            </MudIconButton>
         </div>
 
         <MudText Typo="Typo.subtitle1" Class="mb-2">Voice speed: @_voiceSpeed</MudText>
@@ -45,22 +46,22 @@
 
         <MudButtonGroup Variant="Variant.Filled" Size="Size.Large">
             <MudButton Color="Color.Primary" 
-                      StartIcon="Icons.Material.Filled.VolumeUp"
+                      StartIcon="@Icons.Material.Filled.VolumeUp"
                       OnClick="Speak">
                 Speak
             </MudButton>
             <MudButton Color="Color.Warning" 
-                      StartIcon="Icons.Material.Filled.Pause"
+                      StartIcon="@Icons.Material.Filled.Pause"
                       OnClick="speechSynthesis.Pause">
                 Pause
             </MudButton>
             <MudButton Color="Color.Info" 
-                      StartIcon="Icons.Material.Filled.PlayArrow"
+                      StartIcon="@Icons.Material.Filled.PlayArrow"
                       OnClick="speechSynthesis.Resume">
                 Play
             </MudButton>
             <MudButton Color="Color.Error" 
-                      StartIcon="Icons.Material.Filled.Stop"
+                      StartIcon="@Icons.Material.Filled.Stop"
                       OnClick="speechSynthesis.Cancel">
                 Stop
             </MudButton>

@@ -1,11 +1,25 @@
 ﻿@inject ILocalStorageService LocalStorage
 
-<div class="d-flex align-items-center">
+<div class="d-flex align-items-center flex-grow-1">
     <MudCheckBox @bind-Checked="Item.IsCompleted" 
                  Color="Color.Primary"
                  T="bool"
-                 ValueChanged="@OnIsCompletedChanged" />
-    <MudText Class="ml-2 flex-grow-1">@Item.Task</MudText>
+                 ValueChanged="@OnIsCompletedChanged" 
+                 Size="Size.Medium"
+                 Class="mr-3"
+                 Style="margin-top: 2px;" />
+    <div class="d-flex align-items-center flex-grow-1">
+        <MudText Class="@GetTextClass()" Style="@GetTextStyle()" Typo="Typo.body1">
+            @Item.Task
+        </MudText>
+        @if (Item.IsCompleted)
+        {
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" 
+                     Size="Size.Small" 
+                     Color="Color.Success" 
+                     Class="ml-2" />
+        }
+    </div>
 </div>
 
 @code {
@@ -14,7 +28,7 @@
 
     [Parameter]
     public EventCallback<TodoItem> ItemChanged { get; set; }
-
+    
     Task OnIsCompletedChanged(bool isCompleted)
     {
         LocalStorage.SetItem(
@@ -28,4 +42,12 @@
 
         return Task.CompletedTask;
     }
+
+    string GetTextClass() => Item.IsCompleted 
+        ? "flex-grow-1 text-muted" 
+        : "flex-grow-1";
+
+    string GetTextStyle() => Item.IsCompleted 
+        ? "text-decoration: line-through; opacity: 0.7;" 
+        : "";
 }

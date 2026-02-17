@@ -1,26 +1,31 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="Icons.Material.Filled.Home">
+﻿@using System.Runtime.InteropServices
+<MudNavMenu>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
         Home
     </MudNavLink>
-    <MudNavLink Href="todos" Icon="Icons.Material.Filled.Task">
+    <MudNavLink Href="todos" Icon="@Icons.Material.Filled.Task">
         Local Storage
     </MudNavLink>
-    <MudNavLink Href="geolocation" Icon="Icons.Material.Filled.LocationOn">
+    <MudNavLink Href="geolocation" Icon="@Icons.Material.Filled.LocationOn">
         Geolocation
     </MudNavLink>
-    <MudNavLink Href="speak" Icon="Icons.Material.Filled.VolumeUp">
+    <MudNavLink Href="speak" Icon="@Icons.Material.Filled.VolumeUp">
         Text-to-speech
     </MudNavLink>
-    <MudNavLink Href="listen" Icon="Icons.Material.Filled.Mic">
+    <MudNavLink Href="listen" Icon="@Icons.Material.Filled.Mic">
         Speech-to-text
     </MudNavLink>
-    <MudNavLink Href="track" Icon="Icons.Material.Filled.TrackChanges">
+    <MudNavLink Href="track" Icon="@Icons.Material.Filled.TrackChanges">
         Track
     </MudNavLink>
-    <MudNavLink Href="sandbox" Icon="Icons.Material.Filled.Science">
+    <MudNavLink Href="sandbox" Icon="@Icons.Material.Filled.Science">
         Sandbox
     </MudNavLink>
-    <MudNavLink Href="https://github.com/IEvangelist/blazorators" Target="_blank" Icon="Icons.Material.Filled.Code">
+    <MudNavLink Href="https://github.com/IEvangelist/blazorators" Target="_blank" Icon="@Icons.Material.Filled.Code">
         Source Code
+    </MudNavLink>
+    <MudSpacer />
+    <MudNavLink Disabled Icon="@Icons.Material.Filled.Numbers">
+        Powered by @RuntimeInformation.FrameworkDescription
     </MudNavLink>
 </MudNavMenu>

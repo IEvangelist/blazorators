@@ -1,22 +1,31 @@
 ﻿@using System.Runtime.InteropServices
 @inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider @ref="@_mudThemeProvider"
+                  Theme="@layoutService.CurrentTheme"
+                  ObserveSystemThemeChange="@layoutService.ObserveSystemThemeChange"
+                  IsDarkMode="@layoutService.IsDarkMode"
+                  IsDarkModeChanged="@((dark) => layoutService.UpdateDarkModeState(dark))" />
+
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
-        <MudImage Src="logo.png" Height="32" Width="32" Alt="Blazorators" Class="mr-3" />
-        <MudText Typo="Typo.h6">Blazorators</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
         <MudSpacer />
-        <MudText Typo="Typo.body2" Class="mud-text-secondary">
-            Powered by @RuntimeInformation.FrameworkDescription
-        </MudText>
+        <MudTooltip Text="@DarkLightModeButtonText">
+            <MudIconButton OnClick="@layoutService.CycleDarkLightMode" Icon="@DarkLightModeButtonIcon" Color="Color.Inherit" aria-label="@DarkLightModeButtonText" />
+        </MudTooltip>
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"
+                       Href="https://github.com/IEvangelist/blazorators" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+        <MudDrawerHeader>
+            <MudImage Src="logo.png" Height="32" Width="32" Alt="Blazorators" Class="mr-3" />
+            <MudText Typo="Typo.h5" Class="mt-1">Blazorators</MudText>
+        </MudDrawerHeader>
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
@@ -29,8 +38,5 @@
 @code {
     private bool _drawerOpen = true;
 
-    private void ToggleDrawer()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
 }

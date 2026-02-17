@@ -10,7 +10,7 @@
     }
     @if (_position is not null)
     {
-        <MudChip Color="Color.Primary" Size="Size.Small" Icon="Icons.Material.Filled.Schedule">
+        <MudChip T="string" Color="Color.Primary" Size="Size.Small" Icon="Icons.Material.Filled.Schedule">
             @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"))
         </MudChip>
         <MudIconButton Icon="Icons.Material.Filled.OpenInNew" 

@@ -1,0 +1,23 @@
+ (TID 1) 638888054605012834 +    2.9852ms: Building handshake for node type X64, (version 1): options 16777220.
+ (TID 1) 638888054605049904 +     3.707ms: Handshake salt is 
+ (TID 1) 638888054605056878 +    0.6974ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.302
+ (TID 1) 638888054605160978 +     10.41ms: Executing build with command line 'C:\Program Files\dotnet\sdk\9.0.302\MSBuild.dll -maxcpucount -verbosity:m -tlp:default=auto -nologo -restore -consoleloggerparameters:Summary E:\GitHub\docs-aspire\docs\snippets\azure\AppHost\AppHost.csproj -distributedlogger:Microsoft.DotNet.Tools.MSBuild.MSBuildLogger,C:\Program Files\dotnet\sdk\9.0.302\dotnet.dll*Microsoft.DotNet.Tools.MSBuild.MSBuildForwardingLogger,C:\Program Files\dotnet\sdk\9.0.302\dotnet.dll'
+ (TID 1) 638888054605162639 +    0.1661ms: Server was not running. Starting server now.
+ (TID 1) 638888054605163940 +    0.1301ms: Starting Server...
+ (TID 1) 638888054605167806 +    0.3866ms: Launching node from C:\Program Files\dotnet\sdk\9.0.302\MSBuild.dll
+ (TID 1) 638888054605208939 +    4.1133ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 62776
+ (TID 1) 638888054605212531 +    0.3592ms: Server started with PID: 62776
+ (TID 1) 638888054606195585 +   98.3054ms: Writing handshake part 0 (16777220) to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606269035 +     7.345ms: Writing handshake part 1 (2015404885) to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606270893 +    0.1858ms: Writing handshake part 2 (17) to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606272359 +    0.1466ms: Writing handshake part 3 (14) to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606273845 +    0.1486ms: Writing handshake part 4 (13) to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606275041 +    0.1196ms: Writing handshake part 5 (31314) to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606277445 +    0.2404ms: Reading handshake from pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM
+ (TID 1) 638888054606279288 +    0.1843ms: Successfully connected to pipe MSBuildServer-qdVpuiDz87m6qBVLjF5QRkYmyDNk_oVYHowJ_zvjvpM...!
+ (TID 1) 638888054606286324 +    0.7036ms: MSBuild client warning: problem during querying console buffer width.
+ (TID 1) 638888054606293364 +     0.704ms: Command packet of type 'ServerNodeBuildCommand' sent...
+MSBuild Client Packet Pump (TID 24) 638888054606299894 +     0.653ms: Entering read loop.
+MSBuild Client Packet Pump (TID 24) 638888054621326765 + 1502.6871ms: Ending read loop.
+ (TID 1) 638888054621429729 +   10.2964ms: Build response received: exit code '0', exit type 'Success'
+ (TID 1) 638888054621431427 +    0.1698ms: Build finished.

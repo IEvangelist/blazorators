@@ -1,0 +1,65 @@
+.NET TP Worker (TID 4) 638887275023754188 +    0.3215ms: Starting to acquire 5 new or existing node(s) to establish nodes from ID 2 to 6...
+.NET TP Worker (TID 4) 638887275023778643 +    2.4455ms: Building handshake for node type X64, NodeReuse, (version 1): options 16777228.
+.NET TP Worker (TID 4) 638887275023780909 +    0.2266ms: Handshake salt is 
+.NET TP Worker (TID 4) 638887275023782900 +    0.1991ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.302
+.NET TP Worker (TID 4) 638887275024342147 +   55.9247ms: Attempting to connect to 23 existing processes 'dotnet'...
+.NET TP Worker (TID 4) 638887275024345457 +     0.331ms: Trying to connect to existing process dotnet with id 4064 to establish node 2...
+.NET TP Worker (TID 11) 638887275024347335 +    0.1878ms: Trying to connect to existing process dotnet with id 12100 to establish node 3...
+.NET TP Worker (TID 14) 638887275024349274 +    0.1939ms: Trying to connect to existing process dotnet with id 15040 to establish node 4...
+.NET TP Worker (TID 12) 638887275024351443 +    0.2169ms: Trying to connect to existing process dotnet with id 18788 to establish node 5...
+.NET TP Worker (TID 6) 638887275024353830 +    0.2387ms: Trying to connect to existing process dotnet with id 19756 to establish node 6...
+.NET TP Worker (TID 4) 638887275025506186 +  115.2356ms: Attempting connect to PID 4064 with pipe MSBuild4064 with timeout 0 ms
+.NET TP Worker (TID 6) 638887275025508930 +    0.2744ms: Attempting connect to PID 19756 with pipe MSBuild19756 with timeout 0 ms
+.NET TP Worker (TID 11) 638887275025511078 +    0.2148ms: Attempting connect to PID 12100 with pipe MSBuild12100 with timeout 0 ms
+.NET TP Worker (TID 14) 638887275025512959 +    0.1881ms: Attempting connect to PID 15040 with pipe MSBuild15040 with timeout 0 ms
+.NET TP Worker (TID 12) 638887275025514895 +    0.1936ms: Attempting connect to PID 18788 with pipe MSBuild18788 with timeout 0 ms
+.NET TP Worker (TID 14) 638887275025552148 +    3.7253ms: Writing handshake part 0 (16777228) to pipe MSBuild15040
+.NET TP Worker (TID 4) 638887275025557652 +    0.5504ms: Writing handshake part 0 (16777228) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025559845 +    0.2193ms: Writing handshake part 0 (16777228) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025561767 +    0.1922ms: Writing handshake part 0 (16777228) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025563654 +    0.1887ms: Writing handshake part 1 (2015404885) to pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025565031 +    0.1377ms: Writing handshake part 0 (16777228) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025566805 +    0.1774ms: Writing handshake part 1 (2015404885) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025568968 +    0.2163ms: Writing handshake part 1 (2015404885) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025570740 +    0.1772ms: Writing handshake part 1 (2015404885) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025572782 +    0.2042ms: Writing handshake part 2 (17) to pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025574374 +    0.1592ms: Writing handshake part 1 (2015404885) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025575475 +    0.1101ms: Writing handshake part 2 (17) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025576710 +    0.1235ms: Writing handshake part 2 (17) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025579409 +    0.2699ms: Writing handshake part 2 (17) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025581174 +    0.1765ms: Writing handshake part 3 (14) to pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025582519 +    0.1345ms: Writing handshake part 2 (17) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025584338 +    0.1819ms: Writing handshake part 3 (14) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025586275 +    0.1937ms: Writing handshake part 3 (14) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025587491 +    0.1216ms: Writing handshake part 3 (14) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025589325 +    0.1834ms: Writing handshake part 4 (13) to pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025590968 +    0.1643ms: Writing handshake part 3 (14) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025592367 +    0.1399ms: Writing handshake part 4 (13) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025593857 +     0.149ms: Writing handshake part 4 (13) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025595696 +    0.1839ms: Writing handshake part 4 (13) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025597711 +    0.2015ms: Writing handshake part 5 (31314) to pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025599453 +    0.1742ms: Writing handshake part 4 (13) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025601330 +    0.1877ms: Writing handshake part 5 (31314) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025603386 +    0.2056ms: Writing handshake part 5 (31314) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025605005 +    0.1619ms: Writing handshake part 5 (31314) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025607005 +       0.2ms: Writing handshake part 6 (1) to pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025608677 +    0.1672ms: Writing handshake part 5 (31314) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025610540 +    0.1863ms: Writing handshake part 6 (1) to pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025612444 +    0.1904ms: Writing handshake part 6 (1) to pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025614080 +    0.1636ms: Writing handshake part 6 (1) to pipe MSBuild19756
+.NET TP Worker (TID 14) 638887275025615765 +    0.1685ms: Reading handshake from pipe MSBuild15040
+.NET TP Worker (TID 11) 638887275025617912 +    0.2147ms: Writing handshake part 6 (1) to pipe MSBuild12100
+.NET TP Worker (TID 4) 638887275025619605 +    0.1693ms: Reading handshake from pipe MSBuild4064
+.NET TP Worker (TID 12) 638887275025621583 +    0.1978ms: Reading handshake from pipe MSBuild18788
+.NET TP Worker (TID 6) 638887275025623349 +    0.1766ms: Reading handshake from pipe MSBuild19756
+.NET TP Worker (TID 11) 638887275025624496 +    0.1147ms: Reading handshake from pipe MSBuild12100
+.NET TP Worker (TID 14) 638887275025691427 +    6.6931ms: Successfully connected to pipe MSBuild15040...!
+.NET TP Worker (TID 6) 638887275025694608 +    0.3181ms: Successfully connected to pipe MSBuild19756...!
+.NET TP Worker (TID 14) 638887275025696647 +    0.2039ms: Successfully connected to existed node 4 which is PID 15040
+.NET TP Worker (TID 4) 638887275025698790 +    0.2143ms: Successfully connected to pipe MSBuild4064...!
+.NET TP Worker (TID 11) 638887275025700693 +    0.1903ms: Successfully connected to pipe MSBuild12100...!
+.NET TP Worker (TID 12) 638887275025702622 +    0.1929ms: Successfully connected to pipe MSBuild18788...!
+.NET TP Worker (TID 12) 638887275025704568 +    0.1946ms: Successfully connected to existed node 5 which is PID 18788
+.NET TP Worker (TID 4) 638887275025706068 +      0.15ms: Successfully connected to existed node 2 which is PID 4064
+.NET TP Worker (TID 11) 638887275025707447 +    0.1379ms: Successfully connected to existed node 3 which is PID 12100
+.NET TP Worker (TID 6) 638887275025709047 +      0.16ms: Successfully connected to existed node 6 which is PID 19756

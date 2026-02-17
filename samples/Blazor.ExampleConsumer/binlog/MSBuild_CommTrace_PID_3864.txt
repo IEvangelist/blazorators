@@ -1,0 +1,105 @@
+.NET TP Worker (TID 28) 638887275165705213 +    0.2083ms: Starting to acquire 5 new or existing node(s) to establish nodes from ID 2 to 6...
+.NET TP Worker (TID 28) 638887275165715283 +     1.007ms: Building handshake for node type X64, NodeReuse, (version 1): options 16777228.
+.NET TP Worker (TID 28) 638887275165716550 +    0.1267ms: Handshake salt is 
+.NET TP Worker (TID 28) 638887275165717327 +    0.0777ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.302
+.NET TP Worker (TID 28) 638887275165924776 +   20.7449ms: Attempting to connect to 23 existing processes 'dotnet'...
+.NET TP Worker (TID 28) 638887275165927260 +    0.2484ms: Trying to connect to existing process dotnet with id 3864 to establish node 2...
+.NET TP Worker (TID 12) 638887275165929129 +    0.1869ms: Trying to connect to existing process dotnet with id 4064 to establish node 3...
+.NET TP Worker (TID 31) 638887275165930686 +    0.1557ms: Trying to connect to existing process dotnet with id 12100 to establish node 4...
+.NET TP Worker (TID 6) 638887275165932060 +    0.1374ms: Trying to connect to existing process dotnet with id 15040 to establish node 5...
+.NET TP Worker (TID 29) 638887275165933591 +    0.1531ms: Trying to connect to existing process dotnet with id 18788 to establish node 6...
+.NET TP Worker (TID 28) 638887275165935809 +    0.2218ms: Trying to connect to existing process dotnet with id 19756 to establish node 2...
+.NET TP Worker (TID 12) 638887275165939282 +    0.3473ms: Attempting connect to PID 4064 with pipe MSBuild4064 with timeout 0 ms
+.NET TP Worker (TID 29) 638887275165940612 +     0.133ms: Attempting connect to PID 18788 with pipe MSBuild18788 with timeout 0 ms
+.NET TP Worker (TID 28) 638887275165942052 +     0.144ms: Attempting connect to PID 19756 with pipe MSBuild19756 with timeout 0 ms
+.NET TP Worker (TID 31) 638887275165943832 +     0.178ms: Attempting connect to PID 12100 with pipe MSBuild12100 with timeout 0 ms
+.NET TP Worker (TID 6) 638887275165945049 +    0.1217ms: Attempting connect to PID 15040 with pipe MSBuild15040 with timeout 0 ms
+.NET TP Worker (TID 12) 638887275166487246 +   54.2197ms: Failed to connect to pipe MSBuild4064. The operation has timed out.
+.NET TP Worker (TID 6) 638887275166489173 +    0.1927ms: Failed to connect to pipe MSBuild15040. The operation has timed out.
+.NET TP Worker (TID 6) 638887275166490520 +    0.1347ms: Trying to connect to existing process dotnet with id 29664 to establish node 5...
+.NET TP Worker (TID 6) 638887275166492693 +    0.2173ms: Attempting connect to PID 29664 with pipe MSBuild29664 with timeout 0 ms
+.NET TP Worker (TID 28) 638887275166495988 +    0.3295ms: Failed to connect to pipe MSBuild19756. The operation has timed out.
+.NET TP Worker (TID 12) 638887275166497565 +    0.1577ms: Trying to connect to existing process dotnet with id 20412 to establish node 3...
+.NET TP Worker (TID 12) 638887275166498718 +    0.1153ms: Attempting connect to PID 20412 with pipe MSBuild20412 with timeout 0 ms
+.NET TP Worker (TID 31) 638887275166499987 +    0.1269ms: Failed to connect to pipe MSBuild12100. The operation has timed out.
+.NET TP Worker (TID 31) 638887275166501084 +    0.1097ms: Trying to connect to existing process dotnet with id 33392 to establish node 4...
+.NET TP Worker (TID 31) 638887275166502617 +    0.1533ms: Attempting connect to PID 33392 with pipe MSBuild33392 with timeout 0 ms
+.NET TP Worker (TID 29) 638887275166504991 +    0.2374ms: Failed to connect to pipe MSBuild18788. The operation has timed out.
+.NET TP Worker (TID 29) 638887275166506502 +    0.1511ms: Trying to connect to existing process dotnet with id 34108 to establish node 6...
+.NET TP Worker (TID 29) 638887275166508146 +    0.1644ms: Attempting connect to PID 34108 with pipe MSBuild34108 with timeout 0 ms
+.NET TP Worker (TID 28) 638887275166510169 +    0.2023ms: Trying to connect to existing process dotnet with id 30004 to establish node 2...
+.NET TP Worker (TID 28) 638887275166512776 +    0.2607ms: Attempting connect to PID 30004 with pipe MSBuild30004 with timeout 0 ms
+.NET TP Worker (TID 6) 638887275167134052 +   62.1276ms: Failed to connect to pipe MSBuild29664. The operation has timed out.
+.NET TP Worker (TID 12) 638887275167135829 +    0.1777ms: Failed to connect to pipe MSBuild20412. The operation has timed out.
+.NET TP Worker (TID 29) 638887275167136828 +    0.0999ms: Failed to connect to pipe MSBuild34108. The operation has timed out.
+.NET TP Worker (TID 31) 638887275167137844 +    0.1016ms: Failed to connect to pipe MSBuild33392. The operation has timed out.
+.NET TP Worker (TID 31) 638887275167138742 +    0.0898ms: Trying to connect to existing process dotnet with id 51412 to establish node 4...
+.NET TP Worker (TID 6) 638887275167139590 +    0.0848ms: Trying to connect to existing process dotnet with id 38728 to establish node 5...
+.NET TP Worker (TID 6) 638887275167140420 +     0.083ms: Attempting connect to PID 38728 with pipe MSBuild38728 with timeout 0 ms
+.NET TP Worker (TID 12) 638887275167141527 +    0.1107ms: Trying to connect to existing process dotnet with id 43640 to establish node 3...
+.NET TP Worker (TID 12) 638887275167142103 +    0.0576ms: Attempting connect to PID 43640 with pipe MSBuild43640 with timeout 0 ms
+.NET TP Worker (TID 31) 638887275167142822 +    0.0719ms: Attempting connect to PID 51412 with pipe MSBuild51412 with timeout 0 ms
+.NET TP Worker (TID 28) 638887275167144804 +    0.1982ms: Failed to connect to pipe MSBuild30004. The operation has timed out.
+.NET TP Worker (TID 29) 638887275167146548 +    0.1744ms: Trying to connect to existing process dotnet with id 44556 to establish node 6...
+.NET TP Worker (TID 29) 638887275167148019 +    0.1471ms: Attempting connect to PID 44556 with pipe MSBuild44556 with timeout 0 ms
+.NET TP Worker (TID 28) 638887275167149439 +     0.142ms: Trying to connect to existing process dotnet with id 51680 to establish node 2...
+.NET TP Worker (TID 28) 638887275167151037 +    0.1598ms: Attempting connect to PID 51680 with pipe MSBuild51680 with timeout 0 ms
+.NET TP Worker (TID 12) 638887275167152574 +    0.1537ms: Failed to connect to pipe MSBuild43640. The operation has timed out.
+.NET TP Worker (TID 12) 638887275167154447 +    0.1873ms: Trying to connect to existing process dotnet with id 52480 to establish node 3...
+.NET TP Worker (TID 12) 638887275167156255 +    0.1808ms: Attempting connect to PID 52480 with pipe MSBuild52480 with timeout 0 ms
+.NET TP Worker (TID 28) 638887275167165914 +    0.9659ms: Writing handshake part 0 (16777228) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167167914 +       0.2ms: Writing handshake part 0 (16777228) to pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167169719 +    0.1805ms: Writing handshake part 0 (16777228) to pipe MSBuild51412
+.NET TP Worker (TID 28) 638887275167171136 +    0.1417ms: Writing handshake part 1 (2015404885) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167172253 +    0.1117ms: Writing handshake part 1 (2015404885) to pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167173333 +     0.108ms: Writing handshake part 1 (2015404885) to pipe MSBuild51412
+.NET TP Worker (TID 28) 638887275167174765 +    0.1432ms: Writing handshake part 2 (17) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167176231 +    0.1466ms: Writing handshake part 2 (17) to pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167177133 +    0.0902ms: Writing handshake part 2 (17) to pipe MSBuild51412
+.NET TP Worker (TID 28) 638887275167178105 +    0.0972ms: Writing handshake part 3 (14) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167179497 +    0.1392ms: Writing handshake part 3 (14) to pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167180809 +    0.1312ms: Writing handshake part 3 (14) to pipe MSBuild51412
+.NET TP Worker (TID 28) 638887275167181766 +    0.0957ms: Writing handshake part 4 (13) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167182834 +    0.1068ms: Writing handshake part 4 (13) to pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167184055 +    0.1221ms: Writing handshake part 4 (13) to pipe MSBuild51412
+.NET TP Worker (TID 28) 638887275167184851 +    0.0796ms: Writing handshake part 5 (31314) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167185998 +    0.1147ms: Writing handshake part 5 (31314) to pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167187004 +    0.1006ms: Writing handshake part 5 (31314) to pipe MSBuild51412
+.NET TP Worker (TID 28) 638887275167187839 +    0.0835ms: Writing handshake part 6 (1) to pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167188542 +    0.0703ms: Writing handshake part 6 (1) to pipe MSBuild52480
+.NET TP Worker (TID 28) 638887275167189266 +    0.0724ms: Reading handshake from pipe MSBuild51680
+.NET TP Worker (TID 12) 638887275167189923 +    0.0657ms: Reading handshake from pipe MSBuild52480
+.NET TP Worker (TID 31) 638887275167190581 +    0.0658ms: Writing handshake part 6 (1) to pipe MSBuild51412
+.NET TP Worker (TID 31) 638887275167192017 +    0.1436ms: Reading handshake from pipe MSBuild51412
+.NET TP Worker (TID 12) 638887275167287164 +    9.5147ms: Successfully connected to pipe MSBuild52480...!
+.NET TP Worker (TID 28) 638887275167288657 +    0.1493ms: Successfully connected to pipe MSBuild51680...!
+.NET TP Worker (TID 28) 638887275167289472 +    0.0815ms: Successfully connected to existed node 2 which is PID 51680
+.NET TP Worker (TID 12) 638887275167290248 +    0.0776ms: Successfully connected to existed node 3 which is PID 52480
+.NET TP Worker (TID 31) 638887275167291207 +    0.0959ms: Successfully connected to pipe MSBuild51412...!
+.NET TP Worker (TID 31) 638887275167291943 +    0.0736ms: Successfully connected to existed node 4 which is PID 51412
+.NET TP Worker (TID 6) 638887275167640073 +    34.813ms: Failed to connect to pipe MSBuild38728. The operation has timed out.
+.NET TP Worker (TID 6) 638887275167641553 +     0.148ms: Trying to connect to existing process dotnet with id 53172 to establish node 5...
+.NET TP Worker (TID 6) 638887275167642201 +    0.0648ms: Attempting connect to PID 53172 with pipe MSBuild53172 with timeout 0 ms
+.NET TP Worker (TID 6) 638887275167643696 +    0.1495ms: Writing handshake part 0 (16777228) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167646338 +    0.2642ms: Writing handshake part 1 (2015404885) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167649244 +    0.2906ms: Writing handshake part 2 (17) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167652278 +    0.3034ms: Writing handshake part 3 (14) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167653965 +    0.1687ms: Writing handshake part 4 (13) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167656044 +    0.2079ms: Writing handshake part 5 (31314) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167657920 +    0.1876ms: Writing handshake part 6 (1) to pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167660408 +    0.2488ms: Reading handshake from pipe MSBuild53172
+.NET TP Worker (TID 6) 638887275167766095 +   10.5687ms: Successfully connected to pipe MSBuild53172...!
+.NET TP Worker (TID 6) 638887275167767489 +    0.1394ms: Successfully connected to existed node 5 which is PID 53172
+.NET TP Worker (TID 29) 638887275167794328 +    2.6839ms: Failed to connect to pipe MSBuild44556. The operation has timed out.
+.NET TP Worker (TID 29) 638887275167795392 +    0.1064ms: Trying to connect to existing process dotnet with id 53488 to establish node 6...
+.NET TP Worker (TID 29) 638887275167796035 +    0.0643ms: Attempting connect to PID 53488 with pipe MSBuild53488 with timeout 0 ms
+.NET TP Worker (TID 29) 638887275167798284 +    0.2249ms: Writing handshake part 0 (16777228) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167800027 +    0.1743ms: Writing handshake part 1 (2015404885) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167801614 +    0.1587ms: Writing handshake part 2 (17) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167802940 +    0.1326ms: Writing handshake part 3 (14) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167804400 +     0.146ms: Writing handshake part 4 (13) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167805688 +    0.1288ms: Writing handshake part 5 (31314) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167807004 +    0.1316ms: Writing handshake part 6 (1) to pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167808768 +    0.1764ms: Reading handshake from pipe MSBuild53488
+.NET TP Worker (TID 29) 638887275167910120 +   10.1352ms: Successfully connected to pipe MSBuild53488...!
+.NET TP Worker (TID 29) 638887275167911409 +    0.1289ms: Successfully connected to existed node 6 which is PID 53488

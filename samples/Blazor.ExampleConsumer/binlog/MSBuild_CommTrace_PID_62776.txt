@@ -1,0 +1,22 @@
+ (TID 1) 638888054605954505 +    5.5726ms: Building handshake for node type X64, (version 1): options 16777220.
+ (TID 1) 638888054605988602 +    3.4097ms: Handshake salt is 
+ (TID 1) 638888054605993651 +    0.5049ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.302
+ (TID 1) 638888054606101002 +   10.7351ms: Starting new server node with handshake 16777220 2015404885 17 14 13 31314 1
+OutOfProc Endpoint Packet Pump (TID 7) 638888054606138274 +    3.7272ms: Waiting for connection 900000 ms...
+OutOfProc Endpoint Packet Pump (TID 7) 638888054606190424 +     5.215ms: Parent started connecting. Reading handshake from parent
+OutOfProc Endpoint Packet Pump (TID 7) 638888054606277528 +    8.7104ms: Successfully connected to parent.
+OutOfProc Endpoint Packet Pump (TID 7) 638888054606279209 +    0.1681ms: Changing link status from Inactive to Active
+OutOfProc Endpoint Packet Pump (TID 7) 638888054606279936 +    0.0727ms: Entering read loop.
+.NET TP Worker (TID 10) 638888054606323185 +    4.3249ms: Building with MSBuild server with command line System.String[]
+ (TID 1) 638888054621324473 + 1500.1288ms: Shutting down with reason: BuildCompleteReuse, and exception: .
+OutOfProc Endpoint Packet Pump (TID 7) 638888054621416786 +    9.2313ms: Disconnecting voluntarily
+OutOfProc Endpoint Packet Pump (TID 7) 638888054621417774 +    0.0988ms: Changing link status from Active to Failed
+OutOfProc Endpoint Packet Pump (TID 7) 638888054621418269 +    0.0495ms: Ending read loop
+ (TID 1) 638888054621421208 +    0.2939ms: Changing link status from Failed to Inactive
+ (TID 1) 638888054621421934 +    0.0726ms: Shut down complete.
+OutOfProc Endpoint Packet Pump (TID 36) 638888054621425243 +    0.3309ms: Waiting for connection 900000 ms...
+OutOfProc Endpoint Packet Pump (TID 36) 638888063621434712 +    900001ms: Connection timed out waiting a host to contact us.  Exiting comm thread.
+OutOfProc Endpoint Packet Pump (TID 36) 638888063621513888 +    7.9176ms: Changing link status from Inactive to ConnectionFailed
+ (TID 1) 638888063621515494 +    0.1606ms: Shutting down with reason: ConnectionFailed, and exception: .
+ (TID 1) 638888063621518340 +    0.2846ms: Changing link status from ConnectionFailed to Inactive
+ (TID 1) 638888063621518771 +    0.0431ms: Shut down complete.
