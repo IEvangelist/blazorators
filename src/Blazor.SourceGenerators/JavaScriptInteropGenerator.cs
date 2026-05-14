@@ -53,21 +53,19 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
     {
-        if (node is InterfaceDeclarationSyntax interfaceDeclaration &&
-            interfaceDeclaration.AttributeLists.Count > 0)
+        if (node is not InterfaceDeclarationSyntax interfaceDeclaration ||
+            interfaceDeclaration.AttributeLists.Count is 0)
         {
-            foreach (var attributeListSyntax in interfaceDeclaration.AttributeLists)
+            return false;
+        }
+
+        foreach (var attributeListSyntax in interfaceDeclaration.AttributeLists)
+        {
+            foreach (var attributeSyntax in attributeListSyntax.Attributes)
             {
-                foreach (var attributeSyntax in attributeListSyntax.Attributes)
+                if (TryMatchInteropAttribute(attributeSyntax, out _))
                 {
-                    var name = attributeSyntax.Name.ToString();
-
-                    var isAutoInterop =
-                        nameof(JSAutoInteropAttribute).Contains(name);
-                    var isAutoGenericInterop =
-                        nameof(JSAutoGenericInteropAttribute).Contains(name);
-
-                    return isAutoInterop || isAutoGenericInterop;
+                    return true;
                 }
             }
         }
@@ -83,23 +81,46 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         {
             foreach (var attributeSyntax in attributeListSyntax.Attributes)
             {
-                var name = attributeSyntax.Name.ToString();
-
-                var isAutoInterop =
-                    nameof(JSAutoInteropAttribute).Contains(name);
-                var isAutoGenericInterop =
-                    nameof(JSAutoGenericInteropAttribute).Contains(name);
-
-                if (isAutoInterop || isAutoGenericInterop)
+                if (TryMatchInteropAttribute(attributeSyntax, out var isGeneric))
                 {
                     return new(
-                        Options: attributeSyntax.GetGeneratorOptions(isAutoGenericInterop),
+                        Options: attributeSyntax.GetGeneratorOptions(isGeneric),
                         InterfaceDeclaration: interfaceDeclaration,
                         InteropAttribute: attributeSyntax);
                 }
             }
         }
+
         return null;
+    }
+
+    /// <summary>
+    /// Returns <c>true</c> if <paramref name="attribute"/> is one of the source generator's interop
+    /// attributes (with or without the <c>Attribute</c> suffix and ignoring any qualifying namespace).
+    /// When matched, <paramref name="isGeneric"/> reports whether the attribute is the generic variant.
+    /// </summary>
+    internal static bool TryMatchInteropAttribute(AttributeSyntax attribute, out bool isGeneric)
+    {
+        isGeneric = false;
+
+        var name = attribute.Name.ToString();
+        var lastDot = name.LastIndexOf('.');
+        var simpleName = lastDot >= 0 ? name.Substring(lastDot + 1) : name;
+
+        switch (simpleName)
+        {
+            case "JSAutoInterop":
+            case nameof(JSAutoInteropAttribute):
+                return true;
+
+            case "JSAutoGenericInterop":
+            case nameof(JSAutoGenericInteropAttribute):
+                isGeneric = true;
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     private static void Execute(
