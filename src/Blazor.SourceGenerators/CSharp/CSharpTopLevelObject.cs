@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.CSharp;
@@ -60,7 +60,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         foreach (var method in Methods ?? [])
         {
             var details = MethodBuilderDetails.Create(method, options);
-            builder.ResetIndentiationTo(methodLevel);
+            builder.ResetIndentationTo(methodLevel);
 
             var isJavaScriptOverride = method.IsJavaScriptOverride(options);
             var isPureNonBiDirectionalOrOverriddenJS =
@@ -194,7 +194,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             if (index.IsFirst) builder.AppendLine();
             if (property.IsIndexer) continue;
 
-            builder.ResetIndentiationTo(methodLevel);
+            builder.ResetIndentationTo(methodLevel);
 
             var details = PropertyBuilderDetails.Create(property, options);
 
@@ -209,7 +209,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             }
         }
 
-        builder.ResetIndentiationTo(0);
+        builder.ResetIndentationTo(0);
         builder.AppendClosingCurlyBrace();
 
         var interfaceDeclaration = TryFormatCSharpSourceText(builder.ToSourceCodeString());
@@ -238,7 +238,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         foreach (var (index, method) in (Methods ?? []).Select())
         {
             var details = MethodBuilderDetails.Create(method, options);
-            builder.ResetIndentiationTo(methodLevel);
+            builder.ResetIndentationTo(methodLevel);
 
             var isJavaScriptOverride = method.IsJavaScriptOverride(options);
             var isPureNonBiDirectionalOrOverriddenJS =
@@ -480,7 +480,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             if (index.IsFirst) builder.AppendLine();
             if (property.IsIndexer) continue;
 
-            builder.ResetIndentiationTo(methodLevel);
+            builder.ResetIndentationTo(methodLevel);
 
             var details = PropertyBuilderDetails.Create(property, options);
 
@@ -495,7 +495,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
             }
         }
 
-        builder.ResetIndentiationTo(0);
+        builder.ResetIndentationTo(0);
         builder.AppendClosingCurlyBrace();
 
         var implementation = TryFormatCSharpSourceText(builder.ToSourceCodeString());

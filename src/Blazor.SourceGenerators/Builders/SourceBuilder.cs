@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazor.SourceGenerators.Builders;
@@ -185,10 +185,10 @@ internal sealed class SourceBuilder
                         $"/// <param name=\"component\">The calling Razor (or Blazor) component.</param>{NewLine}");
                 }
 
-                if (param.ActionDeclation is not null)
+                if (param.ActionDeclaration is not null)
                 {
                     var name = param.ToArgumentString();
-                    var dependentTypes = param.ActionDeclation.DependentTypes.Keys;
+                    var dependentTypes = param.ActionDeclaration.DependentTypes.Keys;
                     var action =
                         $"Expects the name of a <c>\"JSInvokableAttribute\"</c> C# method with the following " +
                         $"<c>System.Action{{{string.Join(", ", dependentTypes)}}}\"</c>.";
@@ -291,12 +291,12 @@ internal sealed class SourceBuilder
         {
             foreach (var group in
                 methods.SelectMany(m => m.ParameterDefinitions)
-                    .Where(param => param.ActionDeclation is not null)
+                    .Where(param => param.ActionDeclaration is not null)
                     .GroupBy(param => param.RawName))
             {
                 var param = group.First();
                 var keys =
-                    param.ActionDeclation!.ParameterDefinitions.Select(p => p.RawTypeName);
+                    param.ActionDeclaration!.ParameterDefinitions.Select(p => p.RawTypeName);
 
                 var fieldName = $"_{param.RawName}";
                 Fields ??= new HashSet<string>();
@@ -319,7 +319,7 @@ internal sealed class SourceBuilder
 
             foreach (var group in
                 methods.SelectMany(m => m.ParameterDefinitions)
-                    .Where(param => param.ActionDeclation is not null)
+                    .Where(param => param.ActionDeclaration is not null)
                     .GroupBy(param => param.RawName))
             {
                 var param = group.First();
@@ -336,7 +336,7 @@ internal sealed class SourceBuilder
             }
 
             AppendLine();
-            ResetIndentiationTo(level);
+            ResetIndentationTo(level);
         }
 
         return this;
@@ -345,7 +345,7 @@ internal sealed class SourceBuilder
     private SourceBuilder AppendParameters(CSharpType param, string fieldName)
     {
         var args = new List<string>();
-        foreach (var (interation, p) in param.ActionDeclation!.ParameterDefinitions!.Select())
+        foreach (var (interation, p) in param.ActionDeclaration!.ParameterDefinitions!.Select())
         {
             args.Add(p.RawName);
             AppendRaw($"{p.RawTypeName} {p.RawName}", appendNewLine: false);
@@ -370,7 +370,7 @@ internal sealed class SourceBuilder
         return this;
     }
 
-    internal SourceBuilder ResetIndentiationTo(int level)
+    internal SourceBuilder ResetIndentationTo(int level)
     {
         _indentation = _indentation.ResetTo(level);
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 using Blazor.SourceGenerators.Builders;
@@ -9,22 +9,22 @@ internal record CSharpType(
     string RawName,
     string RawTypeName,
     bool IsNullable = false,
-    CSharpAction? ActionDeclation = null) : ICSharpDependencyGraphObject
+    CSharpAction? ActionDeclaration = null) : ICSharpDependencyGraphObject
 {
     public Dictionary<string, CSharpObject> DependentTypes
     {
         get
         {
             Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop in ActionDeclation?.DependentTypes
+            foreach (var prop in ActionDeclaration?.DependentTypes
                 ?? Enumerable.Empty<KeyValuePair<string, CSharpObject>>())
             {
                 result[prop.Key] = prop.Value;
             }
 
-            if (ActionDeclation is { ParameterDefinitions.Count: > 0 })
+            if (ActionDeclaration is { ParameterDefinitions.Count: > 0 })
             {
-                foreach (var type in ActionDeclation.ParameterDefinitions)
+                foreach (var type in ActionDeclaration.ParameterDefinitions)
                 {
                     foreach (var pair
                         in type.DependentTypes.SelectMany(
@@ -85,7 +85,7 @@ internal record CSharpType(
                 : $"{MethodBuilderDetails.GenericTypeValue} {ToArgumentString()}";
         }
 
-        var isCallback = ActionDeclation is not null;
+        var isCallback = ActionDeclaration is not null;
         var typeName = TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName)
             ? TypeMap.PrimitiveTypes[RawTypeName]
             : isCallback
@@ -102,10 +102,10 @@ internal record CSharpType(
 
     public string ToActionString(bool isGenericType = false, bool overrideNullability = false)
     {
-        if (ActionDeclation is not null)
+        if (ActionDeclaration is not null)
         {
             var parameterName = ToArgumentString(asDelegate: true);
-            var dependentTypes = ActionDeclation.DependentTypes.Keys;
+            var dependentTypes = ActionDeclaration.DependentTypes.Keys;
             var parameterDefault = overrideNullability ? "" : " = null";
 
             return IsNullable
@@ -118,7 +118,7 @@ internal record CSharpType(
 
     public string ToArgumentString(bool toJson = false, bool asDelegate = false)
     {
-        var isCallback = ActionDeclation is not null;
+        var isCallback = ActionDeclaration is not null;
         var suffix = asDelegate ? "" : "MethodName";
         var parameterName = isCallback
             ? $"on{RawName.CapitalizeFirstLetter()}{suffix}"
