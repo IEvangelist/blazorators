@@ -23,16 +23,26 @@ internal record CSharpMethod(
     public Dictionary<string, CSharpObject> DependentTypes { get; init; }
         = new(StringComparer.OrdinalIgnoreCase);
 
+    private IImmutableSet<(string TypeName, CSharpObject Object)>? _allDependentTypes;
+
     public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
     {
         get
         {
+            if (_allDependentTypes is not null)
+            {
+                return _allDependentTypes;
+            }
+
             Dictionary<string, CSharpObject> dependentTypes = new(StringComparer.OrdinalIgnoreCase);
             if (ParameterDefinitions is { Count: > 0 })
             {
                 foreach (var kvp
                     in ParameterDefinitions.SelectMany(pd => pd.DependentTypes)
-                        .Flatten(pair => pair.Value.DependentTypes))
+                        .Flatten(
+                            childSelector: pair => pair.Value.DependentTypes,
+                            keySelector: pair => pair.Key,
+                            keyComparer: StringComparer.OrdinalIgnoreCase))
                 {
                     dependentTypes[kvp.Key] = kvp.Value;
                 }
@@ -41,13 +51,16 @@ internal record CSharpMethod(
             {
                 foreach (var dependency
                     in JavaScriptMethodDependency.ParameterDefinitions.SelectMany(pd => pd.DependentTypes)
-                        .Flatten(pair => pair.Value.DependentTypes))
+                        .Flatten(
+                            childSelector: pair => pair.Value.DependentTypes,
+                            keySelector: pair => pair.Key,
+                            keyComparer: StringComparer.OrdinalIgnoreCase))
                 {
                     dependentTypes[dependency.Key] = dependency.Value;
                 }
             }
 
-            return dependentTypes.Select(kvp => (kvp.Key, kvp.Value))
+            return _allDependentTypes = dependentTypes.Select(kvp => (kvp.Key, kvp.Value))
                 .Concat(this.GetAllDependencies())
                 .ToImmutableHashSet();
         }

@@ -16,24 +16,47 @@ internal record CSharpObject(
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } =
         new(StringComparer.OrdinalIgnoreCase);
 
+    private IImmutableSet<(string TypeName, CSharpObject Object)>? _allDependentTypes;
+    private bool _isComputingAllDependentTypes;
+
     public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
     {
         get
         {
-            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop
-                in this.GetAllDependencies()
-                    .Concat(Properties.SelectMany(
-                        p => p.Value.AllDependentTypes))
-                    .Concat(Methods.SelectMany(
-                        p => p.Value.AllDependentTypes)))
+            if (_allDependentTypes is not null)
             {
-                result[prop.TypeName] = prop.Object;
+                return _allDependentTypes;
             }
 
-            return result.Select(kvp => (kvp.Key, kvp.Value))
-                .Concat([(TypeName, this)])
-                .ToImmutableHashSet();
+            // Re-entrant access (cycle in the dependency graph): return what we
+            // have so far. The outermost call will finalize and cache the full set.
+            if (_isComputingAllDependentTypes)
+            {
+                return ImmutableHashSet<(string, CSharpObject)>.Empty;
+            }
+
+            _isComputingAllDependentTypes = true;
+            try
+            {
+                Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
+                foreach (var prop
+                    in this.GetAllDependencies()
+                        .Concat(Properties.SelectMany(
+                            p => p.Value.AllDependentTypes))
+                        .Concat(Methods.SelectMany(
+                            p => p.Value.AllDependentTypes)))
+                {
+                    result[prop.TypeName] = prop.Object;
+                }
+
+                return _allDependentTypes = result.Select(kvp => (kvp.Key, kvp.Value))
+                    .Concat([(TypeName, this)])
+                    .ToImmutableHashSet();
+            }
+            finally
+            {
+                _isComputingAllDependentTypes = false;
+            }
         }
     }
 

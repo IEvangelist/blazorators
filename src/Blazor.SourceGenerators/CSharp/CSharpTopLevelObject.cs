@@ -12,10 +12,17 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
 
     public Dictionary<string, CSharpObject> DependentTypes { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
+    private IImmutableSet<(string TypeName, CSharpObject Object)>? _allDependentTypes;
+
     public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
     {
         get
         {
+            if (_allDependentTypes is not null)
+            {
+                return _allDependentTypes;
+            }
+
             Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
             foreach (var prop
                 in DependentTypes
@@ -28,7 +35,7 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
                 result[prop.TypeName] = prop.Object;
             }
 
-            return result.Select(pair => (pair.Key, pair.Value))
+            return _allDependentTypes = result.Select(pair => (pair.Key, pair.Value))
                 .ToImmutableHashSet();
         }
     }

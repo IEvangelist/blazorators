@@ -39,10 +39,36 @@ internal record CSharpType(
         }
     }
 
-    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes =>
-        DependentTypes
-            .SelectMany(kvp => kvp.Value.AllDependentTypes)
-            .ToImmutableHashSet();
+    private IImmutableSet<(string TypeName, CSharpObject Object)>? _allDependentTypes;
+    private bool _isComputingAllDependentTypes;
+
+    public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
+    {
+        get
+        {
+            if (_allDependentTypes is not null)
+            {
+                return _allDependentTypes;
+            }
+
+            if (_isComputingAllDependentTypes)
+            {
+                return ImmutableHashSet<(string, CSharpObject)>.Empty;
+            }
+
+            _isComputingAllDependentTypes = true;
+            try
+            {
+                return _allDependentTypes = DependentTypes
+                    .SelectMany(kvp => kvp.Value.AllDependentTypes)
+                    .ToImmutableHashSet();
+            }
+            finally
+            {
+                _isComputingAllDependentTypes = false;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets a string representation of the C# type as a parameter declaration. For example,

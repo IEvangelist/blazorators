@@ -31,22 +31,43 @@ internal record CSharpAction(
     public Dictionary<string, CSharpObject> DependentTypes { get; init; }
         = new(StringComparer.OrdinalIgnoreCase);
 
+    private IImmutableSet<(string TypeName, CSharpObject Object)>? _allDependentTypes;
+    private bool _isComputingAllDependentTypes;
+
     public IImmutableSet<(string TypeName, CSharpObject Object)> AllDependentTypes
     {
         get
         {
-            Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
-            foreach (var prop
-                in DependentTypes.Select(
-                        kvp => (TypeName: kvp.Key, Object: kvp.Value))
-                    .Concat(ParameterDefinitions.SelectMany(
-                        p => p.AllDependentTypes)))
+            if (_allDependentTypes is not null)
             {
-                result[prop.TypeName] = prop.Object;
+                return _allDependentTypes;
             }
 
-            return result.Select(kvp => (kvp.Key, kvp.Value))
-                .ToImmutableHashSet();
+            if (_isComputingAllDependentTypes)
+            {
+                return ImmutableHashSet<(string, CSharpObject)>.Empty;
+            }
+
+            _isComputingAllDependentTypes = true;
+            try
+            {
+                Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
+                foreach (var prop
+                    in DependentTypes.Select(
+                            kvp => (TypeName: kvp.Key, Object: kvp.Value))
+                        .Concat(ParameterDefinitions.SelectMany(
+                            p => p.AllDependentTypes)))
+                {
+                    result[prop.TypeName] = prop.Object;
+                }
+
+                return _allDependentTypes = result.Select(kvp => (kvp.Key, kvp.Value))
+                    .ToImmutableHashSet();
+            }
+            finally
+            {
+                _isComputingAllDependentTypes = false;
+            }
         }
     }
 }

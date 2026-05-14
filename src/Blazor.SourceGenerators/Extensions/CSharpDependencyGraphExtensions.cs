@@ -11,7 +11,9 @@ internal static class CSharpDependencyGraphExtensions
         Dictionary<string, CSharpObject> map = new(StringComparer.OrdinalIgnoreCase);
         foreach (var kvp
             in dependencyGraphObject.DependentTypes?.Flatten(
-                obj => obj.Value.DependentTypes)
+                childSelector: obj => obj.Value.DependentTypes,
+                keySelector: obj => obj.Key,
+                keyComparer: StringComparer.OrdinalIgnoreCase)
             ?? [])
         {
             map[kvp.Key] = kvp.Value;
