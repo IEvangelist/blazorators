@@ -75,7 +75,16 @@ internal record CSharpObject(
         new(StringComparer.OrdinalIgnoreCase);
 
     public bool IsActionParameter =>
-        TypeName.EndsWith("Callback");
+        IsCallback || TypeName.EndsWith("Callback");
+
+    /// <summary>
+    /// True when this object was parsed from a TypeScript callback
+    /// interface (a body of one-or-more anonymous call signatures).
+    /// Set by <c>TypeDeclarationParser.ToObject</c> via shape-based
+    /// detection rather than relying on the <c>"Callback"</c> name
+    /// suffix.
+    /// </summary>
+    public bool IsCallback { get; init; }
 
     internal string ToClassString()
     {

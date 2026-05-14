@@ -7,6 +7,13 @@ internal sealed partial class TypeDeclarationParser
 {
     internal CSharpObject? ToObject(string typeScriptTypeDeclaration)
     {
+        // Callback interfaces don't have parseable methods or properties in
+        // the regex grammar (the body is an anonymous call signature). We
+        // still emit a placeholder `CSharpObject` so downstream emission
+        // can filter on `IsActionParameter`/`IsCallback`, but bail out of
+        // the rest of the per-line parser.
+        var isCallback = IsCallbackTypeDeclaration(typeScriptTypeDeclaration);
+
         CSharpObject? cSharpObject = null;
 
         var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
@@ -21,7 +28,12 @@ internal sealed partial class TypeDeclarationParser
                 var subclass = ExtendsTypeNameRegex.GetMatchGroupValue(seg, "TypeName");
                 if (typeName is not null)
                 {
-                    cSharpObject = new(typeName, subclass);
+                    cSharpObject = new(typeName, subclass) { IsCallback = isCallback };
+                    if (isCallback)
+                    {
+                        return cSharpObject;
+                    }
+
                     continue;
                 }
                 else
@@ -393,7 +405,7 @@ internal sealed partial class TypeDeclarationParser
                     InvokableMethodName = $"blazorators.{typeName.LowerCaseFirstLetter()}.{rawName}"
                 };
 
-                if (parameterType.EndsWith("Callback"))
+                if (IsCallbackTypeDeclaration(typeScriptDefinitionText))
                 {
                     action = ToAction(typeScriptDefinitionText);
                     javaScriptMethod = javaScriptMethod with
