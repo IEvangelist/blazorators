@@ -29,7 +29,7 @@ runs:
 
     - name: Build
       shell: bash
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore -maxcpucount:1
 
     - name: Pack
       if: inputs.pack == 'true'
