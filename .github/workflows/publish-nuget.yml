@@ -34,6 +34,40 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
+      - name: Diagnose token exchange (only on login failure)
+        if: failure() && steps.login.outcome == 'failure'
+        shell: bash
+        env:
+          NUGET_USER: ${{ secrets.NUGET_USER }}
+        run: |
+          set -euo pipefail
+          oidc_token=$(curl -sS \
+            -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://www.nuget.org" \
+            | jq -r .value)
+          echo "::add-mask::$oidc_token"
+          echo "::group::OIDC claims that GitHub sent to nuget.org"
+          echo "$oidc_token" | awk -F. '{print $2}' | tr -d '\n' \
+            | { read -r b; pad=$((4 - ${#b} % 4)); [ $pad -lt 4 ] && b="$b$(printf '%*s' $pad | tr ' ' '=')"; echo "$b"; } \
+            | base64 -di 2>/dev/null \
+            | jq '{
+                sub, aud, iss, repository, repository_owner, repository_id,
+                workflow, workflow_ref, job_workflow_ref,
+                ref, ref_type, event_name,
+                environment, runner_environment
+              }'
+          echo "::endgroup::"
+          echo "::group::Raw nuget.org /api/v2/token response"
+          body=$(printf '{"username":"%s","tokenType":"ApiKey"}' "${NUGET_USER}")
+          curl -sS -i -X POST https://www.nuget.org/api/v2/token \
+            -H "Authorization: Bearer $oidc_token" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: blazorators-debug" \
+            -d "$body" || true
+          echo
+          echo "::endgroup::"
+          echo "::notice title=Trusted publishing setup::Compare the OIDC claims above with the policy you registered at https://www.nuget.org/account/trusted-publishing. Required matches: repository_owner=IEvangelist, repository=blazorators, workflow file=publish-nuget.yml, and environment (must equal whatever you set in the policy, or be absent if the policy has none)."
+
       - name: Publish
         run: |
           dotnet nuget push --skip-duplicate artifacts/package/release/*.nupkg \
