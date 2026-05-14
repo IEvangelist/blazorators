@@ -15,16 +15,13 @@ internal sealed partial class TypeDeclarationReader
 
     internal static TypeDeclarationReader Factory(string source)
     {
+        // `TypeDeclarationSources` is reserved for future use; the generator
+        // currently always parses the embedded `lib.dom.d.ts`. When the
+        // scaffolded URL/file ingestion is implemented this method should
+        // resolve `source` (file path or URL), hash-invalidate against the
+        // `s_readerCache`, and return a per-source `TypeDeclarationReader`.
+        _ = source;
         return Default;
-
-        //var uri = new Uri(source);
-        //var sourceKey = uri.IsFile ? uri.LocalPath : uri.OriginalString;
-
-        //var reader =
-        //    s_readerCache.GetOrAdd(
-        //        sourceKey, _ => new TypeDeclarationReader(uri));
-
-        //return reader;
     }
 
     internal static TypeDeclarationReader Default

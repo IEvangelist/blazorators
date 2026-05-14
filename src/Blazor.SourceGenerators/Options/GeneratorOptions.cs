@@ -40,12 +40,12 @@ internal sealed record GeneratorOptions(
         field ??= BuildParsers();
 
     private ISet<TypeDeclarationParser> BuildParsers() =>
-        new HashSet<TypeDeclarationParser>(
-            TypeDeclarationSources is { Length: > 0 }
-                ? TypeDeclarationSources
-                    .Select(TypeDeclarationReader.Factory)
-                    .Select(reader => new TypeDeclarationParser(reader))
-                : [TypeDeclarationParser.Default]);
+        // `TypeDeclarationSources` is currently reserved for future use - the
+        // generator always parses the embedded `lib.dom.d.ts`. Returning a
+        // single shared parser instance keeps the work cached and avoids
+        // creating N reference-equal parser duplicates when consumers set
+        // the property anyway.
+        new HashSet<TypeDeclarationParser> { TypeDeclarationParser.Default };
 
     public bool Equals(GeneratorOptions? other) =>
         other is not null &&

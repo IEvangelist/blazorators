@@ -60,7 +60,11 @@ public class JSAutoInteropAttribute : Attribute
     public string? Url { get; set; }
 
     /// <summary>
-    /// An optional array of TypeScript type declarations sources. Valid values are URLs or file paths.
+    /// Reserved for future use. Intended to allow consumers to point the
+    /// generator at additional TypeScript declaration sources (file paths or
+    /// URLs); the current implementation always parses the embedded
+    /// <c>lib.dom.d.ts</c> file and ignores this value. Setting it has no
+    /// effect.
     /// </summary>
     public string[]? TypeDeclarationSources { get; set; }
 }

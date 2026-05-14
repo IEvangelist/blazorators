@@ -161,4 +161,31 @@ namespace Microsoft.JSInterop
         Assert.Contains("BlazorHostingModel.g.cs", fileNames);
         Assert.Contains("RecordCompat.g.cs", fileNames);
     }
+
+    [Fact]
+    public void TypeDeclarationSources_IsBenignNoOp()
+    {
+        // `TypeDeclarationSources` is reserved for future use; setting it
+        // must not change generator output, must not throw, and must not
+        // suppress emission of the embedded `lib.dom.d.ts`-derived files.
+        const string source = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoInterop(
+        TypeName = ""Geolocation"",
+        Implementation = ""window.navigator.geolocation"",
+        TypeDeclarationSources = new[] { ""https://example.com/some.d.ts"", ""local.d.ts"" })]
+    public partial interface IGeolocationService { }
+}";
+
+        var result = GetRunResult(source);
+        var fileNames = result.GeneratedTrees
+            .Select(t => System.IO.Path.GetFileName(t.FilePath))
+            .ToArray();
+
+        Assert.DoesNotContain(result.Diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        Assert.Contains("IGeolocationService.g.cs", fileNames);
+        Assert.Contains("GeolocationService.g.cs", fileNames);
+        Assert.Contains("GeolocationServiceCollectionExtensions.g.cs", fileNames);
+    }
 }
