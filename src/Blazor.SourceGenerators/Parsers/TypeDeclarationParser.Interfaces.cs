@@ -363,17 +363,22 @@ internal sealed partial class TypeDeclarationParser
 
         // Example input:
         // "(someCallback: CallbackType, someId?: number | null)"
-        var trimmedParameters = parametersString.Replace("(", "").Replace(")", "");
-        var parameterLineTokenizer = trimmedParameters.Split([':', ',',]);
-
         JavaScriptMethod? javaScriptMethod = new(rawName);
-        foreach (var parameterPair in parameterLineTokenizer.Where(t => t.Length > 0).Chunk(2))
+        foreach (var parameterSegment in SplitTopLevelParameters(parametersString))
         {
-            var isNullable = parameterPair[0].EndsWith("?");
-            var parameterName = parameterPair[0].Replace("?", "").Trim();
+            if (!TrySplitParameterNameAndType(parameterSegment, out var rawNameToken, out var rawTypeToken))
+            {
+                continue;
+            }
+
+            var isNullable = rawNameToken.EndsWith("?", StringComparison.Ordinal);
+            var parameterName = isNullable
+                ? rawNameToken.Substring(0, rawNameToken.Length - 1).Trim()
+                : rawNameToken.Trim();
+
             var parameterType = isNullable
-                ? parameterPair[1].Trim().Replace(" | null", "")
-                : parameterPair[1].Trim();
+                ? rawTypeToken.Replace(" | null", "").Trim()
+                : rawTypeToken.Trim();
 
             CSharpAction? action = null;
 
@@ -415,6 +420,152 @@ internal sealed partial class TypeDeclarationParser
         };
 
         return (parameters, javaScriptMethod);
+    }
+
+    /// <summary>
+    /// Splits a raw TypeScript parameter list (with or without the enclosing
+    /// parentheses) into per-parameter segments, respecting nested generics,
+    /// function-type parameters, object-literal types, and tuple/array types.
+    /// </summary>
+    internal static List<string> SplitTopLevelParameters(string parametersString)
+    {
+        var result = new List<string>();
+        if (string.IsNullOrWhiteSpace(parametersString))
+        {
+            return result;
+        }
+
+        var trimmed = parametersString.Trim();
+        if (trimmed.Length >= 2 &&
+            trimmed[0] == '(' &&
+            trimmed[trimmed.Length - 1] == ')')
+        {
+            trimmed = trimmed.Substring(1, trimmed.Length - 2);
+        }
+
+        if (trimmed.Length == 0)
+        {
+            return result;
+        }
+
+        var brackets = 0;
+        var angles = 0;
+        var current = new StringBuilder();
+
+        foreach (var c in trimmed)
+        {
+            switch (c)
+            {
+                case '(':
+                case '[':
+                case '{':
+                    brackets++;
+                    break;
+
+                case ')':
+                case ']':
+                case '}':
+                    if (brackets > 0)
+                    {
+                        brackets--;
+                    }
+                    break;
+
+                case '<':
+                    angles++;
+                    break;
+
+                case '>':
+                    // '>' may appear as part of '=>' in TS function types; only treat it
+                    // as a generic-list close when we've actually opened a '<'.
+                    if (angles > 0)
+                    {
+                        angles--;
+                    }
+                    break;
+
+                case ',' when brackets == 0 && angles == 0:
+                    AppendSegment(result, current);
+                    current.Clear();
+                    continue;
+            }
+
+            current.Append(c);
+        }
+
+        AppendSegment(result, current);
+        return result;
+
+        static void AppendSegment(List<string> sink, StringBuilder buffer)
+        {
+            if (buffer.Length == 0)
+            {
+                return;
+            }
+
+            var segment = buffer.ToString().Trim();
+            if (segment.Length > 0)
+            {
+                sink.Add(segment);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Splits a single TypeScript parameter segment of the form
+    /// <c>name[?]: type</c> into its (name, type) parts. Inner colons inside
+    /// nested generics, function-type parameters, or object literals do not
+    /// participate in the split.
+    /// </summary>
+    internal static bool TrySplitParameterNameAndType(
+        string parameter,
+        out string name,
+        out string type)
+    {
+        var brackets = 0;
+        var angles = 0;
+
+        for (var i = 0; i < parameter.Length; i++)
+        {
+            var c = parameter[i];
+            switch (c)
+            {
+                case '(':
+                case '[':
+                case '{':
+                    brackets++;
+                    break;
+
+                case ')':
+                case ']':
+                case '}':
+                    if (brackets > 0)
+                    {
+                        brackets--;
+                    }
+                    break;
+
+                case '<':
+                    angles++;
+                    break;
+
+                case '>':
+                    if (angles > 0)
+                    {
+                        angles--;
+                    }
+                    break;
+
+                case ':' when brackets == 0 && angles == 0:
+                    name = parameter.Substring(0, i).Trim();
+                    type = parameter.Substring(i + 1).Trim();
+                    return true;
+            }
+        }
+
+        name = string.Empty;
+        type = string.Empty;
+        return false;
     }
 
     internal static bool IsAction(
