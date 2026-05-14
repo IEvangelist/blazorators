@@ -242,11 +242,11 @@ internal sealed class SourceBuilder
         var jsMethodName = property.RawName.LowerCaseFirstLetter();
         var func = $"{_options.Implementation}.{jsMethodName}";
 
-        _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.\r\n");
+        _builder.Append($"{indent}/// Source generated implementation of <c>{func}</c>.{NewLine}");
         var rootUrl = "https://developer.mozilla.org/docs/Web/API";
         var fullUrl = $"{rootUrl}/{_options.TypeName}/{jsMethodName}";
-        _builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>\r\n");
-        _builder.Append($"{indent}/// </summary>\r\n");
+        _builder.Append($"{indent}/// <a href=\"{fullUrl}\"></a>{NewLine}");
+        _builder.Append($"{indent}/// </summary>{NewLine}");
 
         return this;
     }

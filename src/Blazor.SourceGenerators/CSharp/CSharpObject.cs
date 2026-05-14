@@ -79,19 +79,19 @@ internal record CSharpObject(
 
     internal string ToClassString()
     {
-        StringBuilder builder = new("#nullable enable\r\n");
+        StringBuilder builder = new("#nullable enable\n");
 
-        builder.Append("using System.Text.Json.Serialization;\r\n\r\n");
-        builder.Append("namespace Microsoft.JSInterop;\r\n\r\n");
+        builder.Append("using System.Text.Json.Serialization;\n\n");
+        builder.Append("namespace Microsoft.JSInterop;\n\n");
 
         builder.Append(
-                $"/// <summary>\r\n");
+                $"/// <summary>\n");
         builder.Append(
-            $"/// Source-generated object representing an ideally immutable <c>{TypeName}</c> value.\r\n");
+            $"/// Source-generated object representing an ideally immutable <c>{TypeName}</c> value.\n");
         builder.Append(
-            $"/// </summary>\r\n");
+            $"/// </summary>\n");
 
-        builder.Append($"public class {TypeName}\r\n{{\r\n");
+        builder.Append($"public class {TypeName}\n{{\n");
 
         var memberCount = Properties.Count;
         foreach (var (index, kvp)
@@ -107,39 +107,38 @@ internal record CSharpObject(
             var csharpMemberName = memberName.CapitalizeFirstLetter();
 
             builder.Append(
-                $"    /// <summary>\r\n");
+                $"    /// <summary>\n");
             builder.Append(
-                $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value.\r\n");
+                $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value.\n");
             builder.Append(
-                $"    /// </summary>\r\n");
+                $"    /// </summary>\n");
             builder.Append(
-                $"    [JsonPropertyName(\"{memberName}\")]\r\n");
+                $"    [JsonPropertyName(\"{memberName}\")]\n");
             builder.Append(
-                $"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\r\n");
+                $"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\n");
 
-            // Add readonly property for converting DOMTimeStamp (long) to DateTime.
             if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null"
                 or "EpochTimeStamp" or "EpochTimeStamp | null")
             {
                 builder.Append(
-                $"    /// <summary>\r\n");
+                $"    /// <summary>\n");
                 builder.Append(
-                    $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value, \r\n");
+                    $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value, \n");
 
                 builder.Append(
-                    $"    /// converted as a <see cref=\"System.DateTime\" /> in UTC.\r\n");
+                    $"    /// converted as a <see cref=\"System.DateTime\" /> in UTC.\n");
                 builder.Append(
-                    $"    /// </summary>\r\n");
+                    $"    /// </summary>\n");
 
                 var nullable = member.IsNullable ? "?" : "";
                 builder.Append(
-                    $"    [JsonIgnore]\r\n");
+                    $"    [JsonIgnore]\n");
                 builder.Append(
-                    $"    public DateTime{nullable} {csharpMemberName}AsUtcDateTime => {csharpMemberName}.ToDateTimeFromUnix();\r\n");
+                    $"    public DateTime{nullable} {csharpMemberName}AsUtcDateTime => {csharpMemberName}.ToDateTimeFromUnix();\n");
             }
         }
 
-        builder.Append("}\r\n");
+        builder.Append("}\n");
         var result = builder.ToString();
         return result;
     }
