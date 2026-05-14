@@ -40,22 +40,19 @@ jobs:
         env:
           NUGET_USER: ${{ secrets.NUGET_USER }}
         run: |
-          set -euo pipefail
+          set +e
           oidc_token=$(curl -sS \
             -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
             "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://www.nuget.org" \
             | jq -r .value)
           echo "::add-mask::$oidc_token"
           echo "::group::OIDC claims that GitHub sent to nuget.org"
-          echo "$oidc_token" | awk -F. '{print $2}' | tr -d '\n' \
-            | { read -r b; pad=$((4 - ${#b} % 4)); [ $pad -lt 4 ] && b="$b$(printf '%*s' $pad | tr ' ' '=')"; echo "$b"; } \
-            | base64 -di 2>/dev/null \
-            | jq '{
-                sub, aud, iss, repository, repository_owner, repository_id,
-                workflow, workflow_ref, job_workflow_ref,
-                ref, ref_type, event_name,
-                environment, runner_environment
-              }'
+          printf '%s' "$oidc_token" | python3 -c "import sys, base64, json
+          t = sys.stdin.read().strip().split('.')[1]
+          t += '=' * (-len(t) % 4)
+          claims = json.loads(base64.urlsafe_b64decode(t))
+          keep = ['sub','aud','iss','repository','repository_owner','repository_id','workflow','workflow_ref','job_workflow_ref','ref','ref_type','event_name','environment','runner_environment']
+          print(json.dumps({k: claims.get(k) for k in keep}, indent=2))"
           echo "::endgroup::"
           echo "::group::Raw nuget.org /api/v2/token response"
           body=$(printf '{"username":"%s","tokenType":"ApiKey"}' "${NUGET_USER}")
@@ -63,10 +60,11 @@ jobs:
             -H "Authorization: Bearer $oidc_token" \
             -H "Content-Type: application/json" \
             -H "User-Agent: blazorators-debug" \
-            -d "$body" || true
+            -d "$body"
           echo
           echo "::endgroup::"
-          echo "::notice title=Trusted publishing setup::Compare the OIDC claims above with the policy you registered at https://www.nuget.org/account/trusted-publishing. Required matches: repository_owner=IEvangelist, repository=blazorators, workflow file=publish-nuget.yml, and environment (must equal whatever you set in the policy, or be absent if the policy has none)."
+          echo "::notice title=Trusted publishing setup::Compare the OIDC claims above with the policy at https://www.nuget.org/account/trusted-publishing. Matches required: repository_owner=IEvangelist, repository=blazorators, workflow file (basename of job_workflow_ref)=publish-nuget.yml, and environment (must equal whatever you set in the policy, or be absent if the policy has none)."
+          exit 0
 
       - name: Publish
         run: |
