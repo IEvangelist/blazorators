@@ -432,7 +432,7 @@ internal sealed partial class TypeDeclarationParser
         if (isSuccess)
         {
             var methodName = match.GetGroupValue("MethodName");
-            if (methodName is "addEventListener" or "removeEventListener")
+            if (IsEventListenerMethod(methodName))
             {
                 return false;
             }
@@ -445,6 +445,23 @@ internal sealed partial class TypeDeclarationParser
         }
 
         return isSuccess;
+    }
+
+    private static bool IsEventListenerMethod(string? methodName)
+    {
+        if (string.IsNullOrEmpty(methodName))
+        {
+            return false;
+        }
+
+        var bareName = methodName!;
+        var genericStart = bareName.IndexOf('<');
+        if (genericStart >= 0)
+        {
+            bareName = bareName.Substring(0, genericStart);
+        }
+
+        return bareName is "addEventListener" or "removeEventListener";
     }
 
     internal static bool IsProperty(
