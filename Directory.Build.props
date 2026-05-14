@@ -18,6 +18,7 @@
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
 
   <PropertyGroup>

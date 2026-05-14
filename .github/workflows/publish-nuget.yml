@@ -1,90 +1,41 @@
 name: publish nuget
+
 on:
   push:
     tags:
       - '**'
 
+permissions:
+  contents: read
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@main
-    - name: Setup .NET
-      uses: actions/setup-dotnet@main
-      with:
-        dotnet-version: 9.0.x
-    - name: Test
-      run: dotnet test --filter "Category!=EndToEnd" --configuration Release
-    
-    - name: Build end-to-end tests
-      run: |
-        dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release
-
-    - name: Install Playwright dependencies
-      run: |
-        pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net9.0/playwright.ps1 install --with-deps
-
-    - name: Run end-to-end tests
-      run: |
-        dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --verbosity normal
-  
   publish:
-    needs: test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project:
-        - Blazor.SourceGenerators
-        - Blazor.Serialization
-        - Blazor.LocalStorage.WebAssembly
-        - Blazor.LocalStorage
-        - Blazor.SessionStorage.WebAssembly
-        - Blazor.SessionStorage
-        - Blazor.Geolocation.WebAssembly
-        - Blazor.Geolocation
-        - Blazor.SpeechSynthesis.WebAssembly
-        - Blazor.SpeechSynthesis
-        - Blazor.SpeechRecognition.WebAssembly
-        - Blazor.SpeechRecognition
-    steps:
-    
-    - name: Print tag ref
-      run: echo $GITHUB_REF
-      
-    - name: Extract version number
-      uses: actions-ecosystem/action-regex-match@main
-      id: regex-match
-      with:
-        text: ${{ github.ref }}
-        regex: '[0-9.]+'
-       
-    - name: Print version number
-      run: echo '${{ steps.regex-match.outputs.match }}'
-      
-    - uses: actions/checkout@main
-    - name: Setup .NET
-      uses: actions/setup-dotnet@main
-      with:
-        dotnet-version: 9.0.x
-        
-    - name: Restore dependencies for ${{ matrix.project }}
-      run: |
-        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj
-      
-    - name: Build ${{ matrix.project }}
-      run: |
-        dotnet build ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --no-restore
-    
-    - name: Pack ${{ matrix.project }}
-      run: |
-        dotnet pack ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --output packages
+    permissions:
+      id-token: write   # OIDC token for NuGet Trusted Publishing
+      contents: read
 
-    - name: Upload ${{ matrix.project }}
-      uses: actions/upload-artifact@main
-      with:
-        name: ${{ matrix.project }}.${{ steps.regex-match.outputs.match }}.nupkg
-        path: packages/*.nupkg
-      
-    - name: Publish ${{ matrix.project }} package
-      run: |
-        nuget push **\${{ matrix.project }}.*.nupkg -Source 'https://api.nuget.org/v3/index.json' -NoSymbols -NonInteractive -ApiKey ${{secrets.NUGET_API_KEY}}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: Build
+        uses: ./.github/actions/build
+        with:
+          run-tests: 'false'
+          pack: 'true'
+          upload-artifacts: 'true'
+
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publish
+        run: |
+          dotnet nuget push --skip-duplicate artifacts/package/release/*.nupkg \
+            --source "https://api.nuget.org/v3/index.json" \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"

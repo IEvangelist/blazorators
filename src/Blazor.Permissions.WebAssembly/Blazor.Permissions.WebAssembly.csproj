@@ -43,7 +43,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <IsPackable>true</IsPackable>
+    <IsPackable>false</IsPackable>
     <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 

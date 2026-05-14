@@ -1,0 +1,48 @@
+name: "Build"
+description: "A build GitHub Action composite shared workflow."
+
+inputs:
+  upload-artifacts:
+    description: "Whether to upload artifacts"
+    required: true
+    default: "true"
+  run-tests:
+    description: "Whether to run tests"
+    required: true
+    default: "true"
+  pack:
+    description: "Whether to pack NuGet packages"
+    required: true
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+      with:
+        global-json-file: global.json
+
+    - name: Install dependencies
+      shell: bash
+      run: dotnet restore
+
+    - name: Build
+      shell: bash
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Pack
+      if: inputs.pack == 'true'
+      shell: bash
+      run: dotnet pack --configuration Release --no-build
+
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      if: inputs.upload-artifacts == 'true' && inputs.pack == 'true'
+      with:
+        name: nuget
+        path: artifacts/package/release/*.nupkg
+
+    - name: Test
+      if: inputs.run-tests == 'true'
+      shell: bash
+      run: dotnet test --configuration Release --no-restore --no-build --filter "Category!=EndToEnd"
