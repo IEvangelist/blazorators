@@ -639,15 +639,3 @@ internal sealed partial class TypeDeclarationParser
         return isSuccess;
     }
 }
-
-static class EnumerableExtensions
-{
-    internal static IEnumerable<T[]> Chunk<T>(this IEnumerable<T> source, int chunksize)
-    {
-        while (source.Any())
-        {
-            yield return source.Take(chunksize).ToArray();
-            source = source.Skip(chunksize);
-        }
-    }
-}
