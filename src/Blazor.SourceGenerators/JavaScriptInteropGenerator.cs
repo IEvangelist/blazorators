@@ -153,6 +153,11 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             var isPartial = interfaceDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
             if (!isPartial)
             {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.MissingPartialModifierDiagnostic,
+                        interfaceDeclaration.Identifier.GetLocation(),
+                        interfaceDeclaration.Identifier.ValueText));
                 continue;
             }
 
@@ -165,27 +170,46 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             foreach (var parser in options.Parsers)
             {
                 var result = parser.ParseTargetType(options.TypeName!);
-                if (result.Status is ParserResultStatus.SuccessfullyParsed &&
-                    result.Value is not null)
+
+                switch (result.Status)
                 {
-                    var namespaceString =
-                        (containingNamespace, interfaceDeclaration.Parent) switch
-                        {
-                            (string { Length: > 0 } ns, _) => ns,
-                            (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
-                            _ => null
-                        };
-                    var @interface =
-                        options.Implementation.ToInterfaceName();
-                    var implementation =
-                        options.Implementation.ToImplementationName();
+                    case ParserResultStatus.SuccessfullyParsed when result.Value is not null:
+                        var namespaceString =
+                            (containingNamespace, interfaceDeclaration.Parent) switch
+                            {
+                                (string { Length: > 0 } ns, _) => ns,
+                                (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
+                                _ => null
+                            };
+                        var @interface =
+                            options.Implementation.ToInterfaceName();
+                        var implementation =
+                            options.Implementation.ToImplementationName();
 
-                    var topLevelObject = result.Value;
+                        var topLevelObject = result.Value;
 
-                    context.AddDependentTypesSource(topLevelObject)
-                        .AddInterfaceSource(topLevelObject, @interface, options, namespaceString)
-                        .AddImplementationSource(topLevelObject, implementation, options, namespaceString)
-                        .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, options);
+                        context.AddDependentTypesSource(topLevelObject)
+                            .AddInterfaceSource(topLevelObject, @interface, options, namespaceString)
+                            .AddImplementationSource(topLevelObject, implementation, options, namespaceString)
+                            .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, options);
+                        break;
+
+                    case ParserResultStatus.TargetTypeNotFound:
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptors.TargetTypeNotFoundDiagnostic,
+                                attribute.GetLocation(),
+                                options.TypeName));
+                        break;
+
+                    case ParserResultStatus.ErrorParsing:
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptors.TypeParseFailureDiagnostic,
+                                attribute.GetLocation(),
+                                options.TypeName,
+                                result.Error ?? "(no error message)"));
+                        break;
                 }
             }
         }

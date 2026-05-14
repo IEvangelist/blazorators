@@ -9,3 +9,6 @@ BR0001 | Blazorators.JSAutoInteropAttribute | Error | Descriptors
 BR0002 | Blazorators.JSAutoInteropAttribute | Error | Descriptors
 BR0003 | Blazorators.JSAutoGenericInteropAttribute | Error | Descriptors
 BR0004 | Blazorators.JSAutoGenericInteropAttribute | Error | Descriptors
+BR0005 | Blazorators.JSAutoInteropAttribute | Error | Descriptors
+BR0006 | Blazorators.JSAutoInteropAttribute | Error | Descriptors
+BR0007 | Blazorators.JSAutoInteropAttribute | Error | Descriptors
