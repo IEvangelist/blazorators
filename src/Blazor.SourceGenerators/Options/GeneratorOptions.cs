@@ -46,4 +46,77 @@ internal sealed record GeneratorOptions(
                     .Select(TypeDeclarationReader.Factory)
                     .Select(reader => new TypeDeclarationParser(reader))
                 : [TypeDeclarationParser.Default]);
+
+    public bool Equals(GeneratorOptions? other) =>
+        other is not null &&
+        SupportsGenerics == other.SupportsGenerics &&
+        TypeName == other.TypeName &&
+        Implementation == other.Implementation &&
+        OnlyGeneratePureJS == other.OnlyGeneratePureJS &&
+        Url == other.Url &&
+        IsWebAssembly == other.IsWebAssembly &&
+        ArrayEquals(GenericMethodDescriptors, other.GenericMethodDescriptors) &&
+        ArrayEquals(PureJavaScriptOverrides, other.PureJavaScriptOverrides) &&
+        ArrayEquals(TypeDeclarationSources, other.TypeDeclarationSources);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hash = 17;
+            hash = (hash * 31) + SupportsGenerics.GetHashCode();
+            hash = (hash * 31) + (TypeName?.GetHashCode() ?? 0);
+            hash = (hash * 31) + (Implementation?.GetHashCode() ?? 0);
+            hash = (hash * 31) + OnlyGeneratePureJS.GetHashCode();
+            hash = (hash * 31) + (Url?.GetHashCode() ?? 0);
+            hash = (hash * 31) + IsWebAssembly.GetHashCode();
+            hash = (hash * 31) + ArrayHashCode(GenericMethodDescriptors);
+            hash = (hash * 31) + ArrayHashCode(PureJavaScriptOverrides);
+            hash = (hash * 31) + ArrayHashCode(TypeDeclarationSources);
+            return hash;
+        }
+    }
+
+    private static bool ArrayEquals(string[]? left, string[]? right)
+    {
+        if (ReferenceEquals(left, right))
+        {
+            return true;
+        }
+
+        if (left is null || right is null || left.Length != right.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < left.Length; i++)
+        {
+            if (!string.Equals(left[i], right[i], StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static int ArrayHashCode(string[]? items)
+    {
+        if (items is null)
+        {
+            return -1;
+        }
+
+        unchecked
+        {
+            var hash = 17;
+            hash = (hash * 31) + items.Length;
+            foreach (var item in items)
+            {
+                hash = (hash * 31) + (item?.GetHashCode() ?? 0);
+            }
+
+            return hash;
+        }
+    }
 }
