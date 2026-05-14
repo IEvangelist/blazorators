@@ -1,14 +1,16 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.CodeAnalysis;
-using System;
+using System.Threading;
 
 namespace Blazor.SourceGenerators;
 
 [Generator(LanguageNames.CSharp)]
 internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 {
+    private const string JSAutoInteropAttributeMetadataName = "JSAutoInteropAttribute";
+    private const string JSAutoGenericInteropAttributeMetadataName = "JSAutoGenericInteropAttribute";
+
     private static readonly HashSet<(string FileName, string SourceCode)> s_sourceCodeToAdd =
     [
         (nameof(RecordCompat).ToGeneratedFileName(), RecordCompat),
@@ -37,170 +39,147 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             }
         });
 
-        var provider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (s, _) => IsSyntaxTargetForGeneration(s),
-                transform: (ctx, _) => GetSemanticTargetForGeneration(ctx))
-            .Where(static m => m is not null);
+        // `ForAttributeWithMetadataName` (Roslyn 4.4+) is materially faster
+        // than `CreateSyntaxProvider` because Roslyn maintains an attribute
+        // index per compilation unit, so only nodes whose attribute lists
+        // textually mention the metadata name even reach the predicate.
+        // Each registration is scoped to a single attribute name; we run
+        // one for each interop attribute and union the results.
+        var nonGenericTargets = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                JSAutoInteropAttributeMetadataName,
+                predicate: static (node, _) => node is InterfaceDeclarationSyntax,
+                transform: static (ctx, ct) => BuildTarget(ctx, isGeneric: false, ct))
+            .Where(static t => t is not null);
 
-        context.RegisterSourceOutput(
-            provider.Collect(),
-            Execute);
+        var genericTargets = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                JSAutoGenericInteropAttributeMetadataName,
+                predicate: static (node, _) => node is InterfaceDeclarationSyntax,
+                transform: static (ctx, ct) => BuildTarget(ctx, isGeneric: true, ct))
+            .Where(static t => t is not null);
 
+        var allTargets = nonGenericTargets.Collect().Combine(genericTargets.Collect());
+
+        context.RegisterSourceOutput(allTargets, Execute);
     }
 
-    private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
+    private static InteropTarget? BuildTarget(
+        GeneratorAttributeSyntaxContext context,
+        bool isGeneric,
+        CancellationToken cancellationToken)
     {
-        if (node is not InterfaceDeclarationSyntax interfaceDeclaration ||
-            interfaceDeclaration.AttributeLists.Count is 0)
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (context.TargetNode is not InterfaceDeclarationSyntax interfaceDeclaration)
         {
-            return false;
+            return null;
         }
 
-        foreach (var attributeListSyntax in interfaceDeclaration.AttributeLists)
+        // `Attributes` holds every matching AttributeData on this node.
+        // `JSAutoInteropAttribute` has `AllowMultiple = false`, so taking
+        // the first is correct.
+        var attributeData = context.Attributes.FirstOrDefault();
+        if (attributeData is null)
         {
-            foreach (var attributeSyntax in attributeListSyntax.Attributes)
-            {
-                if (TryMatchInteropAttribute(attributeSyntax, out _))
-                {
-                    return true;
-                }
-            }
+            return null;
         }
 
-        return false;
-    }
-
-    private static InterfaceDeclarationDetails? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        var interfaceDeclaration = (InterfaceDeclarationSyntax)context.Node;
-
-        foreach (var attributeListSyntax in interfaceDeclaration.AttributeLists)
+        // NOTE: We deliberately parse the attribute *syntax* rather than the
+        // `AttributeData.NamedArguments` collection. Inside the syntax-provider
+        // transform, attribute-argument binding has not yet completed, so
+        // `NamedArguments` is empty even when the attribute is valid. The
+        // syntax path is reliable and matches the original generator's
+        // behavior; switching to semantic argument parsing (see T1.11) would
+        // require running outside `ForAttributeWithMetadataName`.
+        if (attributeData.ApplicationSyntaxReference?.GetSyntax(cancellationToken) is not AttributeSyntax attributeSyntax)
         {
-            foreach (var attributeSyntax in attributeListSyntax.Attributes)
-            {
-                if (TryMatchInteropAttribute(attributeSyntax, out var isGeneric))
-                {
-                    return new(
-                        Options: attributeSyntax.GetGeneratorOptions(isGeneric),
-                        InterfaceDeclaration: interfaceDeclaration,
-                        InteropAttribute: attributeSyntax);
-                }
-            }
+            return null;
         }
 
-        return null;
-    }
+        var options = attributeSyntax.GetGeneratorOptions(isGeneric);
+        var isPartial = interfaceDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 
-    /// <summary>
-    /// Returns <c>true</c> if <paramref name="attribute"/> is one of the source generator's interop
-    /// attributes (with or without the <c>Attribute</c> suffix and ignoring any qualifying namespace).
-    /// When matched, <paramref name="isGeneric"/> reports whether the attribute is the generic variant.
-    /// </summary>
-    internal static bool TryMatchInteropAttribute(AttributeSyntax attribute, out bool isGeneric)
-    {
-        isGeneric = false;
+        var containingNamespace = context.TargetSymbol.ContainingNamespace is
+            { IsGlobalNamespace: false } ns
+                ? ns.ToDisplayString()
+                : null;
 
-        var name = attribute.Name.ToString();
-        var lastDot = name.LastIndexOf('.');
-        var simpleName = lastDot >= 0 ? name.Substring(lastDot + 1) : name;
+        var identifierLocation = LocationInfo.CreateFrom(interfaceDeclaration.Identifier.GetLocation());
+        var attributeLocation = LocationInfo.CreateFrom(attributeSyntax);
 
-        switch (simpleName)
-        {
-            case "JSAutoInterop":
-            case nameof(JSAutoInteropAttribute):
-                return true;
-
-            case "JSAutoGenericInterop":
-            case nameof(JSAutoGenericInteropAttribute):
-                isGeneric = true;
-                return true;
-
-            default:
-                return false;
-        }
+        return new InteropTarget(
+            Options: options,
+            InterfaceName: interfaceDeclaration.Identifier.ValueText,
+            IsPartial: isPartial,
+            ContainingNamespace: containingNamespace,
+            IsGeneric: isGeneric,
+            IdentifierLocation: identifierLocation,
+            AttributeLocation: attributeLocation);
     }
 
     private static void Execute(
         SourceProductionContext context,
-        ImmutableArray<InterfaceDeclarationDetails?> interfaceDeclarations)
+        (ImmutableArray<InteropTarget?> NonGeneric, ImmutableArray<InteropTarget?> Generic) inputs)
     {
-        if (interfaceDeclarations.IsDefaultOrEmpty)
-        {
-            return;
-        }
+        var combined = inputs.NonGeneric.Concat(inputs.Generic);
 
-        foreach (var tuple in interfaceDeclarations.Distinct())
+        foreach (var target in combined.Distinct())
         {
-            if (tuple is null)
+            if (target is null)
             {
                 continue;
             }
 
-            var (options, interfaceDeclaration, attribute) = tuple;
-
-            if (options is null || IsDiagnosticError(options, context, attribute))
+            if (IsDiagnosticError(target.Options, context, target.AttributeLocation))
             {
                 continue;
             }
 
-            var isPartial = interfaceDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
-            if (!isPartial)
+            if (!target.IsPartial)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         Descriptors.MissingPartialModifierDiagnostic,
-                        interfaceDeclaration.Identifier.GetLocation(),
-                        interfaceDeclaration.Identifier.ValueText));
+                        target.IdentifierLocation?.ToLocation() ?? Location.None,
+                        target.InterfaceName));
                 continue;
             }
 
-            var @namespace = interfaceDeclaration.Ancestors()
-                .OfType<NamespaceDeclarationSyntax>()
-                .FirstOrDefault();
-
-            var containingNamespace = @namespace?.Name.ToString();
-
-            foreach (var parser in options.Parsers)
+            foreach (var parser in target.Options.Parsers)
             {
-                var result = parser.ParseTargetType(options.TypeName!);
+                var result = parser.ParseTargetType(target.Options.TypeName!);
 
                 switch (result.Status)
                 {
                     case ParserResultStatus.SuccessfullyParsed when result.Value is not null:
-                        var namespaceString =
-                            (containingNamespace, interfaceDeclaration.Parent) switch
-                            {
-                                (string { Length: > 0 } ns, _) => ns,
-                                (_, BaseNamespaceDeclarationSyntax namespaceDeclaration) => namespaceDeclaration.Name.ToString(),
-                                _ => null
-                            };
                         var @interface =
-                            options.Implementation.ToInterfaceName();
+                            target.Options.Implementation!.ToInterfaceName();
                         var implementation =
-                            options.Implementation.ToImplementationName();
+                            target.Options.Implementation!.ToImplementationName();
 
                         var topLevelObject = result.Value;
 
                         context.AddDependentTypesSource(topLevelObject)
-                            .AddInterfaceSource(topLevelObject, @interface, options, namespaceString)
-                            .AddImplementationSource(topLevelObject, implementation, options, namespaceString)
-                            .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, options);
+                            .AddInterfaceSource(topLevelObject, @interface, target.Options, target.ContainingNamespace)
+                            .AddImplementationSource(topLevelObject, implementation, target.Options, target.ContainingNamespace)
+                            .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, target.Options);
                         break;
 
                     case ParserResultStatus.TargetTypeNotFound:
                         context.ReportDiagnostic(
                             Diagnostic.Create(
                                 Descriptors.TargetTypeNotFoundDiagnostic,
-                                attribute.GetLocation(),
-                                options.TypeName));
+                                target.AttributeLocation?.ToLocation() ?? Location.None,
+                                target.Options.TypeName));
                         break;
 
                     case ParserResultStatus.ErrorParsing:
                         context.ReportDiagnostic(
                             Diagnostic.Create(
                                 Descriptors.TypeParseFailureDiagnostic,
-                                attribute.GetLocation(),
-                                options.TypeName,
+                                target.AttributeLocation?.ToLocation() ?? Location.None,
+                                target.Options.TypeName,
                                 result.Error ?? "(no error message)"));
                         break;
                 }
@@ -208,14 +187,17 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         }
     }
 
-    static bool IsDiagnosticError(GeneratorOptions options, SourceProductionContext context, AttributeSyntax attribute)
+    static bool IsDiagnosticError(
+        GeneratorOptions options,
+        SourceProductionContext context,
+        LocationInfo? attributeLocation)
     {
         if (options.TypeName is null)
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     Descriptors.TypeNameRequiredDiagnostic,
-                    attribute.GetLocation()));
+                    attributeLocation?.ToLocation() ?? Location.None));
 
             return true;
         }
@@ -225,7 +207,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     Descriptors.PathFromWindowRequiredDiagnostic,
-                    attribute.GetLocation()));
+                    attributeLocation?.ToLocation() ?? Location.None));
 
             return true;
         }

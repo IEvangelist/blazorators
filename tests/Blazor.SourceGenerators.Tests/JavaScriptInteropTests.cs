@@ -54,12 +54,17 @@ namespace Microsoft.JSInterop
     }
 
     [Fact]
-    public void GeneratesOutput_WhenAttributeUsesFullyQualifiedName()
+    public void GeneratesOutput_WhenAttributeUsesGloballyQualifiedName()
     {
+        // Regression test for attribute resolution: `JSAutoInteropAttribute`
+        // lives in the global namespace (it's emitted from the generator's
+        // `RegisterPostInitializationOutput`), and `ForAttributeWithMetadataName`
+        // must continue to match the attribute when the user explicitly
+        // disambiguates with `global::`.
         const string source = @"
 namespace Consumer
 {
-    [Microsoft.JSInterop.JSAutoInterop(
+    [global::JSAutoInterop(
         TypeName = ""Geolocation"",
         Implementation = ""window.navigator.geolocation"")]
     public partial interface IGeolocationService { }
@@ -69,7 +74,7 @@ namespace Consumer
 
         Assert.True(
             ContainsFile(result, "GeolocationServiceCollectionExtensions"),
-            "Generator must recognize the attribute when used with a fully-qualified name.");
+            "Generator must recognize the attribute when used with a globally-qualified name.");
     }
 
     [Fact]
