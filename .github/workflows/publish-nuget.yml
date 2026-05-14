@@ -1,39 +1,50 @@
 name: publish nuget
 
+# Publishes the Blazor.* packages to nuget.org using NuGet Trusted Publishing
+# (OIDC). No long-lived API keys — the workflow exchanges a short-lived GitHub
+# OIDC token for a temporary API key valid for 1 hour.
+#
+# nuget.org policy:
+#   Repository Owner: IEvangelist
+#   Repository:       blazorators
+#   Workflow File:    publish-nuget.yml
+#   Environment:      production
+
 on:
   push:
     tags:
       - '**'
-
-permissions:
-  contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: production
     permissions:
-      id-token: write
       contents: read
+      id-token: write
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@main
         with:
           fetch-depth: 0
           filter: tree:0
 
-      - name: Build
-        uses: ./.github/actions/build
+      - uses: actions/setup-dotnet@main
         with:
-          run-tests: 'false'
+          global-json-file: global.json
 
-      - name: NuGet login
-        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+      - run: dotnet restore
+
+      - run: dotnet build --configuration Release --no-restore -maxcpucount:1
+
+      - run: dotnet pack --configuration Release --no-build
+
+      - uses: NuGet/login@v1
         id: login
         with:
-          user: ${{ secrets.NUGET_USER }}
+          user: dpine
 
-      - name: Publish
-        run: |
+      - run: |
           dotnet nuget push --skip-duplicate artifacts/package/release/*.nupkg \
-            --source "https://api.nuget.org/v3/index.json" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
+            --source "https://api.nuget.org/v3/index.json" \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
