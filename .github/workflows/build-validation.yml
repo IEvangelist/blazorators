@@ -41,7 +41,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 9.0.x
+        global-json-file: global.json
 
     - name: Restore dependencies for ${{ matrix.project }}
       run: |
@@ -62,7 +62,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
-        dotnet-version: 9.0.x
+        global-json-file: global.json
 
     - name: Run tests
       run: |
@@ -74,7 +74,7 @@ jobs:
 
     - name: Install Playwright dependencies
       run: |
-        pwsh ./tests/Blazor.ExampleConsumer.EndToEndTests/bin/Release/net9.0/playwright.ps1 install --with-deps
+        pwsh ./artifacts/bin/Blazor.ExampleConsumer.EndToEndTests/release/playwright.ps1 install --with-deps
 
     - name: Run end-to-end tests
       run: |

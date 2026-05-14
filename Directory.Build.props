@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefaultTargetFrameworks>net8.0;net9.0</DefaultTargetFrameworks>
+    <DefaultTargetFrameworks>net8.0;net9.0;net10.0</DefaultTargetFrameworks>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
