@@ -42,12 +42,9 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
                 transform: (ctx, _) => GetSemanticTargetForGeneration(ctx))
             .Where(static m => m is not null);
 
-        var compilationAndInterfaces =
-            context.CompilationProvider.Combine(provider.Collect());
-
         context.RegisterSourceOutput(
-            compilationAndInterfaces,
-            (ctx, tuple) => Execute(ctx, tuple.Left, tuple.Right));
+            provider.Collect(),
+            Execute);
 
     }
 
@@ -125,12 +122,8 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 
     private static void Execute(
         SourceProductionContext context,
-        Compilation compilation,
         ImmutableArray<InterfaceDeclarationDetails?> interfaceDeclarations)
     {
-        // Not sure if/when this will be needed.
-        _ = compilation;
-
         if (interfaceDeclarations.IsDefaultOrEmpty)
         {
             return;
