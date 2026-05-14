@@ -237,18 +237,6 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             return true;
         }
 
-        //if (options.SupportsGenerics &&
-        //    context.Compilation.ReferencedAssemblyNames.Any(ai =>
-        //    ai.Name.Equals("Blazor.Serialization", StringComparison.OrdinalIgnoreCase)) is false)
-        //{
-        //    context.ReportDiagnostic(
-        //        Diagnostic.Create(
-        //            Descriptors.MissingBlazorSerializationPackageReferenceDiagnostic,
-        //            attribute.GetLocation()));
-
-        //    return true;
-        //}
-
         return false;
     }
 }

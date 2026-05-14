@@ -44,9 +44,9 @@ public class JSAutoInteropAttribute : Attribute
     /// <summary>
     /// Whether to generate only pure JavaScript functions that do not require callbacks.
     /// For example, <c>""Geolocation.clearWatch""</c> is consider pure, but <c>""Geolocation.watchPosition""</c> is not.
-    /// Defaults to <c>true</c>.
+    /// Defaults to <c>false</c>.
     /// </summary>
-    public bool OnlyGeneratePureJS { get; set; } = true;
+    public bool OnlyGeneratePureJS { get; set; } = false;
 
     /// <summary>
     /// The Blazor hosting model to generate source for. WebAssembly creates <c>IJSInProcessRuntime</c> extensions,

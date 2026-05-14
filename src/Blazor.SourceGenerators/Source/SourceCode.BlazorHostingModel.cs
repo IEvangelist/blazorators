@@ -16,7 +16,8 @@ public enum BlazorHostingModel
     WebAssembly,
 
     /// <summary>
-    /// Use this to source generate targeting the synchronous <c>IJSRuntime</c> type.
+    /// Use this to source generate targeting the asynchronous <c>IJSRuntime</c> type.
+    /// Returns <c>ValueTask</c>-wrapped results from interop calls.
     /// </summary>
     Server
 };
