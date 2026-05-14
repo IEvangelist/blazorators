@@ -35,22 +35,15 @@ internal sealed record GeneratorOptions(
     /// the default <i>lib.dom.d.ts</i> parser is used.
     /// </summary>
 #pragma warning disable CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
-    internal ISet<TypeDeclarationParser> Parsers
+    internal ISet<TypeDeclarationParser> Parsers =>
 #pragma warning restore CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
-    {
-        get
-        {
-            field ??= new HashSet<TypeDeclarationParser>();
+        field ??= BuildParsers();
 
-            foreach (var source in
-                TypeDeclarationSources?.Select(TypeDeclarationReader.Factory)
-                    ?.Select(reader => new TypeDeclarationParser(reader))
-                    ?? [TypeDeclarationParser.Default])
-            {
-                field.Add(source);
-            }
-
-            return field;
-        }
-    }
+    private ISet<TypeDeclarationParser> BuildParsers() =>
+        new HashSet<TypeDeclarationParser>(
+            TypeDeclarationSources is { Length: > 0 }
+                ? TypeDeclarationSources
+                    .Select(TypeDeclarationReader.Factory)
+                    .Select(reader => new TypeDeclarationParser(reader))
+                : [TypeDeclarationParser.Default]);
 }
