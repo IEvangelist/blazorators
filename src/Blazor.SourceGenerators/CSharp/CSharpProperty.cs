@@ -16,30 +16,71 @@ internal record CSharpProperty(
     {
         get
         {
-            var mappedTypeName = TypeMap.PrimitiveTypes[RawTypeName];
-            if (mappedTypeName == RawTypeName)
+            var direct = TypeMap.PrimitiveTypes[RawTypeName];
+            if (!string.Equals(direct, RawTypeName, StringComparison.Ordinal))
             {
-                if (IsArray)
-                {
-                    mappedTypeName = mappedTypeName
-                        .Replace("[]", "")
-                        .Replace("ReadonlyArray<", "")
-                        .Replace(">", "");
-                }
-
-                if (IsNullable)
-                {
-                    mappedTypeName = mappedTypeName
-                        .Replace("| null", "");
-                }
+                return direct;
             }
 
-            return mappedTypeName;
+            if (TryGetArrayElementTypeName(RawTypeName, out var elementTypeName))
+            {
+                return TypeMap.PrimitiveTypes[elementTypeName];
+            }
+
+            if (IsNullable)
+            {
+                return RawTypeName.Replace("| null", "").TrimEnd();
+            }
+
+            return RawTypeName;
         }
     }
 
     public bool IsIndexer => RawName.StartsWith("[") && RawName.EndsWith("]");
 
-    public bool IsArray => RawTypeName.EndsWith("[]") ||
-        (RawTypeName.StartsWith("ReadonlyArray<") && RawTypeName.EndsWith(">"));
+    public bool IsArray =>
+        RawTypeName.EndsWith("[]") ||
+        IsGenericArrayForm(RawTypeName, "ReadonlyArray<") ||
+        IsGenericArrayForm(RawTypeName, "Array<");
+
+    private static bool IsGenericArrayForm(string rawTypeName, string prefix) =>
+        rawTypeName.StartsWith(prefix, StringComparison.Ordinal) &&
+        rawTypeName.EndsWith(">", StringComparison.Ordinal);
+
+    private static bool TryGetArrayElementTypeName(string rawTypeName, out string elementTypeName)
+    {
+        if (rawTypeName.EndsWith("[]", StringComparison.Ordinal))
+        {
+            elementTypeName = rawTypeName.Substring(0, rawTypeName.Length - 2);
+            return true;
+        }
+
+        if (TryExtractGenericArgument(rawTypeName, "ReadonlyArray<", out elementTypeName))
+        {
+            return true;
+        }
+
+        if (TryExtractGenericArgument(rawTypeName, "Array<", out elementTypeName))
+        {
+            return true;
+        }
+
+        elementTypeName = string.Empty;
+        return false;
+    }
+
+    private static bool TryExtractGenericArgument(
+        string rawTypeName,
+        string prefix,
+        out string argument)
+    {
+        if (IsGenericArrayForm(rawTypeName, prefix))
+        {
+            argument = rawTypeName.Substring(prefix.Length, rawTypeName.Length - prefix.Length - 1);
+            return true;
+        }
+
+        argument = string.Empty;
+        return false;
+    }
 }
