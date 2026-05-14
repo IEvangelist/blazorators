@@ -9,7 +9,7 @@ namespace Blazor.SourceGenerators;
 [Generator(LanguageNames.CSharp)]
 internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 {
-    private readonly HashSet<(string FileName, string SourceCode)> _sourceCodeToAdd =
+    private static readonly HashSet<(string FileName, string SourceCode)> s_sourceCodeToAdd =
     [
         (nameof(RecordCompat).ToGeneratedFileName(), RecordCompat),
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
@@ -30,7 +30,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(c =>
         {
             // Add source from text.
-            foreach (var (fileName, sourceCode) in _sourceCodeToAdd)
+            foreach (var (fileName, sourceCode) in s_sourceCodeToAdd)
             {
                 c.AddSource(fileName,
                     SourceText.From(sourceCode, Encoding.UTF8));

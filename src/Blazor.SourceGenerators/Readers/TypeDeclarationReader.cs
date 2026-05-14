@@ -5,42 +5,36 @@ namespace Blazor.SourceGenerators.Readers;
 
 internal sealed partial class TypeDeclarationReader
 {
-    readonly Lazy<string> _typeDeclarationText;
+    private readonly IDictionary<string, string> _typeDeclarationMap;
+    private readonly IDictionary<string, string> _typeAliasMap;
 
-    private IDictionary<string, string> TypeDeclarationMap =>
-        field ??= ReadTypeDeclarationMap(_typeDeclarationText.Value);
-
-    private IDictionary<string, string> TypeAliasMap =>
-        field ??= ReadTypeAliasMap(_typeDeclarationText.Value);
-
-#pragma warning disable CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     private TypeDeclarationReader()
-#pragma warning restore CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
     {
-        _typeDeclarationText = new Lazy<string>(
-            valueFactory: () => GetEmbeddedResourceText());
+        var text = GetEmbeddedResourceText();
+        // Build both maps eagerly from the source text so we can release the
+        // raw ~800KB string immediately. Holding it in a Lazy<string> kept it
+        // alive for the host process lifetime via the static reader cache.
+        _typeDeclarationMap = ReadTypeDeclarationMap(text);
+        _typeAliasMap = ReadTypeAliasMap(text);
     }
 
-    IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
+    private static IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
     {
-        ConcurrentDictionary<string, string> map = new();
+        Dictionary<string, string> map = new(StringComparer.Ordinal);
 
         try
         {
             if (typeDeclarations is { Length: > 0 })
             {
-                var matchCollection =
-                    InterfaceRegex.Matches(typeDeclarations).Cast<Match>().Select(m => m.Value);
-                Parallel.ForEach(
-                    matchCollection,
-                    match =>
+                foreach (Match match in InterfaceRegex.Matches(typeDeclarations))
+                {
+                    var matchValue = match.Value;
+                    var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(matchValue, "TypeName");
+                    if (typeName is not null)
                     {
-                        var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(match, "TypeName");
-                        if (typeName is not null)
-                        {
-                            map[typeName] = match;
-                        }
-                    });
+                        map[typeName] = matchValue;
+                    }
+                }
             }
         }
         catch (Exception ex)
@@ -51,26 +45,23 @@ internal sealed partial class TypeDeclarationReader
         return map;
     }
 
-    IDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
+    private static IDictionary<string, string> ReadTypeAliasMap(string typeDeclarations)
     {
-        ConcurrentDictionary<string, string> map = new();
+        Dictionary<string, string> map = new(StringComparer.Ordinal);
 
         try
         {
             if (typeDeclarations is { Length: > 0 })
             {
-                var matchCollection =
-                    TypeRegex.Matches(typeDeclarations).Cast<Match>().Select(m => m.Value);
-                Parallel.ForEach(
-                    matchCollection,
-                    match =>
+                foreach (Match match in TypeRegex.Matches(typeDeclarations))
+                {
+                    var matchValue = match.Value;
+                    var typeName = TypeNameRegex.GetMatchGroupValue(matchValue, "TypeName");
+                    if (typeName is not null)
                     {
-                        var typeName = TypeNameRegex.GetMatchGroupValue(match, "TypeName");
-                        if (typeName is not null)
-                        {
-                            map[typeName] = match;
-                        }
-                    });
+                        map[typeName] = matchValue;
+                    }
+                }
             }
         }
         catch (Exception ex)
@@ -84,13 +75,13 @@ internal sealed partial class TypeDeclarationReader
     /// <summary>
     /// For testing purposes.
     /// </summary>
-    internal bool IsInitialized => TypeDeclarationMap is { Count: > 0 };
+    internal bool IsInitialized => _typeDeclarationMap is { Count: > 0 };
 
     public bool TryGetDeclaration(
         string typeName, out string? declaration) =>
-        TypeDeclarationMap.TryGetValue(typeName, out declaration);
+        _typeDeclarationMap.TryGetValue(typeName, out declaration);
 
     public bool TryGetTypeAlias(
         string typeAliasName, out string? typeAlias) =>
-        TypeAliasMap.TryGetValue(typeAliasName, out typeAlias);
+        _typeAliasMap.TryGetValue(typeAliasName, out typeAlias);
 }
