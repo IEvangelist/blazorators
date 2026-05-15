@@ -97,7 +97,12 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             return null;
         }
 
-        var options = attributeSyntax.GetGeneratorOptions(isGeneric);
+        // Use the semantic model bound by `ForAttributeWithMetadataName` to
+        // evaluate attribute argument expressions. This lets the parser
+        // resolve constants, `nameof(...)` results, escaped-quote string
+        // literals, enum members, and verbatim/raw strings - shapes the
+        // previous syntactic parser silently mangled (T1.11).
+        var options = attributeSyntax.GetGeneratorOptions(isGeneric, context.SemanticModel);
         var isPartial = interfaceDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 
         var containingNamespace = context.TargetSymbol.ContainingNamespace is
