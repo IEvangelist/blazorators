@@ -27,12 +27,63 @@ internal static class TypeMap
                 ["Date | null"] = "DateTime?",
                 ["DOMTimeStamp | null"] = "long?",
                 ["EpochTimeStamp | null"] = "long?",
-                //["Array"] = "[]"
+
+                // Generic-fallback / non-primitive TS object types: the consumer
+                // is expected to model these as a CLR `object` (which round-trips
+                // through `System.Text.Json` as a `JsonElement`). Mapping them
+                // here prevents the parser from recursing into `_reader.TryGetDeclaration`
+                // and either looping forever or emitting an empty DTO class.
+                ["any"] = "object",
+                ["unknown"] = "object",
+                ["object"] = "object",
+                ["any | null"] = "object?",
+                ["unknown | null"] = "object?",
+                ["object | null"] = "object?",
+
+                // TS `void` is only legal in return position. We still map it so
+                // primitive-detection short-circuits for methods that return it.
+                ["void"] = "void",
+
+                // BigInt round-trips poorly through System.Text.Json; the closest
+                // CLR primitive without forcing a `System.Numerics` dependency on
+                // consumers is `long`. Lossy for values outside [Int64.MinValue,
+                // Int64.MaxValue]; documented as such on the BlazorHostingModel
+                // attribute.
+                ["bigint"] = "long",
+                ["bigint | null"] = "long?",
+
+                // Typed-array views map to native CLR arrays so consumers can use
+                // them directly without an extra JS-interop hop. Note that JS
+                // serialization may copy the buffer.
+                ["ArrayBuffer"] = "byte[]",
+                ["ArrayBuffer | null"] = "byte[]?",
+                ["Uint8Array"] = "byte[]",
+                ["Uint8Array | null"] = "byte[]?",
+                ["Uint8ClampedArray"] = "byte[]",
+                ["Uint8ClampedArray | null"] = "byte[]?",
+                ["Uint16Array"] = "ushort[]",
+                ["Uint16Array | null"] = "ushort[]?",
+                ["Uint32Array"] = "uint[]",
+                ["Uint32Array | null"] = "uint[]?",
+                ["Int8Array"] = "sbyte[]",
+                ["Int8Array | null"] = "sbyte[]?",
+                ["Int16Array"] = "short[]",
+                ["Int16Array | null"] = "short[]?",
+                ["Int32Array"] = "int[]",
+                ["Int32Array | null"] = "int[]?",
+                ["BigInt64Array"] = "long[]",
+                ["BigInt64Array | null"] = "long[]?",
+                ["BigUint64Array"] = "ulong[]",
+                ["BigUint64Array | null"] = "ulong[]?",
+                ["Float32Array"] = "float[]",
+                ["Float32Array | null"] = "float[]?",
+                ["Float64Array"] = "double[]",
+                ["Float64Array | null"] = "double[]?",
             };
 
         internal bool IsPrimitiveType(string typeScriptType) =>
             _primitiveTypeMap.ContainsKey(typeScriptType) ||
-            _primitiveTypeMap.Values.Any(value => value == typeScriptType);
+            _primitiveTypeMap.Values.Contains(typeScriptType);
 
         internal string this[string typeScriptType] =>
             _primitiveTypeMap.TryGetValue(typeScriptType, out var csharpType) ? csharpType : typeScriptType;
