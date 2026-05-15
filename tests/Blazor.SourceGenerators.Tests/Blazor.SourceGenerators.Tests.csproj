@@ -22,6 +22,18 @@
     </PackageReference>
   </ItemGroup>
 
+  <!--
+    Snapshots/ holds expected generator-output text (named .g.cs so the
+    files visually mirror the artifacts they pin). They are read at test
+    time via System.IO.File and must NOT be compiled into the test
+    assembly. Without these excludes, MSBuild's default *.cs glob picks
+    them up and the test build fails with CS1547 / CS0246 etc.
+  -->
+  <ItemGroup>
+    <Compile Remove="Snapshots\**\*" />
+    <None Include="Snapshots\**\*" />
+  </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\..\src\Blazor.Serialization\Blazor.Serialization.csproj" />
         <ProjectReference Include="..\..\src\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" />

@@ -48,24 +48,28 @@ internal static class CSharpMethodExtensions
                 : ($"ValueTask<{MethodBuilderDetails.GenericTypeValue}{nullable}>", primitiveType);
         }
 
+        // IsVoid must be checked before isPrimitiveType. Once `void` lives in
+        // the primitive map (added in T5.2 so dependent-type recursion short-
+        // circuits on void return), the `isPrimitiveType` branch otherwise
+        // emits `ValueTask<void>` for Server hosting — illegal C#.
         var isJavaScriptOverride = method.IsJavaScriptOverride(options);
         if (options.IsWebAssembly && !isJavaScriptOverride)
         {
-            var returnType = isPrimitiveType
-                ? primitiveType
-                    : method.IsVoid
-                        ? "void"
-                        : method.RawReturnTypeName;
+            var returnType = method.IsVoid
+                ? "void"
+                : isPrimitiveType
+                    ? primitiveType
+                    : method.RawReturnTypeName;
 
             return (returnType, primitiveType);
         }
         else
         {
-            var returnType = isPrimitiveType
-                ? $"ValueTask<{primitiveType}>"
-                    : method.IsVoid
-                        ? "ValueTask"
-                        : $"ValueTask<{method.RawReturnTypeName}>";
+            var returnType = method.IsVoid
+                ? "ValueTask"
+                : isPrimitiveType
+                    ? $"ValueTask<{primitiveType}>"
+                    : $"ValueTask<{method.RawReturnTypeName}>";
 
             return (returnType, primitiveType);
         }

@@ -18,12 +18,12 @@ internal sealed class GeolocationService : IGeolocationService
     [JSInvokable]
     public void OnErrorCallback(GeolocationPositionError positionError) => _errorCallback?.Invoke(positionError);
     /// <inheritdoc cref = "IGeolocationService.ClearWatchAsync"/>
-    ValueTask<void> IGeolocationService.ClearWatchAsync(double watchId) => _javaScript.InvokeVoidAsync("window.navigator.geolocation.clearWatch", watchId);
+    ValueTask IGeolocationService.ClearWatchAsync(double watchId) => _javaScript.InvokeVoidAsync("window.navigator.geolocation.clearWatch", watchId);
     /// <inheritdoc cref = "IGeolocationService.GetCurrentPositionAsync"/>
-    ValueTask<void> IGeolocationService.GetCurrentPositionAsync<TComponent>(TComponent component, string onSuccessCallbackMethodName, string? onErrorCallbackMethodName, PositionOptions? options)
+    ValueTask IGeolocationService.GetCurrentPositionAsync<TComponent>(TComponent component, string onSuccessCallbackMethodName, string? onErrorCallbackMethodName, PositionOptions? options)
         where TComponent : class => _javaScript.InvokeVoidAsync("blazorators.geolocation.getCurrentPosition", DotNetObjectReference.Create(component), onSuccessCallbackMethodName, onErrorCallbackMethodName, options);
     /// <inheritdoc cref = "IGeolocationService.GetCurrentPositionAsync"/>
-    ValueTask<void> IGeolocationService.GetCurrentPositionAsync(Action<GeolocationPosition> onSuccessCallback, Action<GeolocationPositionError>? onErrorCallback, PositionOptions? options)
+    ValueTask IGeolocationService.GetCurrentPositionAsync(Action<GeolocationPosition> onSuccessCallback, Action<GeolocationPositionError>? onErrorCallback, PositionOptions? options)
     {
         _successCallback = onSuccessCallback;
         _errorCallback = onErrorCallback;
