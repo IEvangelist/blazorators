@@ -46,7 +46,7 @@ A C# source generator that creates fully functioning Blazor JavaScript interop c
 > Targets the `IJSRuntime` type.
 
 > **Note**<br>
-> The reason that I generate two separate packages, one with an async API and another with the synchronous version is due to the explicit usage of `IJSInProcessRuntime` when using Blazor WebAssembly. This decision allows the APIs to be separate, and easily consumable from their repsective consuming Blazor apps, either Blazor server or Blazor WebAssembly. I might change it later to make this a consumer configuration, in that each consuming library will have to explicitly define a preprocessor directive to specify `IS_WEB_ASSEMBLY` defined.
+> Two separate package sets ship for each Web API: WebAssembly-targeted (using `IJSInProcessRuntime`) and Server-targeted (using `IJSRuntime`). Both expose **asynchronous** `ValueTask`-based APIs; the difference is just which underlying JS runtime they dispatch through. WebAssembly can additionally take advantage of the in-process runtime to avoid the cross-process hop. The split could later be replaced by a single package with a build-time preprocessor switch (e.g. `IS_WEB_ASSEMBLY`).
 
 ## Using the `Blazor.SourceGenerators` package 📦
 
@@ -84,7 +84,7 @@ This code designates itself into the `Microsoft.JSInterop` namespace, making the
 > The generic method descriptors syntax is:
 > `"methodName"` for generic return type and `"methodName:parameterName"` for generic parameter type.
 
-The file needs to define an interface and it needs to be `partial`, for example; `public partial interface`. Decorating the class with the `JSAutoInterop` (or `JSAutoGenericInterop) attribute will source generate the following C# code, as shown in the source generated _IStorageServiceService.g.cs_:
+The file needs to define an interface and it needs to be `partial`, for example; `public partial interface`. Decorating the class with the `JSAutoInterop` (or `JSAutoGenericInterop`) attribute will source generate the following C# code, as shown in the source generated _IStorageService.g.cs_:
 
 ```csharp
 using Blazor.Serialization.Extensions;
@@ -96,7 +96,7 @@ namespace Microsoft.JSInterop;
 /// <summary>
 /// Source generated interface definition of the <c>Storage</c> type.
 /// </summary>
-public partial interface IStorageServiceService
+public partial interface IStorageService
 {
     /// <summary>
     /// Source generated implementation of <c>window.localStorage.length</c>.
@@ -252,7 +252,7 @@ namespace Microsoft.JSInterop;
     HostingModel = BlazorHostingModel.Server,
     OnlyGeneratePureJS = true,
     Url = "https://developer.mozilla.org/docs/Web/API/Window/localStorage")]
-public partial interface IStorageServiceService
+public partial interface IStorageService
 {
 }
 ```
@@ -270,7 +270,7 @@ using System.Threading.Tasks;
 #nullable enable
 namespace Microsoft.JSInterop;
 
-public partial interface IStorageServiceService
+public partial interface IStorageService
 {
     /// <summary>
     /// Source generated implementation of <c>window.localStorage.length</c>.
@@ -313,7 +313,19 @@ public partial interface IStorageServiceService
 }
 ```
 
-Notice, that since the generic method descriptors are not added generics are not supported. This is not yet implemented as I've been focusing on WebAssembly scenarios.
+Notice that, since this declaration does not include `GenericMethodDescriptors`, no generic overloads are produced. Both WebAssembly *and* Server hosting modes support generics by adding the `GenericMethodDescriptors` argument (or by using the `JSAutoGenericInterop` attribute); the example above is intentionally non-generic to show the simpler shape.
+
+## Diagnostics 🩺
+
+The generator emits the following compile-time diagnostics so that misconfigured attribute usage surfaces in the IDE / build log rather than silently producing nothing:
+
+| ID | Severity | When it triggers |
+|---|---|---|
+| `BR0001` | Error | The `[JSAutoInterop]` / `[JSAutoGenericInterop]` attribute is missing the required `TypeName` argument. |
+| `BR0002` | Error | The attribute is missing the required `Implementation` argument. |
+| `BR0005` | Error | The decorated interface isn't marked `partial`. The generator cannot extend it. |
+| `BR0006` | Error | The `TypeName` could not be found in the configured TypeScript declarations (`lib.dom.d.ts` or supplied `TypeDeclarationSources`). |
+| `BR0007` | Error | The generator threw while parsing the type declaration — typically a malformed ingestion edge case. |
 
 ## Design goals 🎯
 
