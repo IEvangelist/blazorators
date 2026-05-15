@@ -86,70 +86,97 @@ internal record CSharpObject(
     /// </summary>
     public bool IsCallback { get; init; }
 
+    private const char NewLine = '\n';
+
     internal string ToClassString()
     {
-        StringBuilder builder = new("#nullable enable\n");
+        StringBuilder builder = new();
 
-        builder.Append("using System.Text.Json.Serialization;\n\n");
-        builder.Append("namespace Microsoft.JSInterop;\n\n");
+        AppendHeader(builder);
+        AppendClassOpening(builder, TypeName);
 
-        builder.Append(
-                $"/// <summary>\n");
-        builder.Append(
-            $"/// Source-generated object representing an ideally immutable <c>{TypeName}</c> value.\n");
-        builder.Append(
-            $"/// </summary>\n");
-
-        builder.Append($"public class {TypeName}\n{{\n");
-
-        var memberCount = Properties.Count;
-        foreach (var (index, kvp)
-            in Properties.Select((kvp, index) => (index, kvp)))
+        foreach (var kvp in Properties)
         {
-            var (memberName, member) = (kvp.Key, kvp.Value);
-            var typeName = member.MappedTypeName;
-            var nullableExpression = member.IsNullable && !typeName.EndsWith("?") ? "?" : "";
-            var trivia = member.IsArray ? "[]" : "";
-            var isPrimitive = TypeMap.PrimitiveTypes.IsPrimitiveType(typeName);
-            var statementTerminator = member.IsNullable ||
-                typeName is "string" || isPrimitive is false ? " = default!;" : "";
-            var csharpMemberName = memberName.CapitalizeFirstLetter();
-
-            builder.Append(
-                $"    /// <summary>\n");
-            builder.Append(
-                $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value.\n");
-            builder.Append(
-                $"    /// </summary>\n");
-            builder.Append(
-                $"    [JsonPropertyName(\"{memberName}\")]\n");
-            builder.Append(
-                $"    public {typeName}{trivia}{nullableExpression} {csharpMemberName} {{ get; set; }}{statementTerminator}\n");
-
-            if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null"
-                or "EpochTimeStamp" or "EpochTimeStamp | null")
-            {
-                builder.Append(
-                $"    /// <summary>\n");
-                builder.Append(
-                    $"    /// Source-generated property representing the <c>{TypeName}.{memberName}</c> value, \n");
-
-                builder.Append(
-                    $"    /// converted as a <see cref=\"System.DateTime\" /> in UTC.\n");
-                builder.Append(
-                    $"    /// </summary>\n");
-
-                var nullable = member.IsNullable ? "?" : "";
-                builder.Append(
-                    $"    [JsonIgnore]\n");
-                builder.Append(
-                    $"    public DateTime{nullable} {csharpMemberName}AsUtcDateTime => {csharpMemberName}.ToDateTimeFromUnix();\n");
-            }
+            AppendProperty(builder, TypeName, kvp.Key, kvp.Value);
         }
 
-        builder.Append("}\n");
-        var result = builder.ToString();
-        return result;
+        builder.Append('}').Append(NewLine);
+
+        return builder.ToString();
+    }
+
+    private static void AppendHeader(StringBuilder builder)
+    {
+        builder
+            .Append("#nullable enable").Append(NewLine)
+            .Append("using System.Text.Json.Serialization;").Append(NewLine).Append(NewLine)
+            .Append("namespace Microsoft.JSInterop;").Append(NewLine).Append(NewLine);
+    }
+
+    private static void AppendClassOpening(StringBuilder builder, string typeName)
+    {
+        builder
+            .Append("/// <summary>").Append(NewLine)
+            .Append("/// Source-generated object representing an ideally immutable <c>")
+                .Append(typeName).Append("</c> value.").Append(NewLine)
+            .Append("/// </summary>").Append(NewLine)
+            .Append("public class ").Append(typeName).Append(NewLine)
+            .Append('{').Append(NewLine);
+    }
+
+    private static void AppendProperty(
+        StringBuilder builder,
+        string typeName,
+        string memberName,
+        CSharpProperty member)
+    {
+        var mappedTypeName = member.MappedTypeName;
+        var nullableSuffix = member.IsNullable && !mappedTypeName.EndsWith("?") ? "?" : "";
+        var arraySuffix = member.IsArray ? "[]" : "";
+        var isPrimitive = TypeMap.PrimitiveTypes.IsPrimitiveType(mappedTypeName);
+        var initializer = member.IsNullable ||
+            mappedTypeName is "string" ||
+            isPrimitive is false
+                ? " = default!;"
+                : "";
+        var csharpMemberName = memberName.CapitalizeFirstLetter();
+
+        builder
+            .Append("    /// <summary>").Append(NewLine)
+            .Append("    /// Source-generated property representing the <c>")
+                .Append(typeName).Append('.').Append(memberName).Append("</c> value.").Append(NewLine)
+            .Append("    /// </summary>").Append(NewLine)
+            .Append("    [JsonPropertyName(\"").Append(memberName).Append("\")]").Append(NewLine)
+            .Append("    public ").Append(mappedTypeName).Append(arraySuffix).Append(nullableSuffix)
+                .Append(' ').Append(csharpMemberName).Append(" { get; set; }").Append(initializer)
+                .Append(NewLine);
+
+        if (member.RawTypeName is "DOMTimeStamp" or "DOMTimeStamp | null"
+            or "EpochTimeStamp" or "EpochTimeStamp | null")
+        {
+            AppendUnixToUtcDateTimeAccessor(builder, typeName, memberName, csharpMemberName, member);
+        }
+    }
+
+    private static void AppendUnixToUtcDateTimeAccessor(
+        StringBuilder builder,
+        string typeName,
+        string memberName,
+        string csharpMemberName,
+        CSharpProperty member)
+    {
+        var nullable = member.IsNullable ? "?" : "";
+
+        builder
+            .Append("    /// <summary>").Append(NewLine)
+            .Append("    /// Source-generated property representing the <c>")
+                .Append(typeName).Append('.').Append(memberName).Append("</c> value, ").Append(NewLine)
+            .Append("    /// converted as a <see cref=\"System.DateTime\" /> in UTC.").Append(NewLine)
+            .Append("    /// </summary>").Append(NewLine)
+            .Append("    [JsonIgnore]").Append(NewLine)
+            .Append("    public DateTime").Append(nullable).Append(' ')
+                .Append(csharpMemberName).Append("AsUtcDateTime => ")
+                .Append(csharpMemberName).Append(".ToDateTimeFromUnix();").Append(NewLine);
     }
 
     public override string ToString() => ToClassString();

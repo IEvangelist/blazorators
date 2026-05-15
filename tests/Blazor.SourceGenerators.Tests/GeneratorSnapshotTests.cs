@@ -83,6 +83,30 @@ public class GeneratorSnapshotTests : GeneratorBaseUnitTests
             actual: actual);
     }
 
+    [Fact]
+    public void Geolocation_WebAssembly_Snapshot_DependentDto_GeolocationPosition()
+    {
+        var result = GetRunResult(GeolocationWasmSource);
+        var actual = ReadFile(result, "GeolocationPosition.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Geolocation_Wasm",
+            fileName: "GeolocationPosition.g.cs",
+            actual: actual);
+    }
+
+    [Fact]
+    public void Geolocation_WebAssembly_Snapshot_DependentDto_GeolocationCoordinates()
+    {
+        var result = GetRunResult(GeolocationWasmSource);
+        var actual = ReadFile(result, "GeolocationCoordinates.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Geolocation_Wasm",
+            fileName: "GeolocationCoordinates.g.cs",
+            actual: actual);
+    }
+
     private const string GeolocationWasmSource = @"
 namespace Microsoft.JSInterop
 {
