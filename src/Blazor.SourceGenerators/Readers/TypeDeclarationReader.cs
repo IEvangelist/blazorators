@@ -18,6 +18,26 @@ internal sealed partial class TypeDeclarationReader
         _typeAliasMap = ReadTypeAliasMap(text);
     }
 
+    /// <summary>
+    /// Builds a reader from caller-supplied TypeScript declaration text.
+    /// This is the entry point used by the generator's
+    /// <c>AdditionalTextsProvider</c> path: the consumer ships a <c>.d.ts</c>
+    /// via <c>&lt;AdditionalFiles&gt;</c>, and the generator hands the text
+    /// content to this constructor so the parser can resolve interfaces
+    /// declared outside <c>lib.dom.d.ts</c>.
+    /// </summary>
+    internal TypeDeclarationReader(string declarationText)
+    {
+        // The shared interface/type regexes use `$` in multiline mode,
+        // which only matches before `\n` - not before `\r`. The embedded
+        // lib.dom.d.ts is shipped with LF endings (see T1.8); a consumer-
+        // supplied `.d.ts` may have CRLF if it was checked out on Windows.
+        // Normalize here so the regex matches uniformly.
+        var normalized = declarationText?.Replace("\r\n", "\n") ?? string.Empty;
+        _typeDeclarationMap = ReadTypeDeclarationMap(normalized);
+        _typeAliasMap = ReadTypeAliasMap(normalized);
+    }
+
     private static IDictionary<string, string> ReadTypeDeclarationMap(string typeDeclarations)
     {
         Dictionary<string, string> map = new(StringComparer.Ordinal);

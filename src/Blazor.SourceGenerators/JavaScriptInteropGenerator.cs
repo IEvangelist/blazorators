@@ -61,7 +61,22 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 
         var allTargets = nonGenericTargets.Collect().Combine(genericTargets.Collect());
 
-        context.RegisterSourceOutput(allTargets, Execute);
+        // Project `AdditionalFiles` ending in `.d.ts` into value-equatable
+        // records so the incremental cache only re-runs the generator when
+        // the *contents* of a declaration source actually change. The Roslyn
+        // `AdditionalText` instance itself is not value-equatable.
+        // See T5.1 in the audit plan.
+        var dtsSources = context.AdditionalTextsProvider
+            .Where(static t => t.Path.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
+            .Select(static (t, ct) => new AdditionalTypeDeclarationSource(
+                Path: t.Path,
+                FileName: System.IO.Path.GetFileName(t.Path),
+                Content: t.GetText(ct)?.ToString() ?? string.Empty))
+            .Collect();
+
+        var executeInput = allTargets.Combine(dtsSources);
+
+        context.RegisterSourceOutput(executeInput, Execute);
     }
 
     private static InteropTarget? BuildTarget(
@@ -125,9 +140,11 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 
     private static void Execute(
         SourceProductionContext context,
-        (ImmutableArray<InteropTarget?> NonGeneric, ImmutableArray<InteropTarget?> Generic) inputs)
+        ((ImmutableArray<InteropTarget?> NonGeneric, ImmutableArray<InteropTarget?> Generic) Targets,
+         ImmutableArray<AdditionalTypeDeclarationSource> AdditionalSources) inputs)
     {
-        var combined = inputs.NonGeneric.Concat(inputs.Generic);
+        var combined = inputs.Targets.NonGeneric.Concat(inputs.Targets.Generic);
+        var additionalSources = inputs.AdditionalSources;
 
         foreach (var target in combined.Distinct())
         {
@@ -151,7 +168,28 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
                 continue;
             }
 
-            foreach (var parser in target.Options.Parsers)
+            // When the consumer supplies `TypeDeclarationSources`, parse only
+            // the matched additional .d.ts files - the embedded lib.dom.d.ts
+            // parser is set aside for this target. This makes the option do
+            // what its documentation always claimed (T5.1 fix). When the
+            // option is empty/null, fall back to the cached default parser
+            // exposed by `GeneratorOptions.Parsers`.
+            var parsers = ResolveParsers(target.Options, additionalSources);
+            if (!parsers.Any())
+            {
+                // `TypeDeclarationSources` was configured but none of the
+                // requested entries matched an `AdditionalFile` in the
+                // compilation. Surface BR0006 so the consumer notices, rather
+                // than silently producing no output.
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.TargetTypeNotFoundDiagnostic,
+                        target.AttributeLocation?.ToLocation() ?? Location.None,
+                        target.Options.TypeName));
+                continue;
+            }
+
+            foreach (var parser in parsers)
             {
                 var result = parser.ParseTargetType(target.Options.TypeName!);
 
@@ -218,5 +256,55 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Builds the parser set the generator should use for a target. When
+    /// <see cref="GeneratorOptions.TypeDeclarationSources"/> is non-empty
+    /// the resolver walks the in-pipeline <c>AdditionalFiles</c> snapshot
+    /// (<paramref name="additionalSources"/>) and returns a parser per
+    /// matched source. When the option is empty/null, falls through to
+    /// the cached default parser (embedded <c>lib.dom.d.ts</c>).
+    /// </summary>
+    private static IEnumerable<TypeDeclarationParser> ResolveParsers(
+        GeneratorOptions options,
+        ImmutableArray<AdditionalTypeDeclarationSource> additionalSources)
+    {
+        var requested = options.TypeDeclarationSources;
+        if (requested is null || requested.Length == 0)
+        {
+            return options.Parsers;
+        }
+
+        var matched = new List<TypeDeclarationParser>();
+        foreach (var requestedSource in requested)
+        {
+            if (string.IsNullOrWhiteSpace(requestedSource))
+            {
+                continue;
+            }
+
+            // Match by basename, full path, or trailing-segment - MSBuild
+            // rewrites `AdditionalFiles` paths to absolute, so a bare
+            // "my.d.ts" in the attribute still needs to match a transformed
+            // "C:\proj\decls\my.d.ts" entry.
+            var requestedBasename = System.IO.Path.GetFileName(requestedSource);
+            foreach (var src in additionalSources)
+            {
+                if (string.Equals(src.Path, requestedSource, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(src.FileName, requestedBasename, StringComparison.OrdinalIgnoreCase) ||
+                    src.Path.EndsWith(requestedSource, StringComparison.OrdinalIgnoreCase))
+                {
+                    matched.Add(new TypeDeclarationParser(new TypeDeclarationReader(src.Content)));
+                    break;
+                }
+            }
+        }
+
+        // No matches - the consumer asked for a custom source that isn't
+        // wired into AdditionalFiles. Returning an empty set means we drop
+        // to the no-op path; the downstream parser will report TargetTypeNotFound
+        // for the requested TypeName, which is the right user-facing signal.
+        return matched.Count > 0 ? matched : [];
     }
 }

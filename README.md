@@ -327,6 +327,26 @@ The generator emits the following compile-time diagnostics so that misconfigured
 | `BR0006` | Error | The `TypeName` could not be found in the configured TypeScript declarations (`lib.dom.d.ts` or supplied `TypeDeclarationSources`). |
 | `BR0007` | Error | The generator threw while parsing the type declaration — typically a malformed ingestion edge case. |
 
+### Bringing your own TypeScript declarations
+
+By default the generator parses the bundled `lib.dom.d.ts` to resolve `TypeName`. Setting `TypeDeclarationSources` on the attribute switches the generator over to use TypeScript declaration files supplied via MSBuild `<AdditionalFiles>` instead:
+
+```xml
+<ItemGroup>
+  <AdditionalFiles Include="declarations\my-api.d.ts" />
+</ItemGroup>
+```
+
+```csharp
+[JSAutoInterop(
+    TypeName = "MyCustomApi",
+    Implementation = "window.myCustomApi",
+    TypeDeclarationSources = new[] { "my-api.d.ts" })]
+public partial interface IMyCustomApiService { }
+```
+
+`TypeDeclarationSources` entries are matched against `AdditionalFiles` by basename, full path, or trailing-segment suffix, so a bare filename in the attribute still resolves regardless of how MSBuild rewrites the path. When `TypeDeclarationSources` is set, the embedded `lib.dom.d.ts` is *not* consulted for that target; if none of the listed sources match an `AdditionalFile`, the generator surfaces `BR0006`.
+
 ## Design goals 🎯
 
 I was hoping to use the [TypeScript lib.dom.d.ts](https://github.com/microsoft/TypeScript/blob/315b807489b8ff3a892179488fb0c00398d9b2c3/lib/lib.dom.d.ts) bits as input. This input would be read, parsed, and cached within the generator. The generator code would be capable of generating extension methods on the `IJSRuntime`. Additionally, the generator will create object graphs from the well know web APIs.

@@ -33,8 +33,20 @@ public abstract class GeneratorBaseUnitTests
 
     public GeneratorDriverRunResult GetRunResult(string sourceCode)
     {
+        return GetRunResult(sourceCode, additionalTexts: null);
+    }
+
+    public GeneratorDriverRunResult GetRunResult(
+        string sourceCode,
+        IEnumerable<AdditionalText>? additionalTexts)
+    {
         var compilation = GetCompilation(sourceCode);
-        var driver = CSharpGeneratorDriver.Create(incrementalGenerators: SourceGenerators);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(SourceGenerators);
+        if (additionalTexts is not null)
+        {
+            driver = driver.AddAdditionalTexts([.. additionalTexts]);
+        }
+
         return driver
             .RunGenerators(compilation)
             .GetRunResult();

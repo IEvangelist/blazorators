@@ -163,11 +163,14 @@ namespace Microsoft.JSInterop
     }
 
     [Fact]
-    public void TypeDeclarationSources_IsBenignNoOp()
+    public void TypeDeclarationSources_WithoutMatchingAdditionalFile_ReportsTargetTypeNotFound()
     {
-        // `TypeDeclarationSources` is reserved for future use; setting it
-        // must not change generator output, must not throw, and must not
-        // suppress emission of the embedded `lib.dom.d.ts`-derived files.
+        // T5.1: `TypeDeclarationSources` used to be a silent no-op. Now it's
+        // wired into the generator's `AdditionalTextsProvider`. When the
+        // consumer references a source that isn't supplied via `AdditionalFiles`
+        // (e.g. a stale URL or an unreferenced local path), the generator
+        // surfaces BR0006 (TargetTypeNotFound) so the misconfiguration doesn't
+        // sit silent.
         const string source = @"
 namespace Microsoft.JSInterop
 {
@@ -179,13 +182,7 @@ namespace Microsoft.JSInterop
 }";
 
         var result = GetRunResult(source);
-        var fileNames = result.GeneratedTrees
-            .Select(t => System.IO.Path.GetFileName(t.FilePath))
-            .ToArray();
 
-        Assert.DoesNotContain(result.Diagnostics, d => d.Severity == DiagnosticSeverity.Error);
-        Assert.Contains("IGeolocationService.g.cs", fileNames);
-        Assert.Contains("GeolocationService.g.cs", fileNames);
-        Assert.Contains("GeolocationServiceCollectionExtensions.g.cs", fileNames);
+        Assert.Contains(result.Diagnostics, d => d.Id == "BR0006");
     }
 }
