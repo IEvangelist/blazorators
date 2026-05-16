@@ -7,9 +7,11 @@ static partial class SourceCode
 {
     internal const string JSAutoGenericInteropAttribute = @"#nullable enable
 /// <summary>
-/// Use this attribute on <code>public static partial</code> extension method classes.
-/// For example:
-/// <example>
+/// Use this attribute on a <c>public partial interface</c> declaration when
+/// the interop should expose generic <c>TValue</c> overloads (typically for
+/// JSON-serialized payloads). The source generator emits the interface body,
+/// a concrete implementation, and a <c>ServiceCollectionExtensions</c> class
+/// that registers both with DI. For example:
 /// <code>
 /// [JSAutoGenericInterop(
 ///    TypeName = ""Storage"",
@@ -21,12 +23,9 @@ static partial class SourceCode
 ///        ""getItem"",
 ///        ""setItem:value""
 ///    })]
-/// public static partial LocalStorageExtensions
-/// {
-/// }
+/// public partial interface ILocalStorageService;
 /// </code>
-/// </example>
-/// This will source generate all the extension methods for the IJSInProcessRuntime type for the localStorage APIs.
+/// This generates the strongly-typed extensions for the <c>localStorage</c> APIs.
 /// </summary>
 public class JSAutoGenericInteropAttribute : JSAutoInteropAttribute
 {

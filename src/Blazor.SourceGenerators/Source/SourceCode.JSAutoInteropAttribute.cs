@@ -7,19 +7,19 @@ static partial class SourceCode
 {
     internal const string JSAutoInteropAttribute = @"#nullable enable
 /// <summary>
-/// Use this attribute on <code>public static partial</code> extension method classes.
+/// Use this attribute on a <c>public partial interface</c> declaration. The
+/// source generator emits the interface body, a concrete implementation, and
+/// a <c>ServiceCollectionExtensions</c> class that registers both with DI.
 /// For example:
 /// <code>
 /// [JSAutoInterop(
-///    TypeName = ""Storage"",
-///    Implementation = ""window.localStorage"",
+///    TypeName = ""Geolocation"",
+///    Implementation = ""window.navigator.geolocation"",
 ///    HostingModel = BlazorHostingModel.WebAssembly,
-///    Url = ""https://developer.mozilla.org/docs/Web/API/Window/localStorage"")]
-/// public static partial LocalStorageExtensions
-/// {
-/// }
+///    Url = ""https://developer.mozilla.org/docs/Web/API/Geolocation"")]
+/// public partial interface IGeolocationService;
 /// </code>
-/// This will source generate all the extension methods for the IJSInProcessRuntime type for the localStorage APIs.
+/// This generates Blazor JavaScript-interop extensions for the <c>geolocation</c> APIs.
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Interface,
