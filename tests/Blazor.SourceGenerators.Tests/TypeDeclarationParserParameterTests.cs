@@ -120,4 +120,54 @@ public class TypeDeclarationParserParameterTests
         Assert.False(TypeDeclarationParser.TrySplitParameterNameAndType(
             "rest...", out _, out _));
     }
+
+    [Theory]
+    // Plain primitive paired with ` | null` on the type (not on the name).
+    [InlineData(
+        "interface IFoo {\n    bar(name: string | null): void;\n}",
+        "name",
+        "string?")]
+    // Array primitive paired with ` | null` (the original failure case).
+    [InlineData(
+        "interface IFoo {\n    bar(items: string[] | null): void;\n}",
+        "items",
+        "string[]?")]
+    // Array of custom interface paired with ` | null`. The parser should
+    // still emit a clean nullable C# array even when the element type is
+    // not a TS primitive.
+    [InlineData(
+        "interface IFoo {\n    bar(records: SomeRecord[] | null): void;\n}\ninterface SomeRecord {\n    value: number;\n}",
+        "records",
+        "SomeRecord[]?")]
+    public void ParseParameters_TypeLevelNullClauseEmitsNullableCSharp(
+        string typeScriptDeclarations,
+        string expectedParameterName,
+        string expectedTypeSuffix)
+    {
+        // Regression: when a parameter was declared as `x: T | null` (with
+        // the `| null` on the type rather than `?` on the name), the parser
+        // left the literal "| null" in the resulting C# type. The output
+        // emitted `string[] | null items` -- invalid C#. Normalize the
+        // `| null` clause to `isNullable=true` and a clean element type.
+        var reader = new Readers.TypeDeclarationReader(typeScriptDeclarations);
+        var parser = new TypeDeclarationParser(reader);
+        var result = parser.ParseTargetType("IFoo");
+
+        Assert.Equal(ParserResultStatus.SuccessfullyParsed, result.Status);
+        var topLevel = result.Value;
+        Assert.NotNull(topLevel);
+
+        var method = Assert.Single(topLevel!.Methods!);
+        var parameter = Assert.Single(method.ParameterDefinitions);
+
+        Assert.Equal(expectedParameterName, parameter.RawName);
+        Assert.True(parameter.IsNullable);
+
+        // `ToParameterString(isGenericType: false)` is what the emitter
+        // calls when building the interface/impl signatures. The previous
+        // buggy code path would produce `string[] | null items` here.
+        var emitted = parameter.ToParameterString();
+        Assert.Contains(expectedTypeSuffix, emitted);
+        Assert.DoesNotContain("| null", emitted);
+    }
 }

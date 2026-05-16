@@ -388,9 +388,26 @@ internal sealed partial class TypeDeclarationParser
                 ? rawNameToken.Substring(0, rawNameToken.Length - 1).Trim()
                 : rawNameToken.Trim();
 
-            var parameterType = isNullable
-                ? rawTypeToken.Replace(" | null", "").Trim()
-                : rawTypeToken.Trim();
+            var trimmedType = rawTypeToken.Trim();
+
+            // A TS parameter is nullable if EITHER the name has a `?` suffix
+            // (`x?: T`) OR the type has a ` | null` clause (`x: T | null`).
+            // We normalize both forms onto `isNullable=true` and strip the
+            // `| null` from the type so the downstream primitive/declaration
+            // lookups see a clean `T`. Previously only primitives whose
+            // exact `"T | null"` key existed in `TypeMap` survived this -
+            // e.g. `string | null` worked because the map had an entry,
+            // but `string[] | null` (or any custom interface) emitted
+            // `string[] | null x` verbatim, which isn't valid C#.
+            if (trimmedType.EndsWith(" | null", StringComparison.Ordinal))
+            {
+                isNullable = true;
+                trimmedType = trimmedType
+                    .Substring(0, trimmedType.Length - " | null".Length)
+                    .Trim();
+            }
+
+            var parameterType = trimmedType;
 
             CSharpAction? action = null;
 
