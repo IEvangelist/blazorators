@@ -41,12 +41,40 @@ internal static class CSharpMethodExtensions
         // dropped the raw TypeScript name into both the method signature
         // and the `_javaScript.Invoke...<BareType>()` call, producing
         // invalid C#.
-        var primitiveType = isPrimitiveType
-            ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
-            : TypeShape.TryGetArrayElementTypeName(method.RawReturnTypeName, out var arrayElement) &&
-              TypeMap.PrimitiveTypes.IsPrimitiveType(arrayElement)
-                ? $"{TypeMap.PrimitiveTypes[arrayElement]}[]"
-                : method.RawReturnTypeName;
+        //
+        // The TS `| null` clause is peeled here so that custom-type
+        // nullable returns (`Node | null`, `HTMLElement | null`) emit
+        // `Node?` / `HTMLElement?` rather than the verbatim TS spelling
+        // (which is not legal C#). For scalar primitives the direct map
+        // already carries explicit `"T | null" -> "T?"` entries, so the
+        // `isPrimitiveType` branch short-circuits before reaching the
+        // peel. For array-of-primitive nullables (`number[] | null`,
+        // etc.) and array-of-custom nullables (`Node[] | null`) the peel
+        // routes through the array-element resolution and re-attaches
+        // `?` at the end.
+        string primitiveType;
+        if (isPrimitiveType)
+        {
+            primitiveType = TypeMap.PrimitiveTypes[method.RawReturnTypeName];
+        }
+        else
+        {
+            var bare = TypeShape.StripNullClause(method.RawReturnTypeName);
+            var hadNullClause = bare.Length != method.RawReturnTypeName.Length;
+
+            string resolved;
+            if (TypeShape.TryGetArrayElementTypeName(bare, out var arrayElement)
+                && TypeMap.PrimitiveTypes.IsPrimitiveType(arrayElement))
+            {
+                resolved = $"{TypeMap.PrimitiveTypes[arrayElement]}[]";
+            }
+            else
+            {
+                resolved = bare;
+            }
+
+            primitiveType = hadNullClause ? $"{resolved}?" : resolved;
+        }
 
         if (!method.IsVoid && isGenericReturnType)
         {
