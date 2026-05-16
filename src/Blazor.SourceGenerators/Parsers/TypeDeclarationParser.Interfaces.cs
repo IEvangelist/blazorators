@@ -275,7 +275,17 @@ internal sealed partial class TypeDeclarationParser
             parameterDefinitions,
             javaScriptMethod);
 
-        var nonArrayMethodReturnType = methodReturnType.Replace("[]", "");
+        // Resolve the element type for dependent-DTO emission. Previously
+        // the code did a textual `Replace("[]", "")` which only handled
+        // the `T[]` shape (missing `Array<T>` and `ReadonlyArray<T>`) and
+        // would also strip a `[]` from inside nested generic arguments.
+        // Route through `TypeShape` so all three array forms agree with
+        // the parameter side and `CSharpProperty.MappedTypeName`.
+        var nonArrayMethodReturnType =
+            TypeShape.TryGetArrayElementTypeName(methodReturnType, out var elementTypeName)
+                ? elementTypeName
+                : methodReturnType;
+
         if (!TypeMap.PrimitiveTypes.IsPrimitiveType(nonArrayMethodReturnType) &&
             _reader.TryGetDeclaration(nonArrayMethodReturnType, out var typeScriptDefinitionText) &&
             typeScriptDefinitionText is not null)
@@ -411,10 +421,19 @@ internal sealed partial class TypeDeclarationParser
 
             CSharpAction? action = null;
 
-            // When a parameter defines a custom type, that type needs to also be parsed
-            // and source generated. This is so that dependent types are known and resolved.
-            if (!TypeMap.PrimitiveTypes.IsPrimitiveType(parameterType) &&
-                _reader.TryGetDeclaration(parameterType, out var typeScriptDefinitionText) &&
+            // Look up the parameter type in the declaration map. For array
+            // shapes (`T[]`, `Array<T>`, `ReadonlyArray<T>`) the registered
+            // declaration is the element type, so peel the wrapper before
+            // hitting the reader. Previously array-of-custom-type parameters
+            // never reached `appendDependentType`, so the consuming code
+            // ended up referencing an undefined DTO class.
+            var declarationLookupType =
+                TypeShape.TryGetArrayElementTypeName(parameterType, out var elementType)
+                    ? elementType
+                    : parameterType;
+
+            if (!TypeMap.PrimitiveTypes.IsPrimitiveType(declarationLookupType) &&
+                _reader.TryGetDeclaration(declarationLookupType, out var typeScriptDefinitionText) &&
                 typeScriptDefinitionText is not null)
             {
                 javaScriptMethod = javaScriptMethod with
