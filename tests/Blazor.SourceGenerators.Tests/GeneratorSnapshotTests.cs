@@ -165,6 +165,37 @@ namespace MyCompany.Web.Interop
         Assert.Contains("AddSingleton<IGeolocationService, GeolocationService>", actual);
     }
 
+    /// <summary>
+    /// Companion to <see cref="CustomNamespace_DI_Extension_Adds_Consumer_Using"/>:
+    /// when the consumer's interface lives in a non-default namespace,
+    /// dependent DTO files (e.g. <c>PositionOptions.g.cs</c>) must be
+    /// emitted into the <em>same</em> consumer namespace as the
+    /// generated interface and implementation. The interface and
+    /// implementation reference dependent types unqualified -- if the
+    /// DTOs land in a different namespace (the legacy hard-coded
+    /// <c>Microsoft.JSInterop</c>) consumer compilation fails with
+    /// CS0246 on every transitive reference. Regression coverage for
+    /// the DTO-namespace fix.
+    /// </summary>
+    [Fact]
+    public void CustomNamespace_DependentTypes_Use_Consumer_Namespace()
+    {
+        const string source = @"
+namespace MyCompany.Web.Interop
+{
+    [JSAutoInterop(
+        TypeName = ""Geolocation"",
+        Implementation = ""window.navigator.geolocation"")]
+    public partial interface IGeolocationService { }
+}";
+
+        var result = GetRunResult(source);
+        var positionOptions = ReadFile(result, "PositionOptions.g.cs");
+
+        Assert.Contains("namespace MyCompany.Web.Interop;", positionOptions);
+        Assert.DoesNotContain("namespace Microsoft.JSInterop;", positionOptions);
+    }
+
     [Fact]
     public void Permissions_WebAssembly_Snapshot_Interface()
     {

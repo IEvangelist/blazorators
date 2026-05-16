@@ -217,7 +217,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 
                         var topLevelObject = result.Value;
 
-                        context.AddDependentTypesSource(topLevelObject)
+                        context.AddDependentTypesSource(topLevelObject, target.ContainingNamespace)
                             .AddInterfaceSource(topLevelObject, @interface, target.Options, target.ContainingNamespace)
                             .AddImplementationSource(topLevelObject, implementation, target.Options, target.ContainingNamespace)
                             .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, target.Options, target.ContainingNamespace);

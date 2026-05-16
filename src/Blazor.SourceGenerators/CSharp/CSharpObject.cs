@@ -99,13 +99,15 @@ internal record CSharpObject(
     /// </summary>
     public bool IsCallback { get; init; }
 
+    private const string DefaultNamespace = "Microsoft.JSInterop";
+
     private const char NewLine = '\n';
 
-    internal string ToClassString()
+    internal string ToClassString(string? consumerNamespace = null)
     {
         StringBuilder builder = new();
 
-        AppendHeader(builder);
+        AppendHeader(builder, consumerNamespace);
         AppendClassOpening(builder, TypeName);
 
         foreach (var kvp in Properties)
@@ -132,12 +134,23 @@ internal record CSharpObject(
         return builder.ToString();
     }
 
-    private static void AppendHeader(StringBuilder builder)
+    private static void AppendHeader(StringBuilder builder, string? consumerNamespace)
     {
+        // Dependent DTOs are referenced unqualified by the generated
+        // interface and implementation, both of which land in the
+        // consumer's containing namespace. Emit the dependent type into
+        // the same namespace so the references resolve without any
+        // extra `using` directives. Fall back to `Microsoft.JSInterop`
+        // when no consumer namespace was provided (older code paths or
+        // global-namespace declarations).
+        var targetNamespace = string.IsNullOrWhiteSpace(consumerNamespace)
+            ? DefaultNamespace
+            : consumerNamespace!;
+
         builder
             .Append("#nullable enable").Append(NewLine)
             .Append("using System.Text.Json.Serialization;").Append(NewLine).Append(NewLine)
-            .Append("namespace Microsoft.JSInterop;").Append(NewLine).Append(NewLine);
+            .Append("namespace ").Append(targetNamespace).Append(';').Append(NewLine).Append(NewLine);
     }
 
     private static void AppendClassOpening(StringBuilder builder, string typeName)

@@ -7,14 +7,15 @@ internal static class SourceProductionContextExtensions
 {
     internal static SourceProductionContext AddDependentTypesSource(
         this SourceProductionContext context,
-        CSharpTopLevelObject topLevelObject)
+        CSharpTopLevelObject topLevelObject,
+        string? @namespace)
     {
         foreach (var (type, dependentObj) in
                     topLevelObject.AllDependentTypes.Where(
                         t => !t.Object.IsActionParameter))
         {
             context.AddSource(type.ToGeneratedFileName(),
-                SourceText.From(dependentObj.ToString(),
+                SourceText.From(dependentObj.ToClassString(@namespace),
                 Encoding.UTF8));
         }
 
