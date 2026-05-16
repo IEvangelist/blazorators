@@ -726,6 +726,24 @@ internal sealed partial class TypeDeclarationParser
                 return false;
             }
 
+            // Arrow-function-typed properties (callback handlers, e.g.
+            // `pull?: (controller: ReadableStreamDefaultController) => void;`
+            // or `onabort: ((this: AbortSignal, ev: Event) => any) | null;`)
+            // misparse because the property regex's `Name` capture is
+            // greedy and walks to the *last* `:` in the line - including
+            // the one inside the parameter list. That yields a bogus
+            // identifier like "pull?: (controller". Skip these lines:
+            // Blazor JS-interop cannot round-trip callback handler
+            // properties anyway (would require DotNetObjectReference
+            // wiring the generator does not emit for properties), and
+            // the bogus name is never a legal C# identifier.
+            var type = match.GetGroupValue("Type");
+            if ((name is not null && name.Contains("(")) ||
+                (type is not null && type.Contains("=>")))
+            {
+                return false;
+            }
+
             if (match.GetGroupValue("Type") is "void")
             {
                 return false;
