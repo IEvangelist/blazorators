@@ -86,11 +86,29 @@ internal record CSharpType(
         }
 
         var isCallback = ActionDeclaration is not null;
-        var typeName = TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName)
-            ? TypeMap.PrimitiveTypes[RawTypeName]
-            : isCallback
-                ? "string" // When the action is a callback, we require `T` instance and callback names.
-                : RawTypeName;
+        string typeName;
+        if (TypeMap.PrimitiveTypes.IsPrimitiveType(RawTypeName))
+        {
+            typeName = TypeMap.PrimitiveTypes[RawTypeName];
+        }
+        else if (isCallback)
+        {
+            // When the action is a callback, we require `T` instance and callback names.
+            typeName = "string";
+        }
+        else if (TypeShape.TryGetArrayElementTypeName(RawTypeName, out var elementTypeName) &&
+                 TypeMap.PrimitiveTypes.IsPrimitiveType(elementTypeName))
+        {
+            // Array of TS primitive (e.g. `number[]`) -- map the element to its
+            // C# spelling and re-attach `[]`. Without this, the emitter dropped
+            // the raw TypeScript name (`number[] segments`) into the generated
+            // method signature, which is not valid C#.
+            typeName = $"{TypeMap.PrimitiveTypes[elementTypeName]}[]";
+        }
+        else
+        {
+            typeName = RawTypeName;
+        }
 
         var parameterName = ToArgumentString();
         var parameterDefault = overrideNullability ? "" : " = null";

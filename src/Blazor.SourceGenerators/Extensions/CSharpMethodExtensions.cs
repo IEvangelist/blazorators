@@ -34,9 +34,19 @@ internal static class CSharpMethodExtensions
     internal static (string ReturnType, string BareType) GetMethodTypes(
         this CSharpMethod method, GeneratorOptions options, bool isGenericReturnType, bool isPrimitiveType)
     {
+        // Resolve the C# spelling of the bare return type. For scalar
+        // primitives this is a direct map lookup; for array-of-primitive
+        // (e.g. `number[]` -> `double[]`) we strip the suffix, map the
+        // element, and reattach. Without the array branch, the emitter
+        // dropped the raw TypeScript name into both the method signature
+        // and the `_javaScript.Invoke...<BareType>()` call, producing
+        // invalid C#.
         var primitiveType = isPrimitiveType
             ? TypeMap.PrimitiveTypes[method.RawReturnTypeName]
-            : method.RawReturnTypeName;
+            : TypeShape.TryGetArrayElementTypeName(method.RawReturnTypeName, out var arrayElement) &&
+              TypeMap.PrimitiveTypes.IsPrimitiveType(arrayElement)
+                ? $"{TypeMap.PrimitiveTypes[arrayElement]}[]"
+                : method.RawReturnTypeName;
 
         if (!method.IsVoid && isGenericReturnType)
         {
@@ -57,9 +67,7 @@ internal static class CSharpMethodExtensions
         {
             var returnType = method.IsVoid
                 ? "void"
-                : isPrimitiveType
-                    ? primitiveType
-                    : method.RawReturnTypeName;
+                : primitiveType;
 
             return (returnType, primitiveType);
         }
@@ -67,9 +75,7 @@ internal static class CSharpMethodExtensions
         {
             var returnType = method.IsVoid
                 ? "ValueTask"
-                : isPrimitiveType
-                    ? $"ValueTask<{primitiveType}>"
-                    : $"ValueTask<{method.RawReturnTypeName}>";
+                : $"ValueTask<{primitiveType}>";
 
             return (returnType, primitiveType);
         }
