@@ -167,7 +167,18 @@ namespace Microsoft.JSInterop
 }";
         var result = GetRunResult(source);
 
-        Assert.Contains(result.GeneratedTrees,
+        var implementation = Assert.Single(result.GeneratedTrees,
             t => Path.GetFileName(t.FilePath) == "GeolocationService.g.cs");
+
+        var text = implementation.ToString();
+
+        // `OnlyGeneratePureJS=true` must include pure methods (e.g. `clearWatch`,
+        // which takes a primitive `long` and returns `void` with no callbacks)
+        // but must *exclude* methods that require JS-callback wiring (e.g.
+        // `watchPosition`, which accepts a `PositionCallback`). This is the
+        // entire purpose of the flag and was previously unverified.
+        Assert.Contains("ClearWatch", text);
+        Assert.DoesNotContain("WatchPosition", text);
+        Assert.DoesNotContain("GetCurrentPosition", text);
     }
 }
