@@ -81,9 +81,16 @@ internal static class TypeMap
                 ["Float64Array | null"] = "double[]?",
             };
 
+        // Precomputed value set so `IsPrimitiveType` avoids an O(n) scan of
+        // `_primitiveTypeMap.Values` on every check. Primitive detection runs
+        // for every parsed property/method-parameter/return-type, so the cost
+        // adds up across the ~800KB of lib.dom.d.ts.
+        internal static readonly HashSet<string> _csharpPrimitiveValues =
+            new(_primitiveTypeMap.Values, StringComparer.OrdinalIgnoreCase);
+
         internal bool IsPrimitiveType(string typeScriptType) =>
             _primitiveTypeMap.ContainsKey(typeScriptType) ||
-            _primitiveTypeMap.Values.Contains(typeScriptType);
+            _csharpPrimitiveValues.Contains(typeScriptType);
 
         internal string this[string typeScriptType] =>
             _primitiveTypeMap.TryGetValue(typeScriptType, out var csharpType) ? csharpType : typeScriptType;

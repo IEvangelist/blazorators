@@ -145,9 +145,12 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
     {
         var combined = inputs.Targets.NonGeneric.Concat(inputs.Targets.Generic);
         var additionalSources = inputs.AdditionalSources;
+        var cancellationToken = context.CancellationToken;
 
         foreach (var target in combined.Distinct())
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (target is null)
             {
                 continue;
@@ -191,6 +194,8 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 
             foreach (var parser in parsers)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var result = parser.ParseTargetType(target.Options.TypeName!);
 
                 switch (result.Status)
