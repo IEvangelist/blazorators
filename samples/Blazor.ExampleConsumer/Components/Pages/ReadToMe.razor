@@ -1,58 +1,97 @@
-﻿@page "/speak"
+@page "/speak"
+<PageTitle>Text-to-speech · Blazorators</PageTitle>
 
-<PageTitle>Text-to-speech</PageTitle>
+<header class="page-header">
+    <span class="hero-eyebrow">
+        <span class="badge-dot live" aria-hidden="true"></span>
+        Blazor.SpeechSynthesis.WebAssembly
+    </span>
+    <h1>Text-to-speech</h1>
+    <p>Source-generated bindings for the Web Speech API. Pick a voice,
+       drag the rate slider, and hit speak.</p>
+</header>
 
-<p>This page demonstrates the source generated <code>Blazor.SpeechSynthesis.WebAssembly</code> package.</p>
+<section class="card">
+    <div class="field">
+        <label class="field-label" for="voice">
+            <Icon Name="languages" Class="icon-sm" /> Voice
+        </label>
+        <div class="input-group">
+            <select id="voice" class="select"
+                    @bind=_selectedVoice
+                    disabled=@(_voices?.Any() is false)
+                    aria-label="Voice selection">
+                @foreach (var voice in _voices ?? Array.Empty<SpeechSynthesisVoice>())
+                {
+                    <option value="@voice.Name">@voice.Name</option>
+                }
+            </select>
+            <button class="btn btn-ghost btn-icon"
+                    type="button"
+                    title="Refresh voices"
+                    aria-label="Refresh voices"
+                    @onclick=@(async () => await GetVoicesAsync())>
+                <Icon Name="refresh" />
+            </button>
+        </div>
+    </div>
 
-<div class="input-group w-75 mb-3">
-    <select class="form-select" aria-label="Voice selection"
-        @bind="_selectedVoice" disabled=@(_voices?.Any() is false)>
-        @foreach (var voice in _voices ?? Array.Empty<SpeechSynthesisVoice>())
-        {
-            <option value="@voice.Name">@voice.Name</option>
-        }
-    </select>
-    <button class="btn btn-primary" type="button" 
-        title="Refresh voices?" @onclick=@(async () => await GetVoicesAsync())>
-        <span class="oi oi-reload"></span>
-    </button>
-</div>
+    <div class="field">
+        <label class="field-label" for="range">
+            Voice speed
+            <span class="kbd">@_voiceSpeed.ToString("0.00")×</span>
+        </label>
+        <input type="range"
+               min="@_voiceSpeeds.Min()"
+               max="@_voiceSpeeds.Max()"
+               step=".25"
+               class="range"
+               id="range"
+               list="speeds"
+               value="@_voiceSpeed"
+               @onchange=@OnVoiceSpeedChange />
+        <datalist id="speeds">
+            @foreach (var speed in _voiceSpeeds)
+            {
+                <option value="@speed">speed</option>
+            }
+        </datalist>
+    </div>
 
-<div class="input-group mb-3 w-75">
-    <label for="range" class="form-label">Voice speed: @_voiceSpeed</label>
-    <input type="range" min="@_voiceSpeeds.Min()" max="@_voiceSpeeds.Max()"
-        step=".25" class="form-range" id="range" list="speeds"
-        value="@_voiceSpeed"
-        @onchange=@OnVoiceSpeedChange>
-    <datalist id="speeds">
-    @foreach (var speed in _voiceSpeeds)
-    {
-        <option value="@speed">speed</option>
-    }
-    </datalist>
-</div>
+    <div class="field">
+        <label class="field-label" for="text">
+            Text
+            @if (_elapsedTimeMessage is { Length: > 0 })
+            {
+                <span class="badge">
+                    <span class="badge-dot live" aria-hidden="true"></span>
+                    @_elapsedTimeMessage
+                </span>
+            }
+        </label>
+        <textarea class="textarea" id="text"
+                  rows="4"
+                  @oninput=@OnTextChanged
+                  value=@_text></textarea>
+    </div>
 
-<div class="mb-3 w-75">
-    <label for="text" class="form-label">
-        Text-to-speech @(_elapsedTimeMessage is { Length: > 0 } ? $"({_elapsedTimeMessage})" : "")
-    </label>
-    <textarea class="form-control" id="text"
-        @oninput=@OnTextChanged rows="3" value=@_text>
-    </textarea>
-</div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary" @onclick=@Speak>
+            <Icon Name="play" /> <span>Speak</span>
+        </button>
+        <button type="button" class="btn btn-warning"
+                title="Pause" @onclick=@speechSynthesis.Pause>
+            <Icon Name="pause" /> <span class="sr-only">Pause</span>
+        </button>
+        <button type="button" class="btn btn-info"
+                title="Resume" @onclick=@speechSynthesis.Resume>
+            <Icon Name="play" /> <span class="sr-only">Resume</span>
+        </button>
+        <button type="button" class="btn btn-danger"
+                title="Stop" @onclick=@speechSynthesis.Cancel>
+            <Icon Name="square" /> <span class="sr-only">Stop</span>
+        </button>
+    </div>
+</section>
 
-<div class="btn-group btn-group-lg">
-    <button type="button" class="btn btn-lg btn-primary" @onclick=@Speak>
-        <span class="oi oi-audio"></span>
-        <span class="ps-2">Speak</span>
-    </button>
-    <button type="button" class="btn btn-lg btn-warning" title="Pause" @onclick=@speechSynthesis.Pause>
-        <span class="oi oi-media-pause"></span>
-    </button>
-    <button type="button" class="btn btn-lg btn-info"title="Play" @onclick=@speechSynthesis.Resume>
-        <span class="oi oi-media-play"></span>
-    </button>
-    <button type="button" class="btn btn-lg btn-danger" title="Stop" @onclick=@speechSynthesis.Cancel>
-        <span class="oi oi-media-stop"></span>
-    </button>
-</div>
+<RepositoryPrompt Title="Text-to-speech demo" />

@@ -1,36 +1,51 @@
-﻿@page "/track"
+@page "/track"
+<PageTitle>Watch position · Blazorators</PageTitle>
 
-<PageTitle>Track</PageTitle>
-<h1>
-    Geolocation
+<header class="page-header">
+    <span class="hero-eyebrow">
+        <span class="badge-dot live" aria-hidden="true"></span>
+        Blazor.Geolocation.WebAssembly
+    </span>
+    <h1>
+        Watch position
+        @if (_isLoading)
+        {
+            <span class="spinner" role="status" aria-live="polite">
+                <span class="visually-hidden">Loading…</span>
+            </span>
+        }
+        else
+        {
+            <span class="badge">
+                <span class="badge-dot live" aria-hidden="true"></span>
+                WATCHING
+            </span>
+        }
+        @if (_position is not null)
+        {
+            <span class="badge">
+                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString("T"))
+            </span>
+            <a class="link-icon"
+               href="https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly"
+               target="_blank" rel="noopener noreferrer nofollow"
+               title="View package on NuGet" aria-label="View package on NuGet">
+                <Icon Name="external-link" Class="icon-sm" />
+            </a>
+        }
+    </h1>
     @if (_isLoading)
     {
-        <span class="spinner-border text-primary" style="border-width: .12em;" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </span>
+        <p>Subscribes to live <code>watchPosition</code> updates. The map
+           re-centers on every callback.</p>
     }
-    @if (_position is not null)
-    {
-        <span class="pe-1">: 
-            <code>
-                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
-            </code>
-        </span>
-        <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
-            rel="noopener noreferrer nofollow">
-            <span class="oi oi-external-link"></span>
-        </a>
-    }
-</h1>
+</header>
 
-@if (_isLoading)
-{
-    <p>This page demonstrates the source generated <code>Blazor.Geolocation.WebAssembly</code> package.</p>
-}
-
-@{
+<div class="stack">
     <Code Value=@_position T=GeolocationPosition IsError=false />
     <Code Value=@_positionError T=GeolocationPositionError IsError=true />
 
-    <BingMap Position=@_position />
-}
+    <Map Position=@_position />
+</div>
+
+<RepositoryPrompt Title="Watch position demo" />

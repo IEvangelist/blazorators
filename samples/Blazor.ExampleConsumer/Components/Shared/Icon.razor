@@ -1,0 +1,203 @@
+@* Lucide-style inline SVG icon renderer. Names are 1:1 with lucide.dev. *@
+
+@{
+    var sizeAttr = Size is { Length: > 0 } ? Size : "1em";
+    var classes = string.IsNullOrWhiteSpace(Class) ? "icon" : $"icon {Class}";
+    var titleAttr = Title;
+}
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="@sizeAttr" height="@sizeAttr"
+     viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round"
+     class="@classes" aria-hidden="@(titleAttr is null ? "true" : "false")"
+     role="img" focusable="false">
+    @if (titleAttr is { Length: > 0 })
+    {
+        <title>@titleAttr</title>
+    }
+    @switch (Name)
+    {
+        case "home":
+            <path d="M3 9.5 12 3l9 6.5V20a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z" />
+            break;
+        case "list-check":
+            <path d="M11 6h11" />
+            <path d="M11 12h11" />
+            <path d="M11 18h11" />
+            <path d="m3 7 2 2 4-4" />
+            <path d="m3 14 2 2 4-4" />
+            <path d="m3 21 2 2 4-4" />
+            break;
+        case "map-pin":
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+            break;
+        case "mic":
+            <rect x="9" y="2" width="6" height="12" rx="3" />
+            <path d="M19 10a7 7 0 0 1-14 0" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+            break;
+        case "mic-off":
+            <line x1="2" y1="2" x2="22" y2="22" />
+            <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12" />
+            <path d="M5 10a7 7 0 0 0 12 5" />
+            <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
+            <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+            break;
+        case "volume":
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            break;
+        case "navigation":
+            <polygon points="3 11 22 2 13 21 11 13 3 11" />
+            break;
+        case "route":
+            <circle cx="6" cy="19" r="3" />
+            <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+            <circle cx="18" cy="5" r="3" />
+            break;
+        case "compass":
+            <circle cx="12" cy="12" r="10" />
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+            break;
+        case "package":
+            <path d="M16.5 9.4 7.55 4.24" />
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+            break;
+        case "github":
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+            break;
+        case "sun":
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" />
+            <path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" />
+            <path d="m19.07 4.93-1.41 1.41" />
+            break;
+        case "moon":
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+            break;
+        case "monitor":
+            <rect width="20" height="14" x="2" y="3" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+            break;
+        case "panel-left":
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M9 3v18" />
+            break;
+        case "external-link":
+            <path d="M15 3h6v6" />
+            <path d="M10 14 21 3" />
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            break;
+        case "trash":
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+            break;
+        case "play":
+            <polygon points="6 3 20 12 6 21 6 3" />
+            break;
+        case "pause":
+            <rect width="4" height="16" x="6" y="4" />
+            <rect width="4" height="16" x="14" y="4" />
+            break;
+        case "square":
+            <rect width="14" height="14" x="5" y="5" rx="2" />
+            break;
+        case "refresh":
+            <path d="M21 12a9 9 0 1 1-3-6.71" />
+            <polyline points="21 4 21 10 15 10" />
+            break;
+        case "plus":
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+            break;
+        case "eraser":
+            <path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21" />
+            <path d="M22 21H7" />
+            <path d="m5 11 9 9" />
+            break;
+        case "code":
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+            break;
+        case "chevron-down":
+            <path d="m6 9 6 6 6-6" />
+            break;
+        case "chevron-right":
+            <path d="m9 18 6-6-6-6" />
+            break;
+        case "x":
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+            break;
+        case "copy":
+            <rect width="14" height="14" x="8" y="8" rx="2" />
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+            break;
+        case "check":
+            <polyline points="20 6 9 17 4 12" />
+            break;
+        case "alert-circle":
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+            break;
+        case "info":
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="11" x2="12" y2="17" />
+            <line x1="12" y1="7" x2="12.01" y2="7" />
+            break;
+        case "database":
+            <ellipse cx="12" cy="5" rx="9" ry="3" />
+            <path d="M3 5v14a9 3 0 0 0 18 0V5" />
+            <path d="M3 12a9 3 0 0 0 18 0" />
+            break;
+        case "rocket":
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+            break;
+        case "menu":
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
+            break;
+        case "arrow-right":
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+            break;
+        case "languages":
+            <path d="m5 8 6 6" />
+            <path d="m4 14 6-6 2-3" />
+            <path d="M2 5h12" />
+            <path d="M7 2h1" />
+            <path d="m22 22-5-10-5 10" />
+            <path d="M14 18h6" />
+            break;
+        default:
+            <circle cx="12" cy="12" r="3" />
+            break;
+    }
+</svg>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = "";
+    [Parameter] public string? Size { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Title { get; set; }
+}

@@ -1,29 +1,48 @@
-﻿@page "/audio"
+@page "/audio"
+<PageTitle>Audio · Blazorators</PageTitle>
 
-<PageTitle>Audio</PageTitle>
+<header class="page-header">
+    <span class="hero-eyebrow">
+        <span class="badge-dot live" aria-hidden="true"></span>
+        Speech recognition · Speech synthesis
+    </span>
+    <h1>Audio</h1>
+    <p>Source-generated bindings for both <code>Blazor.SpeechRecognition.WebAssembly</code>
+       and <code>Blazor.SpeechSynthesis.WebAssembly</code> on a single page.</p>
+</header>
 
-<p>This page demonstrates the source generated <code>Blazor.SpeechRecognition.WebAssembly</code> and <code>Blazor.SpeechSynthesis.WebAssembly</code> packages package.</p>
+<section class="card">
+    <div class="field">
+        <label class="field-label" for="text">Transcript</label>
+        <textarea class="textarea"
+                  id="text"
+                  rows="6"
+                  readonly=@_isRecognizingSpeech
+                  placeholder="Click the mic and start talking…"
+                  @bind=@_transcript></textarea>
+    </div>
 
-<div class="mb-3 w-75">
-    <label for="text" class="form-label">
-        Speech-to-text
-    </label>
-    <textarea class="form-control" id="text"
-              readonly=@_isRecognizingSpeech rows="6" @bind=@_transcript>
-    </textarea>
-</div>
-<Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
+    <Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
 
-<button type="button" class="btn btn-lg btn-primary"
-        @onclick=@OnRecognizeSpeechClick>
-    @if (_isRecognizingSpeech)
-    {
-        <span class="oi oi-media-stop"></span>
-        <span class="ps-2">Stop</span>
-    }
-    else
-    {
-        <span class="oi oi-microphone"></span>
-        <span class="ps-2">Listen</span>
-    }
-</button>
+    <div class="mic-row">
+        <button type="button"
+                class="mic-btn @(_isRecognizingSpeech ? "recording" : null)"
+                title="@(_isRecognizingSpeech ? "Stop" : "Listen")"
+                aria-pressed="@_isRecognizingSpeech"
+                @onclick=@OnRecognizeSpeechClick>
+            @if (_isRecognizingSpeech)
+            {
+                <Icon Name="mic-off" />
+            }
+            else
+            {
+                <Icon Name="mic" />
+            }
+        </button>
+        <span class="mic-label">
+            @(_isRecognizingSpeech ? "Listening…" : "Tap to listen")
+        </span>
+    </div>
+</section>
+
+<RepositoryPrompt Title="Audio demo" />

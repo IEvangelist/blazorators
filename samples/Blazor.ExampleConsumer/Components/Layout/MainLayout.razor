@@ -1,19 +1,72 @@
-﻿@using System.Runtime.InteropServices
 @inherits LayoutComponentBase
+@using System.Runtime.InteropServices
+@implements IDisposable
+@inject NavigationManager Nav
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="app @(_navOpen ? "nav-open" : null)">
+    <aside class="app-sidebar @(_navOpen ? "open" : null)" id="appSidebar">
+        <NavMenu OnNavigate=@CloseNav />
+    </aside>
 
-    <main>
-        <div class="top-row px-4 text-muted">
-            Powered by @RuntimeInformation.FrameworkDescription
+    @if (_navOpen)
+    {
+        <div class="sidebar-scrim open" @onclick=CloseNav aria-hidden="true"></div>
+    }
+
+    <header class="app-header">
+        <button class="btn btn-icon btn-ghost mobile-toggle"
+                type="button"
+                aria-label="Toggle navigation"
+                @onclick=ToggleNav>
+            <Icon Name="menu" />
+        </button>
+
+        <div class="crumb">
+            <span class="visually-hidden">Runtime</span>
+            <code title="@RuntimeInformation.FrameworkDescription">@_runtimeShort</code>
         </div>
 
-        <article class="content px-4 col-xl-8">
-            @Body
-        </article>
+        <div class="actions">
+            <ThemeToggle />
+            <a class="btn btn-icon btn-ghost"
+               href="https://github.com/IEvangelist/blazorators"
+               target="_blank" rel="noopener noreferrer"
+               title="View on GitHub" aria-label="View on GitHub">
+                <Icon Name="github" />
+            </a>
+        </div>
+    </header>
 
+    <main class="app-main" id="main">
+        <div class="content page-enter" @key=Nav.Uri>
+            @Body
+        </div>
     </main>
 </div>
+
+@code {
+    bool _navOpen;
+    string _runtimeShort = RuntimeInformation.FrameworkDescription;
+
+    protected override void OnInitialized()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    void ToggleNav() => _navOpen = !_navOpen;
+    void CloseNav() => _navOpen = false;
+
+    void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
+    {
+        if (_navOpen)
+        {
+            _navOpen = false;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+}

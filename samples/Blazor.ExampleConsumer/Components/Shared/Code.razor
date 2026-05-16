@@ -1,28 +1,119 @@
-﻿@typeparam T where T : class
+@typeparam T where T : class
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 @if (Value is not null)
 {
-    <pre class="bg-dark @(_textClass) fs-4 p-4">
-        <code>
-            @{
-                var opts = new JsonSerializerOptions()
+    <div class="codeblock @(IsError ? "is-error" : null)" data-filename="@_filename">
+        <div class="codeblock-toolbar">
+            <span class="codeblock-filename">
+                <Icon Name="@(IsError ? "alert-circle" : "code")" Class="icon-sm" />
+                @_filename
+            </span>
+            <span class="codeblock-lang">@Lang</span>
+            <button type="button"
+                    class="btn btn-icon btn-ghost copy-btn"
+                    title="Copy to clipboard"
+                    aria-label="Copy to clipboard"
+                    @onclick=CopyAsync>
+                @if (_copied)
                 {
-                    WriteIndented = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                };
-            }
-            @Value?.ToJson(opts)
-        </code>
-    </pre>
+                    <Icon Name="check" Class="icon-sm" />
+                }
+                else
+                {
+                    <Icon Name="copy" Class="icon-sm" />
+                }
+            </button>
+        </div>
+        <pre class="language-@Lang"><code class="hljs language-@Lang">@_codeHtml</code></pre>
+    </div>
 }
 
 @code {
+    static readonly JsonSerializerOptions s_opts = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
     [Parameter, EditorRequired]
     public T? Value { get; set; } = default!;
 
     [Parameter]
     public bool IsError { get; set; }
 
-    string _textClass => IsError ? "text-warning" : "text-info";
+    [Parameter]
+    public string Lang { get; set; } = "json";
+
+    string _filename => IsError ? $"{typeof(T).Name}.error.json" : $"{typeof(T).Name}.json";
+    string _json => Value?.ToJson(s_opts) ?? string.Empty;
+
+    IJSObjectReference? _clip;
+    IJSObjectReference? _hl;
+    MarkupString _codeHtml;
+    string? _lastJson;
+    bool _copied;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var current = _json;
+        if (string.IsNullOrEmpty(current) || current == _lastJson)
+        {
+            return;
+        }
+
+        _hl ??= await JS.InvokeAsync<IJSObjectReference>("import", "./highlight.js");
+
+        try
+        {
+            var html = await _hl.InvokeAsync<string>("highlight", current, Lang);
+            _codeHtml = new MarkupString(html);
+            _lastJson = current;
+            StateHasChanged();
+        }
+        catch
+        {
+            // Fall back to plain JSON if highlighting fails.
+            _codeHtml = new MarkupString(System.Net.WebUtility.HtmlEncode(current));
+            _lastJson = current;
+            StateHasChanged();
+        }
+    }
+
+    async Task CopyAsync()
+    {
+        var current = _json;
+        if (string.IsNullOrEmpty(current))
+        {
+            return;
+        }
+        _clip ??= await JS.InvokeAsync<IJSObjectReference>("import", "./clipboard.js");
+        await _clip.InvokeVoidAsync("copyText", current);
+        _copied = true;
+        StateHasChanged();
+        _ = ResetCopiedAsync();
+    }
+
+    async Task ResetCopiedAsync()
+    {
+        await Task.Delay(1500);
+        _copied = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_clip is not null)
+        {
+            try { await _clip.DisposeAsync(); }
+            catch { /* ignore */ }
+        }
+        if (_hl is not null)
+        {
+            try { await _hl.DisposeAsync(); }
+            catch { /* ignore */ }
+        }
+    }
 }

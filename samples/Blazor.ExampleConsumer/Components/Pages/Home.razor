@@ -1,9 +1,89 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<section class="hero">
+    <span class="hero-eyebrow">
+        <span class="badge-dot live" aria-hidden="true"></span>
+        Source-generated JS interop for Blazor
+    </span>
+    <h1>Browser APIs, <span class="grad">type-safe</span> in C#.</h1>
+    <p class="hero-lede">
+        Blazorators is a collection of Roslyn source generators that
+        author idiomatic, strongly-typed wrappers around the browser's
+        web APIs &mdash; no hand-written <code>IJSRuntime</code> glue
+        required. Every demo on this page is powered by a Blazorators
+        package.
+    </p>
+    <div class="hero-cta">
+        <a class="btn btn-primary" href="todos">
+            <Icon Name="play" /> See the demos
+        </a>
+        <a class="btn btn-ghost"
+           href="https://github.com/IEvangelist/blazorators"
+           target="_blank" rel="noopener noreferrer">
+            <Icon Name="github" /> View on GitHub
+            <Icon Name="external-link" Class="icon-sm" />
+        </a>
+    </div>
+</section>
 
-<h1>Hi friends! 🤓</h1>
+<section class="grid-feat" aria-label="Demos">
+    <a class="feature-card" href="todos">
+        <span class="feature-icon"><Icon Name="database" /></span>
+        <h3>Local storage</h3>
+        <p>Bind a <code>HashSet&lt;Todo&gt;</code> straight through to
+           <code>window.localStorage</code> with zero JS plumbing.</p>
+        <span class="feature-link">
+            Try it <Icon Name="arrow-right" Class="icon-sm" />
+        </span>
+    </a>
 
-<p>This sample app shows how to consume the source-generated projects of #blazorators.</p>
+    <a class="feature-card" href="geolocation">
+        <span class="feature-icon"><Icon Name="map-pin" /></span>
+        <h3>Geolocation</h3>
+        <p>Resolve the user's position, pinned on a vector map powered
+           by OpenStreetMap data &mdash; no API key, no quota.</p>
+        <span class="feature-link">
+            Try it <Icon Name="arrow-right" Class="icon-sm" />
+        </span>
+    </a>
 
-<RepositoryPrompt Title="GitHub: IEvangelist/blazorators" />
+    <a class="feature-card" href="track">
+        <span class="feature-icon"><Icon Name="route" /></span>
+        <h3>Watch position</h3>
+        <p>Subscribe to live <code>watchPosition</code> updates with a
+           strongly-typed <code>IObservable</code>-style callback.</p>
+        <span class="feature-link">
+            Try it <Icon Name="arrow-right" Class="icon-sm" />
+        </span>
+    </a>
+
+    <a class="feature-card" href="speak">
+        <span class="feature-icon"><Icon Name="volume" /></span>
+        <h3>Text-to-speech</h3>
+        <p>Drive the browser's speech synthesiser. Pick a voice,
+           tweak rate &amp; pitch, ship a single C# call.</p>
+        <span class="feature-link">
+            Try it <Icon Name="arrow-right" Class="icon-sm" />
+        </span>
+    </a>
+
+    <a class="feature-card" href="listen">
+        <span class="feature-icon"><Icon Name="mic" /></span>
+        <h3>Speech-to-text</h3>
+        <p>Subscribe to live transcripts from the Web Speech API with a
+           cancellable <code>IDisposable</code> session.</p>
+        <span class="feature-link">
+            Try it <Icon Name="arrow-right" Class="icon-sm" />
+        </span>
+    </a>
+
+    <a class="feature-card" href="sandbox">
+        <span class="feature-icon"><Icon Name="rocket" /></span>
+        <h3>Sandbox</h3>
+        <p>Callback-style geolocation rendered on the same MapLibre +
+           OpenFreeMap stack. Tweak away.</p>
+        <span class="feature-link">
+            Open <Icon Name="arrow-right" Class="icon-sm" />
+        </span>
+    </a>
+</section>

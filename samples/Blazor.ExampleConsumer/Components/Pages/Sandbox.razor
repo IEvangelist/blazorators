@@ -1,36 +1,49 @@
-﻿@page "/sandbox"
+@page "/sandbox"
 @inject IGeolocationService GeolocationService
 
-<h1>
-    🎭 Sandbox
-    @if (_isLoading)
-    {
-        <span class="spinner-border text-primary" style="border-width: .12em;" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </span>
-    }
-    @if (_position is not null)
-    {
-        <span class="pe-1">: 
-            <code>
-                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString())
-            </code>
-        </span>
-        <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
-            rel="noopener noreferrer nofollow">
-            <span class="oi oi-external-link"></span>
-        </a>
-    }
-</h1>
+<PageTitle>Sandbox · Blazorators</PageTitle>
 
-<Code Value=@_position T=GeolocationPosition IsError=false />
-<Code Value=@_positionError T=GeolocationPositionError IsError=true />
+<header class="page-header">
+    <span class="hero-eyebrow">
+        <Icon Name="rocket" Class="icon-sm" /> Sandbox
+    </span>
+    <h1>
+        Sandbox
+        @if (_isLoading)
+        {
+            <span class="spinner" role="status" aria-live="polite">
+                <span class="visually-hidden">Loading…</span>
+            </span>
+        }
+        @if (_position is not null)
+        {
+            <span class="badge">
+                <span class="badge-dot live" aria-hidden="true"></span>
+                @(_position.TimestampAsUtcDateTime.ToLocalTime().ToString("T"))
+            </span>
+            <a class="link-icon"
+               href="https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly"
+               target="_blank" rel="noopener noreferrer nofollow"
+               title="View package on NuGet" aria-label="View package on NuGet">
+                <Icon Name="external-link" Class="icon-sm" />
+            </a>
+        }
+    </h1>
+    <p>Callback-style geolocation rendered on the same MapLibre + OpenFreeMap stack.</p>
+</header>
 
-<BingMap Position=@_position />
+<div class="stack">
+    <Code Value=@_position T=GeolocationPosition IsError=false />
+    <Code Value=@_positionError T=GeolocationPositionError IsError=true />
+
+    <Map Position=@_position />
+</div>
+
+<RepositoryPrompt Title="Sandbox demo" />
 
 @code {
     bool _isLoading => _position is null && _positionError is null;
-    
+
     GeolocationPosition? _position;
     GeolocationPositionError? _positionError;
 

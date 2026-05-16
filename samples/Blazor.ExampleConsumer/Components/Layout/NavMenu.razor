@@ -1,63 +1,55 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            <img src="logo.png" height="32" width="32" />
-            <span class="ps-2">Blazorators</span>
-        </a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+@inject NavigationManager Nav
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink id="home" class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink id="storage" class="nav-link" href="todos">
-                <span class="oi oi-task" aria-hidden="true"></span> Local Storage
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink id="geolocation" class="nav-link" href="geolocation">
-                <span class="oi oi-map" aria-hidden="true"></span> Geolocation
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink id="tts" class="nav-link" href="speak">
-                <span class="oi oi-audio" aria-hidden="true"></span> Text-to-speech
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink id="stt" class="nav-link" href="listen">
-                <span class="oi oi-microphone" aria-hidden="true"></span> Speech-to-text
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink id="track" class="nav-link" href="track">
-                <span class="oi oi-compass" aria-hidden="true"></span> Track
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink id="sandbox" class="nav-link" href="sandbox">
-                <span class="oi oi-inbox" aria-hidden="true"></span> Sandbox
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <a id="code" href="https://github.com/IEvangelist/blazorators" target="_blank"
-                class="nav-link" rel="noopener noreferrer nofollow">
-                <span class="oi oi-code" aria-hidden="true"></span> Source Code
-            </a>
-        </div>
-    </nav>
+<a class="brand" href="" @onclick=@(_ => OnNavigate.InvokeAsync())>
+    <img src="logo.png" alt="" />
+    <span>Blazorators</span>
+</a>
+
+<nav class="nav" aria-label="Primary">
+    <div class="nav-section">Overview</div>
+    <NavLink id="home" href="" Match="NavLinkMatch.All" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="home" /> <span>Home</span>
+    </NavLink>
+
+    <div class="nav-section">Storage</div>
+    <NavLink id="storage" href="todos" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="list-check" /> <span>Local storage</span>
+    </NavLink>
+
+    <div class="nav-section">Location</div>
+    <NavLink id="geolocation" href="geolocation" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="map-pin" /> <span>Geolocation</span>
+    </NavLink>
+    <NavLink id="track" href="track" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="route" /> <span>Watch position</span>
+    </NavLink>
+
+    <div class="nav-section">Speech</div>
+    <NavLink id="tts" href="speak" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="volume" /> <span>Text-to-speech</span>
+    </NavLink>
+    <NavLink id="stt" href="listen" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="mic" /> <span>Speech-to-text</span>
+    </NavLink>
+
+    <div class="nav-section">Lab</div>
+    <NavLink id="sandbox" href="sandbox" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="rocket" /> <span>Sandbox</span>
+    </NavLink>
+
+    <div class="nav-section">Reference</div>
+    <a id="code" href="https://github.com/IEvangelist/blazorators"
+       target="_blank" rel="noopener noreferrer nofollow">
+        <Icon Name="github" /> <span>Source code</span>
+        <span class="ms-auto"><Icon Name="external-link" Class="icon-sm" /></span>
+    </a>
+</nav>
+
+<div class="nav-footer">
+    <span class="badge"><span class="badge-dot live" aria-hidden="true"></span> WASM ready</span>
+    <div>Source-generated bindings for Blazor.</div>
 </div>
 
 @code {
-    bool _collapseNavMenu = true;
-    string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
-    void ToggleNavMenu() => _collapseNavMenu = !_collapseNavMenu;
+    [Parameter] public EventCallback OnNavigate { get; set; }
 }

@@ -1,32 +1,47 @@
-﻿@page "/listen"
+@page "/listen"
+<PageTitle>Speech-to-text · Blazorators</PageTitle>
 
-<PageTitle>Speech-to-text</PageTitle>
-<p>This page demonstrates the source generated <code>Blazor.SpeechRecognition.WebAssembly</code> package.</p>
+<header class="page-header">
+    <span class="hero-eyebrow">
+        <span class="badge-dot live" aria-hidden="true"></span>
+        Blazor.SpeechRecognition.WebAssembly
+    </span>
+    <h1>Speech-to-text</h1>
+    <p>Source-generated bindings for the browser's Web Speech recognition API.</p>
+</header>
 
-<div class="mb-3 w-75">
-    <label for="text" class="form-label">
-        Speech-to-text
-    </label>
-    <textarea class="form-control" id="text" 
-        readonly=@_isRecognizingSpeech rows="6" @bind=@_transcript>
-    </textarea>
-</div>
-<Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
+<section class="card">
+    <div class="field">
+        <label class="field-label" for="text">Transcript</label>
+        <textarea class="textarea"
+                  id="text"
+                  rows="6"
+                  readonly=@_isRecognizingSpeech
+                  placeholder="Click the mic and start talking…"
+                  @bind=@_transcript></textarea>
+    </div>
 
-<!--
-    Does this work?
--->
+    <Code Value=@_errorEvent T=SpeechRecognitionErrorEvent IsError=true />
 
-<button type="button" class="btn btn-lg btn-primary"
-        @onclick=@OnRecognizeSpeechClick>
-    @if (_isRecognizingSpeech)
-    {
-        <span class="oi oi-media-stop"></span>
-        <span class="ps-2">Stop</span>
-    }
-    else
-    {
-        <span class="oi oi-microphone"></span>
-        <span class="ps-2">Listen</span>
-    }
-</button>
+    <div class="mic-row">
+        <button type="button"
+                class="mic-btn @(_isRecognizingSpeech ? "recording" : null)"
+                title="@(_isRecognizingSpeech ? "Stop" : "Listen")"
+                aria-pressed="@_isRecognizingSpeech"
+                @onclick=@OnRecognizeSpeechClick>
+            @if (_isRecognizingSpeech)
+            {
+                <Icon Name="mic-off" />
+            }
+            else
+            {
+                <Icon Name="mic" />
+            }
+        </button>
+        <span class="mic-label">
+            @(_isRecognizingSpeech ? "Listening…" : "Tap to listen")
+        </span>
+    </div>
+</section>
+
+<RepositoryPrompt Title="Speech-to-text demo" />

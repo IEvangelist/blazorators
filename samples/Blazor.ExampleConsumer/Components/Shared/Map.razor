@@ -1,0 +1,89 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="map-shell @(_isReady ? null : "is-loading")">
+    <div id="@_containerId" class="map-canvas"></div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public GeolocationPosition Position { get; set; } = null!;
+
+    IJSObjectReference? _mapModule;
+    IJSObjectReference? _themeModule;
+    DotNetObjectReference<Map>? _selfRef;
+    int? _themeSubscriptionId;
+    string _containerId = $"map-{Guid.NewGuid():N}";
+    bool _isReady;
+    string _currentTheme = "light";
+    (double Lat, double Lon)? _lastPosition;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Position is null or { Coords: null })
+        {
+            return;
+        }
+
+        var pos = (Position.Coords.Latitude, Position.Coords.Longitude);
+
+        if (!_isReady)
+        {
+            _themeModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./theme.js");
+            _mapModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./map.js");
+            _currentTheme = await _themeModule.InvokeAsync<string>("getResolved");
+
+            await _mapModule.InvokeAsync<bool>(
+                "createMap", _containerId, pos.Latitude, pos.Longitude, _currentTheme);
+
+            _selfRef = DotNetObjectReference.Create(this);
+            _themeSubscriptionId = await _themeModule.InvokeAsync<int>("subscribe", _selfRef);
+
+            _lastPosition = pos;
+            _isReady = true;
+            StateHasChanged();
+        }
+        else if (_lastPosition is null || _lastPosition.Value != pos)
+        {
+            await _mapModule!.InvokeVoidAsync("setCenter", _containerId, pos.Latitude, pos.Longitude);
+            _lastPosition = pos;
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnThemeChanged(string resolved)
+    {
+        if (resolved == _currentTheme || _mapModule is null)
+        {
+            return;
+        }
+        _currentTheme = resolved;
+        try
+        {
+            await _mapModule.InvokeVoidAsync("setTheme", _containerId, resolved);
+        }
+        catch { /* ignore — map may have been torn down */ }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_themeModule is not null && _themeSubscriptionId is int id)
+        {
+            try { await _themeModule.InvokeVoidAsync("unsubscribe", id); }
+            catch { /* ignore */ }
+        }
+        _selfRef?.Dispose();
+        if (_mapModule is not null)
+        {
+            try { await _mapModule.InvokeVoidAsync("dispose", _containerId); }
+            catch { /* ignore */ }
+            try { await _mapModule.DisposeAsync(); }
+            catch { /* ignore */ }
+        }
+        if (_themeModule is not null)
+        {
+            try { await _themeModule.DisposeAsync(); }
+            catch { /* ignore */ }
+        }
+    }
+}

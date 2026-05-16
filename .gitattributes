@@ -1,0 +1,5 @@
+# Default: let Git handle line endings via core.autocrlf on the local machine,
+# except for files that are parsed as embedded resources by source generators —
+# those must stay LF so the TypeScript declaration parser in
+# src/Blazor.SourceGenerators works on every host OS (Windows, macOS, Linux).
+*.d.ts text eol=lf

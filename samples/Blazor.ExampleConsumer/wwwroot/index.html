@@ -1,52 +1,65 @@
-<!DOCTYPE html>
-<html>
-
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Blazorators Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blazorators · Source-generated JS interop for Blazor</title>
+    <meta name="description" content="Blazorators ships compile-time, source-generated JavaScript interop bindings for Blazor — local storage, geolocation, speech synthesis, speech recognition, and more." />
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
-    <link href="Blazor.ExampleConsumer.styles.css" rel="stylesheet" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#ffc40d">
-    <meta name="theme-color" content="#ffffff">
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin />
+    <link rel="preconnect" href="https://esm.sh" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="css/site.css" />
+
+    <script>
+        // Pre-paint theme apply — runs *before* Blazor boots so we never see a
+        // light/dark flash on reload. All subsequent theme work goes through
+        // Blazor JS interop via theme.js.
+        (function () {
+            try {
+                var stored = localStorage.getItem('theme') || 'system';
+                var resolved = stored === 'system'
+                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    : stored;
+                document.documentElement.classList.toggle('dark', resolved === 'dark');
+                document.documentElement.setAttribute('data-theme', resolved);
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
 </head>
-
 <body>
-    <a id="gitlink" target="_blank"
-       href="https://github.com/IEvangelist/blazorators">
-        <img style="position: absolute; top: 0; right: 0; border: 0; z-index: 1000"
-             src="https://aral.github.io/fork-me-on-github-retina-ribbons/right-cerulean@2x.png"
-             alt="Fork me on GitHub">
-    </a>
-
     <div id="app">
-        <div class="d-flex vh-100 align-items-center justify-content-center">
-            <div class="d-flex display-4 mt-5 fw-bold justify-content-center align-items-center">
-                <strong class="p-5">🤖 Loading...</strong>
-                <div class="loading-progress-text"></div>
-                <div class="spinner-grow ms-auto" role="status" aria-hidden="true"></div>
+        <div class="splash" role="status" aria-live="polite">
+            <div class="splash-logo" aria-hidden="true">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
             </div>
+            <div class="splash-title">Blazorators</div>
+            <div class="splash-sub">Booting Blazor WebAssembly…</div>
         </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+    <div id="blazor-error-ui" hidden>
+        <div class="msg">
+            An unhandled error has occurred.
+            <button class="reload">Reload</button>
+            <button class="dismiss" aria-label="Dismiss">×</button>
+        </div>
     </div>
+
     <script src="_content/Blazor.Geolocation.WebAssembly/blazorators.geolocation.g.js"></script>
     <script src="_content/Blazor.SpeechSynthesis.WebAssembly/blazorators.speechSynthesis.g.js"></script>
-    <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AuFFokbS0x6puH-xXz-ADH1ZcMnPC1JkdSyRidoWCGYpVYTlnivpswV0D-OtfxGb" async defer></script>
-    <script src="app.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
-
 </html>

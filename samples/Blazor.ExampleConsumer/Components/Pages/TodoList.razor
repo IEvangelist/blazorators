@@ -1,64 +1,84 @@
-﻿@page "/todos"
+@page "/todos"
+<PageTitle>Local storage · Blazorators</PageTitle>
 
-<PageTitle>Tasks</PageTitle>
+<header class="page-header">
+    <span class="hero-eyebrow">
+        <span class="badge-dot live" aria-hidden="true"></span>
+        Blazor.LocalStorage.WebAssembly
+    </span>
+    <h1>
+        Local storage
+        <a class="link-icon"
+           href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly"
+           target="_blank" rel="noopener noreferrer nofollow"
+           title="View package on NuGet" aria-label="View package on NuGet">
+            <Icon Name="external-link" Class="icon-sm" />
+        </a>
+    </h1>
+    <p>Source-generated bindings over <code>window.localStorage</code> backing
+       a strongly-typed <code>HashSet&lt;TodoItem&gt;</code>.</p>
+</header>
 
-<h1>
-    <span class="pe-1">Local Storage</span>
-    <a href="https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly" target="_blank"
-       rel="noopener noreferrer nofollow">
-        <span class="oi oi-external-link"></span>
-    </a>
-</h1>
-<p>This page demonstrates the source generated <code>Blazor.LocalStorage.WebAssembly</code> package.</p>
-
-<div class="card">
-    <div class="card-body p-5">
-        <div class="d-flex justify-content-center align-items-center">
-            <div class="form-outline flex-fill">
-                <div class="input-group">
-                    <input id="todo" type="text" class="form-control form-control-lg"
-                           @bind=_todoValue
-                           @onkeyup="@OnKeyUp"
-                           autocomplete="off"
-                           placeholder="New task..." />
-                    <button id="add" type="button" class="btn btn-primary"
-                            @onclick="AddNewTodo">
-                        Add
-                    </button>
-                    <button id="clearall" type="button" class="btn btn-danger"
-                            @onclick="ClearAll">
-                        Clear All
-                    </button>
-                </div>
-            </div>
-        </div>
-        @if (_todos is { Count: > 0 })
-        {
-            <ul id="todo-list" class="list-group mb-0 pt-5">
-                @foreach (var todo in _todos)
-                {
-                    <li class="list-group-item d-flex align-items-center border-0 mb-2 rounded bg-light">
-                        <StorageCheckbox Item=@todo ItemChanged=@OnItemChanged>
-                            <EndContent>
-                                <button class="btn btn-danger" type="button" 
-                                    @onclick=@(_ => Delete(todo))>
-                                    <span class="oi oi-trash"></span>
-                                </button>
-                            </EndContent>
-                        </StorageCheckbox>
-                    </li>
-                }
-            </ul>
-        }
+<section class="card">
+    <div class="input-group">
+        <input id="todo"
+               type="text"
+               class="input input-lg"
+               @bind=_todoValue
+               @onkeyup=@OnKeyUp
+               autocomplete="off"
+               placeholder="Add a task and press Enter…"
+               aria-label="New task" />
+        <button id="add" type="button" class="btn btn-primary"
+                @onclick=AddNewTodo>
+            <Icon Name="plus" /> <span>Add</span>
+        </button>
+        <button id="clearall" type="button" class="btn btn-danger"
+                @onclick=ClearAll
+                disabled=@(_todos.Count == 0)>
+            <Icon Name="eraser" /> <span>Clear all</span>
+        </button>
     </div>
-</div>
+
+    @if (_todos is { Count: > 0 })
+    {
+        <ul id="todo-list" class="todo-list" role="list">
+            @foreach (var todo in _todos)
+            {
+                <li class="todo-item @(todo.IsCompleted ? "completed" : null)">
+                    <StorageCheckbox Item=@todo ItemChanged=@OnItemChanged>
+                        <EndContent>
+                            <button class="btn btn-icon btn-ghost"
+                                    type="button"
+                                    title="Remove"
+                                    aria-label="Remove task"
+                                    @onclick=@(_ => Delete(todo))>
+                                <Icon Name="trash" />
+                            </button>
+                        </EndContent>
+                    </StorageCheckbox>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="empty">Add a task above &mdash; it will round-trip through
+           <code>localStorage</code>.</p>
+    }
+</section>
+
 @if (_localStorageItems is { Count: > 0 })
 {
-    <div class="card mt-4">
-        <div class="card-body">
-            <details>
-                <summary>Raw <code>window.localStorage</code> values</summary>
-                <table class="table table-striped table-hover">
+    <section class="card mt-4">
+        <details class="modern">
+            <summary>
+                <Icon Name="database" />
+                <span>Raw <code>window.localStorage</code> values</span>
+                <Icon Name="chevron-down" Class="icon-sm chev" />
+            </summary>
+            <div class="table-wrap">
+                <table class="table">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -67,17 +87,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @foreach (var (i, key, value) in _localStorageItems.Select((kvp, i) => (i, kvp.Key, kvp.Value)))
-                    {
-                        <tr>
-                            <th scope="row">@i.ToString()</th>
-                            <td><code>@key.ToString()</code></td>
-                            <td><code>@value.ToString()</code></td>
-                        </tr>
-                    }
+                        @foreach (var (i, key, value) in _localStorageItems
+                                    .Select((kvp, i) => (i, kvp.Key, kvp.Value)))
+                        {
+                            <tr>
+                                <th scope="row">@i</th>
+                                <td><code>@key</code></td>
+                                <td><code>@value</code></td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
-            </details>
-        </div>
-    </div>
+            </div>
+        </details>
+    </section>
 }
+
+<RepositoryPrompt Title="Local storage demo" />

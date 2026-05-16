@@ -1,11 +1,15 @@
-﻿@inject ILocalStorageService LocalStorage
+@inject ILocalStorageService LocalStorage
 
-<label class="ps-2 fs-5 selectable flex-fill" for="@Item.Id">
-    <input type="checkbox" class="form-check-input"
-        value=@Item.IsCompleted
-        checked=@Item.IsCompleted
-        id="@Item.Id" @onchange=@OnIsCompletedChanged />
-    <span class="ps-3">@Item.Task</span>
+<label class="check" for="@Item.Id">
+    <input type="checkbox"
+           id="@Item.Id"
+           value=@Item.IsCompleted
+           checked=@Item.IsCompleted
+           @onchange=@OnIsCompletedChanged />
+    <span class="check-box" aria-hidden="true">
+        <Icon Name="check" Class="icon-sm" />
+    </span>
+    <span class="check-label">@Item.Task</span>
 </label>
 @if (EndContent is not null)
 {
