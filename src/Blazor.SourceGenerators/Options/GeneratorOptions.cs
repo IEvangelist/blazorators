@@ -40,11 +40,13 @@ internal sealed record GeneratorOptions(
         field ??= BuildParsers();
 
     private ISet<TypeDeclarationParser> BuildParsers() =>
-        // `TypeDeclarationSources` is currently reserved for future use - the
-        // generator always parses the embedded `lib.dom.d.ts`. Returning a
-        // single shared parser instance keeps the work cached and avoids
-        // creating N reference-equal parser duplicates when consumers set
-        // the property anyway.
+        // `Parsers` is the fallback path used when `TypeDeclarationSources`
+        // is null/empty - the generator always wants a parser for the
+        // embedded `lib.dom.d.ts`. When `TypeDeclarationSources` is set,
+        // the generator builds per-source parsers from `AdditionalFiles`
+        // directly inside `JavaScriptInteropGenerator.ResolveParsers` and
+        // never reaches this code path. Returning a single shared parser
+        // here keeps the work cached.
         new HashSet<TypeDeclarationParser> { TypeDeclarationParser.Default };
 
     public bool Equals(GeneratorOptions? other) =>

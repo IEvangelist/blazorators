@@ -15,11 +15,15 @@ internal sealed partial class TypeDeclarationReader
 
     internal static TypeDeclarationReader Factory(string source)
     {
-        // `TypeDeclarationSources` is reserved for future use; the generator
-        // currently always parses the embedded `lib.dom.d.ts`. When the
-        // scaffolded URL/file ingestion is implemented this method should
-        // resolve `source` (file path or URL), hash-invalidate against the
-        // `s_readerCache`, and return a per-source `TypeDeclarationReader`.
+        // Legacy entry point kept around for back-compat. The current
+        // generator pipeline reads consumer-supplied .d.ts content via
+        // `AdditionalFiles` (see `JavaScriptInteropGenerator.ResolveParsers`)
+        // and constructs `TypeDeclarationReader` directly from the in-memory
+        // content, bypassing this factory entirely. New call sites should
+        // prefer that path. Retained because removing it would break source-
+        // level back-compat for downstream consumers that referenced it
+        // (it's `internal`, but the assembly ships as an analyzer so we
+        // keep the surface stable across versions).
         _ = source;
         return Default;
     }
