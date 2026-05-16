@@ -2268,3 +2268,467 @@ details.modern[open] > summary .chev {
     font-size: 0.85rem;
     pointer-events: none;
 }
+
+/* =====================================================================
+   Patch: shadcn-inspired "lit" landing — aurora hero, word rotator,
+   bento grid, pointer-tracked spotlight cards, gradient hover glow,
+   staggered entrance animations. Loaded after everything else so it
+   wins specificity ties.
+   ===================================================================== */
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+/* ---------- shared entrance stagger ----------
+   Elements opt in by setting `style="--i:N"` and inheriting from a
+   `[data-reveal]` ancestor (or `.bento` for cards). */
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[data-reveal] > *:not(.hero-aurora) {
+    animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+}
+
+.bento > .bento-card {
+    animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 70ms + 240ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal] > *,
+    .bento > .bento-card,
+    .aurora-blob,
+    .word-rotator > span,
+    .badge-dot.live::after {
+        animation: none !important;
+    }
+}
+
+/* ---------- hero aurora background ---------- */
+
+.hero-lit {
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+}
+
+.hero-aurora {
+    position: absolute;
+    inset: -3rem -1rem auto -1rem;
+    height: 24rem;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 24px;
+    mask-image: linear-gradient(180deg, #000 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 100%);
+}
+
+.aurora-blob {
+    position: absolute;
+    width: 28rem;
+    height: 28rem;
+    border-radius: 999px;
+    filter: blur(80px);
+    opacity: 0.45;
+    will-change: transform;
+}
+
+.aurora-blob.a1 {
+    background: radial-gradient(circle, hsl(var(--primary) / 0.7), transparent 60%);
+    top: -8rem;
+    left: -4rem;
+    animation: aurora-drift-a 18s ease-in-out infinite alternate;
+}
+
+.aurora-blob.a2 {
+    background: radial-gradient(circle, hsl(var(--info) / 0.6), transparent 60%);
+    top: -6rem;
+    right: -2rem;
+    animation: aurora-drift-b 22s ease-in-out infinite alternate;
+}
+
+.aurora-blob.a3 {
+    background: radial-gradient(circle, hsl(285 95% 65% / 0.5), transparent 60%);
+    bottom: -10rem;
+    left: 28%;
+    animation: aurora-drift-c 26s ease-in-out infinite alternate;
+}
+
+.aurora-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, hsl(var(--foreground) / 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, hsl(var(--foreground) / 0.06) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(ellipse 60% 70% at 50% 30%, #000 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 30%, #000 30%, transparent 80%);
+    opacity: 0.7;
+}
+
+.dark .aurora-blob {
+    opacity: 0.35;
+}
+
+:root:not(.dark) .aurora-blob {
+    opacity: 0.28;
+}
+
+@keyframes aurora-drift-a {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(4rem, 2rem, 0) scale(1.15); }
+}
+
+@keyframes aurora-drift-b {
+    0%   { transform: translate3d(0, 0, 0) scale(1.05); }
+    100% { transform: translate3d(-3rem, 3rem, 0) scale(1); }
+}
+
+@keyframes aurora-drift-c {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(2rem, -2rem, 0) scale(1.1); }
+}
+
+/* ---------- hero headline word rotator ----------
+   `inline-grid` stacks every word in the same cell so the container's
+   width auto-fits the widest word and there is no layout shift. */
+
+.word-rotator {
+    display: inline-grid;
+    vertical-align: bottom;
+    grid-template-areas: "stack";
+    line-height: 1;
+}
+
+.word-rotator > span {
+    grid-area: stack;
+    opacity: 0;
+    transform: translateY(0.55em);
+    animation: word-flip 12s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.word-rotator > span:nth-child(1) { animation-delay:  0s; }
+.word-rotator > span:nth-child(2) { animation-delay:  3s; }
+.word-rotator > span:nth-child(3) { animation-delay:  6s; }
+.word-rotator > span:nth-child(4) { animation-delay:  9s; }
+
+@keyframes word-flip {
+    0%       { opacity: 0; transform: translateY(0.5em); }
+    4%       { opacity: 1; transform: translateY(0); }
+    22%      { opacity: 1; transform: translateY(0); }
+    27%      { opacity: 0; transform: translateY(-0.5em); }
+    100%     { opacity: 0; transform: translateY(-0.5em); }
+}
+
+/* ---------- pulsing eyebrow dot ---------- */
+
+.badge-dot.live {
+    position: relative;
+}
+
+.badge-dot.live::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 0 hsl(var(--success) / 0.6);
+    animation: ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+    0%   { box-shadow: 0 0 0 0 hsl(var(--success) / 0.55); }
+    80%  { box-shadow: 0 0 0 8px hsl(var(--success) / 0); }
+    100% { box-shadow: 0 0 0 0 hsl(var(--success) / 0); }
+}
+
+/* ---------- hero stats strip ---------- */
+
+.hero-stats {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    border-top: 1px solid hsl(var(--border));
+    padding-top: 1.25rem;
+}
+
+.hero-stats > li {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.hero-stats > li > strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--info)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.01em;
+}
+
+.hero-stats > li > span {
+    font-size: 0.78rem;
+    color: hsl(var(--muted-foreground));
+    letter-spacing: 0.01em;
+}
+
+/* ---------- bento grid + cards ---------- */
+
+.bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1rem;
+    margin-top: 2.5rem;
+}
+
+.bento-card {
+    --bg: hsl(var(--surface));
+    grid-column: span 12;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.4rem;
+    background: var(--bg);
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-lg);
+    color: hsl(var(--foreground));
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    transition:
+        border-color var(--dur) var(--ease-out),
+        transform var(--dur) var(--ease-out),
+        box-shadow var(--dur) var(--ease-out);
+}
+
+/* Spotlight: a radial gradient painted at (--mx, --my) — set by
+   spotlight.js — that fades in on hover. */
+.bento-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        circle 320px at var(--mx, -200px) var(--my, -200px),
+        hsl(var(--primary) / 0.18),
+        transparent 55%
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out);
+    z-index: 0;
+}
+
+.bento-card:hover::before {
+    opacity: 1;
+}
+
+.bento-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.bento-card:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    transform: translateY(-2px);
+    text-decoration: none;
+    box-shadow:
+        0 0 0 1px hsl(var(--primary) / 0.18),
+        0 14px 40px -18px hsl(var(--primary) / 0.45),
+        0 4px 12px -6px hsl(0 0% 0% / 0.15);
+}
+
+.bento-feat {
+    grid-column: span 12;
+    grid-row: span 2;
+}
+
+@media (min-width: 760px) {
+    .bento-card {
+        grid-column: span 6;
+    }
+
+    .bento-feat {
+        grid-column: span 6;
+        grid-row: span 2;
+    }
+}
+
+@media (min-width: 1100px) {
+    .bento-card {
+        grid-column: span 4;
+    }
+
+    .bento-feat {
+        grid-column: span 8;
+        grid-row: span 2;
+    }
+}
+
+/* ---------- card icon: subtle glow on hover ---------- */
+
+.bento-card .feature-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--background)) 100%);
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--primary));
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+
+.bento-card .feature-icon .icon {
+    width: 20px;
+    height: 20px;
+}
+
+.bento-card:hover .feature-icon {
+    transform: scale(1.06) rotate(-2deg);
+    color: hsl(var(--primary));
+    box-shadow:
+        0 0 0 1px hsl(var(--primary) / 0.25),
+        0 6px 20px -8px hsl(var(--primary) / 0.55);
+}
+
+.bento-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.bento-feat h3 {
+    font-size: 1.35rem;
+}
+
+.bento-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.55;
+}
+
+.bento-card .feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: hsl(var(--primary));
+    font-weight: 500;
+    margin-top: auto;
+}
+
+.bento-card .feature-link .arrow {
+    transition: transform var(--dur) var(--ease-out);
+}
+
+.bento-card:hover .feature-link .arrow {
+    transform: translateX(3px);
+}
+
+/* ---------- inline code preview (lead bento card) ---------- */
+
+.bento-preview {
+    position: relative;
+    margin: 0.25rem 0;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--background) / 0.7);
+    backdrop-filter: blur(4px);
+    overflow: hidden;
+}
+
+.bento-preview-head {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.7rem;
+    border-bottom: 1px solid hsl(var(--border));
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    color: hsl(var(--muted-foreground));
+}
+
+.bento-preview-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: hsl(var(--muted-foreground) / 0.3);
+    margin-left: auto;
+}
+
+.bento-preview-dot ~ .bento-preview-dot {
+    margin-left: 0.3rem;
+}
+
+.bento-preview pre {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    font-size: 0.78rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    background: transparent;
+    color: hsl(var(--foreground));
+}
+
+.bento-preview pre code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    background: transparent;
+}
+
+/* Shimmer sweep across the preview when the parent card is hovered. */
+.bento-preview::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        110deg,
+        transparent 0%,
+        hsl(var(--primary) / 0.12) 50%,
+        transparent 100%
+    );
+    transform: translateX(-110%);
+    transition: transform 0.9s var(--ease-out);
+    pointer-events: none;
+}
+
+.bento-card:hover .bento-preview::after {
+    transform: translateX(110%);
+}
+
+/* ---------- responsive cleanup ---------- */
+
+@media (max-width: 600px) {
+    .hero-aurora {
+        height: 20rem;
+    }
+
+    .hero-stats {
+        gap: 0.4rem 1.25rem;
+    }
+
+    .bento-preview pre {
+        font-size: 0.72rem;
+    }
+}
