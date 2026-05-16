@@ -60,11 +60,18 @@ public class JSAutoInteropAttribute : Attribute
     public string? Url { get; set; }
 
     /// <summary>
-    /// Reserved for future use. Intended to allow consumers to point the
-    /// generator at additional TypeScript declaration sources (file paths or
-    /// URLs); the current implementation always parses the embedded
-    /// <c>lib.dom.d.ts</c> file and ignores this value. Setting it has no
-    /// effect.
+    /// Optional array of additional TypeScript declaration source identifiers
+    /// (file basenames, full paths, or trailing-path segments matching
+    /// <c>AdditionalFiles</c> entries ending in <c>.d.ts</c>). When non-empty,
+    /// the generator parses the matched <c>AdditionalFile</c> contents in
+    /// place of the bundled <c>lib.dom.d.ts</c>. The consumer is responsible
+    /// for adding the file(s) to the project, e.g.:
+    /// <code>
+    /// &lt;ItemGroup&gt;
+    ///   &lt;AdditionalFiles Include=""decls\my-api.d.ts"" /&gt;
+    /// &lt;/ItemGroup&gt;
+    /// </code>
+    /// When null or empty, the bundled <c>lib.dom.d.ts</c> parser is used.
     /// </summary>
     public string[]? TypeDeclarationSources { get; set; }
 }
