@@ -96,7 +96,7 @@ internal sealed partial class TypeDeclarationParser
                 }
 
                 var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?") || type.Contains("| null");
+                var isNullable = name.EndsWith("?") || type.EndsWith("| null");
 
                 name = name.Replace("?", "").Replace("readonly ", "");
                 type = TryGetPrimitiveType(type);
@@ -201,7 +201,7 @@ internal sealed partial class TypeDeclarationParser
                 }
 
                 var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?") || type.Contains("| null");
+                var isNullable = name.EndsWith("?") || type.EndsWith("| null");
 
                 name = name.Replace("?", "").Replace("readonly ", "");
                 type = TryGetPrimitiveType(type);
