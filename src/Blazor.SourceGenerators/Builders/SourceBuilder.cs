@@ -73,6 +73,17 @@ internal sealed class SourceBuilder
 
     internal SourceBuilder AppendUsingDeclarations(bool requiresValueTask = false)
     {
+        // `using System;` is needed for `Action<>` / `Func<>` callback
+        // parameters that flow into the emitted interface and
+        // implementation. Most consumer projects ship with
+        // `<ImplicitUsings>enable</ImplicitUsings>` and would otherwise
+        // resolve them transparently, but generated code shouldn't
+        // require that opt-in: projects that disable implicit usings
+        // previously hit CS0246 on every callback-bearing interop
+        // surface. Emit unconditionally so the generated files are
+        // self-contained regardless of the host project's settings.
+        _builder.Append(value: $"using System;{NewLine}");
+
         if (_options is { SupportsGenerics: true })
         {
             _builder.Append(value: $"using Blazor.Serialization.Extensions;{NewLine}");
