@@ -16,7 +16,8 @@ internal record CSharpMethod(
         JavaScriptMethodDependency is { IsBiDirectionalJavaScript: false };
 
     public bool IsReturnTypeNullable =>
-        RawReturnTypeName.Contains("null");
+        RawReturnTypeName.EndsWith(" | null", StringComparison.Ordinal) ||
+        RawReturnTypeName.Equals("null", StringComparison.Ordinal);
 
     public bool IsVoid => RawReturnTypeName is "void";
 
