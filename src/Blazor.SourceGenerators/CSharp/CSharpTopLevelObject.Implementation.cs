@@ -217,8 +217,14 @@ internal sealed partial record CSharpTopLevelObject
         {
             var isGenericType = parameter.IsGenericParameter(method.RawName, options);
             var arg = parameter.ToArgumentString(isGenericType, true);
+            // Match `_paramName` fields to the parameter by ordinal
+            // suffix. Without `StringComparison.Ordinal` the comparison
+            // would be culture-sensitive on the host machine -- analyzers
+            // run in the build process and inherit its culture, so a
+            // Turkish locale (the classic `i` / `I` example) would alter
+            // the match results.
             var fieldName =
-                builder.Fields?.FirstOrDefault(field => field.EndsWith(parameter.RawName));
+                builder.Fields?.FirstOrDefault(field => field.EndsWith(parameter.RawName, StringComparison.Ordinal));
 
             if (fieldName is null) continue;
             builder.AppendRaw($"{fieldName} = {arg};");
@@ -246,9 +252,21 @@ internal sealed partial record CSharpTopLevelObject
 
             var isGenericType = parameter.IsGenericParameter(method.RawName, options);
             var arg = parameter.ToArgumentString(isGenericType, true);
+            // Strip the leading `on` prefix produced by
+            // `ToArgumentString` for callback parameters (e.g. `onSuccess`
+            // -> `Success`) so the suffix lines up with the `[JSInvokable]`
+            // method name (`OnSuccess`). For non-callback parameters the
+            // argument string is the raw parameter name, which won't
+            // start with `on` -- and may be shorter than two characters
+            // (real DOM signatures include single-letter parameters such
+            // as `(x: number)`), so `arg.Substring(2)` previously threw
+            // `ArgumentOutOfRangeException`. Guard against the short-name
+            // case and use ordinal comparison to keep the lookup
+            // culture-invariant inside a build-host analyzer.
+            var methodSuffix = arg.Length >= 2 ? arg.Substring(2) : arg;
             var methodName =
                 builder.Methods?.FirstOrDefault(
-                    m => m.EndsWith(arg.Substring(2)));
+                    m => m.EndsWith(methodSuffix, StringComparison.Ordinal));
             var argExpression = methodName is not null ? $"nameof({methodName})" : arg;
             if (ai.IsLast)
             {
