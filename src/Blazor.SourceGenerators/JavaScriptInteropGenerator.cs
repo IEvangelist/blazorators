@@ -147,6 +147,15 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         var additionalSources = inputs.AdditionalSources;
         var cancellationToken = context.CancellationToken;
 
+        // Build a path-keyed parser cache up front so that N targets pointing
+        // at the same `.d.ts` `AdditionalFile` share a single
+        // `TypeDeclarationReader`. Each reader scans the declaration text with
+        // multiple regexes (~800KB for `lib.dom.d.ts`), so constructing one
+        // per target was quadratic in (targets * shared sources).
+        var parserCache = new Dictionary<string, TypeDeclarationParser>(
+            additionalSources.Length,
+            StringComparer.OrdinalIgnoreCase);
+
         foreach (var target in combined.Distinct())
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -177,7 +186,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             // what its documentation always claimed (T5.1 fix). When the
             // option is empty/null, fall back to the cached default parser
             // exposed by `GeneratorOptions.Parsers`.
-            var parsers = ResolveParsers(target.Options, additionalSources);
+            var parsers = ResolveParsers(target.Options, additionalSources, parserCache);
             if (!parsers.Any())
             {
                 // `TypeDeclarationSources` was configured but none of the
@@ -271,9 +280,18 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
     /// matched source. When the option is empty/null, falls through to
     /// the cached default parser (embedded <c>lib.dom.d.ts</c>).
     /// </summary>
+    /// <remarks>
+    /// <paramref name="parserCache"/> is keyed by the matched
+    /// <see cref="AdditionalTypeDeclarationSource.Path"/>, scoped to one
+    /// <c>Execute</c> invocation. Sharing a single
+    /// <see cref="TypeDeclarationParser"/> across all targets that reference
+    /// the same <c>.d.ts</c> avoids paying the regex/map-construction cost
+    /// once per target.
+    /// </remarks>
     private static IEnumerable<TypeDeclarationParser> ResolveParsers(
         GeneratorOptions options,
-        ImmutableArray<AdditionalTypeDeclarationSource> additionalSources)
+        ImmutableArray<AdditionalTypeDeclarationSource> additionalSources,
+        Dictionary<string, TypeDeclarationParser> parserCache)
     {
         var requested = options.TypeDeclarationSources;
         if (requested is null || requested.Length == 0)
@@ -300,7 +318,13 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
                     string.Equals(src.FileName, requestedBasename, StringComparison.OrdinalIgnoreCase) ||
                     src.Path.EndsWith(requestedSource, StringComparison.OrdinalIgnoreCase))
                 {
-                    matched.Add(new TypeDeclarationParser(new TypeDeclarationReader(src.Content)));
+                    if (!parserCache.TryGetValue(src.Path, out var parser))
+                    {
+                        parser = new TypeDeclarationParser(new TypeDeclarationReader(src.Content));
+                        parserCache[src.Path] = parser;
+                    }
+
+                    matched.Add(parser);
                     break;
                 }
             }
