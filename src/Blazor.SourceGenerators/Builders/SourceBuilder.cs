@@ -188,10 +188,26 @@ internal sealed class SourceBuilder
                 if (param.ActionDeclaration is not null)
                 {
                     var name = param.ToArgumentString();
-                    var dependentTypes = param.ActionDeclaration.DependentTypes.Keys;
+                    // Use the canonical action type-argument list rather
+                    // than `DependentTypes.Keys`. The former is the
+                    // single source of truth for the action's generic
+                    // arguments and is C#-mapped (TS `number` ->
+                    // `double`, `boolean` -> `bool`, etc.) with arrays
+                    // intact; the latter only carries *custom* types
+                    // (primitives don't go through the declaration
+                    // reader, and array element shapes are flattened
+                    // to the element key), so the rendered doc string
+                    // diverged from the actual delegate signature any
+                    // time a callback had a primitive parameter (e.g.
+                    // `FrameRequestCallback(time: number)` rendered
+                    // `System.Action{}` instead of `System.Action{double}`).
+                    var typeArgs = param.ActionDeclaration.MappedActionTypeArguments;
+                    var actionRef = typeArgs.Count == 0
+                        ? "System.Action"
+                        : $"System.Action{{{string.Join(", ", typeArgs)}}}";
                     var action =
                         $"Expects the name of a <c>\"JSInvokableAttribute\"</c> C# method with the following " +
-                        $"<c>System.Action{{{string.Join(", ", dependentTypes)}}}\"</c>.";
+                        $"<c>{actionRef}</c>.";
                     _builder.Append(
                         $"/// <param name=\"{name}\">{action}</param>{NewLine}");
                 }

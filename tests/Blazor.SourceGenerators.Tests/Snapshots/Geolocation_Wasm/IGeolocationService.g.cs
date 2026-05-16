@@ -19,8 +19,8 @@ public partial interface IGeolocationService
     /// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/getCurrentPosition"></a>
     /// </summary>
     /// <param name = "component">The calling Razor (or Blazor) component.</param>
-    /// <param name = "onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}"</c>.</param>
-    /// <param name = "onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}"</c>.</param>
+    /// <param name = "onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}</c>.</param>
+    /// <param name = "onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}</c>.</param>
     /// <param name = "options">The <c>PositionOptions</c> value.</param>
     void GetCurrentPosition<TComponent>(TComponent component, string onSuccessCallbackMethodName, string? onErrorCallbackMethodName = null, PositionOptions? options = null)
         where TComponent : class;
@@ -34,8 +34,8 @@ public partial interface IGeolocationService
     /// <a href="https://developer.mozilla.org/docs/Web/API/Geolocation/watchPosition"></a>
     /// </summary>
     /// <param name = "component">The calling Razor (or Blazor) component.</param>
-    /// <param name = "onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}"</c>.</param>
-    /// <param name = "onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}"</c>.</param>
+    /// <param name = "onSuccessCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPosition}</c>.</param>
+    /// <param name = "onErrorCallbackMethodName">Expects the name of a <c>"JSInvokableAttribute"</c> C# method with the following <c>System.Action{GeolocationPositionError}</c>.</param>
     /// <param name = "options">The <c>PositionOptions</c> value.</param>
     double WatchPosition<TComponent>(TComponent component, string onSuccessCallbackMethodName, string? onErrorCallbackMethodName = null, PositionOptions? options = null)
         where TComponent : class;
