@@ -238,24 +238,59 @@ internal sealed partial class TypeDeclarationParser
 
     private string TryGetPrimitiveType(string type)
     {
-        if (!TypeMap.PrimitiveTypes.IsPrimitiveType(type) &&
-            _reader.TryGetTypeAlias(type, out var typeAliasLine) &&
-            typeAliasLine is not null)
+        if (TypeMap.PrimitiveTypes.IsPrimitiveType(type))
         {
-            if (typeAliasLine.Replace(";", "").Split('=')
-                is { Length: 2 } split)
+            return type;
+        }
+
+        // Carry the `| null` clause across the alias lookup. The alias map
+        // is keyed by the bare identifier (e.g. `DOMHighResTimeStamp`),
+        // never `DOMHighResTimeStamp | null`, so without this strip the
+        // resolution missed any property/parameter whose alias type also
+        // tolerated `null`.
+        var hadNullClause = type.EndsWith(" | null", StringComparison.Ordinal);
+        var bareType = hadNullClause
+            ? type.Substring(0, type.Length - " | null".Length).Trim()
+            : type;
+
+        if (TypeMap.PrimitiveTypes.IsPrimitiveType(bareType))
+        {
+            return type;
+        }
+
+        if (!_reader.TryGetTypeAlias(bareType, out var typeAliasLine) ||
+            typeAliasLine is null)
+        {
+            return type;
+        }
+
+        if (typeAliasLine.Replace(";", "").Split('=')
+            is not { Length: 2 } split)
+        {
+            return type;
+        }
+
+        var rhs = split[1].Trim();
+
+        // Single-token primitive alias, e.g. `type DOMHighResTimeStamp = number;`,
+        // `type GLuint = number;`, `type GLboolean = boolean;`. These appear
+        // throughout the DOM lib for unit/precision affordances; without
+        // resolution they slipped through as raw TS identifiers in the
+        // generated C# signatures.
+        if (TypeMap.PrimitiveTypes.IsPrimitiveType(rhs))
+        {
+            return hadNullClause ? $"{rhs} | null" : rhs;
+        }
+
+        if (rhs.Split('|')
+            is { Length: > 0 } values &&
+            values.Select(v => v.Trim())?.ToList()
+            is { Count: > 0 } list)
+        {
+            var isStringAlias = list.All(v => v.StartsWith("\"") && v.EndsWith("\""));
+            if (isStringAlias)
             {
-                if (split[1].Trim().Split('|')
-                    is { Length: > 0 } values &&
-                    values.Select(v => v.Trim())?.ToList()
-                    is { Count: > 0 } list)
-                {
-                    var isStringAlias = list.All(v => v.StartsWith("\"") && v.EndsWith("\""));
-                    if (isStringAlias)
-                    {
-                        type = "string";
-                    }
-                }
+                return hadNullClause ? "string | null" : "string";
             }
         }
 
@@ -268,7 +303,12 @@ internal sealed partial class TypeDeclarationParser
         List<CSharpType> parameterDefinitions,
         JavaScriptMethod? javaScriptMethod)
     {
-        var methodReturnType = CleanseReturnType(returnType);
+        // Resolve simple TS type aliases (`type GLuint = number;`,
+        // `type DOMHighResTimeStamp = number;`, etc.) up front so that the
+        // downstream primitive map / declaration lookup sees the bare TS
+        // primitive instead of the alias identifier. Without this the
+        // emitter dropped the raw alias name into the method signature.
+        var methodReturnType = TryGetPrimitiveType(CleanseReturnType(returnType));
         CSharpMethod cSharpMethod =
             new(methodName,
             methodReturnType,
@@ -416,6 +456,14 @@ internal sealed partial class TypeDeclarationParser
                     .Substring(0, trimmedType.Length - " | null".Length)
                     .Trim();
             }
+
+            // Resolve simple TS type aliases here too. The parameter path
+            // shares the same alias-aware behaviour as the property and
+            // return-type paths so that a method like
+            // `requestAnimationFrame(callback: FrameRequestCallback)` is
+            // distinct from a hypothetical `(time: DOMHighResTimeStamp)`
+            // and the latter emits `double time` instead of the raw alias.
+            trimmedType = TryGetPrimitiveType(trimmedType);
 
             var parameterType = trimmedType;
 
