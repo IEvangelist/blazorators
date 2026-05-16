@@ -57,10 +57,19 @@ static class AttributeSyntaxExtensions
                     "HostingModel" => options with
                     {
                         // BlazorHostingModel.WebAssembly is the source-of-truth
-                        // member name. Compare textually rather than evaluating
-                        // the enum's underlying integer value so we don't have to
-                        // pin the value across versions.
-                        IsWebAssembly = ReadEnumMemberName(arg.Expression, semanticModel)?.Contains("WebAssembly") ?? true
+                        // member name. Compare textually so we don't have to
+                        // pin the enum's underlying integer value across
+                        // versions. `Contains(string)` lacks a
+                        // `StringComparison` overload on netstandard2.0
+                        // and falls through to the culture-sensitive
+                        // implementation -- the analyzer process inherits
+                        // the host machine's culture, so use
+                        // `IndexOf(..., StringComparison.Ordinal)` for an
+                        // explicitly ordinal substring check. The default-
+                        // to-true branch keeps the prior behaviour when
+                        // `HostingModel` is omitted entirely (the
+                        // attribute's own default is `WebAssembly`).
+                        IsWebAssembly = (ReadEnumMemberName(arg.Expression, semanticModel)?.IndexOf("WebAssembly", StringComparison.Ordinal) ?? 0) >= 0
                     },
                     nameof(options.GenericMethodDescriptors) => options with
                     {

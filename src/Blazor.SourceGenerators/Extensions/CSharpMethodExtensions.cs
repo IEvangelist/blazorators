@@ -21,7 +21,7 @@ internal static class CSharpMethodExtensions
             {
                 // If the descriptor describes a parameter, it's not a generic return.
                 // TODO: consider APIs that might do this.
-                if (descriptor.Contains(":"))
+                if (descriptor.IndexOf(':') >= 0)
                 {
                     return false;
                 }

@@ -721,7 +721,14 @@ internal sealed partial class TypeDeclarationParser
             }
 
             var returnType = match.GetGroupValue("ReturnType");
-            if (returnType?.Contains("this") ?? false)
+            // `Contains(string)` is culture-sensitive on netstandard2.0
+            // (no `StringComparison` overload until .NET Core 2.1).
+            // Use `IndexOf(string, StringComparison.Ordinal)` instead so
+            // the comparison is always ordinal -- the analyzer process
+            // inherits the host machine's culture and the same Turkish-
+            // locale class of bug that motivated the broader culture-
+            // invariant audit pass would otherwise apply.
+            if (returnType is not null && returnType.IndexOf("this", StringComparison.Ordinal) >= 0)
             {
                 return false;
             }
@@ -757,7 +764,7 @@ internal sealed partial class TypeDeclarationParser
         {
             var name = match.GetGroupValue("Name");
             if ((name is "addEventListener" or "removeEventListener") ||
-                (name is not null && name.Contains("this")))
+                (name is not null && name.IndexOf("this", StringComparison.Ordinal) >= 0))
             {
                 return false;
             }
@@ -774,8 +781,8 @@ internal sealed partial class TypeDeclarationParser
             // wiring the generator does not emit for properties), and
             // the bogus name is never a legal C# identifier.
             var type = match.GetGroupValue("Type");
-            if ((name is not null && name.Contains("(")) ||
-                (type is not null && type.Contains("=>")))
+            if ((name is not null && name.IndexOf('(') >= 0) ||
+                (type is not null && type.IndexOf("=>", StringComparison.Ordinal) >= 0))
             {
                 return false;
             }

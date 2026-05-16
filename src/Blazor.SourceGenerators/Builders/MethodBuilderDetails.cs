@@ -90,9 +90,18 @@ internal readonly record struct MethodBuilderDetails(
 
         if (method.IsJavaScriptOverride(options) && options.Implementation is not null)
         {
+            // `LastIndexOf(string)` without an explicit `StringComparison`
+            // overload is culture-sensitive on netstandard2.0, which is
+            // the target framework for analyzers and source generators.
+            // A `.` is ASCII so the host machine's culture is unlikely to
+            // alter the match in practice, but the analyzer runs inside
+            // the build host process and inherits whatever culture is
+            // active there -- the same Turkish-locale class of bug that
+            // motivated the broader culture-invariant audit pass. Use
+            // the char overload, which is always ordinal.
             var impl =
                 options.Implementation.Substring(
-                    options.Implementation.LastIndexOf(".") + 1);
+                    options.Implementation.LastIndexOf('.') + 1);
 
             fullyQualifiedJavaScriptIdentifier =
                 $"blazorators.{impl}.{method.RawName}";
