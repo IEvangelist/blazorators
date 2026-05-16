@@ -61,14 +61,16 @@ internal static class SourceProductionContextExtensions
         this SourceProductionContext context,
         CSharpTopLevelObject topLevelObject,
         string implementation,
-        GeneratorOptions options)
+        GeneratorOptions options,
+        string? @namespace)
     {
         context.AddSource(
             $"{options.Implementation.ToImplementationName(false)}ServiceCollectionExtensions".ToGeneratedFileName(),
             SourceText.From(
                 topLevelObject.ToServiceCollectionExtensions(
                     options,
-                    implementation),
+                    implementation,
+                    @namespace),
                 Encoding.UTF8));
 
         return context;

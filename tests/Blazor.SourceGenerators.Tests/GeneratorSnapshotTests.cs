@@ -133,6 +133,38 @@ public class GeneratorSnapshotTests : GeneratorBaseUnitTests
             actual: actual);
     }
 
+    /// <summary>
+    /// When the consumer places their interface in a namespace other
+    /// than <c>Microsoft.JSInterop</c>, the generated DI extension class
+    /// must add a <c>using</c> for that namespace so its <c>I*</c> and
+    /// implementation type references resolve. The DI extension itself
+    /// always lives in <c>Microsoft.Extensions.DependencyInjection</c>
+    /// so consumers can chain <c>services.Add...()</c> calls without an
+    /// extra <c>using</c>. Pinned as an inline assertion (rather than
+    /// a file snapshot) because the rest of the suite already covers
+    /// the default-namespace case via <c>Permissions_WebAssembly_Snapshot_ServiceCollectionExtensions</c>.
+    /// </summary>
+    [Fact]
+    public void CustomNamespace_DI_Extension_Adds_Consumer_Using()
+    {
+        const string source = @"
+namespace MyCompany.Web.Interop
+{
+    [JSAutoInterop(
+        TypeName = ""Geolocation"",
+        Implementation = ""window.navigator.geolocation"")]
+    public partial interface IGeolocationService { }
+}";
+
+        var result = GetRunResult(source);
+        var actual = ReadFile(result, "GeolocationServiceCollectionExtensions.g.cs");
+
+        Assert.Contains("using Microsoft.JSInterop;", actual);
+        Assert.Contains("using MyCompany.Web.Interop;", actual);
+        Assert.Contains("namespace Microsoft.Extensions.DependencyInjection;", actual);
+        Assert.Contains("AddSingleton<IGeolocationService, GeolocationService>", actual);
+    }
+
     [Fact]
     public void Permissions_WebAssembly_Snapshot_Interface()
     {

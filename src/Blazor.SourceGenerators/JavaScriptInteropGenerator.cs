@@ -220,7 +220,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
                         context.AddDependentTypesSource(topLevelObject)
                             .AddInterfaceSource(topLevelObject, @interface, target.Options, target.ContainingNamespace)
                             .AddImplementationSource(topLevelObject, implementation, target.Options, target.ContainingNamespace)
-                            .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, target.Options);
+                            .AddDependencyInjectionExtensionsSource(topLevelObject, implementation, target.Options, target.ContainingNamespace);
                         break;
 
                     case ParserResultStatus.TargetTypeNotFound:
