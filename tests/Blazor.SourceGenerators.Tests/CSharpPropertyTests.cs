@@ -132,10 +132,10 @@ public class CSharpPropertyTests
     }
 
     [Theory]
-    [InlineData("string[] | null", "string[]")]
-    [InlineData("number[] | null", "double[]")]
-    [InlineData("ReadonlyArray<string> | null", "string[]")]
-    [InlineData("Array<string> | null", "string[]")]
+    [InlineData("string[] | null", "string[]?")]
+    [InlineData("number[] | null", "double[]?")]
+    [InlineData("ReadonlyArray<string> | null", "string[]?")]
+    [InlineData("Array<string> | null", "string[]?")]
     public void GetPropertyTypes_NullableArrayPreservesElementMappingOnWasm(
         string rawType, string expectedBareType)
     {
