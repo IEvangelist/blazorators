@@ -107,6 +107,92 @@ public class GeneratorSnapshotTests : GeneratorBaseUnitTests
             actual: actual);
     }
 
+    /// <summary>
+    /// End-to-end coverage for <c>Promise&lt;T&gt;</c> return-type
+    /// unwrapping. The <c>Permissions</c> DOM interface declares
+    /// <c>query(permissionDesc: PermissionDescriptor): Promise&lt;PermissionStatus&gt;</c>
+    /// -- before <c>Promise&lt;T&gt;</c> support landed, the generated
+    /// method signature contained a verbatim <c>Promise&lt;PermissionStatus&gt;</c>
+    /// token (not a CLR type) and the call site invoked the synchronous
+    /// <c>Invoke&lt;T&gt;</c> overload on a value that cannot resolve
+    /// synchronously. The snapshot now pins the corrected behaviour:
+    /// the return type is <c>ValueTask&lt;PermissionStatus&gt;</c>, the
+    /// call site uses <c>InvokeAsync</c>, and the method name carries
+    /// the <c>Async</c> suffix even under the WebAssembly hosting
+    /// model.
+    /// </summary>
+    [Fact]
+    public void Permissions_WebAssembly_Snapshot_Implementation()
+    {
+        var result = GetRunResult(PermissionsWasmSource);
+        var actual = ReadFile(result, "PermissionsService.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Permissions_Wasm",
+            fileName: "PermissionsService.g.cs",
+            actual: actual);
+    }
+
+    [Fact]
+    public void Permissions_WebAssembly_Snapshot_Interface()
+    {
+        var result = GetRunResult(PermissionsWasmSource);
+        var actual = ReadFile(result, "IPermissionsService.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Permissions_Wasm",
+            fileName: "IPermissionsService.g.cs",
+            actual: actual);
+    }
+
+    /// <summary>
+    /// Pins the generated <c>PermissionDescriptor</c> DTO emitted as a
+    /// transitive dependency of <c>Permissions.query</c>. The DTO
+    /// carries a single <c>name: PermissionName</c> property where
+    /// <c>PermissionName</c> is a TS string-union type alias ("geolocation"
+    /// | "notifications" | ...). The alias resolver collapses string
+    /// unions to <c>string</c>, so the emitted property must be a
+    /// plain C# <c>string</c> with the matching JSON property name.
+    /// </summary>
+    [Fact]
+    public void Permissions_WebAssembly_Snapshot_DependentDto_PermissionDescriptor()
+    {
+        var result = GetRunResult(PermissionsWasmSource);
+        var actual = ReadFile(result, "PermissionDescriptor.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Permissions_Wasm",
+            fileName: "PermissionDescriptor.g.cs",
+            actual: actual);
+    }
+
+    /// <summary>
+    /// Pins the generated <c>PermissionStatus</c> DTO. The interface
+    /// declares an <c>onchange</c> arrow-function property (filtered)
+    /// and an <c>addEventListener</c> overload set (filtered), so only
+    /// <c>name</c> and <c>state</c> survive into the emitted class.
+    /// </summary>
+    [Fact]
+    public void Permissions_WebAssembly_Snapshot_DependentDto_PermissionStatus()
+    {
+        var result = GetRunResult(PermissionsWasmSource);
+        var actual = ReadFile(result, "PermissionStatus.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Permissions_Wasm",
+            fileName: "PermissionStatus.g.cs",
+            actual: actual);
+    }
+
+    private const string PermissionsWasmSource = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoInterop(
+        TypeName = ""Permissions"",
+        Implementation = ""window.navigator.permissions"")]
+    public partial interface IPermissionsService { }
+}";
+
     private const string GeolocationWasmSource = @"
 namespace Microsoft.JSInterop
 {

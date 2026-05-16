@@ -25,17 +25,28 @@ internal static class TypeShape
 
     internal static string StripNullClause(string rawTypeName)
     {
-        if (rawTypeName.EndsWith(NullClause, StringComparison.Ordinal))
+        // Loop so layered clauses (`T | null | undefined`, rare in DOM
+        // but legal TS and present in a few WebGL extension declarations)
+        // collapse to a single bare `T`. Both forms are semantically
+        // identical from the C# side -- repeated peeling avoids
+        // partial-strip artefacts leaking into the emitted signature.
+        var current = rawTypeName;
+        while (true)
         {
-            return rawTypeName.Substring(0, rawTypeName.Length - NullClause.Length);
-        }
+            if (current.EndsWith(NullClause, StringComparison.Ordinal))
+            {
+                current = current.Substring(0, current.Length - NullClause.Length);
+                continue;
+            }
 
-        if (rawTypeName.EndsWith(UndefinedClause, StringComparison.Ordinal))
-        {
-            return rawTypeName.Substring(0, rawTypeName.Length - UndefinedClause.Length);
-        }
+            if (current.EndsWith(UndefinedClause, StringComparison.Ordinal))
+            {
+                current = current.Substring(0, current.Length - UndefinedClause.Length);
+                continue;
+            }
 
-        return rawTypeName;
+            return current;
+        }
     }
 
     /// <summary>

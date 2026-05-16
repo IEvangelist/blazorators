@@ -336,16 +336,30 @@ internal sealed partial class TypeDeclarationParser
             parameterDefinitions,
             javaScriptMethod);
 
+        // For `Promise<T>` returns the dependent-type lookup must see
+        // the unwrapped `T`. Without this peel the registration call
+        // searched the declaration map for the literal `Promise<X>`
+        // key, never found it, and the consuming code referenced an
+        // undefined DTO class. Use the same `PromiseUnwrappedTypeName`
+        // helper that drives the C# emit path so both stay in sync.
+        var lookupReturnType = cSharpMethod.IsPromise
+            ? cSharpMethod.PromiseUnwrappedTypeName
+            : methodReturnType;
+
         // Resolve the element type for dependent-DTO emission. Previously
         // the code did a textual `Replace("[]", "")` which only handled
         // the `T[]` shape (missing `Array<T>` and `ReadonlyArray<T>`) and
         // would also strip a `[]` from inside nested generic arguments.
         // Route through `TypeShape` so all three array forms agree with
-        // the parameter side and `CSharpProperty.MappedTypeName`.
+        // the parameter side and `CSharpProperty.MappedTypeName`. Also
+        // strip a trailing nullable clause -- `Promise<T | null>` and
+        // `T | null` returns both need the dependent type resolved
+        // against the bare `T`.
+        var bareLookupType = TypeShape.StripNullClause(lookupReturnType);
         var nonArrayMethodReturnType =
-            TypeShape.TryGetArrayElementTypeName(methodReturnType, out var elementTypeName)
+            TypeShape.TryGetArrayElementTypeName(bareLookupType, out var elementTypeName)
                 ? elementTypeName
-                : methodReturnType;
+                : bareLookupType;
 
         if (!TypeMap.PrimitiveTypes.IsPrimitiveType(nonArrayMethodReturnType) &&
             _reader.TryGetDeclaration(nonArrayMethodReturnType, out var typeScriptDefinitionText) &&
