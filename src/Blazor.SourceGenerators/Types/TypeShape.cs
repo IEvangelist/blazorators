@@ -107,4 +107,78 @@ internal static class TypeShape
         argument = string.Empty;
         return false;
     }
+
+    /// <summary>
+    /// Detects the TypeScript <c>Record&lt;K, V&gt;</c> utility-type
+    /// shape and splits its two generic arguments. Used by the
+    /// property-mapping code and the parameter parser to emit a C#
+    /// <c>Dictionary&lt;TKey, TValue&gt;</c> at the call site instead
+    /// of leaking the raw <c>Record&lt;...&gt;</c> token into generated
+    /// source. Real DOM hits include
+    /// <c>RTCStats.parameterData: Record&lt;string, number&gt;</c>,
+    /// <c>PushSubscriptionJSON.keys: Record&lt;string, string&gt;</c>,
+    /// and the <c>HeadersInit</c> alias used by <c>fetch</c> /
+    /// <c>Headers</c>.
+    /// </summary>
+    /// <remarks>
+    /// The splitter walks the argument string with depth tracking so a
+    /// nested generic value type (<c>Record&lt;string, Array&lt;number&gt;&gt;</c>)
+    /// keeps its inner generics intact. A trailing <c>| null</c> /
+    /// <c>| undefined</c> clause is stripped before matching -- the
+    /// outer caller still observes nullability through the property's
+    /// own nullable flag.
+    /// </remarks>
+    internal static bool TryGetRecordTypeArguments(
+        string rawTypeName,
+        out string keyType,
+        out string valueType)
+    {
+        keyType = string.Empty;
+        valueType = string.Empty;
+
+        if (string.IsNullOrEmpty(rawTypeName))
+        {
+            return false;
+        }
+
+        const string prefix = "Record<";
+        var stripped = StripNullClause(rawTypeName);
+
+        if (!stripped.StartsWith(prefix, StringComparison.Ordinal) ||
+            !stripped.EndsWith(">", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var inner = stripped.Substring(prefix.Length, stripped.Length - prefix.Length - 1);
+        var depth = 0;
+        var splitIndex = -1;
+
+        for (var i = 0; i < inner.Length; i++)
+        {
+            var ch = inner[i];
+            if (ch == '<')
+            {
+                depth++;
+            }
+            else if (ch == '>')
+            {
+                depth--;
+            }
+            else if (ch == ',' && depth == 0)
+            {
+                splitIndex = i;
+                break;
+            }
+        }
+
+        if (splitIndex < 0)
+        {
+            return false;
+        }
+
+        keyType = inner.Substring(0, splitIndex).Trim();
+        valueType = inner.Substring(splitIndex + 1).Trim();
+        return keyType.Length > 0 && valueType.Length > 0;
+    }
 }

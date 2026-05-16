@@ -27,6 +27,19 @@ internal record CSharpProperty(
                 return TypeMap.PrimitiveTypes[elementTypeName];
             }
 
+            // `Record<K, V>` -> `Dictionary<TKey, TValue>` with both
+            // type arguments routed through the primitive map. The
+            // raw `Record<...>` token would otherwise be emitted into
+            // the C# DTO type which is not a valid CLR type. DOM hits
+            // include `RTCStats.parameterData: Record<string, number>`
+            // and `PushSubscriptionJSON.keys: Record<string, string>`.
+            if (TypeShape.TryGetRecordTypeArguments(RawTypeName, out var keyType, out var valueType))
+            {
+                var mappedKey = TypeMap.PrimitiveTypes[keyType];
+                var mappedValue = TypeMap.PrimitiveTypes[valueType];
+                return $"Dictionary<{mappedKey}, {mappedValue}>";
+            }
+
             if (IsNullable)
             {
                 // Strip both forms of the nullable clause -- the DOM

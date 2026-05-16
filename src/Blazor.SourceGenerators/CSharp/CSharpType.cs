@@ -105,6 +105,19 @@ internal record CSharpType(
             // method signature, which is not valid C#.
             typeName = $"{TypeMap.PrimitiveTypes[elementTypeName]}[]";
         }
+        else if (TypeShape.TryGetRecordTypeArguments(RawTypeName, out var keyType, out var valueType))
+        {
+            // `Record<K, V>` -> `Dictionary<TKey, TValue>` with both
+            // arguments routed through the primitive map. See
+            // `CSharpProperty.MappedTypeName` for parallel handling
+            // on the DTO-property side. Without this branch the
+            // raw `Record<...>` token leaked into method signatures
+            // for parameters like
+            // `URLSearchParams(init?: Record<string, string>)`.
+            var mappedKey = TypeMap.PrimitiveTypes[keyType];
+            var mappedValue = TypeMap.PrimitiveTypes[valueType];
+            typeName = $"Dictionary<{mappedKey}, {mappedValue}>";
+        }
         else
         {
             typeName = RawTypeName;
