@@ -123,17 +123,24 @@ internal record CSharpType(
         if (ActionDeclaration is not null)
         {
             var parameterName = ToArgumentString(asDelegate: true);
-            var dependentTypes = ActionDeclaration.DependentTypes.Keys;
+            var typeArguments = ActionDeclaration.MappedActionTypeArguments;
             var parameterDefault = overrideNullability ? "" : " = null";
 
             // For a zero-parameter callback (e.g. the TS `VoidFunction`
-            // interface, `(): void;`) there is no dependent type list to
-            // splice in -- emit the non-generic `Action`. Otherwise the
-            // generator produced `Action<>? on... = null` which does not
-            // compile.
-            var actionType = dependentTypes.Count == 0
+            // interface, `(): void;`) emit the non-generic `Action`.
+            // For one-or-more-parameter callbacks, route each parameter
+            // through `MappedActionTypeArguments` so TS primitive
+            // spellings (`number`, `boolean`, ...) and array-of-primitive
+            // shapes are translated to their C# equivalents (`double`,
+            // `bool`, `double[]`, ...). Previously this method joined
+            // `DependentTypes.Keys`, which silently dropped primitive
+            // parameters from the generic argument list -- a one-param
+            // callback over a primitive emitted the same `Action` as a
+            // zero-param callback, breaking the shim's `Invoke(...)`
+            // arity at the call site.
+            var actionType = typeArguments.Count == 0
                 ? "Action"
-                : $"Action<{string.Join(", ", dependentTypes)}>";
+                : $"Action<{string.Join(", ", typeArguments)}>";
 
             return IsNullable
                 ? $"{actionType}? {parameterName}{parameterDefault}"

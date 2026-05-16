@@ -295,8 +295,7 @@ internal sealed class SourceBuilder
                     .GroupBy(param => param.RawName))
             {
                 var param = group.First();
-                var keys =
-                    param.ActionDeclaration!.ParameterDefinitions.Select(p => p.RawTypeName).ToList();
+                var typeArguments = param.ActionDeclaration!.MappedActionTypeArguments;
 
                 var fieldName = $"_{param.RawName}";
                 Fields ??= new HashSet<string>();
@@ -304,10 +303,15 @@ internal sealed class SourceBuilder
 
                 // For a zero-parameter callback (e.g. TS `VoidFunction`)
                 // the field type is the non-generic `Action` -- emitting
-                // `Action<>?` would not compile.
-                var fieldType = keys.Count == 0
+                // `Action<>?` would not compile. For non-empty cases,
+                // route each generic argument through
+                // `MappedActionTypeArguments` so the field uses C#
+                // primitive spellings (e.g. `Action<double>` for a TS
+                // `(time: number): void` callback) instead of leaking
+                // raw TypeScript names.
+                var fieldType = typeArguments.Count == 0
                     ? "Action"
-                    : $"Action<{string.Join(", ", keys)}>";
+                    : $"Action<{string.Join(", ", typeArguments)}>";
 
                 AppendRaw($"private {fieldType}? {fieldName};");
             }
@@ -376,7 +380,14 @@ internal sealed class SourceBuilder
         foreach (var (interation, p) in parameterDefinitions.Select())
         {
             args.Add(p.RawName);
-            AppendRaw($"{p.RawTypeName} {p.RawName}", appendNewLine: false);
+            // Route each parameter type through the same primitive-mapping
+            // helper used for the `Action<...>` field signature, so the
+            // shim's parameter list aligns with the field's generic
+            // arguments. Previously this emitted `p.RawTypeName` directly
+            // (e.g. `number time` for a TS `(time: DOMHighResTimeStamp)`
+            // callback after alias resolution), which is not valid C#.
+            var typeName = CSharpAction.MapParameterTypeToCSharp(p.RawTypeName);
+            AppendRaw($"{typeName} {p.RawName}", appendNewLine: false);
             if (interation.HasMore)
             {
                 AppendRaw(",");

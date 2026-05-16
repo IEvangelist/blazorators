@@ -31,6 +31,63 @@ internal record CSharpAction(
     public Dictionary<string, CSharpObject> DependentTypes { get; init; }
         = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Returns the C# generic argument list for this callback's
+    /// <c>Action&lt;...&gt;</c> emission. Each parameter's
+    /// <c>RawTypeName</c> is mapped through
+    /// <see cref="TypeMap.PrimitiveTypes"/> (with array-of-primitive
+    /// shapes peeled and re-attached), so a TS callback like
+    /// <c>(time: number): void</c> emits <c>Action&lt;double&gt;</c>
+    /// instead of the invalid <c>Action&lt;number&gt;</c>.
+    ///
+    /// <para>
+    /// This is the single source of truth for the action's generic
+    /// argument list; both <see cref="CSharpType.ToActionString"/> and
+    /// <see cref="SourceBuilder.AppendConditionalDelegateFields"/> route
+    /// through here. Previously the two emit paths derived their
+    /// argument lists from different collections (the former from
+    /// <see cref="DependentTypes"/> keys, which only contains custom
+    /// types; the latter from <see cref="ParameterDefinitions"/>
+    /// <c>RawTypeName</c> verbatim, which leaks raw TypeScript
+    /// spellings) and disagreed for any callback whose signature
+    /// mixed primitive and custom parameters.
+    /// </para>
+    /// </summary>
+    public IReadOnlyList<string> MappedActionTypeArguments
+    {
+        get
+        {
+            if (ParameterDefinitions is null || ParameterDefinitions.Count == 0)
+            {
+                return Array.Empty<string>();
+            }
+
+            var result = new List<string>(ParameterDefinitions.Count);
+            foreach (var parameter in ParameterDefinitions)
+            {
+                result.Add(MapParameterTypeToCSharp(parameter.RawTypeName));
+            }
+
+            return result;
+        }
+    }
+
+    internal static string MapParameterTypeToCSharp(string rawTypeName)
+    {
+        if (TypeMap.PrimitiveTypes.IsPrimitiveType(rawTypeName))
+        {
+            return TypeMap.PrimitiveTypes[rawTypeName];
+        }
+
+        if (TypeShape.TryGetArrayElementTypeName(rawTypeName, out var elementTypeName)
+            && TypeMap.PrimitiveTypes.IsPrimitiveType(elementTypeName))
+        {
+            return $"{TypeMap.PrimitiveTypes[elementTypeName]}[]";
+        }
+
+        return rawTypeName;
+    }
+
     private IImmutableSet<(string TypeName, CSharpObject Object)>? _allDependentTypes;
     private bool _isComputingAllDependentTypes;
 
