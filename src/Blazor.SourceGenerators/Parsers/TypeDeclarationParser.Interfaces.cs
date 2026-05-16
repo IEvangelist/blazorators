@@ -96,7 +96,18 @@ internal sealed partial class TypeDeclarationParser
                 }
 
                 var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?") || type.EndsWith("| null");
+                // TS uses `?:` (optional), ` | null`, and ` | undefined`
+                // somewhat interchangeably for "this value might not
+                // be present". They all collapse to a C# nullable
+                // property; the runtime distinction isn't observable
+                // through JSON round-tripping. `HasNullClause` reads
+                // the trimmed type token from the property regex --
+                // the regex captures whitespace-trimmed content so a
+                // leading space (` | null` vs `| null`) needs to be
+                // tolerated by checking both spellings.
+                var isNullable = name.EndsWith("?")
+                    || type.EndsWith("| null", StringComparison.Ordinal)
+                    || type.EndsWith("| undefined", StringComparison.Ordinal);
 
                 name = name.Replace("?", "").Replace("readonly ", "");
                 type = TryGetPrimitiveType(type);
@@ -201,7 +212,12 @@ internal sealed partial class TypeDeclarationParser
                 }
 
                 var isReadonly = name.StartsWith("readonly ");
-                var isNullable = name.EndsWith("?") || type.EndsWith("| null");
+                // See `ToObject` for rationale: `?:`, ` | null`,
+                // and ` | undefined` all collapse to a C# nullable
+                // property; both clause suffixes need to be detected.
+                var isNullable = name.EndsWith("?")
+                    || type.EndsWith("| null", StringComparison.Ordinal)
+                    || type.EndsWith("| undefined", StringComparison.Ordinal);
 
                 name = name.Replace("?", "").Replace("readonly ", "");
                 type = TryGetPrimitiveType(type);
@@ -243,19 +259,24 @@ internal sealed partial class TypeDeclarationParser
             return type;
         }
 
-        // Carry the `| null` clause across the alias lookup. The alias map
-        // is keyed by the bare identifier (e.g. `DOMHighResTimeStamp`),
-        // never `DOMHighResTimeStamp | null`, so without this strip the
-        // resolution missed any property/parameter whose alias type also
-        // tolerated `null`.
-        var hadNullClause = type.EndsWith(" | null", StringComparison.Ordinal);
-        var bareType = hadNullClause
-            ? type.Substring(0, type.Length - " | null".Length).Trim()
-            : type;
+        // Carry the trailing nullable clause (` | null` or
+        // ` | undefined`) across the alias lookup. The alias map is
+        // keyed by the bare identifier (e.g. `DOMHighResTimeStamp`),
+        // never `DOMHighResTimeStamp | null`, so without this strip
+        // the resolution missed any property/parameter whose alias
+        // type also tolerated `null` (or `undefined`). Both forms map
+        // onto a C# nullable type so we collapse to ` | null` after
+        // detection -- downstream callers only inspect for ` | null`.
+        var hadNullClause = TypeShape.HasNullClause(type);
+        var bareType = hadNullClause ? TypeShape.StripNullClause(type) : type;
 
         if (TypeMap.PrimitiveTypes.IsPrimitiveType(bareType))
         {
-            return type;
+            // Normalise to the ` | null` form so the primitive map's
+            // pre-baked nullable entries (`"number | null"` ->
+            // `"double?"`, etc.) light up regardless of whether the
+            // source spelled it ` | undefined`.
+            return hadNullClause ? $"{bareType} | null" : type;
         }
 
         if (!_reader.TryGetTypeAlias(bareType, out var typeAliasLine) ||
@@ -441,20 +462,21 @@ internal sealed partial class TypeDeclarationParser
             var trimmedType = rawTypeToken.Trim();
 
             // A TS parameter is nullable if EITHER the name has a `?` suffix
-            // (`x?: T`) OR the type has a ` | null` clause (`x: T | null`).
-            // We normalize both forms onto `isNullable=true` and strip the
-            // `| null` from the type so the downstream primitive/declaration
-            // lookups see a clean `T`. Previously only primitives whose
-            // exact `"T | null"` key existed in `TypeMap` survived this -
-            // e.g. `string | null` worked because the map had an entry,
-            // but `string[] | null` (or any custom interface) emitted
-            // `string[] | null x` verbatim, which isn't valid C#.
-            if (trimmedType.EndsWith(" | null", StringComparison.Ordinal))
+            // (`x?: T`) OR the type has a ` | null` / ` | undefined` clause
+            // (`x: T | null`, `x: T | undefined`). We normalize all forms
+            // onto `isNullable=true` and strip the clause so the
+            // downstream primitive/declaration lookups see a clean `T`.
+            // Previously only primitives whose exact `"T | null"` key
+            // existed in `TypeMap` survived this -- e.g. `string | null`
+            // worked because the map had an entry, but `string[] | null`
+            // (or any custom interface) emitted `string[] | null x`
+            // verbatim, which isn't valid C#. `| undefined` was not
+            // recognised at all, leaving the clause in the emitted
+            // signature for callbacks and Promise-derived parameters.
+            if (TypeShape.HasNullClause(trimmedType))
             {
                 isNullable = true;
-                trimmedType = trimmedType
-                    .Substring(0, trimmedType.Length - " | null".Length)
-                    .Trim();
+                trimmedType = TypeShape.StripNullClause(trimmedType);
             }
 
             // Resolve simple TS type aliases here too. The parameter path

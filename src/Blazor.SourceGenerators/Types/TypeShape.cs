@@ -13,11 +13,39 @@ namespace Blazor.SourceGenerators.Types;
 internal static class TypeShape
 {
     private const string NullClause = " | null";
+    // TS uses ` | undefined` semantically the same way the rest of
+    // the runtime treats `| null`: an optional / missing value. The
+    // C# binding represents both as a nullable reference / value
+    // type (`T?`) -- there's no observable difference once the
+    // value crosses JS interop. We collapse both forms here so the
+    // rest of the pipeline (primitive map, array element resolution,
+    // property mapped-type, parameter parsing) doesn't need parallel
+    // code paths.
+    private const string UndefinedClause = " | undefined";
 
-    internal static string StripNullClause(string rawTypeName) =>
-        rawTypeName.EndsWith(NullClause, StringComparison.Ordinal)
-            ? rawTypeName.Substring(0, rawTypeName.Length - NullClause.Length)
-            : rawTypeName;
+    internal static string StripNullClause(string rawTypeName)
+    {
+        if (rawTypeName.EndsWith(NullClause, StringComparison.Ordinal))
+        {
+            return rawTypeName.Substring(0, rawTypeName.Length - NullClause.Length);
+        }
+
+        if (rawTypeName.EndsWith(UndefinedClause, StringComparison.Ordinal))
+        {
+            return rawTypeName.Substring(0, rawTypeName.Length - UndefinedClause.Length);
+        }
+
+        return rawTypeName;
+    }
+
+    /// <summary>
+    /// True when the input ends in either <c> | null</c> or
+    /// <c> | undefined</c>. Used by callers that need to detect
+    /// nullability without also stripping the clause.
+    /// </summary>
+    internal static bool HasNullClause(string rawTypeName) =>
+        rawTypeName.EndsWith(NullClause, StringComparison.Ordinal) ||
+        rawTypeName.EndsWith(UndefinedClause, StringComparison.Ordinal);
 
     internal static bool IsArrayShape(string rawTypeName) =>
         rawTypeName.EndsWith("[]", StringComparison.Ordinal) ||

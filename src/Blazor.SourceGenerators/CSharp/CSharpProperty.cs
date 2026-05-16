@@ -29,7 +29,12 @@ internal record CSharpProperty(
 
             if (IsNullable)
             {
-                return RawTypeName.Replace("| null", "").TrimEnd();
+                // Strip both forms of the nullable clause -- the DOM
+                // uses `T | undefined` for several Promise-returned
+                // properties and `T | null` for everything else. Both
+                // map onto a C# nullable type; the wrapping emitter
+                // appends the `?` suffix based on `IsNullable`.
+                return TypeShape.StripNullClause(RawTypeName);
             }
 
             return RawTypeName;
