@@ -1,10 +1,10 @@
-﻿# Blazorators: The Source Generated `sessionStorage` JavaScript Interop library for Blazor WebAssembly
+# Blazorators: The Source Generated `permissions` JavaScript Interop library for Blazor WebAssembly
 
-The [`Blazor.SessionStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.SessionStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source generated `IStorageService` interface specific to Blazor WebAssembly and the [`sessionStorage`](https://developer.mozilla.org/docs/Web/API/Window/sessionStorage) Web API.
+The [`Blazor.Permissions.WebAssembly`](https://www.nuget.org/packages/Blazor.Permissions.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes a source-generated `IPermissionsService` interface specific to Blazor WebAssembly and the [`permissions`](https://developer.mozilla.org/docs/Web/API/Permissions) Web API.
 
 ## Get started
 
-After the NuGet package is added as a reference, call the `AddSessionStorageServices` method to register the `ISessionStorageService` service type.
+After the NuGet package is added as a reference, call the `AddPermissionsServices` method to register the `IPermissionsService` service type.
 
 ```csharp
 using Microsoft.AspNetCore.Components.Web;
@@ -20,59 +20,36 @@ builder.Services.AddScoped(
         BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
     });
 
-builder.Services.AddSessionStorageServices();
+builder.Services.AddPermissionsServices();
 
 await builder.Build().RunAsync();
 ```
 
-Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `ISessionStorageService` type. The interface takes the following shape:
+Anywhere needed within your Razor component, or Blazor client code — either `@inject` or `[Inject]` the `IPermissionsService` type. The interface takes the following shape:
 
 ```csharp
-using Blazor.Serialization.Extensions;
-using System.Text.Json;
-
 #nullable enable
+using System.Threading.Tasks;
+
 namespace Microsoft.JSInterop;
 
 /// <summary>
-/// Source generated interface definition of the <c>Storage</c> type.
+/// Source generated interface definition of the <c>Permissions</c> type.
 /// </summary>
-public interface ISessionStorageService
+public interface IPermissionsService
 {
     /// <summary>
-    /// Source generated implementation of <c>window.sessionStorage.clear</c>.
-    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/clear"></a>
+    /// Source generated implementation of <c>window.navigator.permissions.query</c>.
+    /// <a href="https://developer.mozilla.org/docs/Web/API/Permissions/query"></a>
     /// </summary>
-    void Clear();
-
-    /// <summary>
-    /// Source generated implementation of <c>window.sessionStorage.getItem</c>.
-    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/getItem"></a>
-    /// </summary>
-    TResult? GetItem<TResult>(string key, JsonSerializerOptions? options = null);
-
-    /// <summary>
-    /// Source generated implementation of <c>window.sessionStorage.key</c>.
-    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/key"></a>
-    /// </summary>
-    string? Key(double index);
-
-    /// <summary>
-    /// Source generated implementation of <c>window.sessionStorage.removeItem</c>.
-    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/removeItem"></a>
-    /// </summary>
-    void RemoveItem(string key);
-
-    /// <summary>
-    /// Source generated implementation of <c>window.sessionStorage.setItem</c>.
-    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/setItem"></a>
-    /// </summary>
-    void SetItem<TArg>(string key, TArg value, JsonSerializerOptions? options = null);
-
-    /// <summary>
-    /// Source generated implementation of <c>window.sessionStorage.length</c>.
-    /// <a href="https://developer.mozilla.org/docs/Web/API/Storage/length"></a>
-    /// </summary>
-    double Length { get; }
+    ValueTask<PermissionStatus> QueryAsync(PermissionDescriptor permissionDesc);
 }
+```
+
+### Add JavaScript dependency
+
+In the _index.html_ file, add the following:
+
+```html
+<script src="_content/Blazor.Permissions.WebAssembly/blazorators.permissions.g.js"></script>
 ```
