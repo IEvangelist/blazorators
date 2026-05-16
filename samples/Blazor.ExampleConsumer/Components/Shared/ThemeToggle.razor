@@ -4,21 +4,21 @@
 <div class="theme-toggle" role="group" aria-label="Theme">
     <button type="button"
             aria-label="Light theme"
-            aria-pressed="@(_theme == "light")"
+            aria-pressed="@((_theme == "light") ? "true" : "false")"
             title="Light"
             @onclick=@(() => SetAsync("light"))>
         <Icon Name="sun" />
     </button>
     <button type="button"
             aria-label="System theme"
-            aria-pressed="@(_theme == "system")"
+            aria-pressed="@((_theme == "system") ? "true" : "false")"
             title="System"
             @onclick=@(() => SetAsync("system"))>
         <Icon Name="monitor" />
     </button>
     <button type="button"
             aria-label="Dark theme"
-            aria-pressed="@(_theme == "dark")"
+            aria-pressed="@((_theme == "dark") ? "true" : "false")"
             title="Dark"
             @onclick=@(() => SetAsync("dark"))>
         <Icon Name="moon" />

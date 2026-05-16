@@ -1631,9 +1631,13 @@ details.modern > *:not(summary) {
 }
 
 .theme-toggle button[aria-pressed="true"] {
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.06);
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.08), 0 0 0 1px hsl(var(--primary) / 0.4);
+}
+
+.theme-toggle button[aria-pressed="true"]:hover {
+    color: hsl(var(--primary-foreground));
 }
 
 .theme-toggle button .icon {
