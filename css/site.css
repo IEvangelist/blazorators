@@ -2732,3 +2732,426 @@ details.modern[open] > summary .chev {
         font-size: 0.72rem;
     }
 }
+/* =====================================================================
+   Patch: per-card inner animations for the lit landing bento.
+   Each non-featured card hosts a small `.bento-anim` panel that
+   illustrates the API it represents (waveform, pin ripple, transcript
+   stack, orbiting chips, route trace). The featured card splits into
+   an animated "saving todos" stack + an inline code preview.
+   ===================================================================== */
+
+.icon-xs {
+    width: 0.8em;
+    height: 0.8em;
+    stroke-width: 2.4;
+}
+
+/* Common shell for every per-card animation panel. */
+.bento-anim {
+    position: relative;
+    height: 120px;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    background:
+        linear-gradient(180deg,
+            hsl(var(--background) / 0.6) 0%,
+            hsl(var(--muted) / 0.4) 100%);
+    overflow: hidden;
+    isolation: isolate;
+    margin-top: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bento-anim *,
+    .bento-anim::before,
+    .bento-anim::after,
+    .anim-route-dot,
+    .anim-route-fg,
+    .bento-feat-split * {
+        animation: none !important;
+    }
+}
+
+/* ---------- Featured card: split panel ----------
+   Left half is the animated "saving todos to localStorage" stack,
+   right half is the existing code preview. Collapses to a single
+   column under 720px. */
+
+.bento-feat-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+@media (min-width: 720px) {
+    .bento-feat-split {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+        gap: 1rem;
+    }
+}
+
+/* The animation panel reuses .bento-anim styles via the .bento-anim-stack class. */
+.bento-anim-stack {
+    height: 100%;
+    min-height: 200px;
+}
+
+.bento-feat-split .bento-preview {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.bento-feat-split .bento-preview pre {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.bento-anim-stack .anim-storage-disk {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.35);
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    box-shadow: 0 0 24px -8px hsl(var(--primary) / 0.6);
+    z-index: 1;
+}
+
+.bento-anim-stack .anim-storage-disk::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 999px;
+    border: 1px solid hsl(var(--primary) / 0.4);
+    opacity: 0;
+    animation: disk-pulse 2.2s ease-out infinite;
+}
+
+@keyframes disk-pulse {
+    0%   { transform: scale(0.85); opacity: 0.55; }
+    100% { transform: scale(1.4);  opacity: 0; }
+}
+
+.bento-anim-stack .anim-todo {
+    position: absolute;
+    left: 14px;
+    top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: var(--radius-sm);
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    box-shadow:
+        0 2px 4px -2px hsl(0 0% 0% / 0.15),
+        0 8px 18px -10px hsl(0 0% 0% / 0.2);
+    font-size: 0.78rem;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    width: 130px;
+    animation: todo-fly 6s cubic-bezier(0.5, 0, 0.55, 1) infinite both;
+    animation-delay: calc(var(--n) * 1.5s);
+    opacity: 0;
+    z-index: 2;
+}
+
+.bento-anim-stack .anim-todo-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: hsl(var(--success));
+    color: hsl(var(--background));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 16px;
+}
+
+.bento-anim-stack .anim-todo-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@keyframes todo-fly {
+    0%   { transform: translate(0, 12px) scale(0.92); opacity: 0; }
+    12%  { transform: translate(0, 0)    scale(1);    opacity: 1; }
+    55%  { transform: translate(0, 0)    scale(1);    opacity: 1; }
+    78%  { transform: translate(calc(100% + 30px), 0) scale(0.6); opacity: 0; }
+    100% { transform: translate(calc(100% + 30px), 0) scale(0.6); opacity: 0; }
+}
+
+/* Stagger vertical position so cards stack visually before flying.
+   Heights are based on 100% panel height — distribute the 4 cards. */
+.bento-anim-stack .anim-todo[style*="--n:0"] { top: 12%; }
+.bento-anim-stack .anim-todo[style*="--n:1"] { top: 34%; }
+.bento-anim-stack .anim-todo[style*="--n:2"] { top: 56%; }
+.bento-anim-stack .anim-todo[style*="--n:3"] { top: 78%; }
+
+/* Subtle scan line behind everything. */
+.bento-anim-stack::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to bottom, transparent 0%, hsl(var(--primary) / 0.05) 50%, transparent 100%);
+    transform: translateY(-100%);
+    animation: scan-line 4s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+    0%, 100% { transform: translateY(-100%); }
+    50%      { transform: translateY(100%); }
+}
+
+/* The existing .bento-preview lives inside the right column when split. */
+.bento-feat-split .bento-preview {
+    margin: 0;
+}
+
+/* ---------- Geolocation: pulsing pin on a faint map grid ---------- */
+
+.bento-anim-pin {
+    display: grid;
+    place-items: center;
+}
+
+.bento-anim-pin .anim-map-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+        linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(circle at 50% 55%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(circle at 50% 55%, #000 0%, transparent 75%);
+    opacity: 0.5;
+}
+
+.bento-anim-pin .anim-pin {
+    position: relative;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 0 0 4px hsl(var(--primary) / 0.18),
+        0 8px 22px -6px hsl(var(--primary) / 0.6);
+    animation: pin-bob 3s ease-in-out infinite;
+}
+
+@keyframes pin-bob {
+    0%, 100% { transform: translateY(-2px); }
+    50%      { transform: translateY(2px); }
+}
+
+.bento-anim-pin .anim-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border-radius: 999px;
+    border: 2px solid hsl(var(--primary));
+    opacity: 0;
+    animation: ripple-out 3s ease-out infinite;
+    z-index: 1;
+}
+
+.bento-anim-pin .anim-ripple-a { animation-delay: 0s; }
+.bento-anim-pin .anim-ripple-b { animation-delay: 1s; }
+.bento-anim-pin .anim-ripple-c { animation-delay: 2s; }
+
+@keyframes ripple-out {
+    0%   { transform: scale(0.7); opacity: 0.55; }
+    80%  { transform: scale(2.6); opacity: 0; }
+    100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* ---------- Watch position: SVG path drawing with a traveling dot ---------- */
+
+.bento-anim-route svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.bento-anim-route .anim-route-fg {
+    stroke-dasharray: 320;
+    stroke-dashoffset: 320;
+    animation: route-draw 3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes route-draw {
+    0%   { stroke-dashoffset: 320; }
+    60%  { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+}
+
+.bento-anim-route .anim-route-dot {
+    filter: drop-shadow(0 0 6px hsl(var(--primary) / 0.8));
+}
+
+/* ---------- Text-to-speech: equalizer bars ---------- */
+
+.bento-anim-wave {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    gap: 3px;
+}
+
+.bento-anim-wave > span {
+    flex: 1;
+    background: linear-gradient(to top, hsl(var(--primary)) 0%, hsl(var(--info)) 100%);
+    border-radius: 2px;
+    animation: bar-pulse 1.2s ease-in-out infinite;
+    animation-delay: calc(var(--n) * -80ms);
+    min-height: 6px;
+    transform-origin: center;
+}
+
+@keyframes bar-pulse {
+    0%, 100% { transform: scaleY(0.15); }
+    50%      { transform: scaleY(1);    }
+}
+
+/* ---------- Speech-to-text: live transcript bubbles ---------- */
+
+.bento-anim-transcript {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.bento-anim-transcript .anim-bubble {
+    align-self: flex-start;
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.72rem;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 4px 12px -6px hsl(0 0% 0% / 0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: bubble-rise 8s cubic-bezier(0.5, 0, 0.55, 1) infinite;
+    animation-delay: calc(var(--n) * 2s);
+}
+
+.bento-anim-transcript .anim-bubble:nth-child(even) {
+    align-self: flex-end;
+    background: hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.35);
+    color: hsl(var(--primary));
+}
+
+@keyframes bubble-rise {
+    0%   { opacity: 0; transform: translateY(20px) scale(0.92); }
+    8%   { opacity: 1; transform: translateY(0)    scale(1); }
+    60%  { opacity: 1; transform: translateY(-20px) scale(1); }
+    78%  { opacity: 0; transform: translateY(-40px) scale(0.95); }
+    100% { opacity: 0; transform: translateY(-40px) scale(0.95); }
+}
+
+/* ---------- Sandbox: orbiting chips ---------- */
+
+.bento-anim-orbit {
+    display: grid;
+    place-items: center;
+}
+
+.bento-anim-orbit .orbit-core {
+    position: relative;
+    z-index: 3;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--info)) 100%);
+    color: hsl(var(--primary-foreground));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 24px -4px hsl(var(--primary) / 0.7);
+    animation: core-bob 4s ease-in-out infinite;
+}
+
+@keyframes core-bob {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+}
+
+.bento-anim-orbit .orbit-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 999px;
+    border: 1px dashed hsl(var(--border));
+    transform: translate(-50%, -50%);
+}
+
+.bento-anim-orbit .orbit-r1 { width: 70px;  height: 70px; }
+.bento-anim-orbit .orbit-r2 { width: 100px; height: 100px; opacity: 0.5; }
+
+.bento-anim-orbit .orbit-chip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
+    border-radius: 999px;
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--primary));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px -6px hsl(0 0% 0% / 0.3);
+    transform-origin: center;
+    animation: orbit-spin 12s linear infinite;
+    --start: var(--a);
+}
+
+@keyframes orbit-spin {
+    from { transform: rotate(calc(var(--start) + 0deg))   translateX(var(--r)) rotate(calc(0deg - var(--start))); }
+    to   { transform: rotate(calc(var(--start) + 360deg)) translateX(var(--r)) rotate(calc(-360deg - var(--start))); }
+}
+
+/* Stop spinning on the inner icon so it stays upright. */
+.bento-anim-orbit .orbit-chip > .icon {
+    transform: none;
+}
+
+/* ---------- Card hover sweetener: nudge waveform & ripple a touch faster ---------- */
+
+.bento-card:hover .bento-anim-wave > span { animation-duration: 0.9s; }
+.bento-card:hover .anim-pin              { animation-duration: 1.6s; }
+.bento-card:hover .orbit-core            { animation-duration: 2s; }
