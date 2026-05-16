@@ -71,7 +71,7 @@ internal sealed class SourceBuilder
         return this;
     }
 
-    internal SourceBuilder AppendUsingDeclarations()
+    internal SourceBuilder AppendUsingDeclarations(bool requiresValueTask = false)
     {
         if (_options is { SupportsGenerics: true })
         {
@@ -80,7 +80,16 @@ internal sealed class SourceBuilder
             _builder.Append(value: $"using System.Text.Json.Serialization.Metadata;{NewLine}");
         }
 
-        if (!_options.IsWebAssembly)
+        // Server hosting always returns `ValueTask`-wrapped values, so
+        // `System.Threading.Tasks` is required. WebAssembly hosting is
+        // synchronous by default, but `Promise<T>` returns force the
+        // async path even under WASM (see `MethodBuilderDetails.Create`),
+        // so the namespace is required whenever any emitted method
+        // returns a Promise. Without this, consumers compiling with
+        // `<ImplicitUsings>disable</ImplicitUsings>` (or older SDKs that
+        // don't auto-include `System.Threading.Tasks`) saw a CS0246
+        // referencing the generated `ValueTask<T>` signature.
+        if (!_options.IsWebAssembly || requiresValueTask)
         {
             _builder.Append($"using System.Threading.Tasks;{NewLine}");
         }

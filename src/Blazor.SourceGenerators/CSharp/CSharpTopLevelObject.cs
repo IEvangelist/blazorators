@@ -46,9 +46,15 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         GeneratorOptions options,
         string? namespaceString)
     {
+        // When any method returns `Promise<T>` we must emit
+        // `using System.Threading.Tasks;` even under WebAssembly,
+        // because Promise returns force the `ValueTask` async path
+        // regardless of hosting model.
+        var requiresValueTask = Methods?.Any(m => m.IsPromise) ?? false;
+
         var builder = new SourceBuilder(options)
             .AppendCopyRightHeader()
-            .AppendUsingDeclarations()
+            .AppendUsingDeclarations(requiresValueTask)
             .AppendNamespace(namespaceString ?? "Microsoft.JSInterop")
             .AppendPublicInterfaceDeclaration()
             .AppendOpeningCurlyBrace()
@@ -220,9 +226,14 @@ internal sealed partial record CSharpTopLevelObject(string RawTypeName)
         GeneratorOptions options,
         string? namespaceString)
     {
+        // See `ToInterfaceString` for rationale -- Promise-returning
+        // methods need `System.Threading.Tasks` under both hosting
+        // models because the async path is forced.
+        var requiresValueTask = Methods?.Any(m => m.IsPromise) ?? false;
+
         var builder = new SourceBuilder(options)
             .AppendCopyRightHeader()
-            .AppendUsingDeclarations()
+            .AppendUsingDeclarations(requiresValueTask)
             .AppendNamespace(namespaceString ?? "Microsoft.JSInterop")
             .AppendInternalImplementationDeclaration()
             .AppendOpeningCurlyBrace()
