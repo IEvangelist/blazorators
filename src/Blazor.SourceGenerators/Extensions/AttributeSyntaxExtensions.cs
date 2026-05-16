@@ -136,15 +136,35 @@ static class AttributeSyntaxExtensions
 
     private static string[]? ReadStringArray(ExpressionSyntax expr, SemanticModel? semanticModel)
     {
-        // Array literals come in two forms:
-        //   new[] { "a", "b" }      -> ImplicitArrayCreationExpressionSyntax
+        // Array literals come in three forms:
+        //   new[] { "a", "b" }       -> ImplicitArrayCreationExpressionSyntax
         //   new string[] { "a", "b" } -> ArrayCreationExpressionSyntax
-        // Both expose an Initializer with the element expressions.
+        //   ["a", "b"]                -> CollectionExpressionSyntax (C# 12+)
+        // Handle each shape via its bound syntax tree before falling back to
+        // text-based parsing - that fallback is brittle around escaped quotes
+        // and embedded commas, and only exists for shapes we don't recognize.
+        if (expr is CollectionExpressionSyntax collection)
+        {
+            var collectionValues = new List<string>();
+            foreach (var element in collection.Elements)
+            {
+                if (element is ExpressionElementSyntax exprElement)
+                {
+                    var value = ReadString(exprElement.Expression, semanticModel);
+                    if (value is not null)
+                    {
+                        collectionValues.Add(value);
+                    }
+                }
+            }
+
+            return collectionValues.Count > 0 ? collectionValues.ToArray() : null;
+        }
+
         InitializerExpressionSyntax? initializer = expr switch
         {
             ImplicitArrayCreationExpressionSyntax impl => impl.Initializer,
             ArrayCreationExpressionSyntax expl => expl.Initializer,
-            CollectionExpressionSyntax => null,
             _ => null,
         };
 

@@ -181,4 +181,95 @@ namespace Microsoft.JSInterop
         Assert.DoesNotContain("WatchPosition", text);
         Assert.DoesNotContain("GetCurrentPosition", text);
     }
+
+    [Fact]
+    public void StringArray_NewArrayInitializer_IsParsed()
+    {
+        const string source = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoGenericInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"",
+        GenericMethodDescriptors = new[] { ""getItem"", ""setItem:value"" })]
+    public partial interface ILocalStorageService { }
+}";
+        var (attribute, semanticModel) = GetAttributeAndModel(source, "JSAutoGenericInterop");
+        var options = attribute.GetGeneratorOptions(supportsGenerics: true, semanticModel);
+
+        Assert.NotNull(options.GenericMethodDescriptors);
+        Assert.Equal(["getItem", "setItem:value"], options.GenericMethodDescriptors);
+    }
+
+    [Fact]
+    public void StringArray_ExplicitlyTypedArray_IsParsed()
+    {
+        const string source = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoGenericInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"",
+        GenericMethodDescriptors = new string[] { ""getItem"" })]
+    public partial interface ILocalStorageService { }
+}";
+        var (attribute, semanticModel) = GetAttributeAndModel(source, "JSAutoGenericInterop");
+        var options = attribute.GetGeneratorOptions(supportsGenerics: true, semanticModel);
+
+        Assert.NotNull(options.GenericMethodDescriptors);
+        Assert.Equal(["getItem"], options.GenericMethodDescriptors);
+    }
+
+    [Fact]
+    public void StringArray_CollectionExpression_IsParsed()
+    {
+        // Regression: C# 12 collection-expression attribute arguments
+        // (`["a", "b"]`) used to fall through to the regex-based fallback,
+        // which silently dropped any element whose textual form included a
+        // comma or quote. The `CollectionExpressionSyntax` shape is bound to
+        // an array type by the semantic model, so we can iterate its
+        // `Elements` directly and resolve each via `GetConstantValue`.
+        const string source = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoGenericInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"",
+        GenericMethodDescriptors = [""getItem"", ""setItem:value"", ""key""])]
+    public partial interface ILocalStorageService { }
+}";
+        var (attribute, semanticModel) = GetAttributeAndModel(source, "JSAutoGenericInterop");
+        var options = attribute.GetGeneratorOptions(supportsGenerics: true, semanticModel);
+
+        Assert.NotNull(options.GenericMethodDescriptors);
+        Assert.Equal(["getItem", "setItem:value", "key"], options.GenericMethodDescriptors);
+    }
+
+    [Fact]
+    public void StringArray_CollectionExpression_ResolvesConstants()
+    {
+        // `[Constants.A, Constants.B]` — collection expression containing
+        // const references. Each element must route through `ReadString`'s
+        // semantic-constant path so const symbols are resolved.
+        const string source = @"
+namespace Microsoft.JSInterop
+{
+    internal static class Names
+    {
+        public const string GetItem = ""getItem"";
+        public const string SetItem = ""setItem:value"";
+    }
+
+    [JSAutoGenericInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"",
+        GenericMethodDescriptors = [Names.GetItem, Names.SetItem])]
+    public partial interface ILocalStorageService { }
+}";
+        var (attribute, semanticModel) = GetAttributeAndModel(source, "JSAutoGenericInterop");
+        var options = attribute.GetGeneratorOptions(supportsGenerics: true, semanticModel);
+
+        Assert.NotNull(options.GenericMethodDescriptors);
+        Assert.Equal(["getItem", "setItem:value"], options.GenericMethodDescriptors);
+    }
 }
