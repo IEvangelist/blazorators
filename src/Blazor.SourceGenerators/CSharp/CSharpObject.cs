@@ -74,8 +74,21 @@ internal record CSharpObject(
     public Dictionary<string, CSharpMethod> Methods { get; init; } =
         new(StringComparer.OrdinalIgnoreCase);
 
-    public bool IsActionParameter =>
-        IsCallback || TypeName.EndsWith("Callback");
+    /// <summary>
+    /// True when this object should be treated as a delegate/action
+    /// parameter rather than a serialized DTO. Backed entirely by
+    /// <see cref="IsCallback"/>, which is set via shape-based detection
+    /// (see <c>TypeDeclarationParser.IsCallbackTypeDeclaration</c>).
+    /// </summary>
+    /// <remarks>
+    /// A previous implementation also matched
+    /// <c>TypeName.EndsWith("Callback")</c> as a belt-and-suspenders
+    /// fallback, which misclassified any normal DTO whose name ended
+    /// with "Callback" (silently dropping it from the generated
+    /// output). The shape-based classifier handles every callback
+    /// interface in the bundled DOM declarations.
+    /// </remarks>
+    public bool IsActionParameter => IsCallback;
 
     /// <summary>
     /// True when this object was parsed from a TypeScript callback
