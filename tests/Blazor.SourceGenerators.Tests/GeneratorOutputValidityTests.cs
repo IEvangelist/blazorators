@@ -23,6 +23,11 @@ public class GeneratorOutputValidityTests : GeneratorBaseUnitTests
     [InlineData(GeolocationWasmSource)]
     [InlineData(GeolocationServerSource)]
     [InlineData(LocalStorageWasmGenericSource)]
+    [InlineData(LocalStorageServerGenericSource)]
+    [InlineData(LocalStorageWasmNonGenericSource)]
+    [InlineData(LocalStorageServerNonGenericSource)]
+    [InlineData(GeolocationWasmPureJsOnlySource)]
+    [InlineData(SessionStorageWasmGenericSource)]
     public void EveryGeneratedTree_ParsesWithoutSyntaxErrors(string source)
     {
         var result = GetRunResult(source);
@@ -68,5 +73,55 @@ namespace Microsoft.JSInterop
         Implementation = ""window.localStorage"",
         GenericMethodDescriptors = new[] { ""getItem"", ""setItem:value"" })]
     public partial interface ILocalStorageService { }
+}";
+
+    private const string LocalStorageServerGenericSource = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoGenericInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"",
+        HostingModel = BlazorHostingModel.Server,
+        GenericMethodDescriptors = new[] { ""getItem"", ""setItem:value"" })]
+    public partial interface ILocalStorageService { }
+}";
+
+    private const string LocalStorageWasmNonGenericSource = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"")]
+    public partial interface ILocalStorageService { }
+}";
+
+    private const string LocalStorageServerNonGenericSource = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.localStorage"",
+        HostingModel = BlazorHostingModel.Server)]
+    public partial interface ILocalStorageService { }
+}";
+
+    private const string GeolocationWasmPureJsOnlySource = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoInterop(
+        TypeName = ""Geolocation"",
+        Implementation = ""window.navigator.geolocation"",
+        OnlyGeneratePureJS = true)]
+    public partial interface IGeolocationService { }
+}";
+
+    private const string SessionStorageWasmGenericSource = @"
+namespace Microsoft.JSInterop
+{
+    [JSAutoGenericInterop(
+        TypeName = ""Storage"",
+        Implementation = ""window.sessionStorage"",
+        GenericMethodDescriptors = new[] { ""getItem"", ""setItem:value"" })]
+    public partial interface ISessionStorageService { }
 }";
 }
