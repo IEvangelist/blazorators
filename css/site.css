@@ -2801,14 +2801,12 @@ details.modern[open] > summary .chev {
 
 .bento-feat-split .bento-preview {
     margin: 0;
-    display: flex;
-    flex-direction: column;
 }
 
 .bento-feat-split .bento-preview pre {
-    flex: 1;
-    display: flex;
-    align-items: center;
+    font-size: 0.72rem;
+    padding: 0.7rem 0.85rem;
+    line-height: 1.55;
 }
 
 .bento-anim-stack .anim-storage-disk {
@@ -2918,9 +2916,6 @@ details.modern[open] > summary .chev {
 }
 
 /* The existing .bento-preview lives inside the right column when split. */
-.bento-feat-split .bento-preview {
-    margin: 0;
-}
 
 /* ---------- Geolocation: pulsing pin on a faint map grid ---------- */
 
@@ -3015,6 +3010,7 @@ details.modern[open] > summary .chev {
 /* ---------- Text-to-speech: equalizer bars ---------- */
 
 .bento-anim-wave {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -3155,3 +3151,426 @@ details.modern[open] > summary .chev {
 .bento-card:hover .bento-anim-wave > span { animation-duration: 0.9s; }
 .bento-card:hover .anim-pin              { animation-duration: 1.6s; }
 .bento-card:hover .orbit-core            { animation-duration: 2s; }
+
+/* =====================================================================
+   Patch: richer "audio playback" waveform for the speak card +
+   live event timeline for the /track watch-position page.
+   ===================================================================== */
+
+/* ---------- Speak: representative-spike audio waveform ---------- */
+
+/* Override the base equalizer with a more organic waveform. Bars now
+   take their height from the panel (so the scaleY actually paints),
+   and each bar follows one of four "spike profiles" so the result
+   looks like a real audio level meter rather than a uniform pulse. */
+.bento-anim-wave {
+    overflow: hidden;
+    gap: 2px;
+}
+
+.bento-anim-wave > span {
+    height: 78%;
+    border-radius: 2px;
+    transform: scaleY(0.15);
+    animation-name: spike-a;
+    animation-duration: 1.4s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: infinite;
+    box-shadow: 0 0 8px -3px hsl(var(--primary) / 0.55);
+}
+
+.bento-anim-wave > span:nth-child(4n+2) {
+    animation-name: spike-b;
+    animation-duration: 1.1s;
+}
+
+.bento-anim-wave > span:nth-child(4n+3) {
+    animation-name: spike-c;
+    animation-duration: 1.6s;
+}
+
+.bento-anim-wave > span:nth-child(4n+4) {
+    animation-name: spike-d;
+    animation-duration: 1.25s;
+}
+
+@keyframes spike-a {
+    0%, 100% { transform: scaleY(0.16); }
+    18%      { transform: scaleY(0.4);  }
+    34%      { transform: scaleY(0.92); }
+    48%      { transform: scaleY(0.55); }
+    66%      { transform: scaleY(0.78); }
+    82%      { transform: scaleY(0.3);  }
+}
+
+@keyframes spike-b {
+    0%, 100% { transform: scaleY(0.18); }
+    14%      { transform: scaleY(0.95); }
+    28%      { transform: scaleY(0.4);  }
+    44%      { transform: scaleY(0.7);  }
+    62%      { transform: scaleY(0.32); }
+    80%      { transform: scaleY(0.65); }
+}
+
+@keyframes spike-c {
+    0%, 100% { transform: scaleY(0.14); }
+    22%      { transform: scaleY(0.55); }
+    42%      { transform: scaleY(0.86); }
+    58%      { transform: scaleY(0.96); }
+    74%      { transform: scaleY(0.5);  }
+    90%      { transform: scaleY(0.25); }
+}
+
+@keyframes spike-d {
+    0%, 100% { transform: scaleY(0.12); }
+    25%      { transform: scaleY(0.22); }
+    48%      { transform: scaleY(0.98); }
+    60%      { transform: scaleY(0.7);  }
+    78%      { transform: scaleY(0.4);  }
+}
+
+/* Faint silence line at the centre so peaks read clearly. */
+.bento-anim-wave::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        hsl(var(--primary) / 0.22) 50%,
+        transparent 100%);
+    transform: translateY(-0.5px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Playhead sweep — a soft vertical glow that travels across the bars
+   to simulate audio playback progress. */
+.bento-anim-wave::after {
+    content: '';
+    position: absolute;
+    top: 8%;
+    bottom: 8%;
+    left: 0;
+    width: 32px;
+    background: radial-gradient(
+        ellipse at center,
+        hsl(var(--primary) / 0.35) 0%,
+        hsl(var(--primary) / 0.12) 35%,
+        transparent 70%);
+    transform: translateX(-100%);
+    animation: playhead-sweep 4.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    filter: blur(0.5px);
+}
+
+@keyframes playhead-sweep {
+    0%   { transform: translateX(-100%); opacity: 0; }
+    8%   { opacity: 0.95; }
+    50%  { opacity: 0.95; }
+    92%  { opacity: 0.95; }
+    100% { transform: translateX(calc(100% + 32px)); opacity: 0; }
+}
+
+.bento-card:hover .bento-anim-wave > span,
+.bento-card:hover .bento-anim-wave > span:nth-child(4n+2),
+.bento-card:hover .bento-anim-wave > span:nth-child(4n+3),
+.bento-card:hover .bento-anim-wave > span:nth-child(4n+4) {
+    animation-duration: 0.85s;
+}
+
+.bento-card:hover .bento-anim-wave::after {
+    animation-duration: 2.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bento-anim-wave > span,
+    .bento-anim-wave::after {
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+/* ---------- /track: live event timeline ---------- */
+
+/* Side-by-side map + timeline on desktop, stacked on mobile. */
+.track-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+@media (min-width: 960px) {
+    .track-grid {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+}
+
+.track-grid-map {
+    min-width: 0;
+}
+
+.track-grid-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1rem 1rem 1.1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--surface));
+    box-shadow:
+        0 1px 0 hsl(var(--border)),
+        0 8px 24px -16px hsl(0 0% 0% / 0.18);
+    min-width: 0;
+    max-height: 32rem;
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid hsl(var(--border));
+}
+
+.timeline-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: hsl(var(--foreground));
+}
+
+.timeline-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid hsl(var(--primary) / 0.25);
+    white-space: nowrap;
+}
+
+.timeline-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1rem;
+    color: hsl(var(--muted-foreground));
+    text-align: center;
+}
+
+.timeline-empty .icon {
+    width: 28px;
+    height: 28px;
+    opacity: 0.55;
+    animation: compass-spin 6s linear infinite;
+}
+
+.timeline-empty p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+@keyframes compass-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0.35rem 0 0.1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.timeline::-webkit-scrollbar {
+    width: 8px;
+}
+
+.timeline::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+}
+
+.timeline-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 0.65rem;
+    align-items: start;
+    padding-left: 0.1rem;
+    animation: timeline-splat 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Continuous rail behind the dots. */
+.timeline-entry::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 18px;
+    bottom: -0.7rem;
+    width: 2px;
+    background: linear-gradient(
+        to bottom,
+        hsl(var(--primary) / 0.3) 0%,
+        hsl(var(--border)) 100%);
+    border-radius: 1px;
+}
+
+.timeline-entry:last-child::before {
+    display: none;
+}
+
+.timeline-dot {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: hsl(var(--surface));
+    color: hsl(var(--primary));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid hsl(var(--primary));
+    box-shadow:
+        0 0 0 4px hsl(var(--background)),
+        0 0 16px -2px hsl(var(--primary) / 0.55);
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.timeline-entry:first-child .timeline-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 999px;
+    border: 2px solid hsl(var(--primary) / 0.55);
+    animation: timeline-dot-pulse 1.8s ease-out infinite;
+}
+
+@keyframes timeline-dot-pulse {
+    0%   { transform: scale(0.8); opacity: 0.85; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
+
+.timeline-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 4px);
+    background: hsl(var(--background));
+    box-shadow: 0 1px 0 hsl(var(--border));
+    min-width: 0;
+}
+
+.timeline-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.timeline-time {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    font-variant-numeric: tabular-nums;
+}
+
+.timeline-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    border: 1px solid hsl(var(--border));
+    white-space: nowrap;
+}
+
+.timeline-stats {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem 0.85rem;
+}
+
+.timeline-stats > div {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.timeline-stats dt {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    color: hsl(var(--muted-foreground));
+    text-transform: lowercase;
+    flex-shrink: 0;
+}
+
+.timeline-stats dd {
+    margin: 0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.74rem;
+    color: hsl(var(--foreground));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* "Splat" entrance — slide in from the rail with a subtle bounce
+   and an instantaneous flash on the dot. */
+@keyframes timeline-splat {
+    0%   {
+        opacity: 0;
+        transform: translateX(-12px) scale(0.96);
+    }
+    60%  {
+        opacity: 1;
+        transform: translateX(2px) scale(1.01);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .timeline-entry,
+    .timeline-dot::after,
+    .timeline-empty .icon {
+        animation: none !important;
+    }
+}
