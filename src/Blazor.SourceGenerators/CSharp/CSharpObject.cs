@@ -158,7 +158,7 @@ internal record CSharpObject(
         CSharpProperty member)
     {
         var mappedTypeName = member.MappedTypeName;
-        var nullableSuffix = member.IsNullable && !mappedTypeName.EndsWith("?") ? "?" : "";
+        var nullableSuffix = member.IsNullable && !mappedTypeName.EndsWith("?", StringComparison.Ordinal) ? "?" : "";
         var arraySuffix = member.IsArray ? "[]" : "";
         var isPrimitive = TypeMap.PrimitiveTypes.IsPrimitiveType(mappedTypeName);
         var initializer = member.IsNullable ||

@@ -30,7 +30,7 @@ internal static class CSharpPropertyExtensions
         // Mirrors the parallel logic in `CSharpObject.AppendProperty`.
         var mappedTypeName = property.MappedTypeName;
         var arraySuffix = property.IsArray ? "[]" : "";
-        var nullableSuffix = property.IsNullable && !mappedTypeName.EndsWith("?") ? "?" : "";
+        var nullableSuffix = property.IsNullable && !mappedTypeName.EndsWith("?", StringComparison.Ordinal) ? "?" : "";
         var bareType = $"{mappedTypeName}{arraySuffix}{nullableSuffix}";
 
         return (

@@ -95,7 +95,7 @@ internal sealed partial class TypeDeclarationParser
                     continue;
                 }
 
-                var isReadonly = name.StartsWith("readonly ");
+                var isReadonly = name.StartsWith("readonly ", StringComparison.Ordinal);
                 // TS uses `?:` (optional), ` | null`, and ` | undefined`
                 // somewhat interchangeably for "this value might not
                 // be present". They all collapse to a C# nullable
@@ -105,7 +105,7 @@ internal sealed partial class TypeDeclarationParser
                 // the regex captures whitespace-trimmed content so a
                 // leading space (` | null` vs `| null`) needs to be
                 // tolerated by checking both spellings.
-                var isNullable = name.EndsWith("?")
+                var isNullable = name.EndsWith("?", StringComparison.Ordinal)
                     || type.EndsWith("| null", StringComparison.Ordinal)
                     || type.EndsWith("| undefined", StringComparison.Ordinal);
 
@@ -211,11 +211,11 @@ internal sealed partial class TypeDeclarationParser
                     continue;
                 }
 
-                var isReadonly = name.StartsWith("readonly ");
+                var isReadonly = name.StartsWith("readonly ", StringComparison.Ordinal);
                 // See `ToObject` for rationale: `?:`, ` | null`,
                 // and ` | undefined` all collapse to a C# nullable
                 // property; both clause suffixes need to be detected.
-                var isNullable = name.EndsWith("?")
+                var isNullable = name.EndsWith("?", StringComparison.Ordinal)
                     || type.EndsWith("| null", StringComparison.Ordinal)
                     || type.EndsWith("| undefined", StringComparison.Ordinal);
 
@@ -308,7 +308,7 @@ internal sealed partial class TypeDeclarationParser
             values.Select(v => v.Trim())?.ToList()
             is { Count: > 0 } list)
         {
-            var isStringAlias = list.All(v => v.StartsWith("\"") && v.EndsWith("\""));
+            var isStringAlias = list.All(v => v.StartsWith("\"", StringComparison.Ordinal) && v.EndsWith("\"", StringComparison.Ordinal));
             if (isStringAlias)
             {
                 return hadNullClause ? "string | null" : "string";

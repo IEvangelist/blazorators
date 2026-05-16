@@ -54,7 +54,7 @@ internal record CSharpProperty(
         }
     }
 
-    public bool IsIndexer => RawName.StartsWith("[") && RawName.EndsWith("]");
+    public bool IsIndexer => RawName.StartsWith("[", StringComparison.Ordinal) && RawName.EndsWith("]", StringComparison.Ordinal);
 
     public bool IsArray =>
         TypeShape.IsArrayShape(TypeShape.StripNullClause(RawTypeName));

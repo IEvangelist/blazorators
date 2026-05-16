@@ -52,12 +52,12 @@ static class StringExtensions
     internal static string CapitalizeFirstLetter(this string name) =>
         string.IsNullOrEmpty(name)
             ? name
-            : $"{char.ToUpper(name[0])}{name.Substring(1)}";
+            : $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
 
     internal static string LowerCaseFirstLetter(this string name) =>
         string.IsNullOrEmpty(name)
             ? name
-            : $"{char.ToLower(name[0])}{name.Substring(1)}";
+            : $"{char.ToLowerInvariant(name[0])}{name.Substring(1)}";
 
     internal static string ToGeneratedFileName(this string name) => $"{name}.g.cs";
 
