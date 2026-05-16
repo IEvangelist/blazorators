@@ -15,11 +15,11 @@ internal readonly record struct Indentation(int Level, int Spaces = 4)
     internal Indentation Reset() => ResetTo(0);
 
     /// <summary>
-    /// Resets the indentation level to the specified value.
+    /// Resets the indentation level to the specified value (clamped to zero or above).
     /// </summary>
-    /// <param name="level">The new indentation level.</param>
+    /// <param name="level">The new indentation level. Negative values are clamped to <c>0</c>.</param>
     /// <returns>A new <see cref="Indentation"/> instance with the updated level.</returns>
-    internal Indentation ResetTo(int level) => this with { Level = level };
+    internal Indentation ResetTo(int level) => this with { Level = Math.Max(0, level) };
 
     /// <summary>
     /// Increases the indentation level by one, with an optional extra increment.
@@ -29,11 +29,12 @@ internal readonly record struct Indentation(int Level, int Spaces = 4)
     internal Indentation Increase(int extra = 0) => this with { Level = Level + 1 + extra };
     
     /// <summary>
-    /// Decreases the indentation level by the specified amount.
+    /// Decreases the indentation level by the specified amount, never going below zero.
     /// </summary>
     /// <param name="extra">The additional amount to decrease the indentation level by.</param>
     /// <returns>A new <see cref="Indentation"/> instance with the decremented indentation level.</returns>
-    internal Indentation Decrease(int extra = 0) => this with { Level = Level - 1 - extra };
+    internal Indentation Decrease(int extra = 0) =>
+        this with { Level = Math.Max(0, Level - 1 - extra) };
 
     /// <summary>
     /// Returns a <see langword="string"/> representation of the current indentation level.
