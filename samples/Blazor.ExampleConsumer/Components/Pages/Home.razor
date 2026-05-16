@@ -76,20 +76,47 @@
             Source generators emit the full <code>ILocalStorageService</code>
             interface from <code>lib.dom.d.ts</code>.
         </p>
-        <div class="bento-preview" aria-hidden="true">
-            <span class="bento-preview-head">
-                <Icon Name="code" Class="icon-sm" />
-                <span>Storage.razor</span>
-                <span class="bento-preview-dot"></span>
-                <span class="bento-preview-dot"></span>
-                <span class="bento-preview-dot"></span>
-            </span>
+
+        <div class="bento-feat-split" aria-hidden="true">
+            <div class="bento-anim bento-anim-stack">
+                <div class="anim-storage-disk">
+                    <Icon Name="database" Class="icon-sm" />
+                    <span>localStorage</span>
+                </div>
+                <div class="anim-todo" style="--n:0">
+                    <span class="anim-todo-check"><Icon Name="check" Class="icon-xs" /></span>
+                    <span class="anim-todo-text">Ship bento UX</span>
+                </div>
+                <div class="anim-todo" style="--n:1">
+                    <span class="anim-todo-check"><Icon Name="check" Class="icon-xs" /></span>
+                    <span class="anim-todo-text">Wire spotlight</span>
+                </div>
+                <div class="anim-todo" style="--n:2">
+                    <span class="anim-todo-check"><Icon Name="check" Class="icon-xs" /></span>
+                    <span class="anim-todo-text">Persist state</span>
+                </div>
+                <div class="anim-todo" style="--n:3">
+                    <span class="anim-todo-check"><Icon Name="check" Class="icon-xs" /></span>
+                    <span class="anim-todo-text">Push to prod</span>
+                </div>
+            </div>
+
+            <div class="bento-preview">
+                <span class="bento-preview-head">
+                    <Icon Name="code" Class="icon-sm" />
+                    <span>Storage.razor</span>
+                    <span class="bento-preview-dot"></span>
+                    <span class="bento-preview-dot"></span>
+                    <span class="bento-preview-dot"></span>
+                </span>
 <pre><code class="hljs language-csharp"><span class="hljs-meta">@@inject</span> <span class="hljs-built_in">ILocalStorageService</span> Storage
 
 <span class="hljs-keyword">await</span> Storage.<span class="hljs-title function_">SetItemAsync</span>(<span class="hljs-string">"todos"</span>, _todos);
 <span class="hljs-keyword">var</span> items = <span class="hljs-keyword">await</span> Storage
     .<span class="hljs-title function_">GetItemAsync</span>&lt;<span class="hljs-built_in">List</span>&lt;<span class="hljs-built_in">Todo</span>&gt;&gt;(<span class="hljs-string">"todos"</span>);</code></pre>
+            </div>
         </div>
+
         <span class="feature-link">
             Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
@@ -102,6 +129,15 @@
             Resolve the user's position, pinned on a vector map powered
             by OpenStreetMap data &mdash; no API key, no quota.
         </p>
+        <div class="bento-anim bento-anim-pin" aria-hidden="true">
+            <span class="anim-map-grid"></span>
+            <span class="anim-ripple anim-ripple-a"></span>
+            <span class="anim-ripple anim-ripple-b"></span>
+            <span class="anim-ripple anim-ripple-c"></span>
+            <span class="anim-pin">
+                <Icon Name="map-pin" Class="icon-sm" />
+            </span>
+        </div>
         <span class="feature-link">
             Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
@@ -115,6 +151,28 @@
             strongly-typed callback. Cancel with a single
             <code>IDisposable</code>.
         </p>
+        <div class="bento-anim bento-anim-route" aria-hidden="true">
+            <svg viewBox="0 0 240 120" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="routeGrad" x1="0" x2="1" y1="0" y2="0">
+                        <stop offset="0%" stop-color="hsl(var(--primary))" stop-opacity="0.1" />
+                        <stop offset="100%" stop-color="hsl(var(--primary))" stop-opacity="1" />
+                    </linearGradient>
+                </defs>
+                <path class="anim-route-bg"
+                      d="M10 90 Q 50 30, 90 60 T 170 50 T 230 25"
+                      fill="none" stroke="hsl(var(--border))" stroke-width="2" />
+                <path class="anim-route-fg"
+                      d="M10 90 Q 50 30, 90 60 T 170 50 T 230 25"
+                      fill="none" stroke="url(#routeGrad)" stroke-width="2.5"
+                      stroke-linecap="round" />
+                <circle class="anim-route-dot" r="4"
+                        fill="hsl(var(--primary))">
+                    <animateMotion dur="3s" repeatCount="indefinite" rotate="auto"
+                                   path="M10 90 Q 50 30, 90 60 T 170 50 T 230 25" />
+                </circle>
+            </svg>
+        </div>
         <span class="feature-link">
             Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
@@ -127,6 +185,32 @@
             Drive the browser's speech synthesiser. Pick a voice,
             tweak rate &amp; pitch, ship a single C# call.
         </p>
+        <div class="bento-anim bento-anim-wave" aria-hidden="true">
+            <span style="--n:0"></span>
+            <span style="--n:1"></span>
+            <span style="--n:2"></span>
+            <span style="--n:3"></span>
+            <span style="--n:4"></span>
+            <span style="--n:5"></span>
+            <span style="--n:6"></span>
+            <span style="--n:7"></span>
+            <span style="--n:8"></span>
+            <span style="--n:9"></span>
+            <span style="--n:10"></span>
+            <span style="--n:11"></span>
+            <span style="--n:12"></span>
+            <span style="--n:13"></span>
+            <span style="--n:14"></span>
+            <span style="--n:15"></span>
+            <span style="--n:16"></span>
+            <span style="--n:17"></span>
+            <span style="--n:18"></span>
+            <span style="--n:19"></span>
+            <span style="--n:20"></span>
+            <span style="--n:21"></span>
+            <span style="--n:22"></span>
+            <span style="--n:23"></span>
+        </div>
         <span class="feature-link">
             Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
@@ -139,6 +223,12 @@
             Subscribe to live transcripts from the Web Speech API with a
             cancellable <code>IDisposable</code> session.
         </p>
+        <div class="bento-anim bento-anim-transcript" aria-hidden="true">
+            <div class="anim-bubble" style="--n:0">"Hey Blazor"</div>
+            <div class="anim-bubble" style="--n:1">"Subscribe to me"</div>
+            <div class="anim-bubble" style="--n:2">"Strongly typed, please"</div>
+            <div class="anim-bubble" style="--n:3">"Dispose when done"</div>
+        </div>
         <span class="feature-link">
             Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
@@ -151,6 +241,15 @@
             Callback-style geolocation rendered on the same MapLibre +
             OpenFreeMap stack. Tweak away.
         </p>
+        <div class="bento-anim bento-anim-orbit" aria-hidden="true">
+            <span class="orbit-core"><Icon Name="rocket" Class="icon-sm" /></span>
+            <span class="orbit-ring orbit-r1"></span>
+            <span class="orbit-ring orbit-r2"></span>
+            <span class="orbit-chip" style="--a:0deg;   --r:46px"><Icon Name="map-pin" Class="icon-xs" /></span>
+            <span class="orbit-chip" style="--a:90deg;  --r:46px"><Icon Name="code"    Class="icon-xs" /></span>
+            <span class="orbit-chip" style="--a:180deg; --r:46px"><Icon Name="mic"     Class="icon-xs" /></span>
+            <span class="orbit-chip" style="--a:270deg; --r:46px"><Icon Name="volume"  Class="icon-xs" /></span>
+        </div>
         <span class="feature-link">
             Open <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
