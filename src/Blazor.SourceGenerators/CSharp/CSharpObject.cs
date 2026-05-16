@@ -110,6 +110,20 @@ internal record CSharpObject(
 
         foreach (var kvp in Properties)
         {
+            // TypeScript index signatures (`[key: string]: T;`) appear in
+            // the parsed property dictionary because the shared property
+            // regex matches them, but they have no direct C# property
+            // analogue -- the raw indexer key (`[index: number]`) is not
+            // a legal identifier. The top-level emit path already skips
+            // these via `IsIndexer`; mirror that filter here so dependent
+            // DTOs pulled in transitively (e.g. through a property typed
+            // as `CSSRuleList` or `HTMLCollection`, both of which carry
+            // `[index: number]: T;`) don't break the consumer's build.
+            if (kvp.Value.IsIndexer)
+            {
+                continue;
+            }
+
             AppendProperty(builder, TypeName, kvp.Key, kvp.Value);
         }
 
