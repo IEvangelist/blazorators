@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Blazor.SourceGenerators.CSharp;
+using Blazor.SourceGenerators.Extensions;
 using Xunit;
 
 namespace Blazor.SourceGenerators.Tests;
@@ -58,5 +59,38 @@ public class CSharpPropertyTests
 
         Assert.False(property.IsArray);
         Assert.Equal("Map<string, string>", property.MappedTypeName);
+    }
+
+    [Theory]
+    [InlineData("string[]", "string[]")]
+    [InlineData("ReadonlyArray<string>", "string[]")]
+    [InlineData("Array<string>", "string[]")]
+    [InlineData("number[]", "double[]")]
+    [InlineData("FontFace[]", "FontFace[]")]
+    public void GetPropertyTypes_PreservesArraySuffix_OnWasm(string rawType, string expected)
+    {
+        // Regression: `MappedTypeName` returns the element type, so the
+        // property-emit helper must re-attach `[]` when `IsArray` is true.
+        // Without this, top-level interface properties with array-shaped
+        // TypeScript types lost the `[]` suffix.
+        var property = new CSharpProperty("items", rawType);
+        var options = new GeneratorOptions(SupportsGenerics: false, IsWebAssembly: true);
+
+        var (returnType, bareType) = property.GetPropertyTypes(options);
+
+        Assert.Equal(expected, bareType);
+        Assert.Equal(expected, returnType);
+    }
+
+    [Fact]
+    public void GetPropertyTypes_PreservesArraySuffix_OnServer()
+    {
+        var property = new CSharpProperty("items", "string[]");
+        var options = new GeneratorOptions(SupportsGenerics: false, IsWebAssembly: false);
+
+        var (returnType, bareType) = property.GetPropertyTypes(options);
+
+        Assert.Equal("string[]", bareType);
+        Assert.Equal("ValueTask<string[]>", returnType);
     }
 }
