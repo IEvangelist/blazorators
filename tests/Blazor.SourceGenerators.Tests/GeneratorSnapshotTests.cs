@@ -146,6 +146,30 @@ public class GeneratorSnapshotTests : GeneratorBaseUnitTests
     }
 
     /// <summary>
+    /// Pins the DI extension class shape for the Permissions service.
+    /// The DI extension is the user-facing wiring API
+    /// (<c>AddPermissionsServices</c>) and its registration shape is
+    /// sensitive to <see cref="GeneratorOptions.IsWebAssembly"/> --
+    /// WASM hosting goes through an <c>AddSingleton</c> that adapts
+    /// the host's <see cref="IJSRuntime"/> to <see cref="IJSInProcessRuntime"/>
+    /// before binding the implementation. Pinning the snapshot
+    /// catches accidental regressions to that wiring (e.g. a switch
+    /// to <c>Scoped</c> would silently break <c>InvokeUnmarshalled</c>
+    /// semantics).
+    /// </summary>
+    [Fact]
+    public void Permissions_WebAssembly_Snapshot_ServiceCollectionExtensions()
+    {
+        var result = GetRunResult(PermissionsWasmSource);
+        var actual = ReadFile(result, "PermissionsServiceCollectionExtensions.g.cs");
+
+        SnapshotAsserter.AssertMatchesSnapshot(
+            scenario: "Permissions_Wasm",
+            fileName: "PermissionsServiceCollectionExtensions.g.cs",
+            actual: actual);
+    }
+
+    /// <summary>
     /// Pins the generated <c>PermissionDescriptor</c> DTO emitted as a
     /// transitive dependency of <c>Permissions.query</c>. The DTO
     /// carries a single <c>name: PermissionName</c> property where
