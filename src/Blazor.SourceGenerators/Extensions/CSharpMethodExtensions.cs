@@ -52,15 +52,29 @@ internal static class CSharpMethodExtensions
         // etc.) and array-of-custom nullables (`Node[] | null`) the peel
         // routes through the array-element resolution and re-attaches
         // `?` at the end.
+        //
+        // For `Promise<T>` return types the wrapper is peeled here and
+        // forwarded into the same primitive / array / nullable resolution
+        // pipeline. `IsPromise` also forces the async invocation path
+        // below: even under WebAssembly the wrapped value can't resolve
+        // synchronously, so the method must return `ValueTask<T>` (or
+        // `ValueTask` for `Promise<void>`) and call `InvokeAsync`.
+        var rawBare = method.IsPromise
+            ? method.PromiseUnwrappedTypeName
+            : method.RawReturnTypeName;
+        var rawBareIsPrimitive = method.IsPromise
+            ? TypeMap.PrimitiveTypes.IsPrimitiveType(rawBare)
+            : isPrimitiveType;
+
         string primitiveType;
-        if (isPrimitiveType)
+        if (rawBareIsPrimitive)
         {
-            primitiveType = TypeMap.PrimitiveTypes[method.RawReturnTypeName];
+            primitiveType = TypeMap.PrimitiveTypes[rawBare];
         }
         else
         {
-            var bare = TypeShape.StripNullClause(method.RawReturnTypeName);
-            var hadNullClause = bare.Length != method.RawReturnTypeName.Length;
+            var bare = TypeShape.StripNullClause(rawBare);
+            var hadNullClause = bare.Length != rawBare.Length;
 
             string resolved;
             if (TypeShape.TryGetArrayElementTypeName(bare, out var arrayElement)
@@ -91,7 +105,7 @@ internal static class CSharpMethodExtensions
         // circuits on void return), the `isPrimitiveType` branch otherwise
         // emits `ValueTask<void>` for Server hosting — illegal C#.
         var isJavaScriptOverride = method.IsJavaScriptOverride(options);
-        if (options.IsWebAssembly && !isJavaScriptOverride)
+        if (options.IsWebAssembly && !isJavaScriptOverride && !method.IsPromise)
         {
             var returnType = method.IsVoid
                 ? "void"

@@ -77,6 +77,17 @@ internal readonly record struct MethodBuilderDetails(
             ? ("", "IJSInProcessRuntime")
             : ("Async", "IJSRuntime");
 
+        // A TS `Promise<T>` return type cannot be resolved synchronously.
+        // Force the async invocation path (`InvokeAsync` /
+        // `InvokeVoidAsync` + `ValueTask`-wrapped return) even when
+        // hosting under WebAssembly. The `_javaScript` field stays
+        // `IJSInProcessRuntime` because it inherits `InvokeAsync<T>` from
+        // `IJSRuntime`, so the runtime dependency does not change.
+        if (method.IsPromise)
+        {
+            suffix = "Async";
+        }
+
         if (method.IsJavaScriptOverride(options) && options.Implementation is not null)
         {
             var impl =

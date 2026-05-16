@@ -19,7 +19,41 @@ internal record CSharpMethod(
         RawReturnTypeName.EndsWith(" | null", StringComparison.Ordinal) ||
         RawReturnTypeName.Equals("null", StringComparison.Ordinal);
 
-    public bool IsVoid => RawReturnTypeName is "void";
+    public bool IsVoid =>
+        RawReturnTypeName is "void" ||
+        (IsPromise && PromiseUnwrappedTypeName is "void");
+
+    /// <summary>
+    /// True when the raw return type is a TypeScript
+    /// <c>Promise&lt;T&gt;</c> shape. The DOM has hundreds of these
+    /// (<c>Permissions.query()</c>, <c>Body.arrayBuffer()</c>,
+    /// <c>AudioContext.close()</c>, ...). Without explicit handling
+    /// the emitter dropped the verbatim <c>Promise&lt;T&gt;</c> token
+    /// into the C# method signature, which is not a CLR type. The
+    /// generator now peels the wrapper and forces the async invocation
+    /// path (<c>InvokeAsync</c> / <c>ValueTask&lt;T&gt;</c>) even when
+    /// hosting under WebAssembly, since a Promise cannot be resolved
+    /// synchronously.
+    /// </summary>
+    public bool IsPromise =>
+        RawReturnTypeName.StartsWith("Promise<", StringComparison.Ordinal) &&
+        RawReturnTypeName.EndsWith(">", StringComparison.Ordinal);
+
+    /// <summary>
+    /// When <see cref="IsPromise"/> is <c>true</c>, returns the type
+    /// argument of the <c>Promise&lt;...&gt;</c> shape (e.g.
+    /// <c>"PermissionStatus"</c> for <c>Promise&lt;PermissionStatus&gt;</c>,
+    /// <c>"void"</c> for <c>Promise&lt;void&gt;</c>). Otherwise
+    /// returns <see cref="RawReturnTypeName"/> verbatim so callers can
+    /// use this property as the single source of truth for the
+    /// "bareTypeBeforeMapping" downstream of the parser.
+    /// </summary>
+    public string PromiseUnwrappedTypeName =>
+        IsPromise
+            ? RawReturnTypeName.Substring(
+                "Promise<".Length,
+                RawReturnTypeName.Length - "Promise<".Length - 1)
+            : RawReturnTypeName;
 
     public Dictionary<string, CSharpObject> DependentTypes { get; init; }
         = new(StringComparer.OrdinalIgnoreCase);
