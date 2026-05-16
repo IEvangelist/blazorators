@@ -1,19 +1,40 @@
 @page "/"
+@inject IJSRuntime JS
+@implements IAsyncDisposable
 
-<section class="hero">
-    <span class="hero-eyebrow">
+<section class="hero hero-lit" data-reveal>
+    <div class="hero-aurora" aria-hidden="true">
+        <span class="aurora-blob a1"></span>
+        <span class="aurora-blob a2"></span>
+        <span class="aurora-blob a3"></span>
+        <span class="aurora-grid"></span>
+    </div>
+
+    <span class="hero-eyebrow" style="--i:0">
         <span class="badge-dot live" aria-hidden="true"></span>
         Source-generated JS interop for Blazor
     </span>
-    <h1>Browser APIs, <span class="grad">type-safe</span> in C#.</h1>
-    <p class="hero-lede">
+
+    <h1 style="--i:1">
+        Browser APIs,
+        <span class="word-rotator" aria-label="type-safe, ergonomic, promised, generated">
+            <span class="grad">type-safe</span>
+            <span class="grad">ergonomic</span>
+            <span class="grad">promised</span>
+            <span class="grad">generated</span>
+        </span>
+        in&nbsp;C#.
+    </h1>
+
+    <p class="hero-lede" style="--i:2">
         Blazorators is a collection of Roslyn source generators that
         author idiomatic, strongly-typed wrappers around the browser's
         web APIs &mdash; no hand-written <code>IJSRuntime</code> glue
         required. Every demo on this page is powered by a Blazorators
         package.
     </p>
-    <div class="hero-cta">
+
+    <div class="hero-cta" style="--i:3">
         <a class="btn btn-primary" href="todos">
             <Icon Name="play" /> See the demos
         </a>
@@ -24,66 +45,145 @@
             <Icon Name="external-link" Class="icon-sm" />
         </a>
     </div>
+
+    <ul class="hero-stats" aria-label="At a glance" style="--i:4">
+        <li>
+            <strong>0</strong>
+            <span>lines of JS glue</span>
+        </li>
+        <li>
+            <strong>7</strong>
+            <span>browser APIs covered</span>
+        </li>
+        <li>
+            <strong>100%</strong>
+            <span>nullable&#8209;annotated</span>
+        </li>
+        <li>
+            <strong>net8 &middot; net9 &middot; net10</strong>
+            <span>multi-targeted</span>
+        </li>
+    </ul>
 </section>
 
-<section class="grid-feat" aria-label="Demos">
-    <a class="feature-card" href="todos">
-        <span class="feature-icon"><Icon Name="database" /></span>
-        <h3>Local storage</h3>
-        <p>Bind a <code>HashSet&lt;Todo&gt;</code> straight through to
-           <code>window.localStorage</code> with zero JS plumbing.</p>
+<section class="bento" aria-label="Demos">
+    <a class="bento-card bento-feat" href="todos" data-spotlight style="--i:0">
+        <span class="feature-icon glow"><Icon Name="database" /></span>
+        <h3>Local storage, type-safe</h3>
+        <p>
+            Bind a <code>HashSet&lt;Todo&gt;</code> straight through to
+            <code>window.localStorage</code> with zero JS plumbing.
+            Source generators emit the full <code>ILocalStorageService</code>
+            interface from <code>lib.dom.d.ts</code>.
+        </p>
+        <div class="bento-preview" aria-hidden="true">
+            <span class="bento-preview-head">
+                <Icon Name="code" Class="icon-sm" />
+                <span>Storage.razor</span>
+                <span class="bento-preview-dot"></span>
+                <span class="bento-preview-dot"></span>
+                <span class="bento-preview-dot"></span>
+            </span>
+<pre><code class="hljs language-csharp"><span class="hljs-meta">@@inject</span> <span class="hljs-built_in">ILocalStorageService</span> Storage
+
+<span class="hljs-keyword">await</span> Storage.<span class="hljs-title function_">SetItemAsync</span>(<span class="hljs-string">"todos"</span>, _todos);
+<span class="hljs-keyword">var</span> items = <span class="hljs-keyword">await</span> Storage
+    .<span class="hljs-title function_">GetItemAsync</span>&lt;<span class="hljs-built_in">List</span>&lt;<span class="hljs-built_in">Todo</span>&gt;&gt;(<span class="hljs-string">"todos"</span>);</code></pre>
+        </div>
         <span class="feature-link">
-            Try it <Icon Name="arrow-right" Class="icon-sm" />
+            Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
     </a>
 
-    <a class="feature-card" href="geolocation">
+    <a class="bento-card" href="geolocation" data-spotlight style="--i:1">
         <span class="feature-icon"><Icon Name="map-pin" /></span>
         <h3>Geolocation</h3>
-        <p>Resolve the user's position, pinned on a vector map powered
-           by OpenStreetMap data &mdash; no API key, no quota.</p>
+        <p>
+            Resolve the user's position, pinned on a vector map powered
+            by OpenStreetMap data &mdash; no API key, no quota.
+        </p>
         <span class="feature-link">
-            Try it <Icon Name="arrow-right" Class="icon-sm" />
+            Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
     </a>
 
-    <a class="feature-card" href="track">
+    <a class="bento-card" href="track" data-spotlight style="--i:2">
         <span class="feature-icon"><Icon Name="route" /></span>
         <h3>Watch position</h3>
-        <p>Subscribe to live <code>watchPosition</code> updates with a
-           strongly-typed <code>IObservable</code>-style callback.</p>
+        <p>
+            Subscribe to live <code>watchPosition</code> updates with a
+            strongly-typed callback. Cancel with a single
+            <code>IDisposable</code>.
+        </p>
         <span class="feature-link">
-            Try it <Icon Name="arrow-right" Class="icon-sm" />
+            Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
     </a>
 
-    <a class="feature-card" href="speak">
+    <a class="bento-card" href="speak" data-spotlight style="--i:3">
         <span class="feature-icon"><Icon Name="volume" /></span>
         <h3>Text-to-speech</h3>
-        <p>Drive the browser's speech synthesiser. Pick a voice,
-           tweak rate &amp; pitch, ship a single C# call.</p>
+        <p>
+            Drive the browser's speech synthesiser. Pick a voice,
+            tweak rate &amp; pitch, ship a single C# call.
+        </p>
         <span class="feature-link">
-            Try it <Icon Name="arrow-right" Class="icon-sm" />
+            Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
     </a>
 
-    <a class="feature-card" href="listen">
+    <a class="bento-card" href="listen" data-spotlight style="--i:4">
         <span class="feature-icon"><Icon Name="mic" /></span>
         <h3>Speech-to-text</h3>
-        <p>Subscribe to live transcripts from the Web Speech API with a
-           cancellable <code>IDisposable</code> session.</p>
+        <p>
+            Subscribe to live transcripts from the Web Speech API with a
+            cancellable <code>IDisposable</code> session.
+        </p>
         <span class="feature-link">
-            Try it <Icon Name="arrow-right" Class="icon-sm" />
+            Try it <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
     </a>
 
-    <a class="feature-card" href="sandbox">
+    <a class="bento-card" href="sandbox" data-spotlight style="--i:5">
         <span class="feature-icon"><Icon Name="rocket" /></span>
         <h3>Sandbox</h3>
-        <p>Callback-style geolocation rendered on the same MapLibre +
-           OpenFreeMap stack. Tweak away.</p>
+        <p>
+            Callback-style geolocation rendered on the same MapLibre +
+            OpenFreeMap stack. Tweak away.
+        </p>
         <span class="feature-link">
-            Open <Icon Name="arrow-right" Class="icon-sm" />
+            Open <Icon Name="arrow-right" Class="icon-sm arrow" />
         </span>
     </a>
 </section>
+
+@code {
+    IJSObjectReference? _spotlight;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            _spotlight = await JS.InvokeAsync<IJSObjectReference>("import", "./spotlight.js");
+            await _spotlight.InvokeVoidAsync("init", ".bento");
+        }
+        catch
+        {
+            // Spotlight is purely decorative — never fail the page on its account.
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_spotlight is not null)
+        {
+            try { await _spotlight.DisposeAsync(); }
+            catch { /* ignore */ }
+        }
+    }
+}
