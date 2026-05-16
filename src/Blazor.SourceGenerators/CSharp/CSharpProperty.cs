@@ -39,28 +39,43 @@ internal record CSharpProperty(
     public bool IsIndexer => RawName.StartsWith("[") && RawName.EndsWith("]");
 
     public bool IsArray =>
-        RawTypeName.EndsWith("[]") ||
-        IsGenericArrayForm(RawTypeName, "ReadonlyArray<") ||
-        IsGenericArrayForm(RawTypeName, "Array<");
+        IsArrayShape(StripNullClause(RawTypeName));
+
+    private static bool IsArrayShape(string rawTypeName) =>
+        rawTypeName.EndsWith("[]", StringComparison.Ordinal) ||
+        IsGenericArrayForm(rawTypeName, "ReadonlyArray<") ||
+        IsGenericArrayForm(rawTypeName, "Array<");
 
     private static bool IsGenericArrayForm(string rawTypeName, string prefix) =>
         rawTypeName.StartsWith(prefix, StringComparison.Ordinal) &&
         rawTypeName.EndsWith(">", StringComparison.Ordinal);
 
+    private static string StripNullClause(string rawTypeName) =>
+        rawTypeName.EndsWith(" | null", StringComparison.Ordinal)
+            ? rawTypeName.Substring(0, rawTypeName.Length - " | null".Length)
+            : rawTypeName;
+
     private static bool TryGetArrayElementTypeName(string rawTypeName, out string elementTypeName)
     {
-        if (rawTypeName.EndsWith("[]", StringComparison.Ordinal))
+        // Strip a trailing ` | null` so the array-shape match still fires
+        // on `T[] | null`, `Array<T> | null`, and `ReadonlyArray<T> | null`.
+        // Without this, those forms fell through to a textual replacement
+        // that preserved the TypeScript primitive name (e.g. "number[]")
+        // instead of the C# mapping ("double[]").
+        var stripped = StripNullClause(rawTypeName);
+
+        if (stripped.EndsWith("[]", StringComparison.Ordinal))
         {
-            elementTypeName = rawTypeName.Substring(0, rawTypeName.Length - 2);
+            elementTypeName = stripped.Substring(0, stripped.Length - 2);
             return true;
         }
 
-        if (TryExtractGenericArgument(rawTypeName, "ReadonlyArray<", out elementTypeName))
+        if (TryExtractGenericArgument(stripped, "ReadonlyArray<", out elementTypeName))
         {
             return true;
         }
 
-        if (TryExtractGenericArgument(rawTypeName, "Array<", out elementTypeName))
+        if (TryExtractGenericArgument(stripped, "Array<", out elementTypeName))
         {
             return true;
         }

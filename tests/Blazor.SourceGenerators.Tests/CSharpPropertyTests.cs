@@ -93,4 +93,58 @@ public class CSharpPropertyTests
         Assert.Equal("string[]", bareType);
         Assert.Equal("ValueTask<string[]>", returnType);
     }
+
+    [Theory]
+    // Regression: previously `IsArray` checked `EndsWith("[]")` against the
+    // raw TS type. For `T[] | null` (or the Array<T> / ReadonlyArray<T>
+    // variants paired with `| null`), `IsArray` returned `false` and the
+    // emitter took a fallback path that left the TS primitive name in
+    // place. The bug was hidden in bundled `lib.dom.d.ts` because no
+    // top-level interface property uses that exact shape, but any custom
+    // `.d.ts` shipping `readonly tags: string[] | null` would have been
+    // emitted as `public string[]` (no nullable marker) on the interface
+    // and worse, with the TS primitive name preserved on dependent DTOs.
+    [InlineData("string[] | null")]
+    [InlineData("ReadonlyArray<string> | null")]
+    [InlineData("Array<string> | null")]
+    public void IsArray_TrueForNullableArrayForms(string rawType)
+    {
+        var property = new CSharpProperty("items", rawType, IsNullable: true);
+
+        Assert.True(property.IsArray);
+    }
+
+    [Theory]
+    [InlineData("string[] | null", "string")]
+    [InlineData("ReadonlyArray<string> | null", "string")]
+    [InlineData("Array<string> | null", "string")]
+    // Primitive-mapping must apply to the array element after the
+    // nullable clause is stripped - `number` is the TS spelling, `double`
+    // is the C# mapping.
+    [InlineData("number[] | null", "double")]
+    [InlineData("ReadonlyArray<number> | null", "double")]
+    [InlineData("Array<number> | null", "double")]
+    public void MappedTypeName_ReturnsElementType_ForNullableArrayForms(string rawType, string expected)
+    {
+        var property = new CSharpProperty("items", rawType, IsNullable: true);
+
+        Assert.Equal(expected, property.MappedTypeName);
+    }
+
+    [Theory]
+    [InlineData("string[] | null", "string[]")]
+    [InlineData("number[] | null", "double[]")]
+    [InlineData("ReadonlyArray<string> | null", "string[]")]
+    [InlineData("Array<string> | null", "string[]")]
+    public void GetPropertyTypes_NullableArrayPreservesElementMappingOnWasm(
+        string rawType, string expectedBareType)
+    {
+        var property = new CSharpProperty("items", rawType, IsNullable: true);
+        var options = new GeneratorOptions(SupportsGenerics: false, IsWebAssembly: true);
+
+        var (returnType, bareType) = property.GetPropertyTypes(options);
+
+        Assert.Equal(expectedBareType, bareType);
+        Assert.Equal(expectedBareType, returnType);
+    }
 }
