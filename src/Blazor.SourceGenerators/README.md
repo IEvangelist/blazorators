@@ -20,5 +20,12 @@ This package is consumed by the following NuGet packages:
 - 📦 [Blazor.LocalStorage](https://www.nuget.org/packages/Blazor.LocalStorage)
 - 📦 [Blazor.Geolocation.WebAssembly](https://www.nuget.org/packages/Blazor.Geolocation.WebAssembly)
 - 📦 [Blazor.Geolocation](https://www.nuget.org/packages/Blazor.Geolocation)
+- 📦 [Blazor.Permissions.WebAssembly](https://www.nuget.org/packages/Blazor.Permissions.WebAssembly)
+- 📦 [Blazor.SessionStorage.WebAssembly](https://www.nuget.org/packages/Blazor.SessionStorage.WebAssembly)
+- 📦 [Blazor.SessionStorage](https://www.nuget.org/packages/Blazor.SessionStorage)
+- 📦 [Blazor.SpeechSynthesis.WebAssembly](https://www.nuget.org/packages/Blazor.SpeechSynthesis.WebAssembly)
+- 📦 [Blazor.SpeechSynthesis](https://www.nuget.org/packages/Blazor.SpeechSynthesis)
+- 📦 [Blazor.SpeechRecognition.WebAssembly](https://www.nuget.org/packages/Blazor.SpeechRecognition.WebAssembly)
+- 📦 [Blazor.SpeechRecognition](https://www.nuget.org/packages/Blazor.SpeechRecognition)
 
 ![Blazorators Logo](https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png)
