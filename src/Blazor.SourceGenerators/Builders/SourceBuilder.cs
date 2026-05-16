@@ -379,7 +379,14 @@ internal sealed class SourceBuilder
         var args = new List<string>();
         foreach (var (interation, p) in parameterDefinitions.Select())
         {
-            args.Add(p.RawName);
+            // Escape if the callback parameter name collides with a C#
+            // reserved keyword (real DOM precedent: callback params
+            // named `event`, `class`, `default`, etc.). The argument
+            // list passed to `_x?.Invoke(...)` uses the same escaped
+            // name, so the call site and the parameter list stay
+            // consistent.
+            var paramName = p.RawName.EscapeCSharpKeyword();
+            args.Add(paramName);
             // Route each parameter type through the same primitive-mapping
             // helper used for the `Action<...>` field signature, so the
             // shim's parameter list aligns with the field's generic
@@ -387,7 +394,7 @@ internal sealed class SourceBuilder
             // (e.g. `number time` for a TS `(time: DOMHighResTimeStamp)`
             // callback after alias resolution), which is not valid C#.
             var typeName = CSharpAction.MapParameterTypeToCSharp(p.RawTypeName);
-            AppendRaw($"{typeName} {p.RawName}", appendNewLine: false);
+            AppendRaw($"{typeName} {paramName}", appendNewLine: false);
             if (interation.HasMore)
             {
                 AppendRaw(",");

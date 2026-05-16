@@ -156,7 +156,15 @@ internal record CSharpType(
         var suffix = asDelegate ? "" : "MethodName";
         var parameterName = isCallback
             ? $"on{RawName.CapitalizeFirstLetter()}{suffix}"
-            : RawName.LowerCaseFirstLetter();
+            // TS parameter names are camelCase, so `LowerCaseFirstLetter`
+            // is usually a no-op. However real DOM declarations include
+            // C# reserved keywords as parameter names (e.g.
+            // `createElementNS(namespace: string, ...)`,
+            // `replaceChild(node: Node, child: Node)` -- the latter is
+            // fine, but `namespace`, `event`, `default`, `public` are
+            // reserved). Escape with `@` so the emitted method signature
+            // (and any downstream `.ToJson(...)` call) compiles.
+            : RawName.LowerCaseFirstLetter().EscapeCSharpKeyword();
 
         return toJson
             ? $"{parameterName}.ToJson(jsonTypeInfo)"
