@@ -33,7 +33,7 @@ internal readonly record struct PropertyBuilderDetails(
     internal static PropertyBuilderDetails Create(CSharpProperty property, GeneratorOptions options)
     {
         var csharpPropertyName = property.RawName.CapitalizeFirstLetter();
-        var javaScriptIndentifier = options.Implementation is not null
+        var javaScriptIdentifier = options.Implementation is not null
             ? $"{options.Implementation}.{property.RawName}"
             : property.RawName;
         var (returnType, bareType) = property.GetPropertyTypes(options);
@@ -44,7 +44,7 @@ internal readonly record struct PropertyBuilderDetails(
         return new PropertyBuilderDetails(
             Property: property,
             CSharpPropertyName: csharpPropertyName,
-            FullyQualifiedJavaScriptIdentifier: javaScriptIndentifier,
+            FullyQualifiedJavaScriptIdentifier: javaScriptIdentifier,
             ReturnType: returnType,
             BareType: bareType,
             Suffix: suffix,
