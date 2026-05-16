@@ -95,7 +95,21 @@ internal static class CSharpMethodExtensions
             var nullable =
                 method.IsReturnTypeNullable ? "?" : "";
 
-            return options.IsWebAssembly
+            // For a generic `Promise<T>` return the WASM path must still
+            // wrap the result in `ValueTask<T>`: a Promise cannot be
+            // resolved synchronously, and the implementation has to call
+            // `InvokeAsync<T>` regardless of hosting model. Without this
+            // override a method like
+            // `getItem<T>(key: string): Promise<T | null>` emitted as
+            // `TValue? GetItem<TValue>(...)` under WASM, which compiled
+            // but mismatched the `InvokeAsync<TValue>(...) -> ValueTask<TValue>`
+            // call inside `ToImplementationString` (CS0029: cannot
+            // implicitly convert `ValueTask<TValue>` to `TValue?`).
+            // Server hosting already wrapped in `ValueTask<T>` via the
+            // `false` branch below; this branch now harmonises the WASM
+            // path with the same async shape when the underlying TS
+            // return type is a Promise.
+            return options.IsWebAssembly && !method.IsPromise
                 ? ($"{MethodBuilderDetails.GenericTypeValue}{nullable}", primitiveType)
                 : ($"ValueTask<{MethodBuilderDetails.GenericTypeValue}{nullable}>", primitiveType);
         }

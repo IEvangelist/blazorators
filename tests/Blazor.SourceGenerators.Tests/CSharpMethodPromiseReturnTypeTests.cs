@@ -147,4 +147,52 @@ public class CSharpMethodPromiseReturnTypeTests
         Assert.True(details.IsVoid);
         Assert.Equal("Async", details.Suffix);
     }
+
+    /// <summary>
+    /// Regression: a method whose generic return type is nullable
+    /// inside a Promise (<c>setItem&lt;T&gt;(): Promise&lt;T | null&gt;</c>
+    /// in real-world DOM code, e.g. a hypothetical typed
+    /// <c>localStorage.getItem</c>) needs to emit
+    /// <c>ValueTask&lt;TValue?&gt;</c> -- not
+    /// <c>ValueTask&lt;TValue&gt;</c>. The original
+    /// <see cref="CSharpMethod.IsReturnTypeNullable"/> implementation
+    /// only inspected the outer <c>RawReturnTypeName</c>
+    /// (<c>"Promise&lt;T | null&gt;"</c>), which ends with <c>&gt;</c>
+    /// not <c> | null</c>, so the nullable annotation was silently
+    /// dropped under the WASM + generics + Promise combination. Pin
+    /// behaviour at both layers so the next refactor surfaces a
+    /// failure if either the unwrap step or the nullable propagation
+    /// regresses.
+    /// </summary>
+    [Theory]
+    [InlineData("Promise<string | null>", true)]
+    [InlineData("Promise<Node | null>", true)]
+    [InlineData("Promise<T | null>", true)]
+    [InlineData("Promise<string | undefined>", true)]
+    [InlineData("Promise<string>", false)]
+    [InlineData("Promise<Node>", false)]
+    [InlineData("Promise<void>", false)]
+    public void IsReturnTypeNullable_PeelsPromiseBeforeCheck(
+        string rawReturnType, bool expectedNullable)
+    {
+        var method = new CSharpMethod("doStuff", rawReturnType, [], null);
+
+        Assert.Equal(expectedNullable, method.IsReturnTypeNullable);
+    }
+
+    [Fact]
+    public void GetMethodTypes_GenericPromiseNullable_EmitsValueTaskOfTValueQuestionMark()
+    {
+        // Hypothetical typed `localStorage.getItem<T>(key: string): Promise<T | null>`
+        // under SupportsGenerics. The historical regression dropped
+        // the `?` on `TValue` because `IsReturnTypeNullable` only saw
+        // the outer `Promise<...>` wrapper.
+        var method = new CSharpMethod("getItem", "Promise<T | null>", [], null);
+        var (returnType, _) = method.GetMethodTypes(
+            WebAssembly,
+            isGenericReturnType: true,
+            isPrimitiveType: false);
+
+        Assert.Equal("ValueTask<TValue?>", returnType);
+    }
 }

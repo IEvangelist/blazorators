@@ -17,6 +17,15 @@ internal record CSharpMethod(
 
     public bool IsReturnTypeNullable =>
         TypeShape.HasNullClause(RawReturnTypeName) ||
+        // `Promise<T | null>` / `Promise<T | undefined>` -- the outer
+        // wrapper hides the nullable clause from `HasNullClause`, so
+        // also inspect the unwrapped inner type. Without this peel a
+        // generic-method return like
+        // `getItem<T>(key: string): Promise<T | null>` was emitted as
+        // `ValueTask<TValue>` instead of `ValueTask<TValue?>`, silently
+        // dropping the nullable annotation under the WASM + generics
+        // + Promise combination.
+        (IsPromise && TypeShape.HasNullClause(PromiseUnwrappedTypeName)) ||
         RawReturnTypeName.Equals("null", StringComparison.Ordinal);
 
     public bool IsVoid =>
