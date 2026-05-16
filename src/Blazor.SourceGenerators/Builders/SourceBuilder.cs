@@ -327,6 +327,11 @@ internal sealed class SourceBuilder
                 Methods ??= new HashSet<string>();
                 if (Methods.Add(methodName))
                 {
+                    // Reset indentation so each [JSInvokable] block starts at the
+                    // outer indentation level — without this reset, the previous
+                    // iteration's `postIncreaseIndentation` leaks into the next one.
+                    ResetIndentationTo(level);
+
                     var fieldName = $"_{param.RawName}";
 
                     AppendRaw("[JSInvokable]");
