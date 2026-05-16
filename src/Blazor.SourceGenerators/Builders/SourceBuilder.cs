@@ -296,13 +296,20 @@ internal sealed class SourceBuilder
             {
                 var param = group.First();
                 var keys =
-                    param.ActionDeclaration!.ParameterDefinitions.Select(p => p.RawTypeName);
+                    param.ActionDeclaration!.ParameterDefinitions.Select(p => p.RawTypeName).ToList();
 
                 var fieldName = $"_{param.RawName}";
                 Fields ??= new HashSet<string>();
                 Fields.Add(fieldName);
 
-                AppendRaw($"private Action<{string.Join(", ", keys)}>? {fieldName};");
+                // For a zero-parameter callback (e.g. TS `VoidFunction`)
+                // the field type is the non-generic `Action` -- emitting
+                // `Action<>?` would not compile.
+                var fieldType = keys.Count == 0
+                    ? "Action"
+                    : $"Action<{string.Join(", ", keys)}>";
+
+                AppendRaw($"private {fieldType}? {fieldName};");
             }
 
             AppendLine();
@@ -349,8 +356,24 @@ internal sealed class SourceBuilder
 
     private SourceBuilder AppendParameters(CSharpType param, string fieldName)
     {
+        var parameterDefinitions = param.ActionDeclaration!.ParameterDefinitions!;
+
+        if (parameterDefinitions.Count == 0)
+        {
+            // Zero-parameter callback (e.g. TS `VoidFunction`, `(): void;`).
+            // Close the open `(` left by the caller and emit the `Invoke`
+            // expression -- without this, the iteration-based path below
+            // silently skipped the loop body and left the `[JSInvokable]`
+            // method definition truncated to `public void OnX(` with no
+            // body, producing uncompilable output.
+            AppendRaw(") =>", postIncreaseIndentation: true);
+            AppendRaw($"{fieldName}?.Invoke();");
+
+            return this;
+        }
+
         var args = new List<string>();
-        foreach (var (interation, p) in param.ActionDeclaration!.ParameterDefinitions!.Select())
+        foreach (var (interation, p) in parameterDefinitions.Select())
         {
             args.Add(p.RawName);
             AppendRaw($"{p.RawTypeName} {p.RawName}", appendNewLine: false);

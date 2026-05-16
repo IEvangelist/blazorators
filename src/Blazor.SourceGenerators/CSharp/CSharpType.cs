@@ -126,9 +126,18 @@ internal record CSharpType(
             var dependentTypes = ActionDeclaration.DependentTypes.Keys;
             var parameterDefault = overrideNullability ? "" : " = null";
 
+            // For a zero-parameter callback (e.g. the TS `VoidFunction`
+            // interface, `(): void;`) there is no dependent type list to
+            // splice in -- emit the non-generic `Action`. Otherwise the
+            // generator produced `Action<>? on... = null` which does not
+            // compile.
+            var actionType = dependentTypes.Count == 0
+                ? "Action"
+                : $"Action<{string.Join(", ", dependentTypes)}>";
+
             return IsNullable
-                ? $"Action<{string.Join(", ", dependentTypes)}>? {parameterName}{parameterDefault}"
-                : $"Action<{string.Join(", ", dependentTypes)}> {parameterName}";
+                ? $"{actionType}? {parameterName}{parameterDefault}"
+                : $"{actionType} {parameterName}";
         }
 
         return ToParameterString(isGenericType, overrideNullability);
