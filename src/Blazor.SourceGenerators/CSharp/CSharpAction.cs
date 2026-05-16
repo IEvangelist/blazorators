@@ -109,11 +109,14 @@ internal record CSharpAction(
             try
             {
                 Dictionary<string, CSharpObject> result = new(StringComparer.OrdinalIgnoreCase);
+                var parameterDependencies = ParameterDefinitions is null
+                    ? Enumerable.Empty<(string TypeName, CSharpObject Object)>()
+                    : ParameterDefinitions.SelectMany(p => p.AllDependentTypes);
+
                 foreach (var prop
                     in DependentTypes.Select(
                             kvp => (TypeName: kvp.Key, Object: kvp.Value))
-                        .Concat(ParameterDefinitions.SelectMany(
-                            p => p.AllDependentTypes)))
+                        .Concat(parameterDependencies))
                 {
                     result[prop.TypeName] = prop.Object;
                 }
