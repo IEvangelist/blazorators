@@ -111,7 +111,9 @@
                 </span>
 <pre><code class="hljs language-csharp"><span class="hljs-meta">@@inject</span> <span class="hljs-built_in">ILocalStorageService</span> Storage
 
-<span class="hljs-keyword">await</span> Storage.<span class="hljs-title function_">SetItemAsync</span>(<span class="hljs-string">"todos"</span>, _todos);
+<span class="hljs-keyword">await</span> Storage.<span class="hljs-title function_">SetItemAsync</span>(
+    <span class="hljs-string">"todos"</span>, _todos);
+
 <span class="hljs-keyword">var</span> items = <span class="hljs-keyword">await</span> Storage
     .<span class="hljs-title function_">GetItemAsync</span>&lt;<span class="hljs-built_in">List</span>&lt;<span class="hljs-built_in">Todo</span>&gt;&gt;(<span class="hljs-string">"todos"</span>);</code></pre>
             </div>
@@ -224,10 +226,10 @@
             cancellable <code>IDisposable</code> session.
         </p>
         <div class="bento-anim bento-anim-transcript" aria-hidden="true">
-            <div class="anim-bubble" style="--n:0">"Hey Blazor"</div>
-            <div class="anim-bubble" style="--n:1">"Subscribe to me"</div>
-            <div class="anim-bubble" style="--n:2">"Strongly typed, please"</div>
-            <div class="anim-bubble" style="--n:3">"Dispose when done"</div>
+            <div class="anim-bubble" style="--n:0">Hello, are you ready?</div>
+            <div class="anim-bubble" style="--n:1">Listening live&hellip;</div>
+            <div class="anim-bubble" style="--n:2">Transcribe everything.</div>
+            <div class="anim-bubble" style="--n:3">Type-safe, cancellable.</div>
         </div>
         <span class="feature-link">
             Try it <Icon Name="arrow-right" Class="icon-sm arrow" />

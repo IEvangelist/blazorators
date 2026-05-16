@@ -45,7 +45,78 @@
     <Code Value=@_position T=GeolocationPosition IsError=false />
     <Code Value=@_positionError T=GeolocationPositionError IsError=true />
 
-    <Map Position=@_position />
+    <section class="track-grid" aria-label="Live position updates">
+        <div class="track-grid-map">
+            <Map Position=@_position />
+        </div>
+
+        <aside class="track-grid-timeline">
+            <header class="timeline-header">
+                <span class="timeline-title">
+                    <Icon Name="route" Class="icon-sm" />
+                    Live updates
+                </span>
+                <span class="timeline-count">
+                    @_timeline.Count event@(_timeline.Count == 1 ? "" : "s")
+                </span>
+            </header>
+
+            @if (_timeline.Count == 0)
+            {
+                <div class="timeline-empty">
+                    <Icon Name="compass" />
+                    <p>Waiting for the first position fix&hellip;</p>
+                </div>
+            }
+            else
+            {
+                <ol class="timeline">
+                    @foreach (var entry in _timeline)
+                    {
+                        <li class="timeline-entry" @key="entry.Id">
+                            <span class="timeline-dot" aria-hidden="true">
+                                <Icon Name="map-pin" Class="icon-xs" />
+                            </span>
+                            <div class="timeline-card">
+                                <div class="timeline-card-head">
+                                    <span class="timeline-time">
+                                        @entry.LocalTime.ToString("HH:mm:ss.fff")
+                                    </span>
+                                    <span class="timeline-badge" title="Accuracy in metres">
+                                        &plusmn; @entry.Accuracy.ToString("F0") m
+                                    </span>
+                                </div>
+                                <dl class="timeline-stats">
+                                    <div>
+                                        <dt>lat</dt>
+                                        <dd>@entry.Latitude.ToString("F5")</dd>
+                                    </div>
+                                    <div>
+                                        <dt>lng</dt>
+                                        <dd>@entry.Longitude.ToString("F5")</dd>
+                                    </div>
+                                    @if (entry.Speed is double speed)
+                                    {
+                                        <div>
+                                            <dt>v</dt>
+                                            <dd>@speed.ToString("F1") m/s</dd>
+                                        </div>
+                                    }
+                                    @if (entry.Heading is double heading)
+                                    {
+                                        <div>
+                                            <dt>hdg</dt>
+                                            <dd>@heading.ToString("F0")&deg;</dd>
+                                        </div>
+                                    }
+                                </dl>
+                            </div>
+                        </li>
+                    }
+                </ol>
+            }
+        </aside>
+    </section>
 </div>
 
 <RepositoryPrompt Title="Watch position demo" />
