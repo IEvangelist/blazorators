@@ -7,16 +7,16 @@ static class Descriptors
 {
     internal static readonly DiagnosticDescriptor TypeNameRequiredDiagnostic = new(
         "BR0001",
-        "The TypeName is required to source generator JavaScript interop",
-        "JSAutoInteropAttribute must provide a 'TypeName', as it is required to source generate JavaScript interop extensions",
+        "TypeName is required to source-generate JavaScript interop",
+        "JSAutoInteropAttribute must specify a 'TypeName' value, which names the TypeScript interface the generator should bind to",
         "Blazorators.JSAutoInteropAttribute",
         DiagnosticSeverity.Error,
         true);
 
-    internal static readonly DiagnosticDescriptor PathFromWindowRequiredDiagnostic = new(
+    internal static readonly DiagnosticDescriptor ImplementationRequiredDiagnostic = new(
         "BR0002",
-        "The Implementation is required to source generator JavaScript interop",
-        "JSAutoInteropAttribute must provide a 'Implementation', as it is required to source generate JavaScript interop extensions",
+        "Implementation is required to source-generate JavaScript interop",
+        "JSAutoInteropAttribute must specify an 'Implementation' value, which is the JavaScript path used to invoke the generated extensions",
         "Blazorators.JSAutoInteropAttribute",
         DiagnosticSeverity.Error,
         true);

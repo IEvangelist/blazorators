@@ -263,7 +263,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(
-                    Descriptors.PathFromWindowRequiredDiagnostic,
+                    Descriptors.ImplementationRequiredDiagnostic,
                     attributeLocation?.ToLocation() ?? Location.None));
 
             return true;
