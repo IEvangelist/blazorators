@@ -1,20 +1,21 @@
-<aside class="callout">
-    <span class="callout-icon" aria-hidden="true">
-        <Icon Name="code" Class="icon-sm" />
-    </span>
-    <div class="callout-body">
+<aside class="source-prompt" aria-label="@(string.IsNullOrWhiteSpace(Title) ? "Source code" : $"{Title} source code")">
+    <div class="source-prompt-meta">
+        <span class="source-prompt-kicker">
+            <Icon Name="code" Class="icon-sm" />
+            Source
+        </span>
         @if (!string.IsNullOrWhiteSpace(Title))
         {
-            <strong class="callout-title">@Title</strong>
+            <span class="source-prompt-title">@Title</span>
         }
-        <span>
-            Want to see the source code? Check it out
-            <a target="_blank" rel="noopener noreferrer"
-               href="https://github.com/IEvangelist/blazorators">
-                on GitHub <Icon Name="external-link" Class="icon-sm" />
-            </a>.
-        </span>
     </div>
+    <a class="source-prompt-link"
+       target="_blank" rel="noopener noreferrer"
+       href="https://github.com/IEvangelist/blazorators">
+        <Icon Name="github" Class="icon-sm" />
+        <span>View on GitHub</span>
+        <Icon Name="arrow-up-right" Class="icon-sm source-prompt-arrow" />
+    </a>
 </aside>
 
 @code {

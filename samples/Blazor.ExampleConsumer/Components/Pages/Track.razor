@@ -71,47 +71,40 @@
             else
             {
                 <ol class="timeline">
+                    @{ var isNewest = true; }
                     @foreach (var entry in _timeline)
                     {
-                        <li class="timeline-entry" @key="entry.Id">
-                            <span class="timeline-dot" aria-hidden="true">
-                                <Icon Name="map-pin" Class="icon-xs" />
-                            </span>
-                            <div class="timeline-card">
-                                <div class="timeline-card-head">
-                                    <span class="timeline-time">
+                        <li class="timeline-entry @(isNewest ? "is-newest" : null)" @key="entry.Id">
+                            <span class="timeline-dot" aria-hidden="true"></span>
+                            <div class="timeline-content">
+                                <div class="timeline-primary">
+                                    <time class="timeline-time" datetime="@entry.LocalTime.ToString("o")">
                                         @entry.LocalTime.ToString("HH:mm:ss.fff")
-                                    </span>
-                                    <span class="timeline-badge" title="Accuracy in metres">
-                                        &plusmn; @entry.Accuracy.ToString("F0") m
+                                    </time>
+                                    <span class="timeline-coords" title="Latitude, longitude">
+                                        @entry.Latitude.ToString("F5")<span class="timeline-coords-sep">,</span>@entry.Longitude.ToString("F5")
                                     </span>
                                 </div>
-                                <dl class="timeline-stats">
-                                    <div>
-                                        <dt>lat</dt>
-                                        <dd>@entry.Latitude.ToString("F5")</dd>
-                                    </div>
-                                    <div>
-                                        <dt>lng</dt>
-                                        <dd>@entry.Longitude.ToString("F5")</dd>
-                                    </div>
+                                <div class="timeline-secondary">
+                                    <span class="timeline-chip timeline-chip-accuracy" title="Accuracy in metres">
+                                        &plusmn;@entry.Accuracy.ToString("F0") m
+                                    </span>
                                     @if (entry.Speed is double speed)
                                     {
-                                        <div>
-                                            <dt>v</dt>
-                                            <dd>@speed.ToString("F1") m/s</dd>
-                                        </div>
+                                        <span class="timeline-chip" title="Speed">
+                                            @speed.ToString("F1") m/s
+                                        </span>
                                     }
                                     @if (entry.Heading is double heading)
                                     {
-                                        <div>
-                                            <dt>hdg</dt>
-                                            <dd>@heading.ToString("F0")&deg;</dd>
-                                        </div>
+                                        <span class="timeline-chip" title="Heading">
+                                            @heading.ToString("F0")&deg;
+                                        </span>
                                     }
-                                </dl>
+                                </div>
                             </div>
                         </li>
+                        isNewest = false;
                     }
                 </ol>
             }

@@ -3,20 +3,22 @@
 @implements IDisposable
 @inject NavigationManager Nav
 
-<div class="app @(_navOpen ? "nav-open" : null)">
-    <aside class="app-sidebar @(_navOpen ? "open" : null)" id="appSidebar">
+<div class="app @(_navToggled ? "nav-toggled" : null)">
+    <aside class="app-sidebar" id="appSidebar">
         <NavMenu OnNavigate=@CloseNav />
     </aside>
 
-    @if (_navOpen)
+    @if (_navToggled)
     {
-        <div class="sidebar-scrim open" @onclick=CloseNav aria-hidden="true"></div>
+        <div class="sidebar-scrim" @onclick=CloseNav aria-hidden="true"></div>
     }
 
     <header class="app-header">
-        <button class="btn btn-icon btn-ghost mobile-toggle"
+        <button class="btn btn-icon btn-ghost nav-toggle"
                 type="button"
                 aria-label="Toggle navigation"
+                aria-expanded="@(!_navToggled)"
+                aria-controls="appSidebar"
                 @onclick=ToggleNav>
             <Icon Name="menu" />
         </button>
@@ -45,7 +47,7 @@
 </div>
 
 @code {
-    bool _navOpen;
+    bool _navToggled;
     string _runtimeShort = RuntimeInformation.FrameworkDescription;
 
     protected override void OnInitialized()
@@ -53,14 +55,14 @@
         Nav.LocationChanged += OnLocationChanged;
     }
 
-    void ToggleNav() => _navOpen = !_navOpen;
-    void CloseNav() => _navOpen = false;
+    void ToggleNav() => _navToggled = !_navToggled;
+    void CloseNav() => _navToggled = false;
 
     void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
     {
-        if (_navOpen)
+        if (_navToggled)
         {
-            _navOpen = false;
+            _navToggled = false;
             StateHasChanged();
         }
     }

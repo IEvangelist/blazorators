@@ -75,21 +75,21 @@
                   value=@_text></textarea>
     </div>
 
-    <div class="btn-group">
+    <div class="btn-group btn-group-segmented" role="group" aria-label="Speech playback">
         <button type="button" class="btn btn-primary" @onclick=@Speak>
             <Icon Name="play" /> <span>Speak</span>
         </button>
-        <button type="button" class="btn btn-warning"
-                title="Pause" @onclick=@speechSynthesis.Pause>
-            <Icon Name="pause" /> <span class="sr-only">Pause</span>
+        <button type="button" class="btn btn-ghost btn-icon"
+                title="Pause" aria-label="Pause" @onclick=@speechSynthesis.Pause>
+            <Icon Name="pause" />
         </button>
-        <button type="button" class="btn btn-info"
-                title="Resume" @onclick=@speechSynthesis.Resume>
-            <Icon Name="play" /> <span class="sr-only">Resume</span>
+        <button type="button" class="btn btn-ghost btn-icon"
+                title="Resume" aria-label="Resume" @onclick=@speechSynthesis.Resume>
+            <Icon Name="play" />
         </button>
-        <button type="button" class="btn btn-danger"
-                title="Stop" @onclick=@speechSynthesis.Cancel>
-            <Icon Name="square" /> <span class="sr-only">Stop</span>
+        <button type="button" class="btn btn-ghost btn-icon btn-icon-danger"
+                title="Stop" aria-label="Stop" @onclick=@speechSynthesis.Cancel>
+            <Icon Name="square" />
         </button>
     </div>
 </section>
