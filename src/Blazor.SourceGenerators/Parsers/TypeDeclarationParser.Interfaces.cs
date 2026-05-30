@@ -436,6 +436,23 @@ internal sealed partial class TypeDeclarationParser
             }
         }
 
+        // Anything else with a top-level `|` separator is an alias that
+        // mixes identifiers, primitives, generics, tuples, and/or
+        // function types (e.g. `type BodyInit = ReadableStream | XMLHttpRequestBodyInit;`,
+        // `type RequestInfo = Request | string;`,
+        // `type HeadersInit = [string, string][] | Record<string, string> | Headers;`).
+        // None of these have a single C# representation we can faithfully
+        // project, so we fall back to `object` (or `object | null` when
+        // the use-site tolerates null). Without this, the raw alias
+        // identifier leaked through to the generated C# and broke the
+        // consumer's compile with CS0246. The depth-aware splitter
+        // guards against `|` tokens embedded inside generic / tuple /
+        // function arms.
+        if (TypeShape.TrySplitTopLevelUnionArms(rhs, out _))
+        {
+            return hadNullClause ? "object | null" : "object";
+        }
+
         return type;
     }
 

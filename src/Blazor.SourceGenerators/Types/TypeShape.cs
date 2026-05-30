@@ -181,4 +181,99 @@ internal static class TypeShape
         valueType = inner.Substring(splitIndex + 1).Trim();
         return keyType.Length > 0 && valueType.Length > 0;
     }
+
+    /// <summary>
+    /// Splits a TypeScript type expression on its top-level <c>|</c>
+    /// separators, ignoring <c>|</c> tokens that sit inside generic
+    /// argument lists, tuple types, parenthesised function types, or
+    /// inline object literals. Used by the alias-resolution path so a
+    /// shape like
+    /// <c>HeadersInit = [string, string][] | Record&lt;string, string&gt; | Headers</c>
+    /// decomposes into three arms (<c>[string, string][]</c>,
+    /// <c>Record&lt;string, string&gt;</c>, <c>Headers</c>) instead of
+    /// being torn apart by a naive <c>Split('|')</c>.
+    /// </summary>
+    /// <param name="rawTypeName">The TS type expression (no trailing semicolon).</param>
+    /// <param name="arms">
+    /// Trimmed top-level arms when a top-level union is present.
+    /// Empty when the expression does not contain a top-level <c>|</c>
+    /// separator.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> when the expression contains at least two top-level
+    /// arms separated by <c>|</c>; otherwise <c>false</c>.
+    /// </returns>
+    internal static bool TrySplitTopLevelUnionArms(
+        string rawTypeName,
+        out IReadOnlyList<string> arms)
+    {
+        if (string.IsNullOrEmpty(rawTypeName))
+        {
+            arms = Array.Empty<string>();
+            return false;
+        }
+
+        List<string>? collected = null;
+        var depthAngle = 0;
+        var depthBracket = 0;
+        var depthParen = 0;
+        var depthBrace = 0;
+        var start = 0;
+
+        void Push(string text, int from, int toExclusive)
+        {
+            collected ??= new List<string>();
+            collected.Add(text.Substring(from, toExclusive - from).Trim());
+        }
+
+        for (var i = 0; i < rawTypeName.Length; i++)
+        {
+            var ch = rawTypeName[i];
+            switch (ch)
+            {
+                case '<':
+                    depthAngle++;
+                    break;
+                case '>':
+                    if (depthAngle > 0) depthAngle--;
+                    break;
+                case '[':
+                    depthBracket++;
+                    break;
+                case ']':
+                    if (depthBracket > 0) depthBracket--;
+                    break;
+                case '(':
+                    depthParen++;
+                    break;
+                case ')':
+                    if (depthParen > 0) depthParen--;
+                    break;
+                case '{':
+                    depthBrace++;
+                    break;
+                case '}':
+                    if (depthBrace > 0) depthBrace--;
+                    break;
+                case '|':
+                    if (depthAngle == 0 && depthBracket == 0 &&
+                        depthParen == 0 && depthBrace == 0)
+                    {
+                        Push(rawTypeName, start, i);
+                        start = i + 1;
+                    }
+                    break;
+            }
+        }
+
+        if (collected is null)
+        {
+            arms = Array.Empty<string>();
+            return false;
+        }
+
+        Push(rawTypeName, start, rawTypeName.Length);
+        arms = collected;
+        return arms.Count > 1;
+    }
 }
