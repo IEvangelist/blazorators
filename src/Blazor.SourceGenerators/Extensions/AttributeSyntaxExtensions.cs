@@ -248,4 +248,110 @@ static class AttributeSyntaxExtensions
 
         return default;
     }
+
+    /// <summary>
+    /// Value-bundle for <c>[assembly: JSAutoService(...)]</c> parsing. The
+    /// G2 pipeline fans each value out into one <see cref="InteropTarget"/>
+    /// per entry in <see cref="TypeNames"/>. The <see cref="Implementation"/>
+    /// override is only honored when exactly one type name was supplied;
+    /// the multi-name form always falls back to inferred defaults so a
+    /// single override doesn't get silently applied to every entry.
+    /// </summary>
+    internal readonly record struct AssemblyServiceOptions(
+        string[] TypeNames,
+        string? Implementation,
+        bool IsWebAssembly,
+        string? Namespace,
+        string[]? TypeDeclarationSources);
+
+    /// <summary>
+    /// Reads the constructor-arg / named-arg pair from a
+    /// <c>JSAutoServiceAttribute</c> usage. Follows the same syntactic
+    /// parsing approach as <see cref="GetGeneratorOptions"/> (so we
+    /// don't depend on attribute-binding being fully completed inside the
+    /// syntax-provider transform - see the BuildTarget note in the
+    /// generator). The constructor takes <c>params string[] typeNames</c>,
+    /// which the C# attribute syntax expresses either as a series of
+    /// individual positional literals or as a single array creation
+    /// expression; both shapes are handled below.
+    /// </summary>
+    internal static AssemblyServiceOptions? GetAssemblyServiceOptions(
+        this AttributeSyntax attribute,
+        SemanticModel? semanticModel = null)
+    {
+        if (attribute is not { ArgumentList.Arguments: var arguments } || arguments.Count == 0)
+        {
+            return null;
+        }
+
+        var typeNames = new List<string>();
+        string? implementation = null;
+        // Mirrors the JSAutoServiceAttribute property default; the attribute
+        // declares HostingModel = BlazorHostingModel.WebAssembly.
+        var isWebAssembly = true;
+        string? ns = null;
+        string[]? sources = null;
+
+        foreach (var arg in arguments)
+        {
+            var propName = arg.NameEquals?.Name?.ToString();
+            if (propName is null)
+            {
+                // Positional argument: part of the params string[] typeNames
+                // ctor. Either a series of literal strings or a single array
+                // creation expression (handled by ReadStringArray).
+                if (arg.Expression is ImplicitArrayCreationExpressionSyntax or
+                    ArrayCreationExpressionSyntax or
+                    CollectionExpressionSyntax)
+                {
+                    var arr = ReadStringArray(arg.Expression, semanticModel);
+                    if (arr is not null)
+                    {
+                        typeNames.AddRange(arr);
+                    }
+                    continue;
+                }
+
+                var single = ReadString(arg.Expression, semanticModel);
+                if (single is not null)
+                {
+                    typeNames.Add(single);
+                }
+
+                continue;
+            }
+
+            switch (propName)
+            {
+                case nameof(AssemblyServiceOptions.Implementation):
+                    implementation = ReadString(arg.Expression, semanticModel);
+                    break;
+                case "HostingModel":
+                    // Same ordinal "WebAssembly" check used by GetGeneratorOptions;
+                    // the analyzer process inherits the host machine's culture
+                    // so an explicit StringComparison is required.
+                    isWebAssembly = (ReadEnumMemberName(arg.Expression, semanticModel)
+                        ?.IndexOf("WebAssembly", StringComparison.Ordinal) ?? 0) >= 0;
+                    break;
+                case nameof(AssemblyServiceOptions.Namespace):
+                    ns = ReadString(arg.Expression, semanticModel);
+                    break;
+                case nameof(AssemblyServiceOptions.TypeDeclarationSources):
+                    sources = ReadStringArray(arg.Expression, semanticModel);
+                    break;
+            }
+        }
+
+        if (typeNames.Count == 0)
+        {
+            return null;
+        }
+
+        return new AssemblyServiceOptions(
+            TypeNames: [.. typeNames],
+            Implementation: implementation,
+            IsWebAssembly: isWebAssembly,
+            Namespace: ns,
+            TypeDeclarationSources: sources);
+    }
 }

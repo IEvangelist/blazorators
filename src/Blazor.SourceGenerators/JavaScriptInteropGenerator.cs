@@ -10,6 +10,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
 {
     private const string JSAutoInteropAttributeMetadataName = "JSAutoInteropAttribute";
     private const string JSAutoGenericInteropAttributeMetadataName = "JSAutoGenericInteropAttribute";
+    private const string JSAutoServiceAttributeMetadataName = "JSAutoServiceAttribute";
 
     private static readonly HashSet<(string FileName, string SourceCode)> s_sourceCodeToAdd =
     [
@@ -17,6 +18,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         (nameof(BlazorHostingModel).ToGeneratedFileName(), BlazorHostingModel),
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
         (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
+        (nameof(JSAutoServiceAttribute).ToGeneratedFileName(), JSAutoServiceAttribute),
     ];
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -59,7 +61,25 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
                 transform: static (ctx, ct) => BuildTarget(ctx, isGeneric: true, ct))
             .Where(static t => t is not null);
 
-        var allTargets = nonGenericTargets.Collect().Combine(genericTargets.Collect());
+        // G2 - assembly-targeted JSAutoService projection. The attribute
+        // hangs off the compilation unit (assembly attributes attach
+        // there), so the syntax predicate filters on
+        // `CompilationUnitSyntax` and the transform fans out into one
+        // `InteropTarget` per typeName the consumer passed in. Because the
+        // transform can produce many targets per attribute application
+        // (the ctor accepts `params string[]`), we `SelectMany` the result
+        // into the flat target stream before combining with the
+        // interface-anchored branches.
+        var assemblyTargets = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                JSAutoServiceAttributeMetadataName,
+                predicate: static (node, _) => node is CompilationUnitSyntax,
+                transform: static (ctx, ct) => BuildAssemblyTargets(ctx, ct))
+            .SelectMany(static (targets, _) => targets);
+
+        var allTargets = nonGenericTargets.Collect()
+            .Combine(genericTargets.Collect())
+            .Combine(assemblyTargets.Collect());
 
         // Project `AdditionalFiles` ending in `.d.ts` into value-equatable
         // records so the incremental cache only re-runs the generator when
@@ -147,15 +167,111 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             ContainingNamespace: containingNamespace,
             IsGeneric: isGeneric,
             IdentifierLocation: identifierLocation,
-            AttributeLocation: attributeLocation);
+            AttributeLocation: attributeLocation,
+            Origin: InteropTargetOrigin.InterfaceAttribute);
+    }
+
+    /// <summary>
+    /// Builds zero-or-more <see cref="InteropTarget"/> records from a single
+    /// <c>[assembly: JSAutoService(...)]</c> application. The
+    /// <c>JSAutoServiceAttribute</c> ctor accepts <c>params string[]</c>, so a
+    /// single application can request many services; the attribute is also
+    /// <c>AllowMultiple = true</c> so a compilation unit can have several
+    /// applications (each one shows up as a separate entry in
+    /// <see cref="GeneratorAttributeSyntaxContext.Attributes"/>). This
+    /// transform handles both: it walks <c>context.Attributes</c> and for
+    /// each one produces one target per type name.
+    /// </summary>
+    private static ImmutableArray<InteropTarget> BuildAssemblyTargets(
+        GeneratorAttributeSyntaxContext context,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (context.Attributes.Length == 0)
+        {
+            return ImmutableArray<InteropTarget>.Empty;
+        }
+
+        var builder = ImmutableArray.CreateBuilder<InteropTarget>();
+
+        foreach (var attributeData in context.Attributes)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (attributeData.ApplicationSyntaxReference?.GetSyntax(cancellationToken)
+                is not AttributeSyntax attributeSyntax)
+            {
+                continue;
+            }
+
+            var parsed = attributeSyntax.GetAssemblyServiceOptions(context.SemanticModel);
+            if (parsed is null)
+            {
+                continue;
+            }
+
+            var (typeNames, sharedImplementation, isWebAssembly, ns, sources) = parsed.Value;
+            var attributeLocation = LocationInfo.CreateFrom(attributeSyntax);
+            var isSingleName = typeNames.Length == 1;
+
+            foreach (var typeName in typeNames)
+            {
+                if (string.IsNullOrWhiteSpace(typeName))
+                {
+                    continue;
+                }
+
+                // Single-name form honors the explicit Implementation
+                // override; multi-name form ignores it and applies the
+                // inferred default to each entry so a single override
+                // doesn't get silently re-used for every service.
+                var implementation = (isSingleName && !string.IsNullOrWhiteSpace(sharedImplementation))
+                    ? sharedImplementation!
+                    : OptionsInference.InferImplementation(typeName);
+
+                var options = new GeneratorOptions(SupportsGenerics: false)
+                {
+                    TypeName = typeName,
+                    Implementation = implementation,
+                    IsWebAssembly = isWebAssembly,
+                    TypeDeclarationSources = sources,
+                };
+
+                builder.Add(new InteropTarget(
+                    Options: options,
+                    InterfaceName: $"I{typeName}Service",
+                    // A single partial declaration is valid C# without any
+                    // other parts; the consumer doesn't have to write an
+                    // anchor interface for the assembly-attribute form.
+                    IsPartial: true,
+                    ContainingNamespace: ns,
+                    IsGeneric: false,
+                    IdentifierLocation: attributeLocation,
+                    AttributeLocation: attributeLocation,
+                    Origin: InteropTargetOrigin.AssemblyAttribute));
+            }
+        }
+
+        return builder.ToImmutable();
     }
 
     private static void Execute(
         SourceProductionContext context,
-        ((ImmutableArray<InteropTarget?> NonGeneric, ImmutableArray<InteropTarget?> Generic) Targets,
+        (((ImmutableArray<InteropTarget?> NonGeneric, ImmutableArray<InteropTarget?> Generic) Interface,
+          ImmutableArray<InteropTarget> Assembly) Targets,
          ImmutableArray<AdditionalTypeDeclarationSource> AdditionalSources) inputs)
     {
-        var combined = inputs.Targets.NonGeneric.Concat(inputs.Targets.Generic);
+        // Interface-attribute targets come first so the dedup step below
+        // (which keeps the first occurrence of any given
+        // (InterfaceName, IsGeneric) key) preserves the
+        // interface-attribute form when both paths request the same
+        // service. The interface form carries the consumer's namespace
+        // and partial body, so it wins.
+        var combined = inputs.Targets.Interface.NonGeneric
+            .Concat(inputs.Targets.Interface.Generic)
+            .Concat(inputs.Targets.Assembly.Select(t => (InteropTarget?)t));
+
         var additionalSources = inputs.AdditionalSources;
         var cancellationToken = context.CancellationToken;
 
@@ -168,12 +284,28 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
             additionalSources.Length,
             StringComparer.OrdinalIgnoreCase);
 
+        // Track (InterfaceName, IsGeneric) collisions across the combined
+        // stream. Without this, an assembly-attribute target that overlaps
+        // with an interface-attribute target would cause `AddSource` to
+        // throw on duplicate hint names. Interface-attribute wins because
+        // it appears first in `combined`.
+        var seenIdentities = new HashSet<(string InterfaceName, bool IsGeneric)>();
+
         foreach (var target in combined.Distinct())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             if (target is null)
             {
+                continue;
+            }
+
+            if (!seenIdentities.Add((target.InterfaceName, target.IsGeneric)))
+            {
+                // Same `IFooService` already projected by the
+                // higher-priority path; skip the duplicate silently. The
+                // interface-anchored form is authoritative when both paths
+                // request the same service.
                 continue;
             }
 
