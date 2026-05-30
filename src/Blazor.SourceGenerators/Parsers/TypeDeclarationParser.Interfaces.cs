@@ -36,9 +36,17 @@ internal sealed partial class TypeDeclarationParser
             {
                 var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
 
-                // Ignore event targets for now.
-                var seg = segment.Replace(" extends EventTarget", "");
-                var subclass = ExtendsTypeNameRegex.GetMatchGroupValue(seg, "TypeName");
+                // Parse the *full* extends list. TS supports
+                // `interface X extends A, B, C { ... }` and the
+                // single-token regex used to silently drop B and C
+                // (and would even capture `A,` as the subclass name).
+                // EventTarget is excluded from the merge: it carries
+                // the DOM event-listener machinery that isn't useful
+                // through JS interop, and the original code already
+                // stripped it for the single-extend case.
+                var extendsBases = ExtractExtendsBases(segment);
+                string? subclass = extendsBases.Count > 0 ? extendsBases[0] : null;
+
                 if (typeName is not null)
                 {
                     // Memo first: if we already finished parsing this type
@@ -73,6 +81,17 @@ internal sealed partial class TypeDeclarationParser
                         visiting.Remove(typeName);
                         memo[typeName] = cSharpObject;
                         return cSharpObject;
+                    }
+
+                    // Merge every base interface's members into the
+                    // derived type. We do this *before* walking the
+                    // derived's own member lines so that any member
+                    // the derived re-declares naturally shadows the
+                    // base via the dictionary writes below (derived
+                    // wins on conflict).
+                    foreach (var baseName in extendsBases)
+                    {
+                        MergeBaseMembers(cSharpObject, baseName, visiting, memo);
                     }
 
                     continue;
@@ -904,5 +923,113 @@ internal sealed partial class TypeDeclarationParser
         }
 
         return isSuccess;
+    }
+
+    /// <summary>
+    /// Parses the comma-separated list of base interfaces from an
+    /// interface header line. Returns each identifier with surrounding
+    /// whitespace trimmed and the special <c>EventTarget</c> base
+    /// dropped, since DOM event-listener machinery is intentionally not
+    /// projected through JS interop.
+    /// </summary>
+    /// <remarks>
+    /// Examples:
+    /// <code>
+    /// "interface X extends A, B, C {"     => [A, B, C]
+    /// "interface X extends EventTarget {" => []
+    /// "interface X extends A {"           => [A]
+    /// "interface X {"                     => []
+    /// </code>
+    /// </remarks>
+    private static List<string> ExtractExtendsBases(string interfaceHeaderSegment)
+    {
+        const string ExtendsKeyword = " extends ";
+        var bases = new List<string>();
+
+        var idx = interfaceHeaderSegment.IndexOf(
+            ExtendsKeyword, StringComparison.Ordinal);
+        if (idx < 0)
+        {
+            return bases;
+        }
+
+        // Take from end of "extends " up to the opening brace (or end of segment).
+        var start = idx + ExtendsKeyword.Length;
+        var brace = interfaceHeaderSegment.IndexOf('{', start);
+        var end = brace >= 0 ? brace : interfaceHeaderSegment.Length;
+        var clause = interfaceHeaderSegment.Substring(start, end - start);
+
+        foreach (var token in clause.Split(','))
+        {
+            var trimmed = token.Trim();
+            if (trimmed.Length == 0)
+            {
+                continue;
+            }
+
+            // EventTarget contributes the DOM event-listener surface,
+            // which the existing single-extends path also stripped.
+            // Preserve that behavior for multi-extends.
+            if (string.Equals(trimmed, "EventTarget", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            bases.Add(trimmed);
+        }
+
+        return bases;
+    }
+
+    /// <summary>
+    /// Parses <paramref name="baseTypeName"/> via <c>ToObject</c>
+    /// and copies its members and dependent types into
+    /// <paramref name="derived"/>. Dictionary writes are unconditional,
+    /// so callers must invoke this <em>before</em> walking the derived
+    /// type's own member lines (which will then overwrite the base on
+    /// any conflict and give the expected "derived wins" shadowing).
+    /// </summary>
+    /// <remarks>
+    /// When the base declaration cannot be resolved (e.g. it lives in a
+    /// type-declaration source we don't carry) the merge is silently
+    /// skipped. The derived type still parses with its own members; the
+    /// only loss is inherited surface. This matches the pre-existing
+    /// behavior for unresolved single-extends bases.
+    /// </remarks>
+    private void MergeBaseMembers(
+        CSharpObject derived,
+        string baseTypeName,
+        HashSet<string> visiting,
+        Dictionary<string, CSharpObject> memo)
+    {
+        if (!_reader.TryGetDeclaration(baseTypeName, out var baseText)
+            || string.IsNullOrWhiteSpace(baseText))
+        {
+            return;
+        }
+
+        var baseObj = ToObject(baseText!, visiting, memo);
+        if (baseObj is null)
+        {
+            return;
+        }
+
+        foreach (var kvp in baseObj.Properties)
+        {
+            derived.Properties[kvp.Key] = kvp.Value;
+        }
+
+        foreach (var kvp in baseObj.Methods)
+        {
+            derived.Methods[kvp.Key] = kvp.Value;
+        }
+
+        if (baseObj.DependentTypes is { Count: > 0 })
+        {
+            foreach (var kvp in baseObj.DependentTypes)
+            {
+                derived.DependentTypes![kvp.Key] = kvp.Value;
+            }
+        }
     }
 }
