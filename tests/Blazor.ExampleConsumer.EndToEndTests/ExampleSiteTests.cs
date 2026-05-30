@@ -78,7 +78,7 @@ public sealed class ExampleSiteTests(
         Assert.True(activeBox!.Y >= 0, "Skip link should be visible when focused.");
 
         await page.Keyboard.PressAsync("Enter");
-        await page.WaitForFunctionAsync("() => location.pathname.endsWith('/track') && location.hash === '#main'");
+        await page.WaitForFunctionAsync("() => location.pathname.replace(/\\/$/, '').endsWith('/track') && location.hash === '#main'");
 
         var activeId = await page.EvaluateAsync<string>("() => document.activeElement?.id ?? ''");
         Assert.Equal("main", activeId);
