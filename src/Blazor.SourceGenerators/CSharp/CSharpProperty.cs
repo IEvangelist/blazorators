@@ -28,15 +28,21 @@ internal record CSharpProperty(
             }
 
             // `Record<K, V>` -> `Dictionary<TKey, TValue>` with both
-            // type arguments routed through the primitive map. The
-            // raw `Record<...>` token would otherwise be emitted into
-            // the C# DTO type which is not a valid CLR type. DOM hits
-            // include `RTCStats.parameterData: Record<string, number>`
-            // and `PushSubscriptionJSON.keys: Record<string, string>`.
+            // type arguments routed through the recursive
+            // `TypeMap.MapNestedTypeFragment` helper. This handles
+            // nested primitives (`number` -> `double`), nested arrays
+            // (`number[]` -> `double[]`), nested Records, and union
+            // value positions (which collapse to `object`). Without the
+            // recursive map, value types like `number[]` were emitted
+            // verbatim, producing the invalid spelling
+            // `Dictionary<string, number[]>`. DOM hits today are simple
+            // (`Record<string, number>`, `Record<string, string>`) but
+            // 3rd-party `.d.ts` files commonly use nested generic
+            // value positions.
             if (TypeShape.TryGetRecordTypeArguments(RawTypeName, out var keyType, out var valueType))
             {
-                var mappedKey = TypeMap.PrimitiveTypes[keyType];
-                var mappedValue = TypeMap.PrimitiveTypes[valueType];
+                var mappedKey = TypeMap.MapNestedTypeFragment(keyType);
+                var mappedValue = TypeMap.MapNestedTypeFragment(valueType);
                 return $"Dictionary<{mappedKey}, {mappedValue}>";
             }
 

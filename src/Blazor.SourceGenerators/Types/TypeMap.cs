@@ -95,4 +95,59 @@ internal static class TypeMap
         internal string this[string typeScriptType] =>
             _primitiveTypeMap.TryGetValue(typeScriptType, out var csharpType) ? csharpType : typeScriptType;
     }
+
+    /// <summary>
+    /// Maps a TypeScript type fragment that sits inside a generic
+    /// argument position (the <c>K</c> or <c>V</c> of a
+    /// <c>Record&lt;K, V&gt;</c>, the element type of an array) into
+    /// its C# spelling, recursing through nested arrays / Records /
+    /// nullable clauses. Unsupported shapes (top-level unions, unknown
+    /// identifiers) collapse to <c>object</c> rather than leaking raw
+    /// TypeScript identifiers into the emitted C# (which would break
+    /// the consumer's compile with CS0246).
+    /// </summary>
+    /// <remarks>
+    /// Use this for inner generic positions. For the outermost type of
+    /// a property/parameter use the existing layered checks in
+    /// <c>CSharpProperty.MappedTypeName</c> /
+    /// <c>CSharpType.ToParameterString</c>, which compose the result
+    /// with the property-level nullable flag and the dependent-type
+    /// resolver.
+    /// </remarks>
+    internal static string MapNestedTypeFragment(string raw)
+    {
+        if (string.IsNullOrEmpty(raw))
+        {
+            return raw;
+        }
+
+        var hadNull = TypeShape.HasNullClause(raw);
+        var bare = hadNull ? TypeShape.StripNullClause(raw) : raw;
+
+        if (PrimitiveTypes.IsPrimitiveType(bare))
+        {
+            var mapped = PrimitiveTypes[bare];
+            return hadNull ? $"{mapped}?" : mapped;
+        }
+
+        if (TypeShape.TrySplitTopLevelUnionArms(bare, out _))
+        {
+            return hadNull ? "object?" : "object";
+        }
+
+        if (TypeShape.TryGetArrayElementTypeName(bare, out var element))
+        {
+            var mappedElement = MapNestedTypeFragment(element);
+            return hadNull ? $"{mappedElement}[]?" : $"{mappedElement}[]";
+        }
+
+        if (TypeShape.TryGetRecordTypeArguments(bare, out var k, out var v))
+        {
+            var mk = MapNestedTypeFragment(k);
+            var mv = MapNestedTypeFragment(v);
+            return hadNull ? $"Dictionary<{mk}, {mv}>?" : $"Dictionary<{mk}, {mv}>";
+        }
+
+        return hadNull ? $"{bare}?" : bare;
+    }
 }

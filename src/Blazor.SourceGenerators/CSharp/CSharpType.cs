@@ -108,14 +108,14 @@ internal record CSharpType(
         else if (TypeShape.TryGetRecordTypeArguments(RawTypeName, out var keyType, out var valueType))
         {
             // `Record<K, V>` -> `Dictionary<TKey, TValue>` with both
-            // arguments routed through the primitive map. See
+            // arguments routed through the recursive
+            // `TypeMap.MapNestedTypeFragment` helper. See
             // `CSharpProperty.MappedTypeName` for parallel handling
-            // on the DTO-property side. Without this branch the
-            // raw `Record<...>` token leaked into method signatures
-            // for parameters like
-            // `URLSearchParams(init?: Record<string, string>)`.
-            var mappedKey = TypeMap.PrimitiveTypes[keyType];
-            var mappedValue = TypeMap.PrimitiveTypes[valueType];
+            // on the DTO-property side. Without recursive mapping, an
+            // argument like `Record<string, number[]>` leaked the raw
+            // `number[]` spelling into the emitted parameter type.
+            var mappedKey = TypeMap.MapNestedTypeFragment(keyType);
+            var mappedValue = TypeMap.MapNestedTypeFragment(valueType);
             typeName = $"Dictionary<{mappedKey}, {mappedValue}>";
         }
         else
