@@ -31,6 +31,9 @@
     <NavLink id="stt" href="listen" @onclick=@(_ => OnNavigate.InvokeAsync())>
         <Icon Name="mic" /> <span>Speech-to-text</span>
     </NavLink>
+    <NavLink id="audio" href="audio" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="volume" /> <span>Audio lab</span>
+    </NavLink>
 
     <div class="nav-section">Lab</div>
     <NavLink id="sandbox" href="sandbox" @onclick=@(_ => OnNavigate.InvokeAsync())>

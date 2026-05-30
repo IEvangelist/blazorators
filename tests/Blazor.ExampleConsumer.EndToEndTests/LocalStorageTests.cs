@@ -3,11 +3,10 @@
 
 namespace Blazor.ExampleConsumer.EndToEndTests;
 
+[Collection(ExampleSiteCollection.Name)]
 [Trait("Category", "EndToEnd")]
-public sealed partial class LocalStorageTests
+public sealed partial class LocalStorageTests(BlazoratorsSiteFixture site)
 {
-    const string DemoSite = "https://ievangelist.github.io/blazorators";
-
     static bool IsDebugging => Debugger.IsAttached;
     static bool IsHeadless => !IsDebugging;
 
@@ -35,12 +34,11 @@ public sealed partial class LocalStorageTests
         {
             page.SetDefaultTimeout(0);
         }
-        await page.GotoAsync(DemoSite);
+        await page.GotoAsync(site.UrlFor("/todos"));
+        await page.EvaluateAsync("() => localStorage.clear()");
+        await page.ReloadAsync(new() { WaitUntil = WaitUntilState.NetworkIdle });
 
         // Act
-        await page.ClickAsync(Selectors.StoragePagetNavLink);
-        await page.ClickAsync(Selectors.ClearAllButton);
-
         foreach (var todo in todos)
         {
             await page.FillAsync(Selectors.TodoInput, todo);
@@ -55,10 +53,6 @@ public sealed partial class LocalStorageTests
 
 file static class Selectors
 {
-    internal const string StoragePagetNavLink = "#storage";
-
-    internal const string ClearAllButton = "#clearall";
-
     internal const string TodoInput = "#todo";
 
     internal const string AddButton = "#add";

@@ -28,7 +28,9 @@
         <button type="button"
                 class="mic-btn @(_isRecognizingSpeech ? "recording" : null)"
                 title="@(_isRecognizingSpeech ? "Stop" : "Listen")"
-                aria-pressed="@_isRecognizingSpeech"
+                aria-label="@(_isRecognizingSpeech ? "Stop speech recognition" : "Start speech recognition")"
+                aria-pressed="@(_isRecognizingSpeech ? "true" : "false")"
+                aria-describedby="speech-status"
                 @onclick=@OnRecognizeSpeechClick>
             @if (_isRecognizingSpeech)
             {
@@ -39,8 +41,8 @@
                 <Icon Name="mic" />
             }
         </button>
-        <span class="mic-label">
-            @(_isRecognizingSpeech ? "Listening…" : "Tap to listen")
+        <span class="mic-label" id="speech-status" role="status" aria-live="polite">
+            @(_isRecognizingSpeech ? "Listening…" : "Ready to listen")
         </span>
     </div>
 </section>

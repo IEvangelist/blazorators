@@ -3,6 +3,11 @@
 @implements IDisposable
 @inject NavigationManager Nav
 
+<a class="skip-link"
+   href="#main"
+   @onclick=SkipToMainAsync
+   @onclick:preventDefault="true">Skip to content</a>
+
 <div class="app @(_navToggled ? "nav-toggled" : null)">
     <aside class="app-sidebar" id="appSidebar">
         <NavMenu OnNavigate=@CloseNav />
@@ -16,8 +21,8 @@
     <header class="app-header">
         <button class="btn btn-icon btn-ghost nav-toggle"
                 type="button"
-                aria-label="Toggle navigation"
-                aria-expanded="@(!_navToggled)"
+                aria-label="@(_navToggled ? "Close navigation" : "Open navigation")"
+                aria-expanded="@(_navToggled ? "true" : "false")"
                 aria-controls="appSidebar"
                 @onclick=ToggleNav>
             <Icon Name="menu" />
@@ -39,7 +44,7 @@
         </div>
     </header>
 
-    <main class="app-main" id="main">
+    <main class="app-main" id="main" tabindex="-1" @ref="_main">
         <div class="content page-enter" @key=Nav.Uri>
             @Body
         </div>
@@ -48,6 +53,7 @@
 
 @code {
     bool _navToggled;
+    ElementReference _main;
     string _runtimeShort = RuntimeInformation.FrameworkDescription;
 
     protected override void OnInitialized()
@@ -57,6 +63,19 @@
 
     void ToggleNav() => _navToggled = !_navToggled;
     void CloseNav() => _navToggled = false;
+
+    async Task SkipToMainAsync()
+    {
+        var relativePath = Nav.ToBaseRelativePath(Nav.Uri);
+        var existingFragmentStart = relativePath.IndexOf('#');
+        if (existingFragmentStart >= 0)
+        {
+            relativePath = relativePath[..existingFragmentStart];
+        }
+
+        Nav.NavigateTo($"{relativePath}#main", replace: true);
+        await _main.FocusAsync();
+    }
 
     void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
     {
