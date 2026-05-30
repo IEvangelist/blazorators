@@ -34,7 +34,15 @@ internal sealed partial class TypeDeclarationParser
         {
             if (index == 0)
             {
-                var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
+                var rawTypeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
+                // Generic interface headers like `interface CustomEventInit<T = any> extends ... {`
+                // capture as `"CustomEventInit<T"` because the underlying
+                // regex greedy-matches non-whitespace. Normalize so the
+                // resulting `CSharpObject.TypeName` is a bare identifier
+                // and the reader/parser dictionaries can look the type
+                // up. Generic propagation (rendering `<T>` in emitted
+                // C#) is deferred to a later phase.
+                var typeName = NormalizeTypeName(rawTypeName);
 
                 // Parse the *full* extends list. TS supports
                 // `interface X extends A, B, C { ... }` and the
@@ -225,7 +233,8 @@ internal sealed partial class TypeDeclarationParser
         {
             if (index == 0)
             {
-                var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
+                var typeName = NormalizeTypeName(
+                    InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName"));
                 if (typeName is not null)
                 {
                     // Cycle guard: see ToObject for rationale.
@@ -488,7 +497,8 @@ internal sealed partial class TypeDeclarationParser
         {
             if (index == 0)
             {
-                var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
+                var typeName = NormalizeTypeName(
+                    InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName"));
                 if (typeName is not null)
                 {
                     // Cycle guard: see ToObject for rationale.
@@ -933,12 +943,14 @@ internal sealed partial class TypeDeclarationParser
     /// projected through JS interop.
     /// </summary>
     /// <remarks>
+    /// The split is depth-aware on <c>&lt;</c>/<c>&gt;</c> so a generic
+    /// base like <c>Map&lt;K, V&gt;</c> is treated as a single token.
     /// Examples:
     /// <code>
-    /// "interface X extends A, B, C {"     => [A, B, C]
-    /// "interface X extends EventTarget {" => []
-    /// "interface X extends A {"           => [A]
-    /// "interface X {"                     => []
+    /// "interface X extends A, B, C {"               => [A, B, C]
+    /// "interface X extends EventTarget {"           => []
+    /// "interface X extends Map&lt;K, V&gt;, Y {"    => [Map&lt;K, V&gt;, Y]
+    /// "interface X {"                               => []
     /// </code>
     /// </remarks>
     private static List<string> ExtractExtendsBases(string interfaceHeaderSegment)
@@ -959,12 +971,40 @@ internal sealed partial class TypeDeclarationParser
         var end = brace >= 0 ? brace : interfaceHeaderSegment.Length;
         var clause = interfaceHeaderSegment.Substring(start, end - start);
 
-        foreach (var token in clause.Split(','))
+        // Depth-aware split on `,` -- commas inside a generic type
+        // argument list (e.g. `Map<K, V>`) must not separate bases.
+        var depth = 0;
+        var tokenStart = 0;
+        for (var i = 0; i < clause.Length; i++)
+        {
+            var ch = clause[i];
+            if (ch == '<')
+            {
+                depth++;
+            }
+            else if (ch == '>')
+            {
+                if (depth > 0)
+                {
+                    depth--;
+                }
+            }
+            else if (ch == ',' && depth == 0)
+            {
+                AddBase(bases, clause.Substring(tokenStart, i - tokenStart));
+                tokenStart = i + 1;
+            }
+        }
+
+        AddBase(bases, clause.Substring(tokenStart, clause.Length - tokenStart));
+        return bases;
+
+        static void AddBase(List<string> sink, string token)
         {
             var trimmed = token.Trim();
             if (trimmed.Length == 0)
             {
-                continue;
+                return;
             }
 
             // EventTarget contributes the DOM event-listener surface,
@@ -972,13 +1012,11 @@ internal sealed partial class TypeDeclarationParser
             // Preserve that behavior for multi-extends.
             if (string.Equals(trimmed, "EventTarget", StringComparison.Ordinal))
             {
-                continue;
+                return;
             }
 
-            bases.Add(trimmed);
+            sink.Add(trimmed);
         }
-
-        return bases;
     }
 
     /// <summary>

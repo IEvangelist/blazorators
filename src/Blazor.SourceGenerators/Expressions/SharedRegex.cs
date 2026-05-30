@@ -65,4 +65,31 @@ internal static class SharedRegex
     public static readonly Regex ArrayValuesRegex =
         new(@"\[(?'Values'[^[\]]*)\]",
             RegexOptions.Multiline | DefaultOptions);
+
+    /// <summary>
+    /// Strips a generic type-parameter clause from a TypeScript
+    /// identifier so the result can be used as a dictionary key or a
+    /// C# type name. The raw token captured by
+    /// <see cref="InterfaceTypeNameRegex"/> includes anything up to
+    /// the next whitespace, which for generic interfaces means a
+    /// fragment like <c>"CustomEventInit&lt;T"</c>. Strip from the
+    /// first <c>&lt;</c> to produce <c>"CustomEventInit"</c>. The
+    /// helper is null-safe and trims surrounding whitespace.
+    /// </summary>
+    public static string? NormalizeTypeName(string? rawTypeName)
+    {
+        if (rawTypeName is null)
+        {
+            return null;
+        }
+
+        var trimmed = rawTypeName.Trim();
+        if (trimmed.Length == 0)
+        {
+            return trimmed;
+        }
+
+        var openAngle = trimmed.IndexOf('<');
+        return openAngle >= 0 ? trimmed.Substring(0, openAngle) : trimmed;
+    }
 }

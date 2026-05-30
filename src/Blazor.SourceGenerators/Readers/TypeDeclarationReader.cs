@@ -49,10 +49,11 @@ internal sealed partial class TypeDeclarationReader
                 foreach (Match match in InterfaceRegex.Matches(typeDeclarations))
                 {
                     var matchValue = match.Value;
-                    var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(matchValue, "TypeName");
-                    if (typeName is not null)
+                    var rawTypeName = InterfaceTypeNameRegex.GetMatchGroupValue(matchValue, "TypeName");
+                    var typeName = NormalizeTypeName(rawTypeName);
+                    if (!string.IsNullOrEmpty(typeName))
                     {
-                        map[typeName] = matchValue;
+                        map[typeName!] = matchValue;
                     }
                 }
             }
