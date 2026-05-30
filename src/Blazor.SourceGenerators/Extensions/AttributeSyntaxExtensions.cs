@@ -354,4 +354,54 @@ static class AttributeSyntaxExtensions
             Namespace: ns,
             TypeDeclarationSources: sources);
     }
+
+    /// <summary>
+    /// Value-bundle for <c>[JSAutoEnum]</c> parsing. Only carries the
+    /// shape-specific properties (no <c>Implementation</c>,
+    /// <c>HostingModel</c>, or generic-method options - those are
+    /// service-only concepts).
+    /// </summary>
+    internal readonly record struct EnumAttributeOptions(
+        string? TypeName,
+        string? Namespace,
+        string[]? TypeDeclarationSources);
+
+    /// <summary>
+    /// Reads the named arguments of a <c>JSAutoEnumAttribute</c> usage.
+    /// The attribute exposes <c>TypeName</c> (optional, inferred from the
+    /// anchor when omitted), <c>Namespace</c> (optional override), and
+    /// <c>TypeDeclarationSources</c> (optional <c>.d.ts</c> overrides).
+    /// All three are <see cref="string"/>-ish so semantic-model-backed
+    /// constant evaluation handles <c>nameof(...)</c> / consts uniformly.
+    /// </summary>
+    internal static EnumAttributeOptions GetEnumOptions(
+        this AttributeSyntax attribute,
+        SemanticModel? semanticModel = null)
+    {
+        string? typeName = null;
+        string? ns = null;
+        string[]? sources = null;
+
+        if (attribute is { ArgumentList: not null })
+        {
+            foreach (var arg in attribute.ArgumentList.Arguments)
+            {
+                var propName = arg.NameEquals?.Name?.ToString();
+                switch (propName)
+                {
+                    case nameof(EnumAttributeOptions.TypeName):
+                        typeName = ReadString(arg.Expression, semanticModel);
+                        break;
+                    case nameof(EnumAttributeOptions.Namespace):
+                        ns = ReadString(arg.Expression, semanticModel);
+                        break;
+                    case nameof(EnumAttributeOptions.TypeDeclarationSources):
+                        sources = ReadStringArray(arg.Expression, semanticModel);
+                        break;
+                }
+            }
+        }
+
+        return new EnumAttributeOptions(typeName, ns, sources);
+    }
 }

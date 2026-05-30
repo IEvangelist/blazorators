@@ -49,4 +49,16 @@ internal sealed partial class TypeDeclarationParser
 
         return result;
     }
+
+    /// <summary>
+    /// Look up a TypeScript type alias and classify it for string-literal
+    /// union projection. Forwarding directly to
+    /// <see cref="TypeDeclarationReader.ClassifyStringLiteralUnion"/> so
+    /// the generator pipeline can stay reader-agnostic (the reader is an
+    /// implementation detail of the parser; everything in
+    /// <c>JavaScriptInteropGenerator</c> only ever talks to the parser).
+    /// </summary>
+    public TypeDeclarationReader.StringLiteralUnionClassification ClassifyStringLiteralUnion(
+        string aliasName, out IReadOnlyList<string> rawMembers) =>
+        _reader.ClassifyStringLiteralUnion(aliasName, out rawMembers);
 }

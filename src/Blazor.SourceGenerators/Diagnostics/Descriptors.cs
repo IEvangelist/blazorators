@@ -44,4 +44,20 @@ static class Descriptors
         "Blazorators.JSAutoInteropAttribute",
         DiagnosticSeverity.Error,
         true);
+
+    internal static readonly DiagnosticDescriptor NotStringLiteralUnionDiagnostic = new(
+        "BR0008",
+        "Type alias is not a string-literal union",
+        "Type alias '{0}' was found but is not a string-literal union (e.g. \"a\" | \"b\" | \"c\"). [JSAutoEnum] only supports string-literal-union aliases. Use [JSAutoType] for object types or remove the [JSAutoEnum] attribute.",
+        "Blazorators.JSAutoEnumAttribute",
+        DiagnosticSeverity.Error,
+        true);
+
+    internal static readonly DiagnosticDescriptor InvalidEnumProjectionMemberDiagnostic = new(
+        "BR0009",
+        "String-literal union member produced an invalid or duplicate C# enum identifier",
+        "String-literal union '{0}' contains a member that could not be projected into a unique, valid C# enum identifier ({1}). Resolve the collision in the upstream TypeScript declaration or apply [JSAutoEnum] to a different union.",
+        "Blazorators.JSAutoEnumAttribute",
+        DiagnosticSeverity.Error,
+        true);
 }

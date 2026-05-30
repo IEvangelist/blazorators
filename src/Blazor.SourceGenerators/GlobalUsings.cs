@@ -9,6 +9,7 @@ global using System.Text.RegularExpressions;
 global using Blazor.SourceGenerators.CSharp;
 global using Blazor.SourceGenerators.Builders;
 global using Blazor.SourceGenerators.Diagnostics;
+global using Blazor.SourceGenerators.Emitters;
 global using Blazor.SourceGenerators.Expressions;
 global using Blazor.SourceGenerators.Extensions;
 global using Blazor.SourceGenerators.JavaScript;

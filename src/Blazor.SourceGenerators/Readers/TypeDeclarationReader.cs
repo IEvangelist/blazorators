@@ -133,38 +133,62 @@ internal sealed partial class TypeDeclarationReader
     /// <summary>
     /// When the supplied alias is a string-literal union (e.g.
     /// <c>type DocumentReadyState = "complete" | "interactive" |
-    /// "loading";</c>), returns the distinct ordered list of raw
-    /// string values. Returns <see langword="false"/> for unknown
-    /// aliases, identifier unions, primitive aliases, function-type
-    /// aliases, and any other non-string-literal alias shape.
+    /// "loading";</c>), returns <see langword="true"/> and the distinct
+    /// ordered list of raw string values. Returns <see langword="false"/>
+    /// for unknown aliases, identifier unions, primitive aliases,
+    /// function-type aliases, and any other non-string-literal alias
+    /// shape. Thin wrapper around
+    /// <see cref="ClassifyStringLiteralUnion"/> preserved for callers
+    /// (and tests) that only need a boolean disposition.
     /// </summary>
-    /// <remarks>
-    /// Detection only — this method does not change generated output.
-    /// It exists so downstream code (and tests) can identify which
-    /// aliases are candidates for C# enum projection in a future
-    /// opt-in feature.
-    /// </remarks>
     public bool TryGetStringLiteralUnion(
+        string aliasName, out IReadOnlyList<string> rawMembers) =>
+        ClassifyStringLiteralUnion(aliasName, out rawMembers)
+            == StringLiteralUnionClassification.StringLiteralUnion;
+
+    /// <summary>
+    /// Three-way classification for a TypeScript type alias lookup. Lets
+    /// callers distinguish "alias not found at all" (BR0006) from "alias
+    /// exists but isn't a string-literal union" (BR0008) without having
+    /// to call <see cref="TryGetTypeAlias"/> separately.
+    /// </summary>
+    internal enum StringLiteralUnionClassification
+    {
+        AliasNotFound,
+        NotStringLiteralUnion,
+        StringLiteralUnion,
+    }
+
+    /// <summary>
+    /// Classifies the supplied alias name as a string-literal union (and
+    /// returns its raw members), an alias that exists but is the wrong
+    /// shape, or an unknown alias. Use this in preference to a
+    /// separate <see cref="TryGetTypeAlias"/> call when the caller needs
+    /// to emit a different diagnostic for each failure mode.
+    /// </summary>
+    public StringLiteralUnionClassification ClassifyStringLiteralUnion(
         string aliasName, out IReadOnlyList<string> rawMembers)
     {
+        rawMembers = Array.Empty<string>();
         if (!_typeAliasMap.TryGetValue(aliasName, out var aliasText) ||
             aliasText is null)
         {
-            rawMembers = Array.Empty<string>();
-            return false;
+            return StringLiteralUnionClassification.AliasNotFound;
         }
 
-        // `aliasText` is the full match captured by `TypeRegex`, which
-        // looks like `type X = ...;`. Strip everything through the
-        // first `=` so the detector sees only the body.
         var equalsIndex = aliasText.IndexOf('=');
         if (equalsIndex < 0 || equalsIndex == aliasText.Length - 1)
         {
-            rawMembers = Array.Empty<string>();
-            return false;
+            return StringLiteralUnionClassification.NotStringLiteralUnion;
         }
 
         var body = aliasText.Substring(equalsIndex + 1);
-        return StringLiteralUnionDetector.TryParse(body, out rawMembers);
+        if (StringLiteralUnionDetector.TryParse(body, out rawMembers))
+        {
+            return StringLiteralUnionClassification.StringLiteralUnion;
+        }
+
+        rawMembers = Array.Empty<string>();
+        return StringLiteralUnionClassification.NotStringLiteralUnion;
     }
 }

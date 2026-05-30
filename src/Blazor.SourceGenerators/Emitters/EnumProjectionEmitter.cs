@@ -1,0 +1,376 @@
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+using Microsoft.CodeAnalysis.CSharp;
+
+namespace Blazor.SourceGenerators.Emitters;
+
+/// <summary>
+/// Emits the C# source for a string-literal-union -&gt; C# enum projection.
+/// Produces an enum decorated with a per-enum
+/// <c>System.Text.Json.Serialization.JsonConverter&lt;TEnum&gt;</c> that
+/// maps raw TypeScript values to enum members (and back) exactly. We
+/// avoid <c>JsonStringEnumConverter</c> + <c>[EnumMember]</c> because
+/// <c>JsonStringEnumConverter</c> does NOT honor <c>[EnumMember(Value=...)]</c>
+/// on older .NET runtimes - so a generated enum would compile but
+/// serialize/deserialize incorrectly. The per-enum converter is the only
+/// approach that works across every supported framework target.
+/// </summary>
+internal static class EnumProjectionEmitter
+{
+    /// <summary>
+    /// Outcome of <see cref="TryBuild"/>. Either a fully-formed source
+    /// string + hint name, or a structured error describing why
+    /// projection failed (member-name collision, invalid identifier
+    /// from a hyphenated raw value, etc.).
+    /// </summary>
+    internal readonly struct EmissionResult
+    {
+        public bool Success { get; }
+        public string? HintName { get; }
+        public string? Source { get; }
+        public string? ErrorReason { get; }
+
+        private EmissionResult(
+            bool success,
+            string? hintName,
+            string? source,
+            string? errorReason)
+        {
+            Success = success;
+            HintName = hintName;
+            Source = source;
+            ErrorReason = errorReason;
+        }
+
+        public static EmissionResult Ok(string hintName, string source) =>
+            new(true, hintName, source, null);
+
+        public static EmissionResult Fail(string reason) =>
+            new(false, null, null, reason);
+    }
+
+    /// <summary>
+    /// Build the C# source for one enum projection. Returns
+    /// <see cref="EmissionResult.Fail(string)"/> when:
+    /// <list type="bullet">
+    ///   <item>the resolved enum name is not a valid C# identifier;</item>
+    ///   <item>the resolved namespace contains a token that isn't a
+    ///   valid C# identifier;</item>
+    ///   <item>any raw TS value produces a null or duplicate enum
+    ///   member identifier.</item>
+    /// </list>
+    /// </summary>
+    public static EmissionResult TryBuild(
+        string enumName,
+        string? effectiveNamespace,
+        IReadOnlyList<string> rawMembers)
+    {
+        if (string.IsNullOrWhiteSpace(enumName) || !IsValidCSharpIdentifier(enumName))
+        {
+            return EmissionResult.Fail($"Resolved enum name '{enumName}' is not a valid C# identifier.");
+        }
+
+        if (!IsValidNamespaceOrNull(effectiveNamespace))
+        {
+            return EmissionResult.Fail($"Namespace '{effectiveNamespace}' is not a valid C# namespace.");
+        }
+
+        if (rawMembers is null || rawMembers.Count == 0)
+        {
+            return EmissionResult.Fail("String-literal union has no members.");
+        }
+
+        var memberMappings = new List<(string Raw, string Csharp)>(rawMembers.Count);
+        var seenIdentifiers = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var raw in rawMembers)
+        {
+            var csharp = StringLiteralUnionDetector.ToEnumMemberName(raw);
+            if (string.IsNullOrEmpty(csharp))
+            {
+                return EmissionResult.Fail(
+                    $"raw value '{EscapeForErrorMessage(raw)}' could not be projected to a valid C# enum identifier");
+            }
+
+            if (!IsValidCSharpIdentifier(csharp!))
+            {
+                return EmissionResult.Fail(
+                    $"raw value '{EscapeForErrorMessage(raw)}' projected to '{csharp}', which is not a valid C# identifier");
+            }
+
+            if (!seenIdentifiers.Add(csharp!))
+            {
+                return EmissionResult.Fail(
+                    $"raw value '{EscapeForErrorMessage(raw)}' collides with another raw value (both project to '{csharp}')");
+            }
+
+            memberMappings.Add((raw, csharp!));
+        }
+
+        var hintName = BuildHintName(effectiveNamespace, enumName);
+        var source = BuildSource(enumName, effectiveNamespace, memberMappings);
+        return EmissionResult.Ok(hintName, source);
+    }
+
+    private static string BuildSource(
+        string enumName,
+        string? effectiveNamespace,
+        IReadOnlyList<(string Raw, string Csharp)> mappings)
+    {
+        var converterName = $"{enumName}JsonConverter";
+        var sb = new StringBuilder();
+
+        sb.Append("// Copyright (c) David Pine. All rights reserved.\n");
+        sb.Append("// Licensed under the MIT License:\n");
+        sb.Append("// https://github.com/IEvangelist/blazorators/blob/main/LICENSE\n");
+        sb.Append("// Auto-generated by blazorators (JSAutoEnum projection).\n");
+        sb.Append("// Source TypeScript shape: string-literal union projected into a C# enum +\n");
+        sb.Append("// custom System.Text.Json converter. Do NOT edit manually.\n");
+        sb.Append("\n");
+        sb.Append("#nullable enable\n");
+        sb.Append("\n");
+
+        var hasNamespace = !string.IsNullOrWhiteSpace(effectiveNamespace);
+        if (hasNamespace)
+        {
+            sb.Append("namespace ").Append(effectiveNamespace).Append(";\n\n");
+        }
+
+        sb.Append("/// <summary>\n");
+        sb.Append("/// Generated C# projection of a TypeScript string-literal union.\n");
+        sb.Append("/// Raw TypeScript values:\n");
+        foreach (var (raw, csharp) in mappings)
+        {
+            sb.Append("/// <list type=\"bullet\"><item><c>\"")
+              .Append(EscapeForXmlDoc(raw))
+              .Append("\"</c> &#8594; <c>")
+              .Append(csharp)
+              .Append("</c></item></list>\n");
+        }
+        sb.Append("/// </summary>\n");
+        sb.Append("[global::System.Text.Json.Serialization.JsonConverter(typeof(")
+          .Append(converterName)
+          .Append("))]\n");
+        sb.Append("public enum ").Append(enumName).Append("\n{\n");
+
+        for (var i = 0; i < mappings.Count; i++)
+        {
+            var (raw, csharp) = mappings[i];
+            sb.Append("    /// <summary>Maps to raw TypeScript value <c>\"")
+              .Append(EscapeForXmlDoc(raw))
+              .Append("\"</c>.</summary>\n");
+            sb.Append("    [global::System.Runtime.Serialization.EnumMember(Value = \"")
+              .Append(EscapeForCSharpStringLiteral(raw))
+              .Append("\")]\n");
+            sb.Append("    ").Append(csharp).Append(",\n");
+        }
+
+        sb.Append("}\n\n");
+
+        EmitConverter(sb, enumName, converterName, mappings);
+
+        return sb.ToString();
+    }
+
+    private static void EmitConverter(
+        StringBuilder sb,
+        string enumName,
+        string converterName,
+        IReadOnlyList<(string Raw, string Csharp)> mappings)
+    {
+        sb.Append("/// <summary>\n");
+        sb.Append("/// Generated <see cref=\"global::System.Text.Json.Serialization.JsonConverter{T}\"/>\n");
+        sb.Append("/// for <see cref=\"").Append(enumName).Append("\"/>. Maps raw TypeScript values to\n");
+        sb.Append("/// enum members exactly, with no reliance on member-name conventions.\n");
+        sb.Append("/// </summary>\n");
+        sb.Append("public sealed class ").Append(converterName)
+          .Append(" : global::System.Text.Json.Serialization.JsonConverter<")
+          .Append(enumName).Append(">\n{\n");
+
+        // Read(...) - JSON string -> enum.
+        sb.Append("    /// <inheritdoc/>\n");
+        sb.Append("    public override ").Append(enumName).Append(" Read(\n");
+        sb.Append("        ref global::System.Text.Json.Utf8JsonReader reader,\n");
+        sb.Append("        global::System.Type typeToConvert,\n");
+        sb.Append("        global::System.Text.Json.JsonSerializerOptions options)\n");
+        sb.Append("    {\n");
+        sb.Append("        if (reader.TokenType != global::System.Text.Json.JsonTokenType.String)\n");
+        sb.Append("        {\n");
+        sb.Append("            throw new global::System.Text.Json.JsonException(\n");
+        sb.Append("                $\"Expected a string token for ").Append(enumName).Append(", got {reader.TokenType}.\");\n");
+        sb.Append("        }\n");
+        sb.Append("        var value = reader.GetString();\n");
+        sb.Append("        return value switch\n");
+        sb.Append("        {\n");
+        foreach (var (raw, csharp) in mappings)
+        {
+            sb.Append("            \"")
+              .Append(EscapeForCSharpStringLiteral(raw))
+              .Append("\" => ")
+              .Append(enumName).Append(".").Append(csharp).Append(",\n");
+        }
+        sb.Append("            _ => throw new global::System.Text.Json.JsonException(\n");
+        sb.Append("                $\"Unknown ").Append(enumName).Append(" value: '{value}'.\"),\n");
+        sb.Append("        };\n");
+        sb.Append("    }\n\n");
+
+        // Write(...) - enum -> JSON string.
+        sb.Append("    /// <inheritdoc/>\n");
+        sb.Append("    public override void Write(\n");
+        sb.Append("        global::System.Text.Json.Utf8JsonWriter writer,\n");
+        sb.Append("        ").Append(enumName).Append(" value,\n");
+        sb.Append("        global::System.Text.Json.JsonSerializerOptions options)\n");
+        sb.Append("    {\n");
+        sb.Append("        var raw = value switch\n");
+        sb.Append("        {\n");
+        foreach (var (raw, csharp) in mappings)
+        {
+            sb.Append("            ").Append(enumName).Append(".").Append(csharp)
+              .Append(" => \"")
+              .Append(EscapeForCSharpStringLiteral(raw))
+              .Append("\",\n");
+        }
+        sb.Append("            _ => throw new global::System.Text.Json.JsonException(\n");
+        sb.Append("                $\"Unknown ").Append(enumName).Append(" value: {value}.\"),\n");
+        sb.Append("        };\n");
+        sb.Append("        writer.WriteStringValue(raw);\n");
+        sb.Append("    }\n");
+        sb.Append("}\n");
+    }
+
+    /// <summary>
+    /// Build a hint name that survives same-enum-name-different-namespace
+    /// collisions. AddSource is keyed by hint name; two enums named
+    /// <c>InsertPosition</c> in different namespaces are legal C#, so the
+    /// hint name has to incorporate the namespace.
+    /// </summary>
+    private static string BuildHintName(string? effectiveNamespace, string enumName) =>
+        string.IsNullOrWhiteSpace(effectiveNamespace)
+            ? $"{enumName}.Enum.g.cs"
+            : $"{effectiveNamespace}.{enumName}.Enum.g.cs";
+
+    /// <summary>
+    /// Permissive identifier validation backed by <see cref="SyntaxFacts"/>.
+    /// Accepts any non-keyword identifier; the caller already excludes
+    /// empty / null at the call site.
+    /// </summary>
+    private static bool IsValidCSharpIdentifier(string candidate) =>
+        SyntaxFacts.IsValidIdentifier(candidate);
+
+    /// <summary>
+    /// Validate every dotted segment of a namespace as a separate C#
+    /// identifier. <see langword="null"/> / whitespace counts as
+    /// "no namespace" (global), which is valid.
+    /// </summary>
+    private static bool IsValidNamespaceOrNull(string? candidate)
+    {
+        if (string.IsNullOrWhiteSpace(candidate))
+        {
+            return true;
+        }
+
+        foreach (var segment in candidate!.Split('.'))
+        {
+            if (!IsValidCSharpIdentifier(segment))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Escape a raw TypeScript string for embedding in a C# verbatim-free
+    /// string literal. Handles double-quote, backslash, and the standard
+    /// control characters defensively so malformed TS doesn't leak into
+    /// uncompilable C# output.
+    /// </summary>
+    private static string EscapeForCSharpStringLiteral(string raw)
+    {
+        var sb = new StringBuilder(raw.Length);
+        foreach (var c in raw)
+        {
+            switch (c)
+            {
+                case '\\': sb.Append(@"\\"); break;
+                case '\"': sb.Append("\\\""); break;
+                case '\r': sb.Append(@"\r"); break;
+                case '\n': sb.Append(@"\n"); break;
+                case '\t': sb.Append(@"\t"); break;
+                case '\0': sb.Append(@"\0"); break;
+                default:
+                    if (c < ' ')
+                    {
+                        sb.Append("\\u").Append(((int)c).ToString("x4", System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Escape a raw value for inclusion in an XML doc comment. We don't
+    /// need full XML escaping (the comment is informational), but a stray
+    /// <c>&lt;</c> or <c>&amp;</c> would still break the consumer's
+    /// XML doc emit.
+    /// </summary>
+    private static string EscapeForXmlDoc(string raw)
+    {
+        var sb = new StringBuilder(raw.Length);
+        foreach (var c in raw)
+        {
+            switch (c)
+            {
+                case '<': sb.Append("&lt;"); break;
+                case '>': sb.Append("&gt;"); break;
+                case '&': sb.Append("&amp;"); break;
+                case '\r':
+                case '\n':
+                    sb.Append(' ');
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Used only for diagnostic messages - keep newlines / control chars
+    /// out of the user-facing message so the Roslyn squiggle text stays
+    /// on one line.
+    /// </summary>
+    private static string EscapeForErrorMessage(string raw)
+    {
+        var sb = new StringBuilder(raw.Length);
+        foreach (var c in raw)
+        {
+            switch (c)
+            {
+                case '\r': sb.Append("\\r"); break;
+                case '\n': sb.Append("\\n"); break;
+                case '\t': sb.Append("\\t"); break;
+                case '\"': sb.Append("\\\""); break;
+                default:
+                    if (c < ' ')
+                    {
+                        sb.Append("\\u").Append(((int)c).ToString("x4", System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+}

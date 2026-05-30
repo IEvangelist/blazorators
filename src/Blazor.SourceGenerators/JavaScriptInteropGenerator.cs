@@ -11,6 +11,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
     private const string JSAutoInteropAttributeMetadataName = "JSAutoInteropAttribute";
     private const string JSAutoGenericInteropAttributeMetadataName = "JSAutoGenericInteropAttribute";
     private const string JSAutoServiceAttributeMetadataName = "JSAutoServiceAttribute";
+    private const string JSAutoEnumAttributeMetadataName = "JSAutoEnumAttribute";
 
     private static readonly HashSet<(string FileName, string SourceCode)> s_sourceCodeToAdd =
     [
@@ -19,6 +20,7 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         (nameof(JSAutoInteropAttribute).ToGeneratedFileName(), JSAutoInteropAttribute),
         (nameof(JSAutoGenericInteropAttribute).ToGeneratedFileName(), JSAutoGenericInteropAttribute),
         (nameof(JSAutoServiceAttribute).ToGeneratedFileName(), JSAutoServiceAttribute),
+        (nameof(JSAutoEnumAttribute).ToGeneratedFileName(), JSAutoEnumAttribute),
     ];
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -77,6 +79,19 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
                 transform: static (ctx, ct) => BuildAssemblyTargets(ctx, ct))
             .SelectMany(static (targets, _) => targets);
 
+        // C2 - JSAutoEnum projection. Lives on its own pipeline branch
+        // because the emission shape (enum + per-enum JsonConverter) and
+        // the diagnostics (BR0008/BR0009) are distinct from the service-
+        // projection pipeline. Routed through its own RegisterSourceOutput
+        // below so an enum projection failure can't bring down the much
+        // larger service Execute path.
+        var enumTargets = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                JSAutoEnumAttributeMetadataName,
+                predicate: static (node, _) => node is InterfaceDeclarationSyntax,
+                transform: static (ctx, ct) => BuildEnumTarget(ctx, ct))
+            .Where(static t => t is not null);
+
         var allTargets = nonGenericTargets.Collect()
             .Combine(genericTargets.Collect())
             .Combine(assemblyTargets.Collect());
@@ -97,6 +112,14 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         var executeInput = allTargets.Combine(dtsSources);
 
         context.RegisterSourceOutput(executeInput, Execute);
+
+        // Independent output registration for enum projection. Combining
+        // with the same dtsSources lets enum lookups honor
+        // `TypeDeclarationSources`, but the failure model stays separate -
+        // a failed enum projection only emits BR0008/BR0009; it never
+        // disturbs the service pipeline above.
+        var enumExecuteInput = enumTargets.Collect().Combine(dtsSources);
+        context.RegisterSourceOutput(enumExecuteInput, ExecuteEnums);
     }
 
     private static InteropTarget? BuildTarget(
