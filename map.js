@@ -55,6 +55,11 @@ export async function createMap(containerId, latitude, longitude, theme) {
     const marker = new maplibregl.Marker({ color: getCssVar('--primary-hex') })
         .setLngLat([longitude, latitude])
         .addTo(map);
+    const markerElement = marker.getElement();
+    markerElement.setAttribute('aria-hidden', 'true');
+    markerElement.removeAttribute('aria-label');
+    markerElement.removeAttribute('role');
+    markerElement.removeAttribute('tabindex');
 
     instances.set(containerId, { map, marker, maplibregl });
     return true;

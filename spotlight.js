@@ -7,6 +7,29 @@
 // `data-spotlight` and is otherwise ordinary HTML.
 
 const wired = new WeakSet();
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const coarsePointer = window.matchMedia('(pointer: coarse)');
+
+function supportsSpotlight() {
+    return !prefersReducedMotion.matches && !coarsePointer.matches;
+}
+
+function setSpotlightPosition(card, x, y) {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${x - r.left}px`);
+    card.style.setProperty('--my', `${y - r.top}px`);
+}
+
+function centerSpotlight(card) {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${r.width / 2}px`);
+    card.style.setProperty('--my', `${r.height / 2}px`);
+}
+
+function clearSpotlight(card) {
+    card.style.removeProperty('--mx');
+    card.style.removeProperty('--my');
+}
 
 function attach(card) {
     if (wired.has(card)) {
@@ -15,14 +38,23 @@ function attach(card) {
     wired.add(card);
 
     card.addEventListener('pointermove', e => {
-        const r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-        card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        if (supportsSpotlight()) {
+            setSpotlightPosition(card, e.clientX, e.clientY);
+        }
     });
 
     card.addEventListener('pointerleave', () => {
-        card.style.removeProperty('--mx');
-        card.style.removeProperty('--my');
+        clearSpotlight(card);
+    });
+
+    card.addEventListener('focus', () => {
+        if (supportsSpotlight()) {
+            centerSpotlight(card);
+        }
+    });
+
+    card.addEventListener('blur', () => {
+        clearSpotlight(card);
     });
 }
 
