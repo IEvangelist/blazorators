@@ -118,6 +118,18 @@ internal sealed partial class JavaScriptInteropGenerator : IIncrementalGenerator
         // literals, enum members, and verbatim/raw strings - shapes the
         // previous syntactic parser silently mangled (T1.11).
         var options = attributeSyntax.GetGeneratorOptions(isGeneric, context.SemanticModel);
+
+        // G1 - apply reasonable defaults for `TypeName` / `Implementation`
+        // when the consumer left them unset, so a bare `[JSAutoInterop]` on
+        // `IGeolocationService` infers `TypeName = "Geolocation"` and
+        // `Implementation = "window.geolocation"`. Explicit attribute
+        // arguments always win; when the interface name can't produce a
+        // sensible TypeName (e.g. `IService`), inference is skipped and the
+        // existing BR0001/BR0002 diagnostics surface the gap to the user.
+        options = OptionsInference.ApplyInferredDefaults(
+            options,
+            interfaceDeclaration.Identifier.ValueText);
+
         var isPartial = interfaceDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 
         var containingNamespace = context.TargetSymbol.ContainingNamespace is

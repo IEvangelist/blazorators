@@ -20,6 +20,16 @@ static partial class SourceCode
 /// public partial interface IGeolocationService;
 /// </code>
 /// This generates Blazor JavaScript-interop extensions for the <c>geolocation</c> APIs.
+/// <para>
+/// Both <see cref=""TypeName""/> and <see cref=""Implementation""/> are
+/// optional. When omitted, the source generator infers <see cref=""TypeName""/>
+/// from the host interface name (stripping a leading <c>I</c> and a trailing
+/// <c>Service</c> when present, e.g. <c>IGeolocationService</c> -&gt;
+/// <c>Geolocation</c>) and infers <see cref=""Implementation""/> as
+/// <c>window.{camelCase(TypeName)}</c>. APIs that hang off a non-root path
+/// (e.g. <c>navigator.geolocation</c>) must continue to supply
+/// <see cref=""Implementation""/> explicitly.
+/// </para>
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Interface,
@@ -31,6 +41,10 @@ public class JSAutoInteropAttribute : Attribute
     /// The type name that corresponds to the lib.dom.d.ts interface. For example, <c>""Geolocation""</c>.
     /// For more information, search 'interface {Name}'
     /// <a href='https://raw.githubusercontent.com/microsoft/TypeScript/main/lib/lib.dom.d.ts'>here for types</a>.
+    /// When unset, the generator infers the value from the host interface
+    /// name by stripping a leading <c>I</c> (when followed by an uppercase
+    /// letter) and a trailing <c>Service</c>. For example,
+    /// <c>IGeolocationService</c> infers <c>""Geolocation""</c>.
     /// </summary>
     public string TypeName { get; set; } = null!;
 
@@ -38,6 +52,10 @@ public class JSAutoInteropAttribute : Attribute
     /// The path from the <c>window</c> object to the corresponding <see cref=""TypeName""/> implementation.
     /// For example, if the <see cref=""TypeName""/> was <c>""Geolocation""</c>, this would be
     /// <c>""window.navigator.geolocation""</c> (or <c>""navigator.geolocation""</c>).
+    /// When unset, the generator infers the value as
+    /// <c>window.{camelCase(TypeName)}</c>. APIs reached via a non-root
+    /// path (e.g. <c>navigator.geolocation</c>, <c>navigator.clipboard</c>)
+    /// must set this property explicitly.
     /// </summary>
     public string Implementation { get; set; } = null!;
 

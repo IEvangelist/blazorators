@@ -14,19 +14,30 @@ public class DiagnosticTests : GeneratorBaseUnitTests
     [Fact]
     public void BR0001_ReportsWhenTypeNameMissing()
     {
+        // Post-G1, BR0001 fires only when TypeName inference fails. The
+        // interface name "IService" strips to empty after both the leading
+        // "I" and trailing "Service" suffixes are removed, so inference
+        // can't produce a sensible TypeName and BR0001 surfaces.
         const string source = @"
 namespace Sample
 {
     [JSAutoInterop(Implementation = ""window.foo"")]
-    public partial interface IFooService { }
+    public partial interface IService { }
 }";
         var result = GetRunResult(source);
         Assert.Contains(result.Diagnostics, d => d.Id == "BR0001");
     }
 
     [Fact]
-    public void BR0002_ReportsWhenImplementationMissing()
+    public void BR0002_DescriptorIsRegistered_ButNotTriggeredViaInferenceSurface()
     {
+        // BR0002 ("Implementation required") was originally triggered by
+        // an attribute that supplied TypeName but omitted Implementation.
+        // Post-G1, that path now flows through OptionsInference, which
+        // synthesises an Implementation from the resolved TypeName. So
+        // BR0002 is no longer reachable via the consumer attribute surface
+        // - it remains a declared diagnostic so future code paths (or a
+        // direct GeneratorOptions construction) can still report it.
         const string source = @"
 namespace Sample
 {
@@ -34,7 +45,16 @@ namespace Sample
     public partial interface IGeolocationService { }
 }";
         var result = GetRunResult(source);
-        Assert.Contains(result.Diagnostics, d => d.Id == "BR0002");
+
+        // No error-level BR0002; the inferred Implementation "window.geolocation"
+        // takes effect and generation proceeds normally.
+        Assert.DoesNotContain(result.Diagnostics, d => d.Id == "BR0002");
+
+        // The descriptor itself remains available for code paths that bypass
+        // inference (sanity check on the public diagnostic surface).
+        Assert.Equal(
+            "BR0002",
+            Blazor.SourceGenerators.Diagnostics.Descriptors.ImplementationRequiredDiagnostic.Id);
     }
 
     [Fact]
