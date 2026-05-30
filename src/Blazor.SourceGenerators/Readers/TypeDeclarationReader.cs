@@ -129,4 +129,42 @@ internal sealed partial class TypeDeclarationReader
     public bool TryGetTypeAlias(
         string typeAliasName, out string? typeAlias) =>
         _typeAliasMap.TryGetValue(typeAliasName, out typeAlias);
+
+    /// <summary>
+    /// When the supplied alias is a string-literal union (e.g.
+    /// <c>type DocumentReadyState = "complete" | "interactive" |
+    /// "loading";</c>), returns the distinct ordered list of raw
+    /// string values. Returns <see langword="false"/> for unknown
+    /// aliases, identifier unions, primitive aliases, function-type
+    /// aliases, and any other non-string-literal alias shape.
+    /// </summary>
+    /// <remarks>
+    /// Detection only — this method does not change generated output.
+    /// It exists so downstream code (and tests) can identify which
+    /// aliases are candidates for C# enum projection in a future
+    /// opt-in feature.
+    /// </remarks>
+    public bool TryGetStringLiteralUnion(
+        string aliasName, out IReadOnlyList<string> rawMembers)
+    {
+        if (!_typeAliasMap.TryGetValue(aliasName, out var aliasText) ||
+            aliasText is null)
+        {
+            rawMembers = Array.Empty<string>();
+            return false;
+        }
+
+        // `aliasText` is the full match captured by `TypeRegex`, which
+        // looks like `type X = ...;`. Strip everything through the
+        // first `=` so the detector sees only the body.
+        var equalsIndex = aliasText.IndexOf('=');
+        if (equalsIndex < 0 || equalsIndex == aliasText.Length - 1)
+        {
+            rawMembers = Array.Empty<string>();
+            return false;
+        }
+
+        var body = aliasText.Substring(equalsIndex + 1);
+        return StringLiteralUnionDetector.TryParse(body, out rawMembers);
+    }
 }
