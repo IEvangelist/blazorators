@@ -206,6 +206,34 @@ internal static class TypeShape
     internal static bool TrySplitTopLevelUnionArms(
         string rawTypeName,
         out IReadOnlyList<string> arms)
+        => TrySplitTopLevelArms(rawTypeName, '|', out arms);
+
+    /// <summary>
+    /// Sibling of <see cref="TrySplitTopLevelUnionArms"/> that detects
+    /// TS intersection expressions (<c>A &amp; B</c>) at the top level
+    /// of <paramref name="rawTypeName"/>. The same depth-aware walk is
+    /// used so nested generics (e.g. <c>A &amp; Pick&lt;B, C&gt;</c>),
+    /// arrays, parens, and object types don't trigger spurious splits.
+    /// </summary>
+    /// <param name="rawTypeName">The TS type expression (no trailing semicolon).</param>
+    /// <param name="arms">
+    /// Trimmed top-level arms when a top-level intersection is present.
+    /// Empty when the expression does not contain a top-level <c>&amp;</c>
+    /// separator.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> when the expression contains at least two top-level
+    /// arms separated by <c>&amp;</c>; otherwise <c>false</c>.
+    /// </returns>
+    internal static bool TrySplitTopLevelIntersectionArms(
+        string rawTypeName,
+        out IReadOnlyList<string> arms)
+        => TrySplitTopLevelArms(rawTypeName, '&', out arms);
+
+    private static bool TrySplitTopLevelArms(
+        string rawTypeName,
+        char separator,
+        out IReadOnlyList<string> arms)
     {
         if (string.IsNullOrEmpty(rawTypeName))
         {
@@ -255,8 +283,9 @@ internal static class TypeShape
                 case '}':
                     if (depthBrace > 0) depthBrace--;
                     break;
-                case '|':
-                    if (depthAngle == 0 && depthBracket == 0 &&
+                default:
+                    if (ch == separator &&
+                        depthAngle == 0 && depthBracket == 0 &&
                         depthParen == 0 && depthBrace == 0)
                     {
                         Push(rawTypeName, start, i);

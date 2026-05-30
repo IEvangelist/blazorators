@@ -453,6 +453,26 @@ internal sealed partial class TypeDeclarationParser
             return hadNullClause ? "object | null" : "object";
         }
 
+        // TS intersection aliases (`type X = A & B`) merge member sets
+        // at the type-system level but have no first-class C# analogue
+        // -- the closest projection would be a synthesized DTO carrying
+        // members from both sides, which requires resolving each arm
+        // independently (interface vs alias vs generic invocation) and
+        // a deduplication pass. That's a much larger change than this
+        // audit slice warrants, especially since the DOM corpus has
+        // exactly one alias intersection (`ElementTagNameMap`), and
+        // the second arm there is `Pick<SVGElementTagNameMap, Exclude<...>>`
+        // -- another TS-only construct we have no projection for. Fall
+        // back to `object` so the consumer's compile keeps moving;
+        // the depth-aware splitter guards against `&` tokens embedded
+        // inside generic arguments (so `Pick<...>` doesn't trigger a
+        // spurious split). Same nullability convention as the union
+        // branch above.
+        if (TypeShape.TrySplitTopLevelIntersectionArms(rhs, out _))
+        {
+            return hadNullClause ? "object | null" : "object";
+        }
+
         return type;
     }
 
