@@ -127,6 +127,18 @@ internal sealed partial class TypeDeclarationParser
                 break;
             }
 
+            // TS ES2015 accessor syntax (`get foo(): T;`) appears on a
+            // handful of DOM types (Document/Window location). Rewrite
+            // to the equivalent `readonly foo: T;` form before line
+            // dispatch so the existing property pipeline picks it up.
+            // Companion `set foo(p: T);` lines stay filtered by
+            // IsProperty's "Name contains `(`" guard.
+            line = NormalizeAccessorSyntax(line);
+            if (line.Length == 0)
+            {
+                continue;
+            }
+
             if (IsMethod(line, out var method) && method is not null)
             {
                 var methodName = method.GetGroupValue("MethodName");
@@ -268,6 +280,12 @@ internal sealed partial class TypeDeclarationParser
             {
                 // We're done
                 break;
+            }
+
+            line = NormalizeAccessorSyntax(line);
+            if (line.Length == 0)
+            {
+                continue;
             }
 
             if (IsMethod(line, out var method) && method is not null)
@@ -934,6 +952,47 @@ internal sealed partial class TypeDeclarationParser
 
         return isSuccess;
     }
+
+    /// <summary>
+    /// Rewrites a TypeScript ES2015 getter accessor line
+    /// (<c>get foo(): Bar;</c>) into the equivalent readonly property
+    /// declaration (<c>readonly foo: Bar;</c>) so the downstream
+    /// <c>IsProperty</c> regex picks it up. Returns the input verbatim
+    /// when the line is not an accessor.
+    /// </summary>
+    /// <remarks>
+    /// Setter accessors (<c>set foo(p: T);</c>) are intentionally left
+    /// alone — the <c>IsProperty</c> "Name contains <c>(</c>" guard
+    /// already drops them, which is the desired behavior. Today's
+    /// generator does not safely round-trip writes through JS interop
+    /// for property setters; the matching <c>get</c> accessor still
+    /// yields a read-only C# property.
+    /// </remarks>
+    internal static string NormalizeAccessorSyntax(string line)
+    {
+        // Cheap pre-filter: bail out on the common case (~98% of lines
+        // in lib.dom.d.ts don't start with `get `) before running the
+        // regex match.
+        if (line.Length < 5 || !line.StartsWith("get ", StringComparison.Ordinal))
+        {
+            return line;
+        }
+
+        var match = s_getterAccessorRegex.Match(line);
+        if (!match.Success)
+        {
+            return line;
+        }
+
+        var name = match.Groups["name"].Value;
+        var type = match.Groups["type"].Value;
+        return $"readonly {name}: {type};";
+    }
+
+    private static readonly Regex s_getterAccessorRegex =
+        new(
+            @"^get\s+(?<name>\w+)\s*\(\s*\)\s*:\s*(?<type>.+?)\s*;\s*$",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
     /// Parses the comma-separated list of base interfaces from an
