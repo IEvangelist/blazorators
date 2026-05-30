@@ -97,6 +97,30 @@ internal sealed partial class TypeDeclarationReader
     /// </summary>
     internal bool IsInitialized => _typeDeclarationMap is { Count: > 0 };
 
+    /// <summary>
+    /// Enumerates the names of every interface declaration discovered in the
+    /// source text. Exposed for the corpus-coverage test harness; callers
+    /// should not depend on ordering.
+    /// </summary>
+    internal IEnumerable<string> DeclarationNames => _typeDeclarationMap.Keys;
+
+    /// <summary>
+    /// Enumerates the names of every type alias discovered in the source
+    /// text. Exposed for the corpus-coverage test harness; callers should not
+    /// depend on ordering.
+    /// </summary>
+    internal IEnumerable<string> TypeAliasNames => _typeAliasMap.Keys;
+
+    /// <summary>
+    /// Total number of interface declarations indexed.
+    /// </summary>
+    internal int DeclarationCount => _typeDeclarationMap.Count;
+
+    /// <summary>
+    /// Total number of type aliases indexed.
+    /// </summary>
+    internal int TypeAliasCount => _typeAliasMap.Count;
+
     public bool TryGetDeclaration(
         string typeName, out string? declaration) =>
         _typeDeclarationMap.TryGetValue(typeName, out declaration);

@@ -5,7 +5,19 @@ namespace Blazor.SourceGenerators.Parsers;
 
 internal sealed partial class TypeDeclarationParser
 {
-    internal CSharpObject? ToObject(string typeScriptTypeDeclaration)
+    private static HashSet<string> CreateVisitingSet() =>
+        new(StringComparer.Ordinal);
+
+    private static Dictionary<string, CSharpObject> CreateMemo() =>
+        new(StringComparer.Ordinal);
+
+    internal CSharpObject? ToObject(string typeScriptTypeDeclaration) =>
+        ToObject(typeScriptTypeDeclaration, CreateVisitingSet(), CreateMemo());
+
+    private CSharpObject? ToObject(
+        string typeScriptTypeDeclaration,
+        HashSet<string> visiting,
+        Dictionary<string, CSharpObject> memo)
     {
         // Callback interfaces don't have parseable methods or properties in
         // the regex grammar (the body is an anonymous call signature). We
@@ -15,6 +27,7 @@ internal sealed partial class TypeDeclarationParser
         var isCallback = IsCallbackTypeDeclaration(typeScriptTypeDeclaration);
 
         CSharpObject? cSharpObject = null;
+        string? trackedTypeName = null;
 
         var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -28,9 +41,37 @@ internal sealed partial class TypeDeclarationParser
                 var subclass = ExtendsTypeNameRegex.GetMatchGroupValue(seg, "TypeName");
                 if (typeName is not null)
                 {
+                    // Memo first: if we already finished parsing this type
+                    // in this root call, hand back the same object so the
+                    // entire dependent-type graph is parsed at most once
+                    // per root. Without this, types shared across many
+                    // properties (e.g. `Element`, `Node`) get re-parsed
+                    // dozens of times per root and the corpus harness
+                    // takes minutes instead of seconds.
+                    if (memo.TryGetValue(typeName, out var memoized))
+                    {
+                        return memoized;
+                    }
+
+                    // Cycle guard: lib.dom.d.ts has type graphs that recurse
+                    // (Node <-> Document, ParentNode <-> Element, etc.). The
+                    // dependent-type discovery below recurses into ToObject
+                    // for every non-primitive property type and return type;
+                    // without this short-circuit a single Node-rooted parse
+                    // blows the stack. If we're already building this type
+                    // in an outer frame, return a placeholder so the outer
+                    // frame populates the full members.
+                    if (!visiting.Add(typeName))
+                    {
+                        return new(typeName, subclass) { IsCallback = isCallback };
+                    }
+
+                    trackedTypeName = typeName;
                     cSharpObject = new(typeName, subclass) { IsCallback = isCallback };
                     if (isCallback)
                     {
+                        visiting.Remove(typeName);
+                        memo[typeName] = cSharpObject;
                         return cSharpObject;
                     }
 
@@ -75,11 +116,13 @@ internal sealed partial class TypeDeclarationParser
                         cSharpObject.TypeName,
                         methodName,
                         parameters,
-                        obj => cSharpObject.DependentTypes![obj.TypeName] = obj);
+                        obj => cSharpObject.DependentTypes![obj.TypeName] = obj,
+                        visiting,
+                        memo);
 
 
                 var cSharpMethod =
-                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod);
+                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod, visiting, memo);
                 cSharpObject.Methods[cSharpMethod.RawName] = cSharpMethod;
 
                 continue;
@@ -120,10 +163,11 @@ internal sealed partial class TypeDeclarationParser
                 // When a property defines a custom type, that type needs to also be parsed
                 // and source generated. This is so that dependent types are known and resolved.
                 if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
+                    !visiting.Contains(mappedType) &&
                     _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
                     typeScriptDefinitionText is not null)
                 {
-                    var obj = ToObject(typeScriptDefinitionText);
+                    var obj = ToObject(typeScriptDefinitionText, visiting, memo);
                     if (obj is not null)
                     {
                         cSharpObject.DependentTypes![obj.TypeName] = obj;
@@ -134,12 +178,28 @@ internal sealed partial class TypeDeclarationParser
             }
         }
 
+        if (trackedTypeName is not null)
+        {
+            visiting.Remove(trackedTypeName);
+            if (cSharpObject is not null)
+            {
+                memo[trackedTypeName] = cSharpObject;
+            }
+        }
+
         return cSharpObject;
     }
 
-    internal CSharpTopLevelObject? ToTopLevelObject(string typeScriptTypeDeclaration)
+    internal CSharpTopLevelObject? ToTopLevelObject(string typeScriptTypeDeclaration) =>
+        ToTopLevelObject(typeScriptTypeDeclaration, CreateVisitingSet(), CreateMemo());
+
+    private CSharpTopLevelObject? ToTopLevelObject(
+        string typeScriptTypeDeclaration,
+        HashSet<string> visiting,
+        Dictionary<string, CSharpObject> memo)
     {
         CSharpTopLevelObject? topLevelObject = null;
+        string? trackedTypeName = null;
 
         var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -149,6 +209,13 @@ internal sealed partial class TypeDeclarationParser
                 var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
                 if (typeName is not null)
                 {
+                    // Cycle guard: see ToObject for rationale.
+                    if (!visiting.Add(typeName))
+                    {
+                        return new(typeName);
+                    }
+
+                    trackedTypeName = typeName;
                     topLevelObject = new(typeName);
                     continue;
                 }
@@ -191,10 +258,12 @@ internal sealed partial class TypeDeclarationParser
                         topLevelObject.RawTypeName,
                         methodName,
                         parameters,
-                        obj => topLevelObject.DependentTypes![obj.TypeName] = obj);
+                        obj => topLevelObject.DependentTypes![obj.TypeName] = obj,
+                        visiting,
+                        memo);
 
                 var cSharpMethod =
-                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod);
+                    ToMethod(methodName, returnType, parameterDefinitions, javaScriptMethod, visiting, memo);
 
                 topLevelObject.Methods!.Add(cSharpMethod);
 
@@ -235,10 +304,11 @@ internal sealed partial class TypeDeclarationParser
                 // When a property defines a custom type, that type needs to also be parsed
                 // and source generated. This is so that dependent types are known and resolved.
                 if (!TypeMap.PrimitiveTypes.IsPrimitiveType(mappedType) &&
+                    !visiting.Contains(mappedType) &&
                     _reader.TryGetDeclaration(mappedType, out var typeScriptDefinitionText) &&
                     typeScriptDefinitionText is not null)
                 {
-                    var obj = ToObject(typeScriptDefinitionText);
+                    var obj = ToObject(typeScriptDefinitionText, visiting, memo);
                     if (obj is not null)
                     {
                         topLevelObject.DependentTypes![obj.TypeName] = obj;
@@ -247,6 +317,11 @@ internal sealed partial class TypeDeclarationParser
 
                 continue;
             }
+        }
+
+        if (trackedTypeName is not null)
+        {
+            visiting.Remove(trackedTypeName);
         }
 
         return topLevelObject;
@@ -322,7 +397,9 @@ internal sealed partial class TypeDeclarationParser
         string methodName,
         string returnType,
         List<CSharpType> parameterDefinitions,
-        JavaScriptMethod? javaScriptMethod)
+        JavaScriptMethod? javaScriptMethod,
+        HashSet<string> visiting,
+        Dictionary<string, CSharpObject> memo)
     {
         // Resolve simple TS type aliases (`type GLuint = number;`,
         // `type DOMHighResTimeStamp = number;`, etc.) up front so that the
@@ -362,10 +439,11 @@ internal sealed partial class TypeDeclarationParser
                 : bareLookupType;
 
         if (!TypeMap.PrimitiveTypes.IsPrimitiveType(nonArrayMethodReturnType) &&
+            !visiting.Contains(nonArrayMethodReturnType) &&
             _reader.TryGetDeclaration(nonArrayMethodReturnType, out var typeScriptDefinitionText) &&
             typeScriptDefinitionText is not null)
         {
-            var dependentType = ToObject(typeScriptDefinitionText);
+            var dependentType = ToObject(typeScriptDefinitionText, visiting, memo);
             if (dependentType is not null)
             {
                 cSharpMethod.DependentTypes![nonArrayMethodReturnType] = dependentType;
@@ -375,9 +453,16 @@ internal sealed partial class TypeDeclarationParser
         return cSharpMethod;
     }
 
-    internal CSharpAction? ToAction(string typeScriptTypeDeclaration)
+    internal CSharpAction? ToAction(string typeScriptTypeDeclaration) =>
+        ToAction(typeScriptTypeDeclaration, CreateVisitingSet(), CreateMemo());
+
+    private CSharpAction? ToAction(
+        string typeScriptTypeDeclaration,
+        HashSet<string> visiting,
+        Dictionary<string, CSharpObject> memo)
     {
         CSharpAction? cSharpAction = null;
+        string? trackedTypeName = null;
 
         var lineTokens = typeScriptTypeDeclaration.Split(['\n']);
         foreach (var (index, segment) in lineTokens.Select((s, i) => (i, s)))
@@ -387,6 +472,13 @@ internal sealed partial class TypeDeclarationParser
                 var typeName = InterfaceTypeNameRegex.GetMatchGroupValue(segment, "TypeName");
                 if (typeName is not null)
                 {
+                    // Cycle guard: see ToObject for rationale.
+                    if (!visiting.Add(typeName))
+                    {
+                        return new(typeName);
+                    }
+
+                    trackedTypeName = typeName;
                     cSharpAction = new(typeName);
                     continue;
                 }
@@ -428,7 +520,9 @@ internal sealed partial class TypeDeclarationParser
                         cSharpAction.RawName,
                         cSharpAction.RawName,
                         parameters,
-                        obj => cSharpAction.DependentTypes![obj.TypeName] = obj);
+                        obj => cSharpAction.DependentTypes![obj.TypeName] = obj,
+                        visiting,
+                        memo);
 
                 cSharpAction = cSharpAction with
                 {
@@ -437,6 +531,11 @@ internal sealed partial class TypeDeclarationParser
 
                 continue;
             }
+        }
+
+        if (trackedTypeName is not null)
+        {
+            visiting.Remove(trackedTypeName);
         }
 
         return cSharpAction;
@@ -454,7 +553,17 @@ internal sealed partial class TypeDeclarationParser
         string typeName,
         string rawName,
         string parametersString,
-        Action<CSharpObject> appendDependentType)
+        Action<CSharpObject> appendDependentType) =>
+        ParseParameters(typeName, rawName, parametersString, appendDependentType,
+            CreateVisitingSet(), CreateMemo());
+
+    private (List<CSharpType> Parameters, JavaScriptMethod? JavaScriptMethod) ParseParameters(
+        string typeName,
+        string rawName,
+        string parametersString,
+        Action<CSharpObject> appendDependentType,
+        HashSet<string> visiting,
+        Dictionary<string, CSharpObject> memo)
     {
         List<CSharpType> parameters = [];
 
@@ -517,6 +626,7 @@ internal sealed partial class TypeDeclarationParser
                     : parameterType;
 
             if (!TypeMap.PrimitiveTypes.IsPrimitiveType(declarationLookupType) &&
+                !visiting.Contains(declarationLookupType) &&
                 _reader.TryGetDeclaration(declarationLookupType, out var typeScriptDefinitionText) &&
                 typeScriptDefinitionText is not null)
             {
@@ -527,7 +637,7 @@ internal sealed partial class TypeDeclarationParser
 
                 if (IsCallbackTypeDeclaration(typeScriptDefinitionText))
                 {
-                    action = ToAction(typeScriptDefinitionText);
+                    action = ToAction(typeScriptDefinitionText, visiting, memo);
                     javaScriptMethod = javaScriptMethod with
                     {
                         IsBiDirectionalJavaScript = true
@@ -535,7 +645,7 @@ internal sealed partial class TypeDeclarationParser
                 }
                 else
                 {
-                    var obj = ToObject(typeScriptDefinitionText);
+                    var obj = ToObject(typeScriptDefinitionText, visiting, memo);
                     if (obj is not null)
                     {
                         appendDependentType(obj);
