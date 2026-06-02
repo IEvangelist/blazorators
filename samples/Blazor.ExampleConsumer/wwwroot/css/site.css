@@ -29,7 +29,9 @@
     /* states */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-accent: 0 85% 35%;
     --warning: 38 92% 50%;
+    --warning-accent: 33 96% 32%;
     --success: 142 71% 45%;
     --info: 199 89% 48%;
 
@@ -75,7 +77,9 @@
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
+    --destructive-accent: 0 88% 78%;
     --warning: 38 92% 60%;
+    --warning-accent: 38 96% 75%;
     --success: 142 70% 55%;
     --info: 199 89% 60%;
 
@@ -655,12 +659,12 @@ hr {
 .btn-danger {
     background: transparent;
     border-color: hsl(var(--border));
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
 }
 
 .btn-danger:hover {
     background: hsl(var(--destructive) / 0.1);
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
     border-color: hsl(var(--destructive) / 0.4);
 }
 
@@ -677,13 +681,13 @@ hr {
 
 .btn-warning {
     background: hsl(var(--warning) / 0.15);
-    color: hsl(var(--warning));
+    color: hsl(var(--warning-accent));
     border-color: hsl(var(--warning) / 0.4);
 }
 
 .btn-warning:hover {
     background: hsl(var(--warning) / 0.2);
-    color: hsl(var(--warning));
+    color: hsl(var(--warning-accent));
 }
 
 .btn-info {
@@ -770,7 +774,7 @@ hr {
 }
 
 .btn-group-segmented .btn-icon-danger:hover {
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
 }
 
 /* ---------- inputs ---------- */
@@ -1379,13 +1383,14 @@ input.check:focus-visible {
 
 .codeblock.is-error {
     border-color: hsl(var(--destructive) / 0.4);
-    background: hsl(var(--destructive) / 0.04);
+    background: hsl(var(--surface-2));
+    box-shadow: inset 3px 0 0 hsl(var(--destructive) / 0.55);
 }
 
 .codeblock.is-error .codeblock-head {
     background: hsl(var(--destructive) / 0.06);
     border-bottom-color: hsl(var(--destructive) / 0.3);
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
 }
 
 /* inline code */
@@ -1773,7 +1778,7 @@ input.check:focus-visible {
 }
 
 .text-warning {
-    color: hsl(var(--warning));
+    color: hsl(var(--warning-accent));
 }
 
 .text-info {
@@ -1781,7 +1786,7 @@ input.check:focus-visible {
 }
 
 .text-danger {
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
 }
 
 .text-sm {
@@ -2165,11 +2170,11 @@ details.modern > *:not(summary) {
 .codeblock.is-error .codeblock-toolbar {
     background: hsl(var(--destructive) / 0.06);
     border-bottom-color: hsl(var(--destructive) / 0.3);
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
 }
 
 .codeblock.is-error .codeblock-filename {
-    color: hsl(var(--destructive));
+    color: hsl(var(--destructive-accent));
 }
 
 .codeblock > pre {
@@ -2195,19 +2200,19 @@ details.modern > *:not(summary) {
 :root {
     --hl-comment: 220 9% 46%;
     --hl-keyword: 262 80% 53%;
-    --hl-string: 142 71% 35%;
+    --hl-string: 142 71% 28%;
     --hl-number: 24 95% 34%;
     --hl-property: 199 92% 30%;
-    --hl-literal: 350 80% 50%;
-    --hl-builtin: 199 89% 38%;
-    --hl-type: 199 89% 38%;
-    --hl-function: 213 94% 50%;
+    --hl-literal: 350 80% 42%;
+    --hl-builtin: 199 89% 32%;
+    --hl-type: 199 89% 32%;
+    --hl-function: 213 94% 42%;
     --hl-punctuation: 220 9% 46%;
-    --hl-tag: 0 72% 51%;
+    --hl-tag: 0 72% 45%;
     --hl-attr: 24 95% 34%;
     --hl-meta: 220 9% 46%;
-    --hl-symbol: 350 80% 50%;
-    --hl-regexp: 142 71% 35%;
+    --hl-symbol: 350 80% 42%;
+    --hl-regexp: 142 71% 28%;
 }
 
 .dark {
