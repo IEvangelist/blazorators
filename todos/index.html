@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blazorators · Source-generated JS interop for Blazor</title>
+    <meta name="description" content="Blazorators ships compile-time, source-generated JavaScript interop bindings for Blazor — local storage, geolocation, speech synthesis, speech recognition, and more." />
+    <base href="/blazorators/" />
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin />
+    <link rel="preconnect" href="https://esm.sh" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="css/site.css" />
+
+    <script>
+        // Pre-paint theme apply — runs *before* Blazor boots so we never see a
+        // light/dark flash on reload. All subsequent theme work goes through
+        // Blazor JS interop via theme.js.
+        (function () {
+            try {
+                var stored = localStorage.getItem('theme') || 'system';
+                var resolved = stored === 'system'
+                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    : stored;
+                document.documentElement.classList.toggle('dark', resolved === 'dark');
+                document.documentElement.setAttribute('data-theme', resolved);
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+</head>
+<body>
+    <div id="app">
+        <div class="splash" role="status" aria-live="polite">
+            <div class="splash-logo" aria-hidden="true">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            <div class="splash-title">Blazorators</div>
+            <div class="splash-sub">Booting Blazor WebAssembly…</div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" hidden>
+        <div class="msg">
+            An unhandled error has occurred.
+            <button class="reload">Reload</button>
+            <button class="dismiss" aria-label="Dismiss">×</button>
+        </div>
+    </div>
+
+    <script src="_content/Blazor.Geolocation.WebAssembly/blazorators.geolocation.g.js"></script>
+    <script src="_content/Blazor.SpeechSynthesis.WebAssembly/blazorators.speechSynthesis.g.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>
