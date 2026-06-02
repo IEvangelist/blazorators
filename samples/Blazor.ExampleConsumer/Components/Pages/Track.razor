@@ -18,7 +18,7 @@
         {
             <span class="badge">
                 <span class="badge-dot live" aria-hidden="true"></span>
-                WATCHING
+                @(IsWatching ? "WATCHING" : "POLLING")
             </span>
         }
         @if (_position is not null)
@@ -36,10 +36,35 @@
     </h1>
     @if (_isLoading)
     {
-        <p>Subscribes to live <code>watchPosition</code> updates. The map
-           re-centers on every callback.</p>
+        <p>Subscribes to live <code>watchPosition</code> updates by default &mdash;
+           switch to a fixed interval below to poll on a cadence even when stationary,
+           or hit <strong>Refresh</strong> for a one-shot fix.</p>
     }
 </header>
+
+<section class="track-toolbar" aria-label="Refresh controls">
+    <span class="track-toolbar-label" id="track-refresh-label">Refresh</span>
+    <div class="btn-group btn-group-segmented" role="group" aria-labelledby="track-refresh-label">
+        @foreach (var choice in IntervalChoices)
+        {
+            var isActive = _selectedIntervalKey == choice.Key;
+            <button type="button"
+                    class="btn @(isActive ? "btn-primary" : "btn-ghost")"
+                    aria-pressed="@(isActive ? "true" : "false")"
+                    title="@choice.Description"
+                    data-interval="@choice.Key"
+                    @onclick="() => SelectInterval(choice.Key)">
+                @choice.Label
+            </button>
+        }
+    </div>
+    <button type="button" class="btn btn-ghost btn-icon track-refresh-now"
+            title="Refresh position now" aria-label="Refresh position now"
+            @onclick="RefreshNowAsync">
+        <Icon Name="refresh" Class="icon-sm" />
+    </button>
+    <span class="track-toolbar-hint" aria-live="polite">@ModeHint</span>
+</section>
 
 <div class="stack">
     <Code Value=@_position T=GeolocationPosition IsError=false />

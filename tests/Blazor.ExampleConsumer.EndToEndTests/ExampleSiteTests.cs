@@ -141,6 +141,59 @@ public sealed class ExampleSiteTests(
     }
 
     [Fact]
+    public async Task TrackPage_RefreshIntervalControl_HasAccessibleToggleSemantics()
+    {
+        await using var context = await NewContextAsync();
+        var page = await context.NewPageAsync();
+        await page.GotoAsync(site.UrlFor("/track"), new PageGotoOptions
+        {
+            WaitUntil = WaitUntilState.NetworkIdle
+        });
+        await ExpectHeadingAsync(page, "Watch position");
+
+        // The toolbar wraps the segmented control with an accessible name + button-group role.
+        var toolbar = page.Locator(".track-toolbar");
+        await Assertions.Expect(toolbar).ToBeVisibleAsync();
+
+        var group = page.GetByRole(AriaRole.Group, new() { Name = "Refresh" });
+        await Assertions.Expect(group).ToBeVisibleAsync();
+
+        // All five interval choices render, and Watch is the default pressed state.
+        string[] expectedKeys = ["watch", "5s", "15s", "30s", "60s"];
+        foreach (var key in expectedKeys)
+        {
+            var button = page.Locator($".track-toolbar button[data-interval='{key}']");
+            await Assertions.Expect(button).ToBeVisibleAsync();
+            var pressed = await button.GetAttributeAsync("aria-pressed");
+            Assert.Equal(key == "watch" ? "true" : "false", pressed);
+        }
+
+        // The manual refresh trigger is a focusable, labelled button.
+        var refreshNow = page.GetByRole(AriaRole.Button, new() { Name = "Refresh position now" });
+        await Assertions.Expect(refreshNow).ToBeVisibleAsync();
+        await refreshNow.FocusAsync();
+        var focused = await page.EvaluateAsync<string?>(
+            "() => document.activeElement?.getAttribute('aria-label')");
+        Assert.Equal("Refresh position now", focused);
+
+        // Selecting another interval mutually toggles aria-pressed.
+        await page.Locator(".track-toolbar button[data-interval='15s']").ClickAsync();
+        await Assertions.Expect(page.Locator(".track-toolbar button[data-interval='15s']"))
+            .ToHaveAttributeAsync("aria-pressed", "true");
+        await Assertions.Expect(page.Locator(".track-toolbar button[data-interval='watch']"))
+            .ToHaveAttributeAsync("aria-pressed", "false");
+
+        // The header status badge swaps from WATCHING to POLLING.
+        await Assertions.Expect(page.Locator("header.page-header .badge").First).ToContainTextAsync("POLLING");
+
+        // Switching back to Watch restores the live subscription.
+        await page.Locator(".track-toolbar button[data-interval='watch']").ClickAsync();
+        await Assertions.Expect(page.Locator(".track-toolbar button[data-interval='watch']"))
+            .ToHaveAttributeAsync("aria-pressed", "true");
+        await Assertions.Expect(page.Locator("header.page-header .badge").First).ToContainTextAsync("WATCHING");
+    }
+
+    [Fact]
     public async Task HeroWordRotator_DoesNotClipOrOverlapTextDuringSwap()
     {
         await using var context = await NewContextAsync();
