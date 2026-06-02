@@ -3649,6 +3649,38 @@ details.modern[open] > summary .chev {
 /* ---------- /track: live event timeline ---------- */
 
 /* Side-by-side map + timeline on desktop, stacked on mobile. */
+.track-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1rem;
+}
+
+.track-toolbar-label {
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    font-size: 0.9rem;
+}
+
+.track-toolbar-hint {
+    flex: 1 1 16rem;
+    min-width: 12rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.85rem;
+    line-height: 1.35;
+}
+
+.track-toolbar .track-refresh-now {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--surface));
+}
+
+.track-toolbar .track-refresh-now:hover {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+}
+
 .track-grid {
     display: grid;
     grid-template-columns: 1fr;
