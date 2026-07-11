@@ -2684,9 +2684,9 @@ details.modern[open] > summary .chev {
     100% { transform: translate3d(2rem, -2rem, 0) scale(1.1); }
 }
 
-/* ---------- hero headline word rotator ----------
-   `inline-grid` stacks every word in the same cell so the container's
-   width auto-fits the widest word and there is no layout shift. */
+/* ---------- hero headline phrase rotator ----------
+   `inline-grid` stacks each phrase in the same cell so the container's
+   width auto-fits the widest phrase and there is no layout shift. */
 
 .word-rotator {
     display: inline-grid;
@@ -2706,9 +2706,9 @@ details.modern[open] > summary .chev {
     line-height: inherit;
     opacity: 0;
     visibility: hidden;
-    transform: none;
-    animation: word-flip 12s linear infinite;
-    will-change: opacity, visibility;
+    transform: translateY(0.18em);
+    animation: phrase-slide 12s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    will-change: opacity, transform, visibility;
 }
 
 .word-rotator > span:first-child {
@@ -2717,16 +2717,18 @@ details.modern[open] > summary .chev {
     transform: none;
 }
 
-.word-rotator > span:nth-child(1) { animation-delay:  0s; }
+.word-rotator > span:nth-child(1) { animation-delay: -0.01s; }
 .word-rotator > span:nth-child(2) { animation-delay:  3s; }
 .word-rotator > span:nth-child(3) { animation-delay:  6s; }
 .word-rotator > span:nth-child(4) { animation-delay:  9s; }
 
-@keyframes word-flip {
-    0%,
-    24.99%   { opacity: 1; visibility: visible; }
-    25%,
-    100%     { opacity: 0; visibility: hidden; }
+@keyframes phrase-slide {
+    0%       { opacity: 0; visibility: visible; transform: translateY(0.18em); }
+    4%       { opacity: 1; visibility: visible; transform: translateY(0); }
+    21%      { opacity: 1; visibility: visible; transform: translateY(0); }
+    25%      { opacity: 0; visibility: visible; transform: translateY(-0.18em); }
+    25.01%,
+    100%     { opacity: 0; visibility: hidden;  transform: translateY(-0.18em); }
 }
 
 @media (prefers-reduced-motion: reduce) {
