@@ -2706,9 +2706,9 @@ details.modern[open] > summary .chev {
     line-height: inherit;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(0.22em);
-    animation: word-flip 12s cubic-bezier(0.16, 1, 0.3, 1) infinite both;
-    will-change: opacity, transform;
+    transform: none;
+    animation: word-flip 12s linear infinite both;
+    will-change: opacity, visibility;
 }
 
 .word-rotator > span:first-child {
@@ -2723,13 +2723,10 @@ details.modern[open] > summary .chev {
 .word-rotator > span:nth-child(4) { animation-delay:  9s; }
 
 @keyframes word-flip {
-    0%       { opacity: 0; visibility: hidden;  transform: translateY(0.22em); }
-    4%       { opacity: 0; visibility: visible; transform: translateY(0); }
-    6%       { opacity: 1; visibility: visible; transform: translateY(0); }
-    20%      { opacity: 1; visibility: visible; transform: translateY(0); }
-    24%      { opacity: 0; visibility: visible; transform: translateY(0); }
-    25%      { opacity: 0; visibility: hidden;  transform: translateY(-0.22em); }
-    100%     { opacity: 0; visibility: hidden;  transform: translateY(-0.22em); }
+    0%,
+    24.99%   { opacity: 1; visibility: visible; }
+    25%,
+    100%     { opacity: 0; visibility: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
