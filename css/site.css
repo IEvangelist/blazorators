@@ -2684,65 +2684,40 @@ details.modern[open] > summary .chev {
     100% { transform: translate3d(2rem, -2rem, 0) scale(1.1); }
 }
 
-/* ---------- hero headline phrase rotator ----------
-   `inline-grid` stacks each phrase in the same cell so the container's
-   width auto-fits the widest phrase and there is no layout shift. */
+/* ---------- hero headline typewriter ---------- */
 
 .word-rotator {
-    display: inline-grid;
-    grid-template-areas: "stack";
+    display: inline-flex;
     align-items: baseline;
-    justify-items: start;
     vertical-align: baseline;
     line-height: inherit;
-    overflow: visible;
-    min-width: max-content;
-}
-
-.word-rotator > span {
-    grid-area: stack;
-    align-self: baseline;
-    display: inline-block;
-    line-height: inherit;
+    white-space: nowrap;
+    min-width: 7.35em;
     color: hsl(var(--foreground));
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(0.18em);
-    animation: phrase-slide 12s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-    will-change: opacity, transform, visibility;
 }
 
-.word-rotator > span:first-child {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
+.typewriter-cursor {
+    display: inline-block;
+    width: 0.08em;
+    height: 0.95em;
+    margin-left: 0.08em;
+    background: currentColor;
+    border-radius: 999px;
+    transform: translateY(0.08em);
+    animation: typewriter-cursor-blink 1s steps(1, end) infinite;
 }
 
-.word-rotator > span:nth-child(1) { animation-delay: -0.01s; }
-.word-rotator > span:nth-child(2) { animation-delay:  3s; }
-.word-rotator > span:nth-child(3) { animation-delay:  6s; }
-.word-rotator > span:nth-child(4) { animation-delay:  9s; }
-
-@keyframes phrase-slide {
-    0%       { opacity: 0; visibility: visible; transform: translateY(0.18em); }
-    4%       { opacity: 1; visibility: visible; transform: translateY(0); }
-    21%      { opacity: 1; visibility: visible; transform: translateY(0); }
-    25%      { opacity: 0; visibility: visible; transform: translateY(-0.18em); }
-    25.01%,
-    100%     { opacity: 0; visibility: hidden;  transform: translateY(-0.18em); }
+@keyframes typewriter-cursor-blink {
+    0%,
+    48%  { opacity: 1; }
+    49%,
+    100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .word-rotator > span {
+    .typewriter-cursor {
         animation: none;
-        opacity: 0;
-        visibility: hidden;
-        transform: none;
-    }
-
-    .word-rotator > span:first-child {
         opacity: 1;
-        visibility: visible;
     }
 }
 
