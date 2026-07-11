@@ -2696,6 +2696,10 @@ details.modern[open] > summary .chev {
     color: hsl(var(--foreground));
 }
 
+.typewriter-suffix {
+    margin-left: 0.16em;
+}
+
 .typewriter-cursor {
     display: inline-block;
     width: 0.08em;
