@@ -2704,6 +2704,7 @@ details.modern[open] > summary .chev {
     align-self: baseline;
     display: inline-block;
     line-height: inherit;
+    color: hsl(var(--foreground));
     opacity: 0;
     visibility: hidden;
     transform: translateY(0.18em);
