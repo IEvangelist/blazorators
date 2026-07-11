@@ -2707,7 +2707,7 @@ details.modern[open] > summary .chev {
     opacity: 0;
     visibility: hidden;
     transform: none;
-    animation: word-flip 12s linear infinite both;
+    animation: word-flip 12s linear infinite;
     will-change: opacity, visibility;
 }
 
