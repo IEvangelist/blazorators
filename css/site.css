@@ -2705,9 +2705,16 @@ details.modern[open] > summary .chev {
     display: inline-block;
     line-height: inherit;
     opacity: 0;
+    visibility: hidden;
     transform: translateY(0.22em);
-    animation: word-flip 12s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    animation: word-flip 12s cubic-bezier(0.16, 1, 0.3, 1) infinite both;
     will-change: opacity, transform;
+}
+
+.word-rotator > span:first-child {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
 }
 
 .word-rotator > span:nth-child(1) { animation-delay:  0s; }
@@ -2716,24 +2723,26 @@ details.modern[open] > summary .chev {
 .word-rotator > span:nth-child(4) { animation-delay:  9s; }
 
 @keyframes word-flip {
-    0%       { opacity: 0; transform: translateY(0.22em); }
-    4%       { opacity: 0; transform: translateY(0); }
-    6%       { opacity: 1; transform: translateY(0); }
-    20%      { opacity: 1; transform: translateY(0); }
-    24%      { opacity: 0; transform: translateY(0); }
-    25%      { opacity: 0; transform: translateY(-0.22em); }
-    100%     { opacity: 0; transform: translateY(-0.22em); }
+    0%       { opacity: 0; visibility: hidden;  transform: translateY(0.22em); }
+    4%       { opacity: 0; visibility: visible; transform: translateY(0); }
+    6%       { opacity: 1; visibility: visible; transform: translateY(0); }
+    20%      { opacity: 1; visibility: visible; transform: translateY(0); }
+    24%      { opacity: 0; visibility: visible; transform: translateY(0); }
+    25%      { opacity: 0; visibility: hidden;  transform: translateY(-0.22em); }
+    100%     { opacity: 0; visibility: hidden;  transform: translateY(-0.22em); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .word-rotator > span {
         animation: none;
         opacity: 0;
+        visibility: hidden;
         transform: none;
     }
 
     .word-rotator > span:first-child {
         opacity: 1;
+        visibility: visible;
     }
 }
 
