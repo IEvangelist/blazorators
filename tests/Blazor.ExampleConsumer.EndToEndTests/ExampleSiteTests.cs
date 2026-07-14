@@ -21,6 +21,14 @@ public sealed class ExampleSiteTests(
         new("/audio", "Audio", "Audio")
     ];
 
+    static readonly string[] HeroPhrases =
+    [
+        "type-safe in C#.",
+        "ergonomic in C#.",
+        "promised in C#.",
+        "generated in C#."
+    ];
+
     public static IEnumerable<object[]> RouteData() =>
         Routes.Select(route => new object[] { route });
 
@@ -194,85 +202,136 @@ public sealed class ExampleSiteTests(
     }
 
     [Fact]
-    public async Task HeroWordRotator_DoesNotClipOrOverlapTextDuringSwap()
+    public async Task HeroTypewriter_DoesNotClipOrOverlapTextDuringTransition()
     {
         await using var context = await NewContextAsync();
         var page = await context.NewPageAsync();
         await page.GotoAsync(site.UrlFor("/"));
         await ExpectHeadingAsync(page, "Browser APIs");
 
+        var observedPhrases = new HashSet<string>(StringComparer.Ordinal);
+
         for (var i = 0; i < 12; i++)
         {
-            var result = await page.EvaluateAsync<RotatorSnapshot>(
+            var snapshot = await page.EvaluateAsync<TypewriterSnapshot>(
                 """
                 () => {
-                    const rotator = document.querySelector('.word-rotator');
-                    const rotatorRect = rotator.getBoundingClientRect();
-                    const visible = [...rotator.querySelectorAll('span')]
-                        .map(span => {
-                            const style = getComputedStyle(span);
-                            const rect = span.getBoundingClientRect();
+                    const typewriter = document.querySelector('.word-rotator');
+                    const typewriterRect = typewriter.getBoundingClientRect();
+                    const pieces = [...typewriter.children]
+                        .map(element => {
+                            const style = getComputedStyle(element);
+                            const rect = element.getBoundingClientRect();
                             return {
-                                opacity: Number.parseFloat(style.opacity),
+                                className: element.className,
+                                ariaHidden: element.getAttribute('aria-hidden'),
+                                display: style.display,
+                                visibility: style.visibility,
+                                left: rect.left,
+                                right: rect.right,
                                 top: rect.top,
                                 bottom: rect.bottom,
                                 width: rect.width,
-                                text: span.textContent.trim()
+                                height: rect.height
                             };
                         })
-                        .filter(span => span.opacity > 0.05);
+                        .filter(piece =>
+                            piece.ariaHidden !== 'true' &&
+                            piece.display !== 'none' &&
+                            piece.visibility !== 'hidden' &&
+                            piece.width > 0 &&
+                            piece.height > 0);
 
                     return {
-                        visibleCount: visible.length,
-                        rotatorTop: rotatorRect.top,
-                        rotatorBottom: rotatorRect.bottom,
-                        rotatorWidth: rotatorRect.width,
-                        visible
+                        ariaLabel: typewriter.getAttribute('aria-label') ?? '',
+                        typewriterLeft: typewriterRect.left,
+                        typewriterRight: typewriterRect.right,
+                        typewriterTop: typewriterRect.top,
+                        typewriterBottom: typewriterRect.bottom,
+                        typewriterWidth: typewriterRect.width,
+                        typewriterHeight: typewriterRect.height,
+                        pieces
                     };
                 }
                 """);
 
-            Assert.InRange(result.VisibleCount, 0, 1);
-            Assert.True(result.RotatorWidth > 0, "The word rotator should reserve width for the active word.");
+            Assert.Contains(snapshot.AriaLabel, HeroPhrases);
+            Assert.True(snapshot.TypewriterWidth > 0, "The typewriter should reserve width for the active phrase.");
+            Assert.True(snapshot.TypewriterHeight > 0, "The typewriter should reserve height for the active phrase.");
 
-            foreach (var span in result.Visible)
+            foreach (var piece in snapshot.Pieces)
             {
-                Assert.True(span.Top >= result.RotatorTop - 1, $"Rotating word '{span.Text}' is clipped above its container.");
-                Assert.True(span.Bottom <= result.RotatorBottom + 1, $"Rotating word '{span.Text}' is clipped below its container.");
-                Assert.True(span.Width <= result.RotatorWidth + 1, $"Rotating word '{span.Text}' is wider than its reserved container.");
+                Assert.True(piece.Left >= snapshot.TypewriterLeft - 1, $"Typewriter piece '{piece.ClassName}' is clipped on the left.");
+                Assert.True(piece.Right <= snapshot.TypewriterRight + 1, $"Typewriter piece '{piece.ClassName}' is clipped on the right.");
+                Assert.True(piece.Top >= snapshot.TypewriterTop - 1, $"Typewriter piece '{piece.ClassName}' is clipped above its container.");
+                Assert.True(piece.Bottom <= snapshot.TypewriterBottom + 1, $"Typewriter piece '{piece.ClassName}' is clipped below its container.");
             }
 
+            for (var pieceIndex = 1; pieceIndex < snapshot.Pieces.Length; pieceIndex++)
+            {
+                var previous = snapshot.Pieces[pieceIndex - 1];
+                var current = snapshot.Pieces[pieceIndex];
+                Assert.True(
+                    current.Left >= previous.Right - 1,
+                    $"Typewriter pieces '{previous.ClassName}' and '{current.ClassName}' overlap.");
+            }
+
+            observedPhrases.Add(snapshot.AriaLabel);
             await Task.Delay(300);
         }
+
+        Assert.True(
+            observedPhrases.Count > 1,
+            "The typewriter should transition to another phrase during the test.");
     }
 
     [Fact]
-    public async Task ReducedMotion_KeepsHeroReadableWithoutAnimations()
+    public async Task ReducedMotion_DisablesHeroCursorAnimation_AndKeepsTextAccessible()
     {
         await using var context = await NewContextAsync(reducedMotion: ReducedMotion.Reduce);
         var page = await context.NewPageAsync();
         await page.GotoAsync(site.UrlFor("/"));
         await ExpectHeadingAsync(page, "Browser APIs");
+        await page.WaitForFunctionAsync(
+            "() => (document.querySelector('.word-rotator > .grad')?.textContent?.trim().length ?? 0) > 0");
 
         var snapshot = await page.EvaluateAsync<ReducedMotionSnapshot>(
             """
             () => {
-                const words = [...document.querySelectorAll('.word-rotator > span')]
-                    .map(span => ({
-                        text: span.textContent.trim(),
-                        opacity: Number.parseFloat(getComputedStyle(span).opacity),
-                        animationName: getComputedStyle(span).animationName
-                    }));
+                const typewriter = document.querySelector('.word-rotator');
+                const word = typewriter.querySelector(':scope > .grad');
+                const suffix = typewriter.querySelector(':scope > .typewriter-suffix');
+                const cursor = typewriter.querySelector(':scope > .typewriter-cursor');
+                const cursorStyle = getComputedStyle(cursor);
+                const normalize = value => value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
 
                 return {
-                    visibleWords: words.filter(word => word.opacity > 0.9).map(word => word.text),
-                    animationNames: words.map(word => word.animationName)
+                    ariaLabel: typewriter.getAttribute('aria-label') ?? '',
+                    wordText: normalize(word.textContent ?? ''),
+                    suffixText: normalize(suffix?.textContent ?? ''),
+                    cursorAnimationName: cursorStyle.animationName,
+                    cursorOpacity: Number.parseFloat(cursorStyle.opacity)
                 };
             }
             """);
 
-        Assert.Equal(new[] { "type-safe" }, snapshot.VisibleWords);
-        Assert.All(snapshot.AnimationNames, animationName => Assert.Equal("none", animationName));
+        Assert.Contains(snapshot.AriaLabel, HeroPhrases);
+
+        var expectedWord = snapshot.AriaLabel.Split(' ', 2)[0];
+        Assert.True(
+            expectedWord.StartsWith(snapshot.WordText, StringComparison.Ordinal),
+            $"Visible typewriter text '{snapshot.WordText}' should be a prefix of '{expectedWord}'.");
+
+        if (snapshot.SuffixText.Length > 0)
+        {
+            Assert.Equal(expectedWord, snapshot.WordText);
+            Assert.True(
+                "in C#.".StartsWith(snapshot.SuffixText, StringComparison.Ordinal),
+                $"Visible typewriter suffix '{snapshot.SuffixText}' should be a prefix of 'in C#.'.");
+        }
+
+        Assert.Equal("none", snapshot.CursorAnimationName);
+        Assert.InRange(snapshot.CursorOpacity, 0.99, 1);
     }
 
     [Fact]
@@ -450,28 +509,36 @@ public sealed class ExampleSiteTests(
         public int BodyClientWidth { get; set; }
     }
 
-    sealed class RotatorSnapshot
+    sealed class TypewriterSnapshot
     {
-        public int VisibleCount { get; set; }
-        public double RotatorTop { get; set; }
-        public double RotatorBottom { get; set; }
-        public double RotatorWidth { get; set; }
-        public RotatorWordSnapshot[] Visible { get; set; } = [];
+        public string AriaLabel { get; set; } = "";
+        public double TypewriterLeft { get; set; }
+        public double TypewriterRight { get; set; }
+        public double TypewriterTop { get; set; }
+        public double TypewriterBottom { get; set; }
+        public double TypewriterWidth { get; set; }
+        public double TypewriterHeight { get; set; }
+        public TypewriterPieceSnapshot[] Pieces { get; set; } = [];
     }
 
-    sealed class RotatorWordSnapshot
+    sealed class TypewriterPieceSnapshot
     {
-        public double Opacity { get; set; }
+        public string ClassName { get; set; } = "";
+        public double Left { get; set; }
+        public double Right { get; set; }
         public double Top { get; set; }
         public double Bottom { get; set; }
         public double Width { get; set; }
-        public string Text { get; set; } = "";
+        public double Height { get; set; }
     }
 
     sealed class ReducedMotionSnapshot
     {
-        public string[] VisibleWords { get; set; } = [];
-        public string[] AnimationNames { get; set; } = [];
+        public string AriaLabel { get; set; } = "";
+        public string WordText { get; set; } = "";
+        public string SuffixText { get; set; } = "";
+        public string CursorAnimationName { get; set; } = "";
+        public double CursorOpacity { get; set; }
     }
 
     sealed class TrackAlignment
