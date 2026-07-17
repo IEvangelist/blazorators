@@ -60,6 +60,65 @@
 
     <script src="_content/Blazor.Geolocation.WebAssembly/blazorators.geolocation.g.js"></script>
     <script src="_content/Blazor.SpeechSynthesis.WebAssembly/blazorators.speechSynthesis.g.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script>
+        (() => {
+            const retryableStatusCodes = new Set([408, 429, 500, 502, 503, 504]);
+            const maxBootResourceAttempts = 3;
+            const errorUi = document.getElementById('blazor-error-ui');
+
+            errorUi.querySelector('.reload').addEventListener('click', () => location.reload());
+            errorUi.querySelector('.dismiss').addEventListener('click', () => {
+                errorUi.hidden = true;
+                errorUi.style.removeProperty('display');
+            });
+
+            function loadBootResource(_type, _name, defaultUri, integrity) {
+                if (_type === 'dotnetjs') {
+                    return defaultUri;
+                }
+
+                return fetchBootResourceWithRetry(defaultUri, integrity);
+            }
+
+            async function fetchBootResourceWithRetry(defaultUri, integrity) {
+                for (let attempt = 1; attempt <= maxBootResourceAttempts; attempt++) {
+                    const uri = new URL(defaultUri, document.baseURI);
+                    if (attempt > 1) {
+                        uri.searchParams.set('blazor-retry', `${attempt - 1}-${Date.now()}`);
+                    }
+
+                    const requestOptions = {
+                        cache: attempt === 1 ? 'default' : 'reload'
+                    };
+                    if (integrity) {
+                        requestOptions.integrity = integrity;
+                    }
+
+                    try {
+                        const response = await fetch(uri, requestOptions);
+                        if (response.ok ||
+                            !retryableStatusCodes.has(response.status) ||
+                            attempt === maxBootResourceAttempts) {
+                            return response;
+                        }
+                    } catch (error) {
+                        if (attempt === maxBootResourceAttempts) {
+                            throw error;
+                        }
+                    }
+
+                    await new Promise(resolve =>
+                        setTimeout(resolve, 200 * 2 ** (attempt - 1)));
+                }
+            }
+
+            Blazor.start({ loadBootResource }).catch(error => {
+                console.error('Blazor failed to start.', error);
+                errorUi.hidden = false;
+                errorUi.style.display = 'flex';
+            });
+        })();
+    </script>
 </body>
 </html>
