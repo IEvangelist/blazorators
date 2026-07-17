@@ -6,9 +6,14 @@ on:
     branches: [ main ]
     paths:
     - '**.cs'
+    - '**.razor'
+    - '**.html'
+    - '**.css'
+    - '**.js'
     - '**.json'
     - '**.csproj'
     - '**.sln'
+    - '.github/workflows/**'
 
 jobs:
   validate:
