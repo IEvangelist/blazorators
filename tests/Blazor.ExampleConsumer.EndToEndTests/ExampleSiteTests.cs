@@ -208,38 +208,55 @@ public sealed class ExampleSiteTests(
                 () => {
                     const rotator = document.querySelector('.word-rotator');
                     const rotatorRect = rotator.getBoundingClientRect();
-                    const visible = [...rotator.querySelectorAll('span')]
+                    const fragments = [...rotator.children]
+                        .filter(span => span.getAttribute('aria-hidden') !== 'true')
                         .map(span => {
                             const style = getComputedStyle(span);
                             const rect = span.getBoundingClientRect();
                             return {
-                                opacity: Number.parseFloat(style.opacity),
+                                label: span.textContent.trim() || span.className,
+                                display: style.display,
+                                visibility: style.visibility,
+                                left: rect.left,
+                                right: rect.right,
                                 top: rect.top,
                                 bottom: rect.bottom,
                                 width: rect.width,
-                                text: span.textContent.trim()
+                                height: rect.height
                             };
                         })
-                        .filter(span => span.opacity > 0.05);
+                        .filter(span =>
+                            span.display !== 'none' &&
+                            span.visibility !== 'hidden' &&
+                            span.width > 0 &&
+                            span.height > 0);
 
                     return {
-                        visibleCount: visible.length,
                         rotatorTop: rotatorRect.top,
                         rotatorBottom: rotatorRect.bottom,
                         rotatorWidth: rotatorRect.width,
-                        visible
+                        fragments
                     };
                 }
                 """);
 
-            Assert.InRange(result.VisibleCount, 0, 1);
             Assert.True(result.RotatorWidth > 0, "The word rotator should reserve width for the active word.");
+            Assert.InRange(result.Fragments.Length, 0, 2);
 
-            foreach (var span in result.Visible)
+            foreach (var fragment in result.Fragments)
             {
-                Assert.True(span.Top >= result.RotatorTop - 1, $"Rotating word '{span.Text}' is clipped above its container.");
-                Assert.True(span.Bottom <= result.RotatorBottom + 1, $"Rotating word '{span.Text}' is clipped below its container.");
-                Assert.True(span.Width <= result.RotatorWidth + 1, $"Rotating word '{span.Text}' is wider than its reserved container.");
+                Assert.True(fragment.Top >= result.RotatorTop - 2, $"Typewriter fragment '{fragment.Label}' is clipped above its container.");
+                Assert.True(fragment.Bottom <= result.RotatorBottom + 2, $"Typewriter fragment '{fragment.Label}' is clipped below its container.");
+                Assert.True(fragment.Width <= result.RotatorWidth + 1, $"Typewriter fragment '{fragment.Label}' is wider than its reserved container.");
+            }
+
+            for (var fragmentIndex = 1; fragmentIndex < result.Fragments.Length; fragmentIndex++)
+            {
+                var previous = result.Fragments[fragmentIndex - 1];
+                var current = result.Fragments[fragmentIndex];
+                Assert.True(
+                    previous.Right <= current.Left + 1,
+                    $"Typewriter fragments '{previous.Label}' and '{current.Label}' overlap.");
             }
 
             await Task.Delay(300);
@@ -254,25 +271,65 @@ public sealed class ExampleSiteTests(
         await page.GotoAsync(site.UrlFor("/"));
         await ExpectHeadingAsync(page, "Browser APIs");
 
-        var snapshot = await page.EvaluateAsync<ReducedMotionSnapshot>(
+        static Task<ReducedMotionSnapshot> ReadSnapshotAsync(IPage page) =>
+            page.EvaluateAsync<ReducedMotionSnapshot>(
             """
             () => {
-                const words = [...document.querySelectorAll('.word-rotator > span')]
-                    .map(span => ({
-                        text: span.textContent.trim(),
-                        opacity: Number.parseFloat(getComputedStyle(span).opacity),
-                        animationName: getComputedStyle(span).animationName
-                    }));
+                const rotator = document.querySelector('.word-rotator');
 
                 return {
-                    visibleWords: words.filter(word => word.opacity > 0.9).map(word => word.text),
-                    animationNames: words.map(word => word.animationName)
+                    phrase: rotator.getAttribute('aria-label'),
+                    animationNames: [...rotator.children]
+                        .map(span => getComputedStyle(span).animationName)
                 };
             }
             """);
 
-        Assert.Equal(new[] { "type-safe" }, snapshot.VisibleWords);
-        Assert.All(snapshot.AnimationNames, animationName => Assert.Equal("none", animationName));
+        var initial = await ReadSnapshotAsync(page);
+        await Task.Delay(2_000);
+        var afterHold = await ReadSnapshotAsync(page);
+
+        Assert.Equal("type-safe in C#.", initial.Phrase);
+        Assert.Equal(initial.Phrase, afterHold.Phrase);
+        Assert.All(initial.AnimationNames, animationName => Assert.Equal("none", animationName));
+        Assert.All(afterHold.AnimationNames, animationName => Assert.Equal("none", animationName));
+    }
+
+    [Fact]
+    public async Task BootResourceLoader_RetriesCachedTransientFailures()
+    {
+        await using var context = await NewContextAsync();
+        var page = await context.NewPageAsync();
+        var requestUrls = new List<string>();
+
+        await page.RouteAsync(
+            "**/_framework/Microsoft.Extensions.Logging.Abstractions*.wasm*",
+            async route =>
+            {
+                requestUrls.Add(route.Request.Url);
+                if (!new Uri(route.Request.Url).Query.Contains("blazor-retry=", StringComparison.Ordinal))
+                {
+                    await route.FulfillAsync(new RouteFulfillOptions
+                    {
+                        Status = 503,
+                        ContentType = "text/plain",
+                        Body = "Service Unavailable"
+                    });
+                    return;
+                }
+
+                await route.ContinueAsync();
+            });
+
+        await page.GotoAsync(site.UrlFor("/"), new PageGotoOptions
+        {
+            WaitUntil = WaitUntilState.NetworkIdle
+        });
+
+        await ExpectHeadingAsync(page, "Browser APIs");
+        Assert.Contains(
+            requestUrls,
+            url => new Uri(url).Query.Contains("blazor-retry=", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -452,25 +509,25 @@ public sealed class ExampleSiteTests(
 
     sealed class RotatorSnapshot
     {
-        public int VisibleCount { get; set; }
         public double RotatorTop { get; set; }
         public double RotatorBottom { get; set; }
         public double RotatorWidth { get; set; }
-        public RotatorWordSnapshot[] Visible { get; set; } = [];
+        public RotatorFragmentSnapshot[] Fragments { get; set; } = [];
     }
 
-    sealed class RotatorWordSnapshot
+    sealed class RotatorFragmentSnapshot
     {
-        public double Opacity { get; set; }
+        public string Label { get; set; } = "";
+        public double Left { get; set; }
+        public double Right { get; set; }
         public double Top { get; set; }
         public double Bottom { get; set; }
         public double Width { get; set; }
-        public string Text { get; set; } = "";
     }
 
     sealed class ReducedMotionSnapshot
     {
-        public string[] VisibleWords { get; set; } = [];
+        public string Phrase { get; set; } = "";
         public string[] AnimationNames { get; set; } = [];
     }
 

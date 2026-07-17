@@ -70,3 +70,7 @@ export function init(scopeSelector) {
     }
     return cards.length;
 }
+
+export function isReducedMotionPreferred() {
+    return prefersReducedMotion.matches;
+}

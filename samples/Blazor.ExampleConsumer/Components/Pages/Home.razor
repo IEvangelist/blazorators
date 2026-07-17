@@ -286,11 +286,6 @@
         }
     }
 
-    protected override void OnInitialized()
-    {
-        _typewriterTask = RunTypewriterAsync(_typewriterCts.Token);
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
@@ -298,14 +293,21 @@
             return;
         }
 
+        var prefersReducedMotion = false;
         try
         {
             _spotlight = await JS.InvokeAsync<IJSObjectReference>("import", "./spotlight.js");
+            prefersReducedMotion = await _spotlight.InvokeAsync<bool>("isReducedMotionPreferred");
             await _spotlight.InvokeVoidAsync("init", ".bento");
         }
-        catch
+        catch (JSException)
         {
-            // Spotlight is purely decorative — never fail the page on its account.
+            // Hero motion and spotlight are decorative — never fail the page on their account.
+        }
+
+        if (!prefersReducedMotion)
+        {
+            _typewriterTask = RunTypewriterAsync(_typewriterCts.Token);
         }
     }
 
