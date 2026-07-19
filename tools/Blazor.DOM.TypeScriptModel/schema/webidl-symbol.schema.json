@@ -1,0 +1,598 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/webidl-symbol-v1.json",
+  "title": "Blazor DOM Web IDL symbol record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ordinal",
+    "name",
+    "classifications",
+    "specifications",
+    "partialDeclarationCount",
+    "declarationCount",
+    "inheritance",
+    "exposures",
+    "globalNames",
+    "serializable",
+    "transferable",
+    "secureContext",
+    "extendedAttributes",
+    "extendedAttributeDetails",
+    "includedMixins",
+    "declarations",
+    "includeStatements"
+  ],
+  "properties": {
+    "ordinal": {
+      "$ref": "#/$defs/ordinal"
+    },
+    "name": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "classifications": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "callback",
+          "callbackInterface",
+          "dictionary",
+          "enum",
+          "interface",
+          "mixin",
+          "namespace",
+          "typedef"
+        ]
+      }
+    },
+    "specifications": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "partialDeclarationCount": {
+      "$ref": "#/$defs/count"
+    },
+    "declarationCount": {
+      "$ref": "#/$defs/positiveCount"
+    },
+    "inheritance": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "exposures": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "globalNames": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "serializable": {
+      "type": "boolean"
+    },
+    "transferable": {
+      "type": "boolean"
+    },
+    "secureContext": {
+      "type": "boolean"
+    },
+    "extendedAttributes": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "extendedAttributeDetails": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/extendedAttribute"
+      }
+    },
+    "includedMixins": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "declarations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/declaration"
+      }
+    },
+    "includeStatements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/includeStatement"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ordinal": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "positiveCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stringSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "extendedAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "rhsType",
+        "values",
+        "arguments"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "rhsType": {
+          "enum": [
+            null,
+            "*",
+            "decimal",
+            "identifier",
+            "identifier-list",
+            "integer",
+            "integer-list",
+            "string"
+          ]
+        },
+        "values": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/argument"
+          }
+        }
+      }
+    },
+    "idlType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context",
+        "name",
+        "generic",
+        "nullable",
+        "union",
+        "typeArguments",
+        "extendedAttributes"
+      ],
+      "properties": {
+        "context": {
+          "enum": [
+            null,
+            "argument-type",
+            "attribute-type",
+            "const-type",
+            "dictionary-type",
+            "return-type",
+            "typedef-type"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "generic": {
+          "enum": [
+            null,
+            "FrozenArray",
+            "ObservableArray",
+            "Promise",
+            "record",
+            "sequence"
+          ]
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "union": {
+          "type": "boolean"
+        },
+        "typeArguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/idlType"
+          }
+        },
+        "extendedAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/extendedAttribute"
+          }
+        }
+      }
+    },
+    "idlValue": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "dictionary",
+                "null",
+                "Infinity",
+                "-Infinity",
+                "NaN"
+              ]
+            },
+            "value": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "boolean"
+            },
+            "value": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "number",
+                "string"
+              ]
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "sequence"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/jsonValue"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nullableIdlValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/idlValue"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "jsonValue": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        }
+      ]
+    },
+    "argument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinal",
+        "name",
+        "type",
+        "optional",
+        "variadic",
+        "default",
+        "extendedAttributes"
+      ],
+      "properties": {
+        "ordinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/$defs/idlType"
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "variadic": {
+          "type": "boolean"
+        },
+        "default": {
+          "$ref": "#/$defs/nullableIdlValue"
+        },
+        "extendedAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/extendedAttribute"
+          }
+        }
+      }
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinal",
+        "kind",
+        "name",
+        "types",
+        "arguments",
+        "required",
+        "readonly",
+        "asynchronous",
+        "special",
+        "default",
+        "value",
+        "exposures",
+        "secureContext",
+        "extendedAttributes"
+      ],
+      "properties": {
+        "ordinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "kind": {
+          "enum": [
+            "async_iterable",
+            "attribute",
+            "const",
+            "constructor",
+            "field",
+            "iterable",
+            "maplike",
+            "operation",
+            "setlike"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/idlType"
+          }
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/argument"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "asynchronous": {
+          "type": "boolean"
+        },
+        "special": {
+          "enum": [
+            null,
+            "deleter",
+            "getter",
+            "inherit",
+            "setter",
+            "static",
+            "stringifier"
+          ]
+        },
+        "default": {
+          "$ref": "#/$defs/nullableIdlValue"
+        },
+        "value": {
+          "$ref": "#/$defs/nullableIdlValue"
+        },
+        "exposures": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "secureContext": {
+          "type": "boolean"
+        },
+        "extendedAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/extendedAttribute"
+          }
+        }
+      }
+    },
+    "declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinal",
+        "specification",
+        "kind",
+        "partial",
+        "inheritance",
+        "members",
+        "type",
+        "arguments",
+        "enumValues",
+        "exposures",
+        "globalNames",
+        "serializable",
+        "transferable",
+        "secureContext",
+        "extendedAttributes"
+      ],
+      "properties": {
+        "ordinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "specification": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "kind": {
+          "enum": [
+            "callback",
+            "callback interface",
+            "dictionary",
+            "enum",
+            "interface",
+            "interface mixin",
+            "namespace",
+            "typedef"
+          ]
+        },
+        "partial": {
+          "type": "boolean"
+        },
+        "inheritance": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/member"
+          }
+        },
+        "type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/idlType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/argument"
+          }
+        },
+        "enumValues": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "exposures": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "globalNames": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "serializable": {
+          "type": "boolean"
+        },
+        "transferable": {
+          "type": "boolean"
+        },
+        "secureContext": {
+          "type": "boolean"
+        },
+        "extendedAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/extendedAttribute"
+          }
+        }
+      }
+    },
+    "includeStatement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification",
+        "mixin",
+        "extendedAttributes"
+      ],
+      "properties": {
+        "specification": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "mixin": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "extendedAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/extendedAttribute"
+          }
+        }
+      }
+    }
+  }
+}

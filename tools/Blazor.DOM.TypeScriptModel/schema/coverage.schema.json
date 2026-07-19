@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/coverage-v1.json",
+  "title": "Blazor DOM semantic model coverage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "typescript",
+    "webIdl",
+    "reconciliation",
+    "unsupported"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "typescript": {
+      "$ref": "#/$defs/typescriptCoverage"
+    },
+    "webIdl": {
+      "$ref": "#/$defs/webIdlCoverage"
+    },
+    "reconciliation": {
+      "$ref": "#/$defs/reconciliation"
+    },
+    "unsupported": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/unsupported"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "countMap": {
+      "type": "object",
+      "propertyNames": {
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/count"
+      }
+    },
+    "stringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "typescriptCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbolCount",
+        "declarationCount",
+        "declarationKinds",
+        "memberCount",
+        "memberKinds",
+        "typeExpressionCount",
+        "typeExpressionKinds",
+        "mergedSymbolCount",
+        "eventMapCount",
+        "constructorObjectCount"
+      ],
+      "properties": {
+        "symbolCount": {
+          "$ref": "#/$defs/count"
+        },
+        "declarationCount": {
+          "$ref": "#/$defs/count"
+        },
+        "declarationKinds": {
+          "$ref": "#/$defs/countMap"
+        },
+        "memberCount": {
+          "$ref": "#/$defs/count"
+        },
+        "memberKinds": {
+          "$ref": "#/$defs/countMap"
+        },
+        "typeExpressionCount": {
+          "$ref": "#/$defs/count"
+        },
+        "typeExpressionKinds": {
+          "$ref": "#/$defs/countMap"
+        },
+        "mergedSymbolCount": {
+          "$ref": "#/$defs/count"
+        },
+        "eventMapCount": {
+          "$ref": "#/$defs/count"
+        },
+        "constructorObjectCount": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "webIdlCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specificationCount",
+        "definitionCount",
+        "canonicalSymbolCount",
+        "definitionKinds",
+        "includeStatementCount",
+        "memberCount",
+        "memberKinds",
+        "argumentCount"
+      ],
+      "properties": {
+        "specificationCount": {
+          "$ref": "#/$defs/count"
+        },
+        "definitionCount": {
+          "$ref": "#/$defs/count"
+        },
+        "canonicalSymbolCount": {
+          "$ref": "#/$defs/count"
+        },
+        "definitionKinds": {
+          "$ref": "#/$defs/countMap"
+        },
+        "includeStatementCount": {
+          "$ref": "#/$defs/count"
+        },
+        "memberCount": {
+          "$ref": "#/$defs/count"
+        },
+        "memberKinds": {
+          "$ref": "#/$defs/countMap"
+        },
+        "argumentCount": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "ambiguous": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "webIdlNames",
+        "classifications",
+        "reason"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "webIdlNames": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "classifications": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matched",
+        "matchedWebIdl",
+        "unmatchedTypeScript",
+        "unmatchedWebIdl",
+        "ambiguousWebIdl",
+        "ambiguous"
+      ],
+      "properties": {
+        "matched": {
+          "$ref": "#/$defs/count"
+        },
+        "matchedWebIdl": {
+          "$ref": "#/$defs/count"
+        },
+        "unmatchedTypeScript": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "unmatchedWebIdl": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "ambiguousWebIdl": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "ambiguous": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ambiguous"
+          }
+        }
+      }
+    },
+    "unsupported": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "kind",
+        "location"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "location": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,407 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/manifest-v1.json",
+  "title": "Blazor DOM semantic model manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "generationProfile",
+    "files",
+    "counts",
+    "provenance"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "generationProfile": {
+      "$ref": "#/$defs/generationProfile"
+    },
+    "files": {
+      "$ref": "#/$defs/files"
+    },
+    "counts": {
+      "$ref": "#/$defs/counts"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "generationProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "includedExposures",
+        "preservesAllExposureMetadata"
+      ],
+      "properties": {
+        "name": {
+          "const": "Window"
+        },
+        "includedExposures": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "Window"
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "preservesAllExposureMetadata": {
+          "const": true
+        }
+      }
+    },
+    "fileDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "format",
+        "schema",
+        "records",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "format": {
+          "enum": [
+            "json",
+            "jsonl"
+          ]
+        },
+        "schema": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "records": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typescriptSymbols",
+        "webIdlSymbols",
+        "coverage"
+      ],
+      "properties": {
+        "typescriptSymbols": {
+          "$ref": "#/$defs/fileDescriptor"
+        },
+        "webIdlSymbols": {
+          "$ref": "#/$defs/fileDescriptor"
+        },
+        "coverage": {
+          "$ref": "#/$defs/fileDescriptor"
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typescriptSymbols",
+        "typescriptDeclarations",
+        "typescriptMembers",
+        "webIdlSpecifications",
+        "webIdlSymbols",
+        "webIdlMembers",
+        "webIdlArguments",
+        "reconciledSymbols",
+        "reconciledWebIdlSymbols",
+        "unmatchedTypeScriptSymbols",
+        "unmatchedWebIdlSymbols",
+        "ambiguousSymbols",
+        "ambiguousWebIdlSymbols",
+        "unsupportedShapes"
+      ],
+      "properties": {
+        "typescriptSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "typescriptDeclarations": {
+          "$ref": "#/$defs/count"
+        },
+        "typescriptMembers": {
+          "$ref": "#/$defs/count"
+        },
+        "webIdlSpecifications": {
+          "$ref": "#/$defs/count"
+        },
+        "webIdlSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "webIdlMembers": {
+          "$ref": "#/$defs/count"
+        },
+        "webIdlArguments": {
+          "$ref": "#/$defs/count"
+        },
+        "reconciledSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "reconciledWebIdlSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "unmatchedTypeScriptSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "unmatchedWebIdlSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "ambiguousSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "ambiguousWebIdlSymbols": {
+          "$ref": "#/$defs/count"
+        },
+        "unsupportedShapes": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "generatorProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "typescriptProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package",
+        "version",
+        "license",
+        "aggregateSha256",
+        "inputs"
+      ],
+      "properties": {
+        "package": {
+          "const": "typescript"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "license": {
+          "const": "Apache-2.0"
+        },
+        "aggregateSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "inputs": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "typescript/lib/lib.dom.d.ts"
+                },
+                "sha256": {
+                  "$ref": "#/$defs/sha256"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "typescript/lib/lib.dom.iterable.d.ts"
+                },
+                "sha256": {
+                  "$ref": "#/$defs/sha256"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "typescript/lib/lib.dom.asynciterable.d.ts"
+                },
+                "sha256": {
+                  "$ref": "#/$defs/sha256"
+                }
+              }
+            }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "provenanceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "webrefProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package",
+        "version",
+        "license",
+        "aggregateSha256",
+        "inputs"
+      ],
+      "properties": {
+        "package": {
+          "const": "@webref/idl"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "license": {
+          "const": "MIT"
+        },
+        "aggregateSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/provenanceFile"
+          }
+        }
+      }
+    },
+    "webidl2Provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package",
+        "version",
+        "license"
+      ],
+      "properties": {
+        "package": {
+          "const": "webidl2"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "license": {
+          "const": "W3C"
+        }
+      }
+    },
+    "overrideProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input",
+        "sha256",
+        "appliedCount"
+      ],
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "appliedCount": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generator",
+        "typescript",
+        "webref",
+        "webidl2",
+        "overrides"
+      ],
+      "properties": {
+        "generator": {
+          "$ref": "#/$defs/generatorProvenance"
+        },
+        "typescript": {
+          "$ref": "#/$defs/typescriptProvenance"
+        },
+        "webref": {
+          "$ref": "#/$defs/webrefProvenance"
+        },
+        "webidl2": {
+          "$ref": "#/$defs/webidl2Provenance"
+        },
+        "overrides": {
+          "$ref": "#/$defs/overrideProvenance"
+        }
+      }
+    }
+  }
+}
