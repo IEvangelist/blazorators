@@ -67,9 +67,9 @@ function notifySubscribers(resolved) {
 export function getTheme() {
     try {
         const v = localStorage.getItem(STORAGE_KEY);
-        return VALID.has(v) ? v : 'system';
+        return VALID.has(v) ? v : 'dark';
     } catch {
-        return 'system';
+        return 'dark';
     }
 }
 

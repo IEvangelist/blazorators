@@ -20,6 +20,7 @@
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
     <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/neon-tattoo.css" />
 
     <script>
         // Pre-paint theme apply — runs *before* Blazor boots so we never see a
@@ -27,7 +28,7 @@
         // Blazor JS interop via theme.js.
         (function () {
             try {
-                var stored = localStorage.getItem('theme') || 'system';
+                var stored = localStorage.getItem('theme') || 'dark';
                 var resolved = stored === 'system'
                     ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
                     : stored;
