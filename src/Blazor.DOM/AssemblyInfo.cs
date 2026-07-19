@@ -1,0 +1,7 @@
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Blazor.DOM.WebAssembly")]
+[assembly: InternalsVisibleTo("Blazor.DOM.Tests")]
