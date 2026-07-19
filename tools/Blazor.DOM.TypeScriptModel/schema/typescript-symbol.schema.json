@@ -1,0 +1,1445 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/typescript-symbol-v1.json",
+  "title": "Blazor DOM TypeScript symbol record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ordinal",
+    "name",
+    "symbolFlags",
+    "declarations",
+    "isDeclarationMerged",
+    "semantic"
+  ],
+  "properties": {
+    "ordinal": {
+      "$ref": "#/$defs/ordinal"
+    },
+    "name": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "symbolFlags": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "declarations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/declaration"
+      }
+    },
+    "isDeclarationMerged": {
+      "type": "boolean"
+    },
+    "semantic": {
+      "$ref": "#/$defs/semantic"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ordinal": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "column",
+        "offset"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "start",
+        "end"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "start": {
+          "$ref": "#/$defs/position"
+        },
+        "end": {
+          "$ref": "#/$defs/position"
+        }
+      }
+    },
+    "documentationTag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "text",
+        "raw"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "text": {
+          "type": "string"
+        },
+        "raw": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "tags",
+        "deprecated"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/documentationTag"
+          }
+        },
+        "deprecated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "propertyName": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "identifier",
+            "string",
+            "number",
+            "computed",
+            "private"
+          ]
+        },
+        "text": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "typeBase": {
+      "type": "object",
+      "required": [
+        "syntaxKind",
+        "checkerType",
+        "kind"
+      ],
+      "properties": {
+        "syntaxKind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "checkerType": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "keywordType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "kind": {
+              "const": "keyword"
+            },
+            "name": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "referenceType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "resolvedSymbol",
+            "typeArguments"
+          ],
+          "properties": {
+            "kind": {
+              "const": "reference"
+            },
+            "name": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "resolvedSymbol": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "typeArguments": {
+              "$ref": "#/$defs/typeExpressionArray"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "compositeType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "types"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "union",
+                "intersection"
+              ]
+            },
+            "types": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/typeExpression"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "arrayType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "elementType"
+          ],
+          "properties": {
+            "kind": {
+              "const": "array"
+            },
+            "elementType": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "tupleType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "elements"
+          ],
+          "properties": {
+            "kind": {
+              "const": "tuple"
+            },
+            "elements": {
+              "$ref": "#/$defs/typeExpressionArray"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "namedTupleMemberType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "optional",
+            "rest",
+            "type"
+          ],
+          "properties": {
+            "kind": {
+              "const": "namedTupleMember"
+            },
+            "name": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "optional": {
+              "type": "boolean"
+            },
+            "rest": {
+              "type": "boolean"
+            },
+            "type": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "wrappedType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "optional",
+                "rest",
+                "parenthesized"
+              ]
+            },
+            "type": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "callableType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "abstract",
+            "typeParameters",
+            "parameters",
+            "returnType"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "function",
+                "constructor"
+              ]
+            },
+            "abstract": {
+              "type": "boolean"
+            },
+            "typeParameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/typeParameter"
+              }
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/parameter"
+              }
+            },
+            "returnType": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "typeLiteralType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "members"
+          ],
+          "properties": {
+            "kind": {
+              "const": "typeLiteral"
+            },
+            "members": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/member"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "operatorType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operator",
+            "type"
+          ],
+          "properties": {
+            "kind": {
+              "const": "operator"
+            },
+            "operator": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "type": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "indexedAccessType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "objectType",
+            "indexType"
+          ],
+          "properties": {
+            "kind": {
+              "const": "indexedAccess"
+            },
+            "objectType": {
+              "$ref": "#/$defs/typeExpression"
+            },
+            "indexType": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "mappedType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "readonlyToken",
+            "typeParameter",
+            "nameType",
+            "optionalToken",
+            "valueType",
+            "members"
+          ],
+          "properties": {
+            "kind": {
+              "const": "mapped"
+            },
+            "readonlyToken": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "typeParameter": {
+              "$ref": "#/$defs/typeParameter"
+            },
+            "nameType": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/typeExpression"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optionalToken": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "valueType": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/typeExpression"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "members": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/member"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "conditionalType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "checkType",
+            "extendsType",
+            "trueType",
+            "falseType"
+          ],
+          "properties": {
+            "kind": {
+              "const": "conditional"
+            },
+            "checkType": {
+              "$ref": "#/$defs/typeExpression"
+            },
+            "extendsType": {
+              "$ref": "#/$defs/typeExpression"
+            },
+            "trueType": {
+              "$ref": "#/$defs/typeExpression"
+            },
+            "falseType": {
+              "$ref": "#/$defs/typeExpression"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "inferType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "typeParameter"
+          ],
+          "properties": {
+            "kind": {
+              "const": "infer"
+            },
+            "typeParameter": {
+              "$ref": "#/$defs/typeParameter"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "queryType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "expressionName",
+            "resolvedSymbol",
+            "typeArguments"
+          ],
+          "properties": {
+            "kind": {
+              "const": "query"
+            },
+            "expressionName": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "resolvedSymbol": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "typeArguments": {
+              "$ref": "#/$defs/typeExpressionArray"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "predicateType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "asserts",
+            "parameterName",
+            "type"
+          ],
+          "properties": {
+            "kind": {
+              "const": "predicate"
+            },
+            "asserts": {
+              "type": "boolean"
+            },
+            "parameterName": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "type": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/typeExpression"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "literalType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "literalKind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "literal"
+            },
+            "literalKind": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "text": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "templateLiteralType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "head",
+            "spans"
+          ],
+          "properties": {
+            "kind": {
+              "const": "templateLiteral"
+            },
+            "head": {
+              "type": "string"
+            },
+            "spans": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "literal"
+                ],
+                "properties": {
+                  "type": {
+                    "$ref": "#/$defs/typeExpression"
+                  },
+                  "literal": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "importType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "argument",
+            "qualifier",
+            "typeArguments",
+            "isTypeOf",
+            "attributes"
+          ],
+          "properties": {
+            "kind": {
+              "const": "import"
+            },
+            "argument": {
+              "$ref": "#/$defs/typeExpression"
+            },
+            "qualifier": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "typeArguments": {
+              "$ref": "#/$defs/typeExpressionArray"
+            },
+            "isTypeOf": {
+              "type": "boolean"
+            },
+            "attributes": {
+              "$ref": "#/$defs/nullableString"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "heritageReferenceType": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/typeBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "expression",
+            "resolvedSymbol",
+            "typeArguments"
+          ],
+          "properties": {
+            "kind": {
+              "const": "heritageReference"
+            },
+            "expression": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "resolvedSymbol": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "typeArguments": {
+              "$ref": "#/$defs/typeExpressionArray"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "typeExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/keywordType"
+        },
+        {
+          "$ref": "#/$defs/referenceType"
+        },
+        {
+          "$ref": "#/$defs/compositeType"
+        },
+        {
+          "$ref": "#/$defs/arrayType"
+        },
+        {
+          "$ref": "#/$defs/tupleType"
+        },
+        {
+          "$ref": "#/$defs/namedTupleMemberType"
+        },
+        {
+          "$ref": "#/$defs/wrappedType"
+        },
+        {
+          "$ref": "#/$defs/callableType"
+        },
+        {
+          "$ref": "#/$defs/typeLiteralType"
+        },
+        {
+          "$ref": "#/$defs/operatorType"
+        },
+        {
+          "$ref": "#/$defs/indexedAccessType"
+        },
+        {
+          "$ref": "#/$defs/mappedType"
+        },
+        {
+          "$ref": "#/$defs/conditionalType"
+        },
+        {
+          "$ref": "#/$defs/inferType"
+        },
+        {
+          "$ref": "#/$defs/queryType"
+        },
+        {
+          "$ref": "#/$defs/predicateType"
+        },
+        {
+          "$ref": "#/$defs/literalType"
+        },
+        {
+          "$ref": "#/$defs/templateLiteralType"
+        },
+        {
+          "$ref": "#/$defs/importType"
+        },
+        {
+          "$ref": "#/$defs/heritageReferenceType"
+        }
+      ]
+    },
+    "typeExpressionArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/typeExpression"
+      }
+    },
+    "nullableTypeExpression": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/typeExpression"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "typeParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "constraint",
+        "default",
+        "location"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "constraint": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "default": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinal",
+        "name",
+        "optional",
+        "rest",
+        "type",
+        "initializer",
+        "location",
+        "documentation"
+      ],
+      "properties": {
+        "ordinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "rest": {
+          "type": "boolean"
+        },
+        "type": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "initializer": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        },
+        "documentation": {
+          "$ref": "#/$defs/documentation"
+        }
+      }
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinal",
+        "kind",
+        "name",
+        "optional",
+        "readonly",
+        "static",
+        "typeParameters",
+        "parameters",
+        "type",
+        "returnType",
+        "documentation",
+        "location"
+      ],
+      "properties": {
+        "ordinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "kind": {
+          "enum": [
+            "property",
+            "method",
+            "callSignature",
+            "constructSignature",
+            "indexSignature",
+            "getter",
+            "setter"
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/propertyName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "static": {
+          "type": "boolean"
+        },
+        "typeParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typeParameter"
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        },
+        "type": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "returnType": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "documentation": {
+          "$ref": "#/$defs/documentation"
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        }
+      }
+    },
+    "heritage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token",
+        "types"
+      ],
+      "properties": {
+        "token": {
+          "enum": [
+            "extends",
+            "implements"
+          ]
+        },
+        "types": {
+          "$ref": "#/$defs/typeExpressionArray"
+        }
+      }
+    },
+    "eventMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "isEventMap",
+        "keys"
+      ],
+      "properties": {
+        "isEventMap": {
+          "type": "boolean"
+        },
+        "keys": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinal",
+        "kind",
+        "name",
+        "modifiers",
+        "typeParameters",
+        "heritage",
+        "members",
+        "type",
+        "parameters",
+        "returnType",
+        "documentation",
+        "location",
+        "variableKind",
+        "constructorObject",
+        "eventMap",
+        "namespaceMembers"
+      ],
+      "properties": {
+        "ordinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "kind": {
+          "enum": [
+            "interface",
+            "typeAlias",
+            "globalVariable",
+            "globalFunction",
+            "namespace"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "modifiers": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "typeParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typeParameter"
+          }
+        },
+        "heritage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/heritage"
+          }
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/member"
+          }
+        },
+        "type": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        },
+        "returnType": {
+          "$ref": "#/$defs/nullableTypeExpression"
+        },
+        "documentation": {
+          "$ref": "#/$defs/documentation"
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        },
+        "variableKind": {
+          "enum": [
+            null,
+            "var",
+            "let",
+            "const"
+          ]
+        },
+        "constructorObject": {
+          "type": "boolean"
+        },
+        "eventMap": {
+          "$ref": "#/$defs/eventMap"
+        },
+        "namespaceMembers": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "semantic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "webIdlName",
+        "bindingKind",
+        "webIdlMemberName",
+        "classifications",
+        "specifications",
+        "exposures",
+        "exposedOnWindow",
+        "exposedOnWorker",
+        "globalNames",
+        "serializable",
+        "transferable",
+        "secureContext",
+        "extendedAttributes",
+        "bindings"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "matched",
+            "unmatched",
+            "ambiguous",
+            "overridden"
+          ]
+        },
+        "webIdlName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "bindingKind": {
+          "enum": [
+            null,
+            "definition",
+            "legacyNamespace",
+            "namespaceMember",
+            "globalMember",
+            "legacyWindowAlias",
+            "legacyFactoryFunction"
+          ]
+        },
+        "webIdlMemberName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "classifications": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "specifications": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "exposures": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "exposedOnWindow": {
+          "type": "boolean"
+        },
+        "exposedOnWorker": {
+          "type": "boolean"
+        },
+        "globalNames": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "serializable": {
+          "type": "boolean"
+        },
+        "transferable": {
+          "type": "boolean"
+        },
+        "secureContext": {
+          "type": "boolean"
+        },
+        "extendedAttributes": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "bindings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/webIdlBinding"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unmatched"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "webIdlName": {
+                "type": "null"
+              },
+              "bindingKind": {
+                "type": "null"
+              },
+              "webIdlMemberName": {
+                "type": "null"
+              },
+              "classifications": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "specifications": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "exposures": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "exposedOnWindow": {
+                "const": false
+              },
+              "exposedOnWorker": {
+                "const": false
+              },
+              "globalNames": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "serializable": {
+                "const": false
+              },
+              "transferable": {
+                "const": false
+              },
+              "secureContext": {
+                "const": false
+              },
+              "extendedAttributes": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "bindings": {
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "webIdlName": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "bindingKind": {
+                "enum": [
+                  "definition",
+                  "legacyNamespace",
+                  "namespaceMember",
+                  "globalMember",
+                  "legacyWindowAlias",
+                  "legacyFactoryFunction"
+                ]
+              },
+              "classifications": {
+                "type": "array",
+                "minItems": 1
+              },
+              "specifications": {
+                "type": "array",
+                "minItems": 1
+              },
+              "bindings": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "bindingKind": {
+                "enum": [
+                  "namespaceMember",
+                  "globalMember"
+                ]
+              }
+            },
+            "required": [
+              "bindingKind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "webIdlMemberName": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "webIdlMemberName": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "webIdlBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "webIdlName",
+        "webIdlMemberName",
+        "specification",
+        "declarationOrdinal",
+        "memberOrdinal",
+        "exposures",
+        "globalNames",
+        "secureContext"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "definition",
+            "legacyNamespace",
+            "namespaceMember",
+            "globalMember",
+            "legacyWindowAlias",
+            "legacyFactoryFunction"
+          ]
+        },
+        "webIdlName": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "webIdlMemberName": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "specification": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "declarationOrdinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "memberOrdinal": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "exposures": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "globalNames": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "secureContext": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

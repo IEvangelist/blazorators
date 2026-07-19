@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/overrides-v1.json",
+  "title": "Blazor DOM semantic model overrides",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "overrides"],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "const": 1 },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "action", "value", "rationale"],
+        "properties": {
+          "target": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "kind", "name"],
+            "properties": {
+              "source": { "enum": ["typescript", "webidl"] },
+              "kind": { "enum": ["symbol", "declaration", "member", "type"] },
+              "name": { "type": "string", "minLength": 1 }
+            }
+          },
+          "action": {
+            "enum": ["classification", "reconciliation", "unsupported-shape"]
+          },
+          "value": { "$ref": "#/$defs/jsonValue" },
+          "rationale": { "type": "string", "pattern": "\\S" },
+          "references": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "jsonValue": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/jsonValue" }
+        },
+        {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        }
+      ]
+    }
+  }
+}

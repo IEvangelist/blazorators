@@ -1,0 +1,25 @@
+{
+  "name": "@blazorators/dom-typescript-model",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline semantic model builder for exhaustive Blazor DOM interop generation.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "generate": "npm run build --silent && node dist/src/cli.js generate",
+    "test": "npm run build --silent && node --test dist/test/*.test.js",
+    "verify": "npm run build --silent && node dist/src/cli.js verify"
+  },
+  "dependencies": {
+    "@webref/idl": "3.81.3",
+    "ajv": "8.17.1",
+    "typescript": "5.9.3",
+    "webidl2": "24.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.1"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}
