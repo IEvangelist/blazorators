@@ -1,0 +1,34 @@
+﻿{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "sourceManifest": {
+    "dataDirectory": "data\\Blazor.DOM.Generated\\Profiles\\WakeLock",
+    "typescriptSymbolsSha256": "451c7967d2556d13441a3ecd81d4c5ca189a6adf315ae164652ed0c02eb14f8a",
+    "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
+  },
+  "accounting": {
+    "totalSymbols": 13,
+    "projected": 13,
+    "excluded": 0,
+    "deferred": 0,
+    "generationFailed": 0,
+    "projectedSymbols": [
+      "AbortSignal",
+      "AddEventListenerOptions",
+      "DOMHighResTimeStamp",
+      "Event",
+      "EventInit",
+      "EventListener",
+      "EventListenerObject",
+      "EventListenerOptions",
+      "EventListenerOrEventListenerObject",
+      "EventTarget",
+      "WakeLock",
+      "WakeLockSentinel",
+      "WakeLockType"
+    ],
+    "excludedSymbols": [],
+    "deferredSymbols": [],
+    "failedSymbols": []
+  }
+}

@@ -1,0 +1,3189 @@
+﻿{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "sourceManifest": {
+    "dataDirectory": "data\\Blazor.DOM.Generated\\run2",
+    "typescriptSymbolsSha256": "451c7967d2556d13441a3ecd81d4c5ca189a6adf315ae164652ed0c02eb14f8a",
+    "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
+  },
+  "accounting": {
+    "totalSymbols": 1866,
+    "projected": 1484,
+    "excluded": 0,
+    "deferred": 154,
+    "generationFailed": 228,
+    "projectedSymbols": [
+      "ANGLE_instanced_arrays",
+      "ARIAMixin",
+      "AbortController",
+      "AbortSignal",
+      "AbstractRange",
+      "AbstractWorker",
+      "AddEventListenerOptions",
+      "AddressErrors",
+      "AesCbcParams",
+      "AesCtrParams",
+      "AesDerivedKeyParams",
+      "AesGcmParams",
+      "AesKeyAlgorithm",
+      "AesKeyGenParams",
+      "Algorithm",
+      "AlgorithmIdentifier",
+      "AlignSetting",
+      "AllowSharedBufferSource",
+      "AlphaOption",
+      "AnalyserNode",
+      "AnalyserOptions",
+      "Animatable",
+      "Animation",
+      "AnimationEffect",
+      "AnimationEvent",
+      "AnimationEventInit",
+      "AnimationFrameProvider",
+      "AnimationPlayState",
+      "AnimationPlaybackEvent",
+      "AnimationPlaybackEventInit",
+      "AnimationReplaceState",
+      "AnimationTimeline",
+      "AppendMode",
+      "AssignedNodesOptions",
+      "AttestationConveyancePreference",
+      "Attr",
+      "AudioBuffer",
+      "AudioBufferOptions",
+      "AudioBufferSourceNode",
+      "AudioBufferSourceOptions",
+      "AudioConfiguration",
+      "AudioContext",
+      "AudioContextLatencyCategory",
+      "AudioContextOptions",
+      "AudioContextState",
+      "AudioData",
+      "AudioDataCopyToOptions",
+      "AudioDataInit",
+      "AudioDataOutputCallback",
+      "AudioDecoder",
+      "AudioDecoderConfig",
+      "AudioDecoderInit",
+      "AudioDecoderSupport",
+      "AudioDestinationNode",
+      "AudioEncoder",
+      "AudioEncoderConfig",
+      "AudioEncoderInit",
+      "AudioEncoderSupport",
+      "AudioListener",
+      "AudioNode",
+      "AudioNodeOptions",
+      "AudioParam",
+      "AudioParamMap",
+      "AudioProcessingEvent",
+      "AudioProcessingEventInit",
+      "AudioSampleFormat",
+      "AudioScheduledSourceNode",
+      "AudioTimestamp",
+      "AudioWorklet",
+      "AudioWorkletNode",
+      "AudioWorkletNodeOptions",
+      "AuthenticationExtensionsClientInputs",
+      "AuthenticationExtensionsClientInputsJSON",
+      "AuthenticationExtensionsClientOutputs",
+      "AuthenticationExtensionsLargeBlobInputs",
+      "AuthenticationExtensionsLargeBlobInputsJSON",
+      "AuthenticationExtensionsLargeBlobOutputs",
+      "AuthenticationExtensionsPRFInputs",
+      "AuthenticationExtensionsPRFInputsJSON",
+      "AuthenticationExtensionsPRFOutputs",
+      "AuthenticationExtensionsPRFValues",
+      "AuthenticationExtensionsPRFValuesJSON",
+      "AuthenticatorAssertionResponse",
+      "AuthenticatorAttachment",
+      "AuthenticatorAttestationResponse",
+      "AuthenticatorResponse",
+      "AuthenticatorSelectionCriteria",
+      "AuthenticatorTransport",
+      "AutoFill",
+      "AutoFillAddressKind",
+      "AutoFillBase",
+      "AutoFillContactField",
+      "AutoFillContactKind",
+      "AutoFillCredentialField",
+      "AutoFillField",
+      "AutoFillNormalField",
+      "AutoFillSection",
+      "AutoKeyword",
+      "AutomationRate",
+      "AvcBitstreamFormat",
+      "AvcEncoderConfig",
+      "BarProp",
+      "Base64URLString",
+      "BaseAudioContext",
+      "BeforeUnloadEvent",
+      "BigInteger",
+      "BinaryType",
+      "BiquadFilterNode",
+      "BiquadFilterOptions",
+      "BiquadFilterType",
+      "BitrateMode",
+      "Blob",
+      "BlobCallback",
+      "BlobEvent",
+      "BlobEventInit",
+      "BlobPart",
+      "BlobPropertyBag",
+      "Body",
+      "BodyInit",
+      "BroadcastChannel",
+      "BufferSource",
+      "ByteLengthQueuingStrategy",
+      "CDATASection",
+      "COSEAlgorithmIdentifier",
+      "CSPViolationReportBody",
+      "CSSAnimation",
+      "CSSConditionRule",
+      "CSSContainerRule",
+      "CSSCounterStyleRule",
+      "CSSFontFaceRule",
+      "CSSFontFeatureValuesRule",
+      "CSSFontPaletteValuesRule",
+      "CSSGroupingRule",
+      "CSSImageValue",
+      "CSSImportRule",
+      "CSSKeyframeRule",
+      "CSSKeyframesRule",
+      "CSSKeywordValue",
+      "CSSKeywordish",
+      "CSSLayerBlockRule",
+      "CSSLayerStatementRule",
+      "CSSMathClamp",
+      "CSSMathInvert",
+      "CSSMathMax",
+      "CSSMathMin",
+      "CSSMathNegate",
+      "CSSMathOperator",
+      "CSSMathProduct",
+      "CSSMathSum",
+      "CSSMathValue",
+      "CSSMatrixComponent",
+      "CSSMatrixComponentOptions",
+      "CSSMediaRule",
+      "CSSNamespaceRule",
+      "CSSNestedDeclarations",
+      "CSSNumberish",
+      "CSSNumericArray",
+      "CSSNumericBaseType",
+      "CSSNumericType",
+      "CSSNumericValue",
+      "CSSPageRule",
+      "CSSPerspective",
+      "CSSPerspectiveValue",
+      "CSSPropertyRule",
+      "CSSRotate",
+      "CSSRule",
+      "CSSRuleList",
+      "CSSScale",
+      "CSSScopeRule",
+      "CSSSkew",
+      "CSSSkewX",
+      "CSSSkewY",
+      "CSSStartingStyleRule",
+      "CSSStyleDeclaration",
+      "CSSStyleRule",
+      "CSSStyleSheet",
+      "CSSStyleSheetInit",
+      "CSSStyleValue",
+      "CSSSupportsRule",
+      "CSSTransformComponent",
+      "CSSTransformValue",
+      "CSSTransition",
+      "CSSTranslate",
+      "CSSUnitValue",
+      "CSSUnparsedSegment",
+      "CSSUnparsedValue",
+      "CSSVariableReferenceValue",
+      "CSSViewTransitionRule",
+      "Cache",
+      "CacheQueryOptions",
+      "CacheStorage",
+      "CanPlayTypeResult",
+      "CanvasCaptureMediaStreamTrack",
+      "CanvasCompositing",
+      "CanvasDirection",
+      "CanvasDrawImage",
+      "CanvasDrawPath",
+      "CanvasFillRule",
+      "CanvasFillStrokeStyles",
+      "CanvasFilters",
+      "CanvasFontKerning",
+      "CanvasFontStretch",
+      "CanvasFontVariantCaps",
+      "CanvasGradient",
+      "CanvasImageData",
+      "CanvasImageSmoothing",
+      "CanvasImageSource",
+      "CanvasLineCap",
+      "CanvasLineJoin",
+      "CanvasPath",
+      "CanvasPathDrawingStyles",
+      "CanvasPattern",
+      "CanvasRect",
+      "CanvasRenderingContext2D",
+      "CanvasRenderingContext2DSettings",
+      "CanvasSettings",
+      "CanvasShadowStyles",
+      "CanvasState",
+      "CanvasText",
+      "CanvasTextAlign",
+      "CanvasTextBaseline",
+      "CanvasTextDrawingStyles",
+      "CanvasTextRendering",
+      "CanvasTransform",
+      "CanvasUserInterface",
+      "CaretPosition",
+      "CaretPositionFromPointOptions",
+      "ChannelCountMode",
+      "ChannelInterpretation",
+      "ChannelMergerNode",
+      "ChannelMergerOptions",
+      "ChannelSplitterNode",
+      "ChannelSplitterOptions",
+      "CharacterData",
+      "CheckVisibilityOptions",
+      "ChildNode",
+      "ClientQueryOptions",
+      "ClientRect",
+      "ClientTypes",
+      "Clipboard",
+      "ClipboardEvent",
+      "ClipboardEventInit",
+      "ClipboardItem",
+      "ClipboardItemData",
+      "ClipboardItemOptions",
+      "ClipboardItems",
+      "CloseEvent",
+      "CloseEventInit",
+      "CodecState",
+      "ColorGamut",
+      "ColorSpaceConversion",
+      "Comment",
+      "CompositeOperation",
+      "CompositeOperationOrAuto",
+      "CompositionEvent",
+      "CompositionEventInit",
+      "CompressionFormat",
+      "CompressionStream",
+      "ComputedEffectTiming",
+      "ComputedKeyframe",
+      "Console",
+      "ConstantSourceNode",
+      "ConstantSourceOptions",
+      "ConstrainBoolean",
+      "ConstrainBooleanParameters",
+      "ConstrainDOMString",
+      "ConstrainDOMStringParameters",
+      "ConstrainDouble",
+      "ConstrainDoubleRange",
+      "ConstrainULong",
+      "ConstrainULongRange",
+      "ContentVisibilityAutoStateChangeEvent",
+      "ContentVisibilityAutoStateChangeEventInit",
+      "ConvolverNode",
+      "ConvolverOptions",
+      "CookieChangeEvent",
+      "CookieChangeEventInit",
+      "CookieInit",
+      "CookieList",
+      "CookieListItem",
+      "CookieSameSite",
+      "CookieStore",
+      "CookieStoreDeleteOptions",
+      "CookieStoreGetOptions",
+      "CookieStoreManager",
+      "CountQueuingStrategy",
+      "Credential",
+      "CredentialCreationOptions",
+      "CredentialMediationRequirement",
+      "CredentialPropertiesOutput",
+      "CredentialRequestOptions",
+      "CredentialsContainer",
+      "Crypto",
+      "CryptoKey",
+      "CryptoKeyPair",
+      "CustomElementRegistry",
+      "CustomEvent",
+      "CustomEventInit",
+      "CustomStateSet",
+      "DOMException",
+      "DOMHighResTimeStamp",
+      "DOMImplementation",
+      "DOMMatrix",
+      "DOMMatrix2DInit",
+      "DOMMatrixInit",
+      "DOMMatrixReadOnly",
+      "DOMParser",
+      "DOMParserSupportedType",
+      "DOMPoint",
+      "DOMPointInit",
+      "DOMPointReadOnly",
+      "DOMQuad",
+      "DOMQuadInit",
+      "DOMRect",
+      "DOMRectInit",
+      "DOMRectList",
+      "DOMRectReadOnly",
+      "DOMStringList",
+      "DOMStringMap",
+      "DOMTokenList",
+      "DataTransfer",
+      "DataTransferItem",
+      "DataTransferItemList",
+      "DecodeErrorCallback",
+      "DecodeSuccessCallback",
+      "DecompressionStream",
+      "DelayNode",
+      "DelayOptions",
+      "DeviceMotionEvent",
+      "DeviceMotionEventAcceleration",
+      "DeviceMotionEventAccelerationInit",
+      "DeviceMotionEventInit",
+      "DeviceMotionEventRotationRate",
+      "DeviceMotionEventRotationRateInit",
+      "DeviceOrientationEvent",
+      "DeviceOrientationEventInit",
+      "DirectionSetting",
+      "DisplayCaptureSurfaceType",
+      "DisplayMediaStreamOptions",
+      "DistanceModelType",
+      "Document",
+      "DocumentFragment",
+      "DocumentOrShadowRoot",
+      "DocumentReadyState",
+      "DocumentTimeline",
+      "DocumentTimelineOptions",
+      "DocumentType",
+      "DocumentVisibilityState",
+      "DoubleRange",
+      "DragEvent",
+      "DragEventInit",
+      "DynamicsCompressorNode",
+      "DynamicsCompressorOptions",
+      "EXT_blend_minmax",
+      "EXT_color_buffer_float",
+      "EXT_color_buffer_half_float",
+      "EXT_float_blend",
+      "EXT_frag_depth",
+      "EXT_sRGB",
+      "EXT_shader_texture_lod",
+      "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc",
+      "EXT_texture_filter_anisotropic",
+      "EXT_texture_norm16",
+      "EcKeyAlgorithm",
+      "EcKeyGenParams",
+      "EcKeyImportParams",
+      "EcdhKeyDeriveParams",
+      "EcdsaParams",
+      "EffectTiming",
+      "Element",
+      "ElementCSSInlineStyle",
+      "ElementContentEditable",
+      "ElementCreationOptions",
+      "ElementDefinitionOptions",
+      "ElementInternals",
+      "ElementTagNameMap",
+      "EncodedAudioChunk",
+      "EncodedAudioChunkInit",
+      "EncodedAudioChunkMetadata",
+      "EncodedAudioChunkOutputCallback",
+      "EncodedAudioChunkType",
+      "EncodedVideoChunk",
+      "EncodedVideoChunkInit",
+      "EncodedVideoChunkMetadata",
+      "EncodedVideoChunkOutputCallback",
+      "EncodedVideoChunkType",
+      "EndOfStreamError",
+      "EndingType",
+      "EpochTimeStamp",
+      "ErrorCallback",
+      "ErrorEvent",
+      "ErrorEventInit",
+      "Event",
+      "EventCounts",
+      "EventInit",
+      "EventListener",
+      "EventListenerObject",
+      "EventListenerOptions",
+      "EventListenerOrEventListenerObject",
+      "EventModifierInit",
+      "EventSource",
+      "EventSourceInit",
+      "EventTarget",
+      "External",
+      "File",
+      "FileCallback",
+      "FileList",
+      "FilePropertyBag",
+      "FileReader",
+      "FileSystem",
+      "FileSystemCreateWritableOptions",
+      "FileSystemDirectoryEntry",
+      "FileSystemDirectoryHandle",
+      "FileSystemDirectoryHandleAsyncIterator",
+      "FileSystemDirectoryReader",
+      "FileSystemEntriesCallback",
+      "FileSystemEntry",
+      "FileSystemEntryCallback",
+      "FileSystemFileEntry",
+      "FileSystemFileHandle",
+      "FileSystemFlags",
+      "FileSystemGetDirectoryOptions",
+      "FileSystemGetFileOptions",
+      "FileSystemHandle",
+      "FileSystemHandleKind",
+      "FileSystemRemoveOptions",
+      "FileSystemWritableFileStream",
+      "FileSystemWriteChunkType",
+      "FillLightMode",
+      "FillMode",
+      "Float32List",
+      "FocusEvent",
+      "FocusEventInit",
+      "FocusOptions",
+      "FontDisplay",
+      "FontFace",
+      "FontFaceDescriptors",
+      "FontFaceLoadStatus",
+      "FontFaceSet",
+      "FontFaceSetLoadEvent",
+      "FontFaceSetLoadEventInit",
+      "FontFaceSetLoadStatus",
+      "FontFaceSource",
+      "FormData",
+      "FormDataEntryValue",
+      "FormDataEvent",
+      "FormDataEventInit",
+      "FormDataIterator",
+      "FragmentDirective",
+      "FrameRequestCallback",
+      "FullscreenNavigationUI",
+      "FullscreenOptions",
+      "FunctionStringCallback",
+      "GLbitfield",
+      "GLboolean",
+      "GLclampf",
+      "GLenum",
+      "GLfloat",
+      "GLint",
+      "GLint64",
+      "GLintptr",
+      "GLsizei",
+      "GLsizeiptr",
+      "GLuint",
+      "GLuint64",
+      "GPUError",
+      "GainNode",
+      "GainOptions",
+      "Gamepad",
+      "GamepadButton",
+      "GamepadEffectParameters",
+      "GamepadEvent",
+      "GamepadEventInit",
+      "GamepadHapticActuator",
+      "GamepadHapticEffectType",
+      "GamepadHapticsResult",
+      "GamepadMappingType",
+      "GenericTransformStream",
+      "Geolocation",
+      "GeolocationCoordinates",
+      "GeolocationPosition",
+      "GeolocationPositionError",
+      "GetAnimationsOptions",
+      "GetComposedRangesOptions",
+      "GetHTMLOptions",
+      "GetNotificationOptions",
+      "GetRootNodeOptions",
+      "GlobalCompositeOperation",
+      "GlobalEventHandlers",
+      "HTMLAllCollection",
+      "HTMLAnchorElement",
+      "HTMLAreaElement",
+      "HTMLAudioElement",
+      "HTMLBRElement",
+      "HTMLBaseElement",
+      "HTMLBodyElement",
+      "HTMLButtonElement",
+      "HTMLCanvasElement",
+      "HTMLCollection",
+      "HTMLCollectionBase",
+      "HTMLCollectionOf",
+      "HTMLDListElement",
+      "HTMLDataElement",
+      "HTMLDataListElement",
+      "HTMLDetailsElement",
+      "HTMLDialogElement",
+      "HTMLDirectoryElement",
+      "HTMLDivElement",
+      "HTMLDocument",
+      "HTMLElement",
+      "HTMLElementDeprecatedTagNameMap",
+      "HTMLElementTagNameMap",
+      "HTMLEmbedElement",
+      "HTMLFieldSetElement",
+      "HTMLFontElement",
+      "HTMLFormControlsCollection",
+      "HTMLFormElement",
+      "HTMLFrameElement",
+      "HTMLFrameSetElement",
+      "HTMLHRElement",
+      "HTMLHeadElement",
+      "HTMLHeadingElement",
+      "HTMLHtmlElement",
+      "HTMLHyperlinkElementUtils",
+      "HTMLIFrameElement",
+      "HTMLImageElement",
+      "HTMLInputElement",
+      "HTMLLIElement",
+      "HTMLLabelElement",
+      "HTMLLegendElement",
+      "HTMLLinkElement",
+      "HTMLMapElement",
+      "HTMLMarqueeElement",
+      "HTMLMediaElement",
+      "HTMLMenuElement",
+      "HTMLMetaElement",
+      "HTMLMeterElement",
+      "HTMLModElement",
+      "HTMLOListElement",
+      "HTMLObjectElement",
+      "HTMLOptGroupElement",
+      "HTMLOptionElement",
+      "HTMLOptionsCollection",
+      "HTMLOrSVGElement",
+      "HTMLOrSVGImageElement",
+      "HTMLOrSVGScriptElement",
+      "HTMLOutputElement",
+      "HTMLParagraphElement",
+      "HTMLParamElement",
+      "HTMLPictureElement",
+      "HTMLPreElement",
+      "HTMLProgressElement",
+      "HTMLQuoteElement",
+      "HTMLScriptElement",
+      "HTMLSelectElement",
+      "HTMLSlotElement",
+      "HTMLSourceElement",
+      "HTMLSpanElement",
+      "HTMLStyleElement",
+      "HTMLTableCaptionElement",
+      "HTMLTableCellElement",
+      "HTMLTableColElement",
+      "HTMLTableDataCellElement",
+      "HTMLTableElement",
+      "HTMLTableHeaderCellElement",
+      "HTMLTableRowElement",
+      "HTMLTableSectionElement",
+      "HTMLTemplateElement",
+      "HTMLTextAreaElement",
+      "HTMLTimeElement",
+      "HTMLTitleElement",
+      "HTMLTrackElement",
+      "HTMLUListElement",
+      "HTMLUnknownElement",
+      "HTMLVideoElement",
+      "HardwareAcceleration",
+      "HashAlgorithmIdentifier",
+      "HashChangeEvent",
+      "HashChangeEventInit",
+      "HdrMetadataType",
+      "Headers",
+      "HeadersInit",
+      "HeadersIterator",
+      "Highlight",
+      "HighlightRegistry",
+      "HighlightType",
+      "History",
+      "HkdfParams",
+      "HmacImportParams",
+      "HmacKeyAlgorithm",
+      "HmacKeyGenParams",
+      "IDBCursor",
+      "IDBCursorDirection",
+      "IDBCursorWithValue",
+      "IDBDatabase",
+      "IDBDatabaseInfo",
+      "IDBFactory",
+      "IDBIndex",
+      "IDBIndexParameters",
+      "IDBKeyRange",
+      "IDBObjectStore",
+      "IDBObjectStoreParameters",
+      "IDBOpenDBRequest",
+      "IDBRequest",
+      "IDBRequestReadyState",
+      "IDBTransaction",
+      "IDBTransactionDurability",
+      "IDBTransactionMode",
+      "IDBTransactionOptions",
+      "IDBValidKey",
+      "IDBVersionChangeEvent",
+      "IDBVersionChangeEventInit",
+      "IIRFilterNode",
+      "IIRFilterOptions",
+      "IdleDeadline",
+      "IdleRequestCallback",
+      "IdleRequestOptions",
+      "ImageBitmap",
+      "ImageBitmapOptions",
+      "ImageBitmapRenderingContext",
+      "ImageBitmapRenderingContextSettings",
+      "ImageBitmapSource",
+      "ImageBufferSource",
+      "ImageCapture",
+      "ImageData",
+      "ImageDataArray",
+      "ImageDataSettings",
+      "ImageDecodeOptions",
+      "ImageDecodeResult",
+      "ImageDecoder",
+      "ImageDecoderInit",
+      "ImageEncodeOptions",
+      "ImageOrientation",
+      "ImageSmoothingQuality",
+      "ImageTrack",
+      "ImageTrackList",
+      "ImportMeta",
+      "ImportNodeOptions",
+      "InputDeviceInfo",
+      "InputEvent",
+      "InputEventInit",
+      "InsertPosition",
+      "Int32List",
+      "IntersectionObserver",
+      "IntersectionObserverCallback",
+      "IntersectionObserverEntry",
+      "IntersectionObserverInit",
+      "IterationCompositeOperation",
+      "JsonWebKey",
+      "KHR_parallel_shader_compile",
+      "KeyAlgorithm",
+      "KeyFormat",
+      "KeySystemTrackConfiguration",
+      "KeyType",
+      "KeyUsage",
+      "KeyboardEvent",
+      "KeyboardEventInit",
+      "Keyframe",
+      "KeyframeAnimationOptions",
+      "KeyframeEffect",
+      "KeyframeEffectOptions",
+      "LargestContentfulPaint",
+      "LatencyMode",
+      "LineAlignSetting",
+      "LineAndPositionSetting",
+      "LinkStyle",
+      "Location",
+      "Lock",
+      "LockGrantedCallback",
+      "LockInfo",
+      "LockManager",
+      "LockManagerSnapshot",
+      "LockMode",
+      "LockOptions",
+      "LoginStatus",
+      "MIDIAccess",
+      "MIDIConnectionEvent",
+      "MIDIConnectionEventInit",
+      "MIDIInput",
+      "MIDIInputMap",
+      "MIDIMessageEvent",
+      "MIDIMessageEventInit",
+      "MIDIOptions",
+      "MIDIOutput",
+      "MIDIOutputMap",
+      "MIDIPort",
+      "MIDIPortConnectionState",
+      "MIDIPortDeviceState",
+      "MIDIPortType",
+      "MathMLElement",
+      "MathMLElementTagNameMap",
+      "MediaCapabilities",
+      "MediaCapabilitiesDecodingInfo",
+      "MediaCapabilitiesEncodingInfo",
+      "MediaCapabilitiesInfo",
+      "MediaCapabilitiesKeySystemConfiguration",
+      "MediaConfiguration",
+      "MediaDecodingConfiguration",
+      "MediaDecodingType",
+      "MediaDeviceInfo",
+      "MediaDeviceKind",
+      "MediaDevices",
+      "MediaElementAudioSourceNode",
+      "MediaElementAudioSourceOptions",
+      "MediaEncodingConfiguration",
+      "MediaEncodingType",
+      "MediaEncryptedEvent",
+      "MediaEncryptedEventInit",
+      "MediaError",
+      "MediaImage",
+      "MediaKeyMessageEvent",
+      "MediaKeyMessageEventInit",
+      "MediaKeyMessageType",
+      "MediaKeySession",
+      "MediaKeySessionClosedReason",
+      "MediaKeySessionType",
+      "MediaKeyStatus",
+      "MediaKeyStatusMap",
+      "MediaKeyStatusMapIterator",
+      "MediaKeySystemAccess",
+      "MediaKeySystemConfiguration",
+      "MediaKeySystemMediaCapability",
+      "MediaKeys",
+      "MediaKeysPolicy",
+      "MediaKeysRequirement",
+      "MediaList",
+      "MediaMetadata",
+      "MediaMetadataInit",
+      "MediaPositionState",
+      "MediaProvider",
+      "MediaQueryList",
+      "MediaQueryListEvent",
+      "MediaQueryListEventInit",
+      "MediaRecorder",
+      "MediaRecorderOptions",
+      "MediaSession",
+      "MediaSessionAction",
+      "MediaSessionActionDetails",
+      "MediaSessionActionHandler",
+      "MediaSessionPlaybackState",
+      "MediaSettingsRange",
+      "MediaSource",
+      "MediaSourceHandle",
+      "MediaStream",
+      "MediaStreamAudioDestinationNode",
+      "MediaStreamAudioSourceNode",
+      "MediaStreamAudioSourceOptions",
+      "MediaStreamConstraints",
+      "MediaStreamTrack",
+      "MediaStreamTrackEvent",
+      "MediaStreamTrackEventInit",
+      "MediaStreamTrackState",
+      "MediaTrackCapabilities",
+      "MediaTrackConstraintSet",
+      "MediaTrackConstraints",
+      "MediaTrackSettings",
+      "MediaTrackSupportedConstraints",
+      "MessageChannel",
+      "MessageEvent",
+      "MessageEventInit",
+      "MessageEventSource",
+      "MessageEventTarget",
+      "MessagePort",
+      "MimeType",
+      "MimeTypeArray",
+      "MouseEvent",
+      "MouseEventInit",
+      "MultiCacheQueryOptions",
+      "MutationCallback",
+      "MutationObserver",
+      "MutationObserverInit",
+      "MutationRecord",
+      "MutationRecordType",
+      "NamedCurve",
+      "NamedNodeMap",
+      "NavigationActivation",
+      "NavigationHistoryEntry",
+      "NavigationPreloadManager",
+      "NavigationPreloadState",
+      "NavigationTimingType",
+      "NavigationType",
+      "Navigator",
+      "NavigatorAutomationInformation",
+      "NavigatorBadge",
+      "NavigatorConcurrentHardware",
+      "NavigatorContentUtils",
+      "NavigatorCookies",
+      "NavigatorID",
+      "NavigatorLanguage",
+      "NavigatorLocks",
+      "NavigatorLogin",
+      "NavigatorOnLine",
+      "NavigatorPlugins",
+      "NavigatorStorage",
+      "Node",
+      "NodeIterator",
+      "NodeList",
+      "NodeListOf",
+      "NonDocumentTypeChildNode",
+      "NonElementParentNode",
+      "Notification",
+      "NotificationDirection",
+      "NotificationOptions",
+      "NotificationPermission",
+      "NotificationPermissionCallback",
+      "OES_draw_buffers_indexed",
+      "OES_element_index_uint",
+      "OES_fbo_render_mipmap",
+      "OES_standard_derivatives",
+      "OES_texture_float",
+      "OES_texture_float_linear",
+      "OES_texture_half_float",
+      "OES_texture_half_float_linear",
+      "OES_vertex_array_object",
+      "OVR_multiview2",
+      "OfflineAudioCompletionEvent",
+      "OfflineAudioCompletionEventInit",
+      "OfflineAudioContext",
+      "OfflineAudioContextOptions",
+      "OffscreenCanvas",
+      "OffscreenCanvasRenderingContext2D",
+      "OffscreenRenderingContext",
+      "OffscreenRenderingContextId",
+      "OnBeforeUnloadEventHandler",
+      "OnBeforeUnloadEventHandlerNonNull",
+      "OnErrorEventHandler",
+      "OnErrorEventHandlerNonNull",
+      "OptionalEffectTiming",
+      "OptionalPostfixToken",
+      "OptionalPrefixToken",
+      "OpusBitstreamFormat",
+      "OpusEncoderConfig",
+      "OrientationType",
+      "OscillatorNode",
+      "OscillatorOptions",
+      "OscillatorType",
+      "OverSampleType",
+      "OverconstrainedError",
+      "PageRevealEvent",
+      "PageRevealEventInit",
+      "PageSwapEvent",
+      "PageSwapEventInit",
+      "PageTransitionEvent",
+      "PageTransitionEventInit",
+      "PannerNode",
+      "PannerOptions",
+      "PanningModelType",
+      "ParentNode",
+      "Path2D",
+      "PayerErrors",
+      "PaymentAddress",
+      "PaymentComplete",
+      "PaymentCurrencyAmount",
+      "PaymentDetailsBase",
+      "PaymentDetailsInit",
+      "PaymentDetailsModifier",
+      "PaymentDetailsUpdate",
+      "PaymentItem",
+      "PaymentMethodChangeEvent",
+      "PaymentMethodChangeEventInit",
+      "PaymentMethodData",
+      "PaymentOptions",
+      "PaymentRequest",
+      "PaymentRequestUpdateEvent",
+      "PaymentRequestUpdateEventInit",
+      "PaymentResponse",
+      "PaymentShippingOption",
+      "PaymentShippingType",
+      "PaymentValidationErrors",
+      "Pbkdf2Params",
+      "Performance",
+      "PerformanceEntry",
+      "PerformanceEntryList",
+      "PerformanceEventTiming",
+      "PerformanceMark",
+      "PerformanceMarkOptions",
+      "PerformanceMeasure",
+      "PerformanceMeasureOptions",
+      "PerformanceNavigation",
+      "PerformanceNavigationTiming",
+      "PerformanceObserver",
+      "PerformanceObserverCallback",
+      "PerformanceObserverEntryList",
+      "PerformanceObserverInit",
+      "PerformancePaintTiming",
+      "PerformanceResourceTiming",
+      "PerformanceServerTiming",
+      "PerformanceTiming",
+      "PeriodicWave",
+      "PeriodicWaveConstraints",
+      "PeriodicWaveOptions",
+      "PermissionDescriptor",
+      "PermissionName",
+      "PermissionState",
+      "PermissionStatus",
+      "Permissions",
+      "PhotoCapabilities",
+      "PhotoSettings",
+      "PictureInPictureEvent",
+      "PictureInPictureEventInit",
+      "PictureInPictureWindow",
+      "PlaneLayout",
+      "PlaybackDirection",
+      "Plugin",
+      "PluginArray",
+      "PointerEvent",
+      "PointerEventInit",
+      "PointerLockOptions",
+      "PopStateEvent",
+      "PopStateEventInit",
+      "PopoverInvokerElement",
+      "PositionAlignSetting",
+      "PositionCallback",
+      "PositionErrorCallback",
+      "PositionOptions",
+      "PredefinedColorSpace",
+      "PremultiplyAlpha",
+      "PresentationStyle",
+      "ProcessingInstruction",
+      "ProgressEvent",
+      "ProgressEventInit",
+      "PromiseRejectionEvent",
+      "PromiseRejectionEventInit",
+      "PropertyDefinition",
+      "PropertyIndexedKeyframes",
+      "PublicKeyCredential",
+      "PublicKeyCredentialClientCapabilities",
+      "PublicKeyCredentialCreationOptions",
+      "PublicKeyCredentialCreationOptionsJSON",
+      "PublicKeyCredentialDescriptor",
+      "PublicKeyCredentialDescriptorJSON",
+      "PublicKeyCredentialEntity",
+      "PublicKeyCredentialJSON",
+      "PublicKeyCredentialParameters",
+      "PublicKeyCredentialRequestOptions",
+      "PublicKeyCredentialRequestOptionsJSON",
+      "PublicKeyCredentialRpEntity",
+      "PublicKeyCredentialType",
+      "PublicKeyCredentialUserEntity",
+      "PublicKeyCredentialUserEntityJSON",
+      "PushEncryptionKeyName",
+      "PushManager",
+      "PushSubscription",
+      "PushSubscriptionJSON",
+      "PushSubscriptionOptions",
+      "PushSubscriptionOptionsInit",
+      "QueuingStrategy",
+      "QueuingStrategyInit",
+      "QueuingStrategySize",
+      "RTCAnswerOptions",
+      "RTCBundlePolicy",
+      "RTCCertificate",
+      "RTCCertificateExpiration",
+      "RTCConfiguration",
+      "RTCDTMFSender",
+      "RTCDTMFToneChangeEvent",
+      "RTCDTMFToneChangeEventInit",
+      "RTCDataChannel",
+      "RTCDataChannelEvent",
+      "RTCDataChannelEventInit",
+      "RTCDataChannelInit",
+      "RTCDataChannelState",
+      "RTCDegradationPreference",
+      "RTCDtlsFingerprint",
+      "RTCDtlsRole",
+      "RTCDtlsTransport",
+      "RTCDtlsTransportState",
+      "RTCEncodedAudioFrame",
+      "RTCEncodedAudioFrameMetadata",
+      "RTCEncodedFrameMetadata",
+      "RTCEncodedVideoFrame",
+      "RTCEncodedVideoFrameMetadata",
+      "RTCEncodedVideoFrameType",
+      "RTCError",
+      "RTCErrorDetailType",
+      "RTCErrorEvent",
+      "RTCErrorEventInit",
+      "RTCErrorInit",
+      "RTCIceCandidate",
+      "RTCIceCandidateInit",
+      "RTCIceCandidatePair",
+      "RTCIceCandidatePairStats",
+      "RTCIceCandidateType",
+      "RTCIceComponent",
+      "RTCIceConnectionState",
+      "RTCIceGathererState",
+      "RTCIceGatheringState",
+      "RTCIceProtocol",
+      "RTCIceRole",
+      "RTCIceServer",
+      "RTCIceTcpCandidateType",
+      "RTCIceTransport",
+      "RTCIceTransportPolicy",
+      "RTCIceTransportState",
+      "RTCInboundRtpStreamStats",
+      "RTCLocalIceCandidateInit",
+      "RTCLocalSessionDescriptionInit",
+      "RTCOfferAnswerOptions",
+      "RTCOfferOptions",
+      "RTCOutboundRtpStreamStats",
+      "RTCPeerConnection",
+      "RTCPeerConnectionErrorCallback",
+      "RTCPeerConnectionIceErrorEvent",
+      "RTCPeerConnectionIceErrorEventInit",
+      "RTCPeerConnectionIceEvent",
+      "RTCPeerConnectionIceEventInit",
+      "RTCPeerConnectionState",
+      "RTCPriorityType",
+      "RTCQualityLimitationReason",
+      "RTCReceivedRtpStreamStats",
+      "RTCRtcpMuxPolicy",
+      "RTCRtcpParameters",
+      "RTCRtpCapabilities",
+      "RTCRtpCodec",
+      "RTCRtpCodecParameters",
+      "RTCRtpCodingParameters",
+      "RTCRtpContributingSource",
+      "RTCRtpEncodingParameters",
+      "RTCRtpHeaderExtensionCapability",
+      "RTCRtpHeaderExtensionParameters",
+      "RTCRtpParameters",
+      "RTCRtpReceiveParameters",
+      "RTCRtpReceiver",
+      "RTCRtpScriptTransform",
+      "RTCRtpSendParameters",
+      "RTCRtpSender",
+      "RTCRtpStreamStats",
+      "RTCRtpSynchronizationSource",
+      "RTCRtpTransceiver",
+      "RTCRtpTransceiverDirection",
+      "RTCRtpTransceiverInit",
+      "RTCRtpTransform",
+      "RTCSctpTransport",
+      "RTCSctpTransportState",
+      "RTCSdpType",
+      "RTCSentRtpStreamStats",
+      "RTCSessionDescription",
+      "RTCSessionDescriptionCallback",
+      "RTCSessionDescriptionInit",
+      "RTCSetParameterOptions",
+      "RTCSignalingState",
+      "RTCStats",
+      "RTCStatsIceCandidatePairState",
+      "RTCStatsReport",
+      "RTCStatsType",
+      "RTCTrackEvent",
+      "RTCTrackEventInit",
+      "RTCTransportStats",
+      "RadioNodeList",
+      "Range",
+      "ReadableByteStreamController",
+      "ReadableStream",
+      "ReadableStreamAsyncIterator",
+      "ReadableStreamBYOBReader",
+      "ReadableStreamBYOBRequest",
+      "ReadableStreamController",
+      "ReadableStreamDefaultController",
+      "ReadableStreamDefaultReader",
+      "ReadableStreamGenericReader",
+      "ReadableStreamGetReaderOptions",
+      "ReadableStreamIteratorOptions",
+      "ReadableStreamReadDoneResult",
+      "ReadableStreamReadResult",
+      "ReadableStreamReadValueResult",
+      "ReadableStreamReader",
+      "ReadableStreamReaderMode",
+      "ReadableStreamType",
+      "ReadableWritablePair",
+      "ReadyState",
+      "RecordingState",
+      "RedEyeReduction",
+      "ReferrerPolicy",
+      "RegistrationOptions",
+      "RemotePlayback",
+      "RemotePlaybackAvailabilityCallback",
+      "RemotePlaybackState",
+      "RenderingContext",
+      "Report",
+      "ReportBody",
+      "ReportList",
+      "ReportingObserver",
+      "ReportingObserverCallback",
+      "ReportingObserverOptions",
+      "Request",
+      "RequestCache",
+      "RequestCredentials",
+      "RequestDestination",
+      "RequestInfo",
+      "RequestInit",
+      "RequestMode",
+      "RequestPriority",
+      "RequestRedirect",
+      "ResidentKeyRequirement",
+      "ResizeObserver",
+      "ResizeObserverBoxOptions",
+      "ResizeObserverCallback",
+      "ResizeObserverEntry",
+      "ResizeObserverOptions",
+      "ResizeObserverSize",
+      "ResizeQuality",
+      "Response",
+      "ResponseInit",
+      "ResponseType",
+      "RsaHashedImportParams",
+      "RsaHashedKeyAlgorithm",
+      "RsaHashedKeyGenParams",
+      "RsaKeyAlgorithm",
+      "RsaKeyGenParams",
+      "RsaOaepParams",
+      "RsaOtherPrimesInfo",
+      "RsaPssParams",
+      "SVGAElement",
+      "SVGAngle",
+      "SVGAnimateElement",
+      "SVGAnimateMotionElement",
+      "SVGAnimateTransformElement",
+      "SVGAnimatedAngle",
+      "SVGAnimatedBoolean",
+      "SVGAnimatedEnumeration",
+      "SVGAnimatedInteger",
+      "SVGAnimatedLength",
+      "SVGAnimatedLengthList",
+      "SVGAnimatedNumber",
+      "SVGAnimatedNumberList",
+      "SVGAnimatedPoints",
+      "SVGAnimatedPreserveAspectRatio",
+      "SVGAnimatedRect",
+      "SVGAnimatedString",
+      "SVGAnimatedTransformList",
+      "SVGAnimationElement",
+      "SVGBoundingBoxOptions",
+      "SVGCircleElement",
+      "SVGClipPathElement",
+      "SVGComponentTransferFunctionElement",
+      "SVGDefsElement",
+      "SVGDescElement",
+      "SVGElement",
+      "SVGElementTagNameMap",
+      "SVGEllipseElement",
+      "SVGFEBlendElement",
+      "SVGFEColorMatrixElement",
+      "SVGFEComponentTransferElement",
+      "SVGFECompositeElement",
+      "SVGFEConvolveMatrixElement",
+      "SVGFEDiffuseLightingElement",
+      "SVGFEDisplacementMapElement",
+      "SVGFEDistantLightElement",
+      "SVGFEDropShadowElement",
+      "SVGFEFloodElement",
+      "SVGFEFuncAElement",
+      "SVGFEFuncBElement",
+      "SVGFEFuncGElement",
+      "SVGFEFuncRElement",
+      "SVGFEGaussianBlurElement",
+      "SVGFEImageElement",
+      "SVGFEMergeElement",
+      "SVGFEMergeNodeElement",
+      "SVGFEMorphologyElement",
+      "SVGFEOffsetElement",
+      "SVGFEPointLightElement",
+      "SVGFESpecularLightingElement",
+      "SVGFESpotLightElement",
+      "SVGFETileElement",
+      "SVGFETurbulenceElement",
+      "SVGFilterElement",
+      "SVGFilterPrimitiveStandardAttributes",
+      "SVGFitToViewBox",
+      "SVGForeignObjectElement",
+      "SVGGElement",
+      "SVGGeometryElement",
+      "SVGGradientElement",
+      "SVGGraphicsElement",
+      "SVGImageElement",
+      "SVGLength",
+      "SVGLengthList",
+      "SVGLineElement",
+      "SVGLinearGradientElement",
+      "SVGMPathElement",
+      "SVGMarkerElement",
+      "SVGMaskElement",
+      "SVGMetadataElement",
+      "SVGNumber",
+      "SVGNumberList",
+      "SVGPathElement",
+      "SVGPatternElement",
+      "SVGPointList",
+      "SVGPolygonElement",
+      "SVGPolylineElement",
+      "SVGPreserveAspectRatio",
+      "SVGRadialGradientElement",
+      "SVGRectElement",
+      "SVGSVGElement",
+      "SVGScriptElement",
+      "SVGSetElement",
+      "SVGStopElement",
+      "SVGStringList",
+      "SVGStyleElement",
+      "SVGSwitchElement",
+      "SVGSymbolElement",
+      "SVGTSpanElement",
+      "SVGTests",
+      "SVGTextContentElement",
+      "SVGTextElement",
+      "SVGTextPathElement",
+      "SVGTextPositioningElement",
+      "SVGTitleElement",
+      "SVGTransform",
+      "SVGTransformList",
+      "SVGURIReference",
+      "SVGUnitTypes",
+      "SVGUseElement",
+      "SVGViewElement",
+      "Screen",
+      "ScreenOrientation",
+      "ScriptProcessorNode",
+      "ScrollBehavior",
+      "ScrollIntoViewOptions",
+      "ScrollLogicalPosition",
+      "ScrollOptions",
+      "ScrollRestoration",
+      "ScrollSetting",
+      "ScrollToOptions",
+      "SecurityPolicyViolationEvent",
+      "SecurityPolicyViolationEventDisposition",
+      "SecurityPolicyViolationEventInit",
+      "Selection",
+      "SelectionMode",
+      "ServiceWorker",
+      "ServiceWorkerContainer",
+      "ServiceWorkerRegistration",
+      "ServiceWorkerState",
+      "ServiceWorkerUpdateViaCache",
+      "ShadowRoot",
+      "ShadowRootInit",
+      "ShadowRootMode",
+      "ShareData",
+      "SharedWorker",
+      "SlotAssignmentMode",
+      "Slottable",
+      "SourceBuffer",
+      "SourceBufferList",
+      "SpeechRecognitionAlternative",
+      "SpeechRecognitionResult",
+      "SpeechRecognitionResultList",
+      "SpeechSynthesis",
+      "SpeechSynthesisErrorCode",
+      "SpeechSynthesisErrorEvent",
+      "SpeechSynthesisErrorEventInit",
+      "SpeechSynthesisEvent",
+      "SpeechSynthesisEventInit",
+      "SpeechSynthesisUtterance",
+      "SpeechSynthesisVoice",
+      "StartViewTransitionOptions",
+      "StaticRange",
+      "StaticRangeInit",
+      "StereoPannerNode",
+      "StereoPannerOptions",
+      "Storage",
+      "StorageEstimate",
+      "StorageEvent",
+      "StorageEventInit",
+      "StorageManager",
+      "StreamPipeOptions",
+      "StructuredSerializeOptions",
+      "StyleMedia",
+      "StylePropertyMap",
+      "StylePropertyMapReadOnly",
+      "StylePropertyMapReadOnlyIterator",
+      "StyleSheet",
+      "StyleSheetList",
+      "SubmitEvent",
+      "SubmitEventInit",
+      "SubtleCrypto",
+      "TexImageSource",
+      "Text",
+      "TextDecodeOptions",
+      "TextDecoder",
+      "TextDecoderCommon",
+      "TextDecoderOptions",
+      "TextDecoderStream",
+      "TextEncoder",
+      "TextEncoderCommon",
+      "TextEncoderEncodeIntoResult",
+      "TextEncoderStream",
+      "TextEvent",
+      "TextMetrics",
+      "TextTrack",
+      "TextTrackCue",
+      "TextTrackCueList",
+      "TextTrackKind",
+      "TextTrackList",
+      "TextTrackMode",
+      "TimeRanges",
+      "TimerHandler",
+      "ToggleEvent",
+      "ToggleEventInit",
+      "Touch",
+      "TouchEvent",
+      "TouchEventInit",
+      "TouchInit",
+      "TouchList",
+      "TouchType",
+      "TrackEvent",
+      "TrackEventInit",
+      "TransferFunction",
+      "Transferable",
+      "TransformStream",
+      "TransformStreamDefaultController",
+      "Transformer",
+      "TransformerFlushCallback",
+      "TransformerStartCallback",
+      "TransformerTransformCallback",
+      "TransitionEvent",
+      "TransitionEventInit",
+      "TreeWalker",
+      "UIEvent",
+      "UIEventInit",
+      "ULongRange",
+      "URL",
+      "URLSearchParams",
+      "URLSearchParamsIterator",
+      "Uint32List",
+      "UnderlyingByteSource",
+      "UnderlyingDefaultSource",
+      "UnderlyingSink",
+      "UnderlyingSinkAbortCallback",
+      "UnderlyingSinkCloseCallback",
+      "UnderlyingSinkStartCallback",
+      "UnderlyingSinkWriteCallback",
+      "UnderlyingSource",
+      "UnderlyingSourceCancelCallback",
+      "UnderlyingSourcePullCallback",
+      "UnderlyingSourceStartCallback",
+      "UserActivation",
+      "UserVerificationRequirement",
+      "VTTCue",
+      "VTTRegion",
+      "ValidityState",
+      "ValidityStateFlags",
+      "VibratePattern",
+      "VideoColorPrimaries",
+      "VideoColorSpace",
+      "VideoColorSpaceInit",
+      "VideoConfiguration",
+      "VideoDecoder",
+      "VideoDecoderConfig",
+      "VideoDecoderInit",
+      "VideoDecoderSupport",
+      "VideoEncoder",
+      "VideoEncoderBitrateMode",
+      "VideoEncoderConfig",
+      "VideoEncoderEncodeOptions",
+      "VideoEncoderEncodeOptionsForAvc",
+      "VideoEncoderInit",
+      "VideoEncoderSupport",
+      "VideoFacingModeEnum",
+      "VideoFrame",
+      "VideoFrameBufferInit",
+      "VideoFrameCallbackMetadata",
+      "VideoFrameCopyToOptions",
+      "VideoFrameInit",
+      "VideoFrameOutputCallback",
+      "VideoFrameRequestCallback",
+      "VideoMatrixCoefficients",
+      "VideoPixelFormat",
+      "VideoPlaybackQuality",
+      "VideoTransferCharacteristics",
+      "ViewTransition",
+      "ViewTransitionTypeSet",
+      "ViewTransitionUpdateCallback",
+      "VisualViewport",
+      "VoidFunction",
+      "WEBGL_color_buffer_float",
+      "WEBGL_compressed_texture_astc",
+      "WEBGL_compressed_texture_etc",
+      "WEBGL_compressed_texture_etc1",
+      "WEBGL_compressed_texture_pvrtc",
+      "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_s3tc_srgb",
+      "WEBGL_debug_renderer_info",
+      "WEBGL_debug_shaders",
+      "WEBGL_depth_texture",
+      "WEBGL_draw_buffers",
+      "WEBGL_lose_context",
+      "WEBGL_multi_draw",
+      "WakeLock",
+      "WakeLockSentinel",
+      "WakeLockType",
+      "WaveShaperNode",
+      "WaveShaperOptions",
+      "WebAssembly.CompileError",
+      "WebAssembly.ExportValue",
+      "WebAssembly.Exports",
+      "WebAssembly.Global",
+      "WebAssembly.GlobalDescriptor",
+      "WebAssembly.ImportExportKind",
+      "WebAssembly.ImportValue",
+      "WebAssembly.Imports",
+      "WebAssembly.Instance",
+      "WebAssembly.LinkError",
+      "WebAssembly.Memory",
+      "WebAssembly.MemoryDescriptor",
+      "WebAssembly.Module",
+      "WebAssembly.ModuleExportDescriptor",
+      "WebAssembly.ModuleImportDescriptor",
+      "WebAssembly.ModuleImports",
+      "WebAssembly.RuntimeError",
+      "WebAssembly.Table",
+      "WebAssembly.TableDescriptor",
+      "WebAssembly.TableKind",
+      "WebAssembly.ValueType",
+      "WebAssembly.ValueTypeMap",
+      "WebAssembly.WebAssemblyInstantiatedSource",
+      "WebCodecsErrorCallback",
+      "WebGL2RenderingContext",
+      "WebGL2RenderingContextBase",
+      "WebGL2RenderingContextOverloads",
+      "WebGLActiveInfo",
+      "WebGLBuffer",
+      "WebGLContextAttributes",
+      "WebGLContextEvent",
+      "WebGLContextEventInit",
+      "WebGLFramebuffer",
+      "WebGLPowerPreference",
+      "WebGLProgram",
+      "WebGLQuery",
+      "WebGLRenderbuffer",
+      "WebGLRenderingContext",
+      "WebGLRenderingContextBase",
+      "WebGLRenderingContextOverloads",
+      "WebGLSampler",
+      "WebGLShader",
+      "WebGLShaderPrecisionFormat",
+      "WebGLSync",
+      "WebGLTexture",
+      "WebGLTransformFeedback",
+      "WebGLUniformLocation",
+      "WebGLVertexArrayObject",
+      "WebGLVertexArrayObjectOES",
+      "WebSocket",
+      "WebTransport",
+      "WebTransportBidirectionalStream",
+      "WebTransportCloseInfo",
+      "WebTransportCongestionControl",
+      "WebTransportDatagramDuplexStream",
+      "WebTransportError",
+      "WebTransportErrorOptions",
+      "WebTransportErrorSource",
+      "WebTransportHash",
+      "WebTransportOptions",
+      "WebTransportSendOptions",
+      "WebTransportSendStreamOptions",
+      "WheelEvent",
+      "WheelEventInit",
+      "Window",
+      "WindowEventHandlers",
+      "WindowLocalStorage",
+      "WindowOrWorkerGlobalScope",
+      "WindowPostMessageOptions",
+      "WindowProxy",
+      "WindowSessionStorage",
+      "Worker",
+      "WorkerOptions",
+      "WorkerType",
+      "Worklet",
+      "WorkletOptions",
+      "WritableStream",
+      "WritableStreamDefaultController",
+      "WritableStreamDefaultWriter",
+      "WriteCommandType",
+      "WriteParams",
+      "XMLDocument",
+      "XMLHttpRequest",
+      "XMLHttpRequestBodyInit",
+      "XMLHttpRequestEventTarget",
+      "XMLHttpRequestResponseType",
+      "XMLHttpRequestUpload",
+      "XMLSerializer",
+      "XPathEvaluator",
+      "XPathEvaluatorBase",
+      "XPathExpression",
+      "XPathResult",
+      "XSLTProcessor"
+    ],
+    "excludedSymbols": [],
+    "deferredSymbols": [
+      {
+        "symbol": "AbortSignalEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "AbstractWorkerEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "AnimationEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "AudioDecoderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "AudioEncoderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "AudioScheduledSourceNodeEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "AudioWorkletNodeEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "BaseAudioContextEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "BroadcastChannelEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "CSS",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.Hz",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.Q",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cap",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.ch",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cm",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cqb",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cqh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cqi",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cqmax",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cqmin",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.cqw",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.deg",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dpcm",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dpi",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dppx",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dvb",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dvh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dvi",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dvmax",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dvmin",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.dvw",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.em",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.escape",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.ex",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.fr",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.grad",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.highlights",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.ic",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.kHz",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lvb",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lvh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lvi",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lvmax",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lvmin",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.lvw",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.mm",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.ms",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.number",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.pc",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.percent",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.pt",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.px",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.rad",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.rcap",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.rch",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.registerProperty",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.rem",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.rex",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.ric",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.rlh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.s",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.supports",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.svb",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.svh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.svi",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.svmax",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.svmin",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.svw",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.turn",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.vb",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.vh",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.vi",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.vmax",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.vmin",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CSS.vw",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "CookieStoreEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "DocumentEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "EventSourceEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "FileReaderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "FontFaceSetEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "GlobalEventHandlersEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "HTMLBodyElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "HTMLElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "HTMLFrameSetElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "HTMLMediaElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "HTMLVideoElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "IDBDatabaseEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "IDBOpenDBRequestEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "IDBRequestEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "IDBTransactionEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MIDIAccessEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MIDIInputEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MIDIPortEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MathMLElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaDevicesEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaKeySessionEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaQueryListEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaRecorderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaSourceEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaStreamEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MediaStreamTrackEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MessageEventTargetEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "MessagePortEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "NavigationHistoryEntryEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "NotificationEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "OfflineAudioContextEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "OffscreenCanvasEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "PaymentRequestEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "PaymentResponseEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "PerformanceEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "PermissionStatusEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "PictureInPictureWindowEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RTCDTMFSenderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RTCDataChannelEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RTCDtlsTransportEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RTCIceTransportEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RTCPeerConnectionEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RTCSctpTransportEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "RemotePlaybackEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "SVGElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "SVGSVGElementEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ScreenOrientationEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ScriptProcessorNodeEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ServiceWorkerContainerEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ServiceWorkerEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ServiceWorkerRegistrationEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "ShadowRootEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "SourceBufferEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "SourceBufferListEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "SpeechSynthesisEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "SpeechSynthesisUtteranceEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "TextTrackCueEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "TextTrackEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "TextTrackListEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "VideoDecoderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "VideoEncoderEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "VisualViewportEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "WakeLockSentinelEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "WebAssembly",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "WebAssembly.compile",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "WebAssembly.compileStreaming",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "WebAssembly.instantiate",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "WebAssembly.instantiateStreaming",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "WebAssembly.validate",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "WebSocketEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "WindowEventHandlersEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "WindowEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "WorkerEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "XMLHttpRequestEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "XMLHttpRequestEventTargetEventMap",
+        "phase": "event-subscription",
+        "reason": "TS-only event map: deferred to typed event subscription emission phase."
+      },
+      {
+        "symbol": "console",
+        "phase": "namespace",
+        "reason": "Namespace container: individual members are emitted as static globals. Namespace type itself deferred to namespace-container phase."
+      },
+      {
+        "symbol": "toString",
+        "phase": "globals",
+        "reason": "TS-only global function: deferred to global-namespace emission phase."
+      }
+    ],
+    "failedSymbols": [
+      {
+        "symbol": "Audio",
+        "reason": "InterfaceEmitter: \u0027Audio\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "CustomElementConstructor",
+        "reason": "CallbackEmitter: \u0027CustomElementConstructor\u0027 has no extractable call signature. Expected: typeAlias with FunctionTypeNode, or interface with callSignature."
+      },
+      {
+        "symbol": "Image",
+        "reason": "InterfaceEmitter: \u0027Image\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "NodeFilter",
+        "reason": "CallbackEmitter: \u0027NodeFilter\u0027 has no extractable call signature. Expected: typeAlias with FunctionTypeNode, or interface with callSignature."
+      },
+      {
+        "symbol": "Option",
+        "reason": "InterfaceEmitter: \u0027Option\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "SVGMatrix",
+        "reason": "InterfaceEmitter: \u0027SVGMatrix\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "SVGPoint",
+        "reason": "InterfaceEmitter: \u0027SVGPoint\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "SVGRect",
+        "reason": "InterfaceEmitter: \u0027SVGRect\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "WebKitCSSMatrix",
+        "reason": "InterfaceEmitter: \u0027WebKitCSSMatrix\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "XPathNSResolver",
+        "reason": "CallbackEmitter: \u0027XPathNSResolver\u0027 has no extractable call signature. Expected: typeAlias with FunctionTypeNode, or interface with callSignature."
+      },
+      {
+        "symbol": "addEventListener",
+        "reason": "InterfaceEmitter: \u0027addEventListener\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "alert",
+        "reason": "InterfaceEmitter: \u0027alert\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "atob",
+        "reason": "InterfaceEmitter: \u0027atob\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "blur",
+        "reason": "InterfaceEmitter: \u0027blur\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "btoa",
+        "reason": "InterfaceEmitter: \u0027btoa\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "caches",
+        "reason": "InterfaceEmitter: \u0027caches\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "cancelAnimationFrame",
+        "reason": "InterfaceEmitter: \u0027cancelAnimationFrame\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "cancelIdleCallback",
+        "reason": "InterfaceEmitter: \u0027cancelIdleCallback\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "captureEvents",
+        "reason": "InterfaceEmitter: \u0027captureEvents\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "clearInterval",
+        "reason": "InterfaceEmitter: \u0027clearInterval\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "clearTimeout",
+        "reason": "InterfaceEmitter: \u0027clearTimeout\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "clientInformation",
+        "reason": "InterfaceEmitter: \u0027clientInformation\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "close",
+        "reason": "InterfaceEmitter: \u0027close\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "closed",
+        "reason": "InterfaceEmitter: \u0027closed\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "confirm",
+        "reason": "InterfaceEmitter: \u0027confirm\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "cookieStore",
+        "reason": "InterfaceEmitter: \u0027cookieStore\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "createImageBitmap",
+        "reason": "InterfaceEmitter: \u0027createImageBitmap\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "crossOriginIsolated",
+        "reason": "InterfaceEmitter: \u0027crossOriginIsolated\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "crypto",
+        "reason": "InterfaceEmitter: \u0027crypto\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "customElements",
+        "reason": "InterfaceEmitter: \u0027customElements\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "devicePixelRatio",
+        "reason": "InterfaceEmitter: \u0027devicePixelRatio\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "dispatchEvent",
+        "reason": "InterfaceEmitter: \u0027dispatchEvent\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "document",
+        "reason": "InterfaceEmitter: \u0027document\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "event",
+        "reason": "InterfaceEmitter: \u0027event\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "external",
+        "reason": "InterfaceEmitter: \u0027external\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "fetch",
+        "reason": "InterfaceEmitter: \u0027fetch\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "focus",
+        "reason": "InterfaceEmitter: \u0027focus\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "frameElement",
+        "reason": "InterfaceEmitter: \u0027frameElement\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "frames",
+        "reason": "InterfaceEmitter: \u0027frames\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "getComputedStyle",
+        "reason": "InterfaceEmitter: \u0027getComputedStyle\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "getSelection",
+        "reason": "InterfaceEmitter: \u0027getSelection\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "history",
+        "reason": "InterfaceEmitter: \u0027history\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "indexedDB",
+        "reason": "InterfaceEmitter: \u0027indexedDB\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "innerHeight",
+        "reason": "InterfaceEmitter: \u0027innerHeight\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "innerWidth",
+        "reason": "InterfaceEmitter: \u0027innerWidth\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "isSecureContext",
+        "reason": "InterfaceEmitter: \u0027isSecureContext\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "length",
+        "reason": "InterfaceEmitter: \u0027length\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "localStorage",
+        "reason": "InterfaceEmitter: \u0027localStorage\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "location",
+        "reason": "InterfaceEmitter: \u0027location\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "locationbar",
+        "reason": "InterfaceEmitter: \u0027locationbar\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "matchMedia",
+        "reason": "InterfaceEmitter: \u0027matchMedia\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "menubar",
+        "reason": "InterfaceEmitter: \u0027menubar\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "moveBy",
+        "reason": "InterfaceEmitter: \u0027moveBy\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "moveTo",
+        "reason": "InterfaceEmitter: \u0027moveTo\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "name",
+        "reason": "InterfaceEmitter: \u0027name\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "navigator",
+        "reason": "InterfaceEmitter: \u0027navigator\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onabort",
+        "reason": "InterfaceEmitter: \u0027onabort\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onafterprint",
+        "reason": "InterfaceEmitter: \u0027onafterprint\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onanimationcancel",
+        "reason": "InterfaceEmitter: \u0027onanimationcancel\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onanimationend",
+        "reason": "InterfaceEmitter: \u0027onanimationend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onanimationiteration",
+        "reason": "InterfaceEmitter: \u0027onanimationiteration\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onanimationstart",
+        "reason": "InterfaceEmitter: \u0027onanimationstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onauxclick",
+        "reason": "InterfaceEmitter: \u0027onauxclick\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onbeforeinput",
+        "reason": "InterfaceEmitter: \u0027onbeforeinput\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onbeforematch",
+        "reason": "InterfaceEmitter: \u0027onbeforematch\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onbeforeprint",
+        "reason": "InterfaceEmitter: \u0027onbeforeprint\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onbeforetoggle",
+        "reason": "InterfaceEmitter: \u0027onbeforetoggle\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onbeforeunload",
+        "reason": "InterfaceEmitter: \u0027onbeforeunload\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onblur",
+        "reason": "InterfaceEmitter: \u0027onblur\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncancel",
+        "reason": "InterfaceEmitter: \u0027oncancel\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncanplay",
+        "reason": "InterfaceEmitter: \u0027oncanplay\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncanplaythrough",
+        "reason": "InterfaceEmitter: \u0027oncanplaythrough\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onchange",
+        "reason": "InterfaceEmitter: \u0027onchange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onclick",
+        "reason": "InterfaceEmitter: \u0027onclick\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onclose",
+        "reason": "InterfaceEmitter: \u0027onclose\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncontextlost",
+        "reason": "InterfaceEmitter: \u0027oncontextlost\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncontextmenu",
+        "reason": "InterfaceEmitter: \u0027oncontextmenu\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncontextrestored",
+        "reason": "InterfaceEmitter: \u0027oncontextrestored\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncopy",
+        "reason": "InterfaceEmitter: \u0027oncopy\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncuechange",
+        "reason": "InterfaceEmitter: \u0027oncuechange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oncut",
+        "reason": "InterfaceEmitter: \u0027oncut\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondblclick",
+        "reason": "InterfaceEmitter: \u0027ondblclick\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondevicemotion",
+        "reason": "InterfaceEmitter: \u0027ondevicemotion\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondeviceorientation",
+        "reason": "InterfaceEmitter: \u0027ondeviceorientation\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondeviceorientationabsolute",
+        "reason": "InterfaceEmitter: \u0027ondeviceorientationabsolute\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondrag",
+        "reason": "InterfaceEmitter: \u0027ondrag\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondragend",
+        "reason": "InterfaceEmitter: \u0027ondragend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondragenter",
+        "reason": "InterfaceEmitter: \u0027ondragenter\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondragleave",
+        "reason": "InterfaceEmitter: \u0027ondragleave\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondragover",
+        "reason": "InterfaceEmitter: \u0027ondragover\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondragstart",
+        "reason": "InterfaceEmitter: \u0027ondragstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondrop",
+        "reason": "InterfaceEmitter: \u0027ondrop\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ondurationchange",
+        "reason": "InterfaceEmitter: \u0027ondurationchange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onemptied",
+        "reason": "InterfaceEmitter: \u0027onemptied\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onended",
+        "reason": "InterfaceEmitter: \u0027onended\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onerror",
+        "reason": "InterfaceEmitter: \u0027onerror\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onfocus",
+        "reason": "InterfaceEmitter: \u0027onfocus\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onformdata",
+        "reason": "InterfaceEmitter: \u0027onformdata\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ongamepadconnected",
+        "reason": "InterfaceEmitter: \u0027ongamepadconnected\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ongamepaddisconnected",
+        "reason": "InterfaceEmitter: \u0027ongamepaddisconnected\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ongotpointercapture",
+        "reason": "InterfaceEmitter: \u0027ongotpointercapture\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onhashchange",
+        "reason": "InterfaceEmitter: \u0027onhashchange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oninput",
+        "reason": "InterfaceEmitter: \u0027oninput\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "oninvalid",
+        "reason": "InterfaceEmitter: \u0027oninvalid\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onkeydown",
+        "reason": "InterfaceEmitter: \u0027onkeydown\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onkeypress",
+        "reason": "InterfaceEmitter: \u0027onkeypress\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onkeyup",
+        "reason": "InterfaceEmitter: \u0027onkeyup\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onlanguagechange",
+        "reason": "InterfaceEmitter: \u0027onlanguagechange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onload",
+        "reason": "InterfaceEmitter: \u0027onload\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onloadeddata",
+        "reason": "InterfaceEmitter: \u0027onloadeddata\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onloadedmetadata",
+        "reason": "InterfaceEmitter: \u0027onloadedmetadata\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onloadstart",
+        "reason": "InterfaceEmitter: \u0027onloadstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onlostpointercapture",
+        "reason": "InterfaceEmitter: \u0027onlostpointercapture\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmessage",
+        "reason": "InterfaceEmitter: \u0027onmessage\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmessageerror",
+        "reason": "InterfaceEmitter: \u0027onmessageerror\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmousedown",
+        "reason": "InterfaceEmitter: \u0027onmousedown\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmouseenter",
+        "reason": "InterfaceEmitter: \u0027onmouseenter\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmouseleave",
+        "reason": "InterfaceEmitter: \u0027onmouseleave\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmousemove",
+        "reason": "InterfaceEmitter: \u0027onmousemove\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmouseout",
+        "reason": "InterfaceEmitter: \u0027onmouseout\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmouseover",
+        "reason": "InterfaceEmitter: \u0027onmouseover\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onmouseup",
+        "reason": "InterfaceEmitter: \u0027onmouseup\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onoffline",
+        "reason": "InterfaceEmitter: \u0027onoffline\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ononline",
+        "reason": "InterfaceEmitter: \u0027ononline\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onorientationchange",
+        "reason": "InterfaceEmitter: \u0027onorientationchange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpagehide",
+        "reason": "InterfaceEmitter: \u0027onpagehide\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpagereveal",
+        "reason": "InterfaceEmitter: \u0027onpagereveal\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpageshow",
+        "reason": "InterfaceEmitter: \u0027onpageshow\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpageswap",
+        "reason": "InterfaceEmitter: \u0027onpageswap\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpaste",
+        "reason": "InterfaceEmitter: \u0027onpaste\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpause",
+        "reason": "InterfaceEmitter: \u0027onpause\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onplay",
+        "reason": "InterfaceEmitter: \u0027onplay\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onplaying",
+        "reason": "InterfaceEmitter: \u0027onplaying\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointercancel",
+        "reason": "InterfaceEmitter: \u0027onpointercancel\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerdown",
+        "reason": "InterfaceEmitter: \u0027onpointerdown\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerenter",
+        "reason": "InterfaceEmitter: \u0027onpointerenter\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerleave",
+        "reason": "InterfaceEmitter: \u0027onpointerleave\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointermove",
+        "reason": "InterfaceEmitter: \u0027onpointermove\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerout",
+        "reason": "InterfaceEmitter: \u0027onpointerout\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerover",
+        "reason": "InterfaceEmitter: \u0027onpointerover\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerrawupdate",
+        "reason": "InterfaceEmitter: \u0027onpointerrawupdate\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpointerup",
+        "reason": "InterfaceEmitter: \u0027onpointerup\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onpopstate",
+        "reason": "InterfaceEmitter: \u0027onpopstate\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onprogress",
+        "reason": "InterfaceEmitter: \u0027onprogress\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onratechange",
+        "reason": "InterfaceEmitter: \u0027onratechange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onrejectionhandled",
+        "reason": "InterfaceEmitter: \u0027onrejectionhandled\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onreset",
+        "reason": "InterfaceEmitter: \u0027onreset\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onresize",
+        "reason": "InterfaceEmitter: \u0027onresize\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onscroll",
+        "reason": "InterfaceEmitter: \u0027onscroll\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onscrollend",
+        "reason": "InterfaceEmitter: \u0027onscrollend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onsecuritypolicyviolation",
+        "reason": "InterfaceEmitter: \u0027onsecuritypolicyviolation\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onseeked",
+        "reason": "InterfaceEmitter: \u0027onseeked\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onseeking",
+        "reason": "InterfaceEmitter: \u0027onseeking\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onselect",
+        "reason": "InterfaceEmitter: \u0027onselect\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onselectionchange",
+        "reason": "InterfaceEmitter: \u0027onselectionchange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onselectstart",
+        "reason": "InterfaceEmitter: \u0027onselectstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onslotchange",
+        "reason": "InterfaceEmitter: \u0027onslotchange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onstalled",
+        "reason": "InterfaceEmitter: \u0027onstalled\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onstorage",
+        "reason": "InterfaceEmitter: \u0027onstorage\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onsubmit",
+        "reason": "InterfaceEmitter: \u0027onsubmit\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onsuspend",
+        "reason": "InterfaceEmitter: \u0027onsuspend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontimeupdate",
+        "reason": "InterfaceEmitter: \u0027ontimeupdate\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontoggle",
+        "reason": "InterfaceEmitter: \u0027ontoggle\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontouchcancel",
+        "reason": "InterfaceEmitter: \u0027ontouchcancel\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontouchend",
+        "reason": "InterfaceEmitter: \u0027ontouchend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontouchmove",
+        "reason": "InterfaceEmitter: \u0027ontouchmove\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontouchstart",
+        "reason": "InterfaceEmitter: \u0027ontouchstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontransitioncancel",
+        "reason": "InterfaceEmitter: \u0027ontransitioncancel\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontransitionend",
+        "reason": "InterfaceEmitter: \u0027ontransitionend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontransitionrun",
+        "reason": "InterfaceEmitter: \u0027ontransitionrun\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "ontransitionstart",
+        "reason": "InterfaceEmitter: \u0027ontransitionstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onunhandledrejection",
+        "reason": "InterfaceEmitter: \u0027onunhandledrejection\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onunload",
+        "reason": "InterfaceEmitter: \u0027onunload\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onvolumechange",
+        "reason": "InterfaceEmitter: \u0027onvolumechange\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onwaiting",
+        "reason": "InterfaceEmitter: \u0027onwaiting\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onwebkitanimationend",
+        "reason": "InterfaceEmitter: \u0027onwebkitanimationend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onwebkitanimationiteration",
+        "reason": "InterfaceEmitter: \u0027onwebkitanimationiteration\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onwebkitanimationstart",
+        "reason": "InterfaceEmitter: \u0027onwebkitanimationstart\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onwebkittransitionend",
+        "reason": "InterfaceEmitter: \u0027onwebkittransitionend\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "onwheel",
+        "reason": "InterfaceEmitter: \u0027onwheel\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "open",
+        "reason": "InterfaceEmitter: \u0027open\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "opener",
+        "reason": "InterfaceEmitter: \u0027opener\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "orientation",
+        "reason": "InterfaceEmitter: \u0027orientation\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "origin",
+        "reason": "InterfaceEmitter: \u0027origin\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "originAgentCluster",
+        "reason": "InterfaceEmitter: \u0027originAgentCluster\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "outerHeight",
+        "reason": "InterfaceEmitter: \u0027outerHeight\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "outerWidth",
+        "reason": "InterfaceEmitter: \u0027outerWidth\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "pageXOffset",
+        "reason": "InterfaceEmitter: \u0027pageXOffset\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "pageYOffset",
+        "reason": "InterfaceEmitter: \u0027pageYOffset\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "parent",
+        "reason": "InterfaceEmitter: \u0027parent\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "performance",
+        "reason": "InterfaceEmitter: \u0027performance\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "personalbar",
+        "reason": "InterfaceEmitter: \u0027personalbar\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "postMessage",
+        "reason": "InterfaceEmitter: \u0027postMessage\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "print",
+        "reason": "InterfaceEmitter: \u0027print\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "prompt",
+        "reason": "InterfaceEmitter: \u0027prompt\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "queueMicrotask",
+        "reason": "InterfaceEmitter: \u0027queueMicrotask\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "releaseEvents",
+        "reason": "InterfaceEmitter: \u0027releaseEvents\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "removeEventListener",
+        "reason": "InterfaceEmitter: \u0027removeEventListener\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "reportError",
+        "reason": "InterfaceEmitter: \u0027reportError\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "requestAnimationFrame",
+        "reason": "InterfaceEmitter: \u0027requestAnimationFrame\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "requestIdleCallback",
+        "reason": "InterfaceEmitter: \u0027requestIdleCallback\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "resizeBy",
+        "reason": "InterfaceEmitter: \u0027resizeBy\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "resizeTo",
+        "reason": "InterfaceEmitter: \u0027resizeTo\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "screen",
+        "reason": "InterfaceEmitter: \u0027screen\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "screenLeft",
+        "reason": "InterfaceEmitter: \u0027screenLeft\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "screenTop",
+        "reason": "InterfaceEmitter: \u0027screenTop\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "screenX",
+        "reason": "InterfaceEmitter: \u0027screenX\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "screenY",
+        "reason": "InterfaceEmitter: \u0027screenY\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "scroll",
+        "reason": "InterfaceEmitter: \u0027scroll\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "scrollBy",
+        "reason": "InterfaceEmitter: \u0027scrollBy\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "scrollTo",
+        "reason": "InterfaceEmitter: \u0027scrollTo\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "scrollX",
+        "reason": "InterfaceEmitter: \u0027scrollX\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "scrollY",
+        "reason": "InterfaceEmitter: \u0027scrollY\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "scrollbars",
+        "reason": "InterfaceEmitter: \u0027scrollbars\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "self",
+        "reason": "InterfaceEmitter: \u0027self\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "sessionStorage",
+        "reason": "InterfaceEmitter: \u0027sessionStorage\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "setInterval",
+        "reason": "InterfaceEmitter: \u0027setInterval\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "setTimeout",
+        "reason": "InterfaceEmitter: \u0027setTimeout\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "speechSynthesis",
+        "reason": "InterfaceEmitter: \u0027speechSynthesis\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "status",
+        "reason": "InterfaceEmitter: \u0027status\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "statusbar",
+        "reason": "InterfaceEmitter: \u0027statusbar\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "stop",
+        "reason": "InterfaceEmitter: \u0027stop\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "structuredClone",
+        "reason": "InterfaceEmitter: \u0027structuredClone\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "toolbar",
+        "reason": "InterfaceEmitter: \u0027toolbar\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "top",
+        "reason": "InterfaceEmitter: \u0027top\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "visualViewport",
+        "reason": "InterfaceEmitter: \u0027visualViewport\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "webkitURL",
+        "reason": "InterfaceEmitter: \u0027webkitURL\u0027 has no interface declaration."
+      },
+      {
+        "symbol": "window",
+        "reason": "InterfaceEmitter: \u0027window\u0027 has no interface declaration."
+      }
+    ]
+  }
+}

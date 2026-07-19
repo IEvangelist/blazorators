@@ -1,0 +1,11 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "WakeLock",
+  "description": "Screen Wake Lock API – prevent device screens from dimming or locking.",
+  "rootSymbols": ["WakeLock", "WakeLockSentinel"],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["screen-wake-lock"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/WakeLock"
+}

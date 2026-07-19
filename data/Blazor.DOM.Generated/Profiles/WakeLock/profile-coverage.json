@@ -1,0 +1,47 @@
+﻿{
+  "profileName": "WakeLock",
+  "description": "Screen Wake Lock API \u2013 prevent device screens from dimming or locking.",
+  "rootSymbols": [
+    "WakeLock",
+    "WakeLockSentinel"
+  ],
+  "features": [
+    "screen-wake-lock"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "closureSize": 15,
+  "includedSymbolCount": 13,
+  "externalReferenceCount": 2,
+  "externalReferences": [
+    "K",
+    "Promise"
+  ],
+  "accounting": {
+    "totalSymbols": 13,
+    "projected": 13,
+    "excluded": 0,
+    "deferred": 0,
+    "generationFailed": 0,
+    "projectedSymbols": [
+      "AbortSignal",
+      "AddEventListenerOptions",
+      "DOMHighResTimeStamp",
+      "Event",
+      "EventInit",
+      "EventListener",
+      "EventListenerObject",
+      "EventListenerOptions",
+      "EventListenerOrEventListenerObject",
+      "EventTarget",
+      "WakeLock",
+      "WakeLockSentinel",
+      "WakeLockType"
+    ],
+    "excludedSymbols": [],
+    "deferredSymbols": [],
+    "failedSymbols": []
+  },
+  "errors": [],
+  "byteIdentityVerified": false
+}

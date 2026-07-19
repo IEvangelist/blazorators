@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "generationProfile": {
+    "name": "Window",
+    "includedExposures": ["Window"],
+    "preservesAllExposureMetadata": true
+  },
+  "files": {
+    "typescriptSymbols": {
+      "path": "typescript-symbols.jsonl",
+      "format": "jsonl",
+      "schema": "dummy",
+      "records": 3,
+      "sha256": "__PLACEHOLDER_TS__"
+    },
+    "webIdlSymbols": {
+      "path": "webidl-symbols.jsonl",
+      "format": "jsonl",
+      "schema": "dummy",
+      "records": 1,
+      "sha256": "__PLACEHOLDER_WEBIDL__"
+    },
+    "coverage": {
+      "path": "coverage.json",
+      "format": "json",
+      "schema": "dummy",
+      "records": 1,
+      "sha256": "__PLACEHOLDER_COVERAGE__"
+    }
+  },
+  "counts": {
+    "typescriptSymbols": 3,
+    "typescriptDeclarations": 3,
+    "typescriptMembers": 5,
+    "webIdlSpecifications": 1,
+    "webIdlSymbols": 1,
+    "webIdlMembers": 0,
+    "webIdlArguments": 0,
+    "reconciledSymbols": 3,
+    "reconciledWebIdlSymbols": 1,
+    "unmatchedTypeScriptSymbols": 0,
+    "unmatchedWebIdlSymbols": 0,
+    "ambiguousSymbols": 0,
+    "ambiguousWebIdlSymbols": 0,
+    "unsupportedShapes": 0
+  },
+  "provenance": {
+    "generator": { "name": "test-fixture", "version": "0.0.0" },
+    "typescript": {
+      "package": "typescript",
+      "version": "5.0.0",
+      "license": "Apache-2.0",
+      "aggregateSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "inputs": []
+    },
+    "webref": { "name": "@webref/idl", "version": "0.0.0", "license": "MIT" },
+    "webidl2": { "name": "webidl2", "version": "0.0.0", "license": "W3C" },
+    "overrides": { "input": "none", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "appliedCount": 0 }
+  }
+}
