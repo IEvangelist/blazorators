@@ -47,7 +47,9 @@ body {
     background: linear-gradient(
         180deg,
         hsl(278 22% 8%) 0%,
-        hsl(280 21% 6%) 52%,
+        hsl(279 22% 7.3%) 28%,
+        hsl(280 21% 6.4%) 52%,
+        hsl(281 22% 5.6%) 76%,
         hsl(282 23% 5%) 100%
     );
     background-attachment: fixed;
@@ -181,7 +183,13 @@ body {
 
 .dark .hero-aurora {
     border: 0;
-    background: linear-gradient(135deg, hsl(var(--primary) / 0.025), transparent 55%);
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        hsl(var(--primary) / 0.018) 16%,
+        hsl(var(--primary) / 0.012) 64%,
+        transparent 100%
+    );
     box-shadow: none;
 }
 
