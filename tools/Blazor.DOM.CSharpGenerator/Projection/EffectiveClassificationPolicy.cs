@@ -34,6 +34,22 @@ public static class EffectiveClassificationPolicy
                 EffectiveClassificationSource.ReviewedOverride);
         }
 
+        // Legacy Window aliases such as SVGMatrix combine a TypeScript type alias
+        // with a constructor-object global while Web IDL classifies the binding as
+        // an interface alias. There is no interface declaration to emit: the
+        // public type shape remains the TypeScript alias.
+        if (symbol.Declarations.Any(declaration =>
+                declaration.Kind == "typeAlias")
+            && !symbol.Declarations.Any(declaration =>
+                declaration.Kind == "interface")
+            && symbol.Semantic.Classifications.FirstOrDefault()
+                is "interface" or "mixin")
+        {
+            return new EffectiveClassification(
+                "typedef",
+                EffectiveClassificationSource.DeclarationShape);
+        }
+
         var semanticClassification = symbol.Semantic.Classifications.FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(semanticClassification))
         {

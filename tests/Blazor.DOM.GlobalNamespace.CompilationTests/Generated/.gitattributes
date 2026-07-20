@@ -1,0 +1,2 @@
+# Generated fixtures must remain byte-identical to LF-only emitter output.
+*.g.cs text eol=lf

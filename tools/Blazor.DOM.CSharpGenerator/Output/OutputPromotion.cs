@@ -38,7 +38,10 @@ public static class OutputPromotion
         "Callbacks",
         "Dictionaries",
         "Enums",
+        "Factories",
+        "Globals",
         "Interfaces",
+        "Namespaces",
         "Typedefs",
     ];
 
@@ -142,12 +145,12 @@ public static class OutputPromotion
             Inject(failureInjector, OutputPromotionFailurePoint.BeforeCanonicalSwap);
             if (canonicalExisted)
             {
-                Directory.Move(canonical, backup);
+                MoveDirectoryWithRetry(canonical, backup);
                 backupMoved = true;
                 Inject(failureInjector, OutputPromotionFailurePoint.AfterCanonicalBackupMove);
             }
 
-            Directory.Move(candidate, canonical);
+            MoveDirectoryWithRetry(candidate, canonical);
             candidatePromoted = true;
             Inject(failureInjector, OutputPromotionFailurePoint.AfterCandidatePromotion);
 
@@ -255,10 +258,10 @@ public static class OutputPromotion
         }
 
         if (candidatePromoted && Directory.Exists(canonical))
-            Directory.Move(canonical, rejected);
+            MoveDirectoryWithRetry(canonical, rejected);
 
         if (backupMoved && Directory.Exists(backup))
-            Directory.Move(backup, canonical);
+            MoveDirectoryWithRetry(backup, canonical);
         else if (canonicalExisted && !Directory.Exists(canonical))
             throw new IOException(
                 $"Rollback backup for '{canonical}' is missing.");
@@ -371,6 +374,27 @@ public static class OutputPromotion
             try
             {
                 DeleteDirectoryTree(directory, afterEntryDeleted);
+                return;
+            }
+            catch (IOException) when (attempt < maxAttempts)
+            {
+                Thread.Sleep(20 * attempt);
+            }
+            catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+            {
+                Thread.Sleep(20 * attempt);
+            }
+        }
+    }
+
+    private static void MoveDirectoryWithRetry(string source, string destination)
+    {
+        const int maxAttempts = 5;
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                Directory.Move(source, destination);
                 return;
             }
             catch (IOException) when (attempt < maxAttempts)

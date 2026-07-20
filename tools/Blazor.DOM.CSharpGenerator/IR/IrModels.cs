@@ -270,7 +270,11 @@ public sealed record TemplateLiteralTypeNode(IReadOnlyList<TypeNode> Parts) : Ty
     public override string Kind => "templateLiteral";
 }
 
-public sealed record QueryTypeNode(TypeNode ExprType) : TypeNode
+public sealed record QueryTypeNode(
+    TypeNode? ExprType,
+    string? ExpressionName = null,
+    string? ResolvedSymbol = null,
+    IReadOnlyList<TypeNode>? TypeArguments = null) : TypeNode
 {
     public override string Kind => "query";
 }
@@ -369,8 +373,17 @@ public sealed class TypeNodeConverter : JsonConverter<TypeNode>
                     : []),
             "query" => new QueryTypeNode(
                 root.TryGetProperty("exprType", out var qt)
-                    ? qt.Deserialize<TypeNode>(options) ?? new UnknownTypeNode("query/unknown")
-                    : new UnknownTypeNode("query/missing")),
+                    ? qt.Deserialize<TypeNode>(options)
+                    : null,
+                root.TryGetProperty("expressionName", out var qen)
+                    ? qen.GetString()
+                    : null,
+                root.TryGetProperty("resolvedSymbol", out var qrs)
+                    ? qrs.GetString()
+                    : null,
+                root.TryGetProperty("typeArguments", out var qta)
+                    ? qta.Deserialize<IReadOnlyList<TypeNode>>(options) ?? []
+                    : []),
             "indexedAccess" => new IndexedAccessTypeNode(
                 root.TryGetProperty("objectType", out var iao)
                     ? iao.Deserialize<TypeNode>(options) ?? new UnknownTypeNode("indexed/obj")
