@@ -22,7 +22,7 @@ public sealed class SlowRemovalFakeJSObjectReference : IJSObjectReference
     public List<(string Identifier, object?[]? Args)> Invocations { get; } = [];
     public Dictionary<string, object?> ReturnValues { get; } = [];
 
-    public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(
+    public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(
         string identifier, object?[]? args)
     {
         Invocations.Add((identifier, args));
@@ -30,13 +30,21 @@ public sealed class SlowRemovalFakeJSObjectReference : IJSObjectReference
         {
             RemovalWasInvoked = true;
             // Return a ValueTask that only completes when CompleteRemoval() is called.
-            return new ValueTask<TValue>(
-                _removalTcs.Task.ContinueWith(_ => default(TValue)!,
-                    TaskContinuationOptions.ExecuteSynchronously));
+            await _removalTcs.Task;
+            return default!;
         }
         if (ReturnValues.TryGetValue(identifier, out var val))
-            return ValueTask.FromResult((TValue)val!);
-        return ValueTask.FromResult<TValue>(default!);
+        {
+            if (identifier == "addDotNetEventListener" && val is int listenerId)
+            {
+                var registration = (DotNetObjectReference<DomEventIdRegistrationHandler>)
+                    args![4]!;
+                await registration.Value.ReceiveRegistrationAsync(listenerId);
+                return default!;
+            }
+            return (TValue)val!;
+        }
+        return default!;
     }
 
     public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(

@@ -65,6 +65,10 @@ public sealed class IrLoaderTests : IDisposable
 
         Assert.Single(bundle.TypescriptSymbols);
         Assert.Equal("AlignSetting", bundle.TypescriptSymbols[0].Name);
+        var aliasType = Assert.IsType<UnionTypeNode>(
+            bundle.TypescriptSymbols[0].Declarations[0].Type);
+        Assert.Equal("json-value", aliasType.Transport?.Kind);
+        Assert.Equal("AlignSetting", aliasType.Transport?.SourceType);
         Assert.Single(bundle.WebIdlSymbols);
     }
 
@@ -78,7 +82,11 @@ public sealed class IrLoaderTests : IDisposable
             "\"declarations\":[{\"ordinal\":0,\"kind\":\"" + declKind + "\",\"name\":\"" + escaped + "\"," +
             "\"modifiers\":[],\"typeParameters\":[],\"heritage\":[],\"members\":[]," +
             "\"type\":{\"syntaxKind\":\"UnionType\",\"checkerType\":\"" + escaped + "\",\"kind\":\"union\"," +
+            "\"transport\":{\"kind\":\"json-value\",\"nullable\":false,\"sourceType\":\"" + escaped + "\"," +
+            "\"streamable\":false,\"structuredClone\":false,\"reason\":null}," +
             "\"types\":[{\"syntaxKind\":\"LiteralType\",\"checkerType\":\"\\\"center\\\"\",\"kind\":\"literal\"," +
+            "\"transport\":{\"kind\":\"json-value\",\"nullable\":false,\"sourceType\":\"\\\"center\\\"\"," +
+            "\"streamable\":false,\"structuredClone\":false,\"reason\":null}," +
             "\"literalKind\":\"StringLiteral\",\"text\":\"\\\"center\\\"\"}]}," +
             "\"parameters\":[],\"returnType\":null," +
             "\"documentation\":{\"text\":\"\",\"tags\":[],\"deprecated\":false}," +
@@ -138,7 +146,7 @@ public sealed class IrLoaderTests : IDisposable
 
         var manifest =
             "{\n" +
-            "  \"schemaVersion\": 1,\n" +
+            "  \"schemaVersion\": 2,\n" +
             "  \"generationProfile\": { \"name\": \"Window\", \"includedExposures\": [\"Window\"], \"preservesAllExposureMetadata\": true },\n" +
             "  \"files\": {\n" +
             $"    \"typescriptSymbols\": {{ \"path\": \"typescript-symbols.jsonl\", \"format\": \"jsonl\", \"schema\": \"dummy\", \"records\": {tsRecords}, \"sha256\": \"{tsHash}\" }},\n" +

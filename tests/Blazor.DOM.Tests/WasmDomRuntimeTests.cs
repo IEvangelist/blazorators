@@ -44,6 +44,23 @@ public sealed class WasmDomRuntimeTests
     }
 
     [Fact]
+    public async Task Reference_property_and_index_sync_paths_return_in_process_references()
+    {
+        var (runtime, module) = await CreateInitializedRuntime();
+        var target = new FakeJSInProcessObjectReference();
+        var propertyReference = new FakeJSInProcessObjectReference();
+        var indexReference = new FakeJSInProcessObjectReference();
+        module.ReturnValues["getProperty"] = propertyReference;
+        module.ReturnValues["getIndex"] = indexReference;
+
+        var property = runtime.GetPropertyRef(target, "ownerDocument");
+        var index = runtime.GetIndexRef(target, 0);
+
+        Assert.Same(propertyReference, property);
+        Assert.Same(indexReference, index);
+    }
+
+    [Fact]
     public async Task SetProperty_sync_calls_setProperty_on_module()
     {
         var (runtime, module) = await CreateInitializedRuntime();

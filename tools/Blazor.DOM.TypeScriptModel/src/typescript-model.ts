@@ -434,6 +434,18 @@ class TypeScriptExtractor {
         node,
         ts.TypeFormatFlags.NoTruncation,
       ),
+      transport: {
+        kind: "unsupported" as const,
+        nullable: false,
+        sourceType: this.checker.typeToString(
+          this.checker.getTypeAtLocation(node),
+          node,
+          ts.TypeFormatFlags.NoTruncation,
+        ),
+        streamable: false,
+        structuredClone: false,
+        reason: "Transport classification requires the reconciled semantic model.",
+      },
     };
 
     if (keywordTypeKindNames.has(node.kind)) {

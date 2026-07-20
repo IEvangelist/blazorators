@@ -10,6 +10,9 @@ namespace Blazor.DOM.CSharpGenerator.IR;
 
 public sealed class IrLoader
 {
+    private const int MinimumSupportedSchemaVersion = 1;
+    private const int MaximumSupportedSchemaVersion = 2;
+
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = false,
@@ -30,9 +33,10 @@ public sealed class IrLoader
             File.ReadAllText(manifestPath), JsonOptions)
             ?? throw new IrValidationException("manifest.json deserialized to null.");
 
-        if (manifest.SchemaVersion != 1)
+        if (manifest.SchemaVersion is < MinimumSupportedSchemaVersion or > MaximumSupportedSchemaVersion)
             throw new IrValidationException(
-                $"Unsupported manifest schemaVersion {manifest.SchemaVersion}. Expected 1.");
+                $"Unsupported manifest schemaVersion {manifest.SchemaVersion}. " +
+                $"Supported versions are {MinimumSupportedSchemaVersion} through {MaximumSupportedSchemaVersion}.");
 
         var tsSymbols = LoadJsonlAndValidate<SymbolModel>(
             dataDirectory,

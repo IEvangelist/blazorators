@@ -13,11 +13,28 @@ public interface IDomRuntime
 {
     // ── Property access ──────────────────────────────────────────────────────
 
-    /// <summary>Reads a named property from a live JS object.</summary>
+    /// <summary>Reads a reviewed JSON-valued property from a live JS object.</summary>
     ValueTask<TValue> GetPropertyAsync<TValue>(
         IJSObjectReference reference,
         string name,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Reads a named property as a live JS object reference.</summary>
+    ValueTask<IJSObjectReference> GetPropertyRefAsync(
+        IJSObjectReference reference,
+        string name,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reads a possibly-null named interface property as an owned typed proxy.
+    /// </summary>
+    ValueTask<TProxy?> GetPropertyReferenceAsync<TProxy>(
+        IJSObjectReference reference,
+        string name,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
 
     /// <summary>Writes a named property on a live JS object.</summary>
     ValueTask SetPropertyAsync(
@@ -55,6 +72,59 @@ public interface IDomRuntime
         object?[]? args,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Invokes a method whose result is a possibly-null named interface and
+    /// returns an owned typed proxy.
+    /// </summary>
+    ValueTask<TProxy?> InvokeMethodReferenceAsync<TProxy>(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
+
+    /// <summary>
+    /// Invokes a method with a one-shot callback whose argument is a nullable,
+    /// callback-scoped typed JS reference.
+    /// </summary>
+    ValueTask InvokeMethodReferenceCallbackAsync<TProxy>(
+        IJSObjectReference reference,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? args,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        Func<DomBorrowedReference<TProxy>?, Task> callback,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
+
+    /// <summary>
+    /// Invokes a method and opens its Blob, ArrayBuffer, or typed-array result
+    /// through an owned, bounded <see cref="IJSStreamReference"/>.
+    /// </summary>
+    ValueTask<DomReadStream> InvokeMethodStreamAsync(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        DomTransportDescriptor transport,
+        long maximumLength,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Invokes a method whose nullable Blob, ArrayBuffer, or typed-array result
+    /// is opened through an owned, bounded <see cref="IJSStreamReference"/>.
+    /// A null result is distinct from a non-null, zero-length stream.
+    /// </summary>
+    ValueTask<DomReadStream?> InvokeMethodNullableStreamAsync(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        DomTransportDescriptor transport,
+        long maximumLength,
+        CancellationToken cancellationToken = default);
+
     // ── Global access ────────────────────────────────────────────────────────
 
     /// <summary>
@@ -78,17 +148,44 @@ public interface IDomRuntime
 
     // ── Index access ─────────────────────────────────────────────────────────
 
-    /// <summary>Reads a numeric or string index from a JS object.</summary>
+    /// <summary>Reads a reviewed JSON-valued numeric index from a JS object.</summary>
     ValueTask<TValue> GetIndexAsync<TValue>(
         IJSObjectReference reference,
         int index,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Reads a numeric index as a live JS object reference.</summary>
+    ValueTask<IJSObjectReference> GetIndexRefAsync(
+        IJSObjectReference reference,
+        int index,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reads a possibly-null indexed interface value as an owned typed proxy.
+    /// </summary>
+    ValueTask<TProxy?> GetIndexReferenceAsync<TProxy>(
+        IJSObjectReference reference,
+        int index,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
 
     /// <summary>Writes a value at a numeric index on a JS object.</summary>
     ValueTask SetIndexAsync(
         IJSObjectReference reference,
         int index,
         object? value,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Opens Blob or binary content already represented by a live JS reference
+    /// through an owned, bounded stream.
+    /// </summary>
+    ValueTask<DomReadStream> OpenReadStreamAsync(
+        IJSObjectReference reference,
+        DomTransportDescriptor transport,
+        long maximumLength,
         CancellationToken cancellationToken = default);
 
     // ── Event listeners ──────────────────────────────────────────────────────
@@ -110,6 +207,20 @@ public interface IDomRuntime
         string type,
         Func<string, Task> callback,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Attaches a typed event listener. Each event arrives as a borrowed proxy
+    /// and is released after the awaited handler unless promoted.
+    /// </summary>
+    ValueTask<DomReferenceEventSubscription<TProxy>>
+        AddReferenceEventListenerAsync<TProxy>(
+            IJSObjectReference target,
+            string type,
+            IDomProxyFactory proxyFactory,
+            DomTransportDescriptor transport,
+            Func<DomBorrowedReference<TProxy>, Task> callback,
+            CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
 
     /// <summary>
     /// Removes a previously registered event listener by its runtime ID.

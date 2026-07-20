@@ -109,27 +109,69 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     public async ValueTask<TValue> GetPropertyAsync<TValue>(
         IJSObjectReference reference, string name, CancellationToken cancellationToken = default)
     {
+        DomTransportValidator.ValidateJsonResult<TValue>();
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TValue>(
             "getProperty", cancellationToken, [reference, name]).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
+    public async ValueTask<IJSObjectReference> GetPropertyRefAsync(
+        IJSObjectReference reference,
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.GetPropertyObjectReferenceAsync(
+            module,
+            reference,
+            name,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<TProxy?> GetPropertyReferenceAsync<TProxy>(
+        IJSObjectReference reference,
+        string name,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(proxyFactory);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireReference(nameof(transport));
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.GetPropertyReferenceAsync<TProxy>(
+            module,
+            proxyFactory,
+            reference,
+            name,
+            transport,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask SetPropertyAsync(
         IJSObjectReference reference, string name, object? value, CancellationToken cancellationToken = default)
     {
+        var preparedValue = DomArguments.PrepareValue(value, $"property '{name}'");
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            "setProperty", cancellationToken, [reference, name, value]).ConfigureAwait(false);
+            "setProperty", cancellationToken, [reference, name, preparedValue]).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async ValueTask<TResult> InvokeMethodAsync<TResult>(
         IJSObjectReference reference, string name, object?[]? args, CancellationToken cancellationToken = default)
     {
+        DomTransportValidator.ValidateJsonResult<TResult>();
+        var preparedArgs = DomArguments.Prepare(args);
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TResult>(
-            "invokeMethod", cancellationToken, [reference, name, DomArguments.Unwrap(args)])
+            "invokeMethod", cancellationToken, [reference, name, preparedArgs])
             .ConfigureAwait(false);
     }
 
@@ -137,9 +179,10 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     public async ValueTask InvokeMethodVoidAsync(
         IJSObjectReference reference, string name, object?[]? args, CancellationToken cancellationToken = default)
     {
+        var preparedArgs = DomArguments.Prepare(args);
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            "invokeMethod", cancellationToken, [reference, name, DomArguments.Unwrap(args)])
+            "invokeMethod", cancellationToken, [reference, name, preparedArgs])
             .ConfigureAwait(false);
     }
 
@@ -147,10 +190,145 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     public async ValueTask<IJSObjectReference> InvokeMethodRefAsync(
         IJSObjectReference reference, string name, object?[]? args, CancellationToken cancellationToken = default)
     {
+        var preparedArgs = DomArguments.Prepare(args);
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
-        return await module.InvokeAsync<IJSObjectReference>(
-            "invokeMethod", cancellationToken, [reference, name, DomArguments.Unwrap(args)])
-            .ConfigureAwait(false);
+        return await DomRuntimeTransport.InvokeMethodObjectReferenceAsync(
+            module,
+            reference,
+            name,
+            preparedArgs,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<TProxy?> InvokeMethodReferenceAsync<TProxy>(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(proxyFactory);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireReference(nameof(transport));
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.InvokeMethodReferenceAsync<TProxy>(
+            module,
+            proxyFactory,
+            reference,
+            name,
+            preparedArgs,
+            transport,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask InvokeMethodReferenceCallbackAsync<TProxy>(
+        IJSObjectReference reference,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? args,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        Func<DomBorrowedReference<TProxy>?, Task> callback,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(proxyFactory);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireReference(nameof(transport));
+        ArgumentNullException.ThrowIfNull(callback);
+        var preparedArgs = DomArguments.Prepare(args);
+        var argumentCount = preparedArgs?.Length ?? 0;
+        if (callbackArgumentIndex < 0 || callbackArgumentIndex > argumentCount)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(callbackArgumentIndex),
+                callbackArgumentIndex,
+                "The callback index must identify an insertion point in the argument list.");
+        }
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        await DomRuntimeTransport.InvokeReferenceCallbackAsync(
+            module,
+            proxyFactory,
+            reference,
+            name,
+            callbackArgumentIndex,
+            preparedArgs,
+            transport,
+            callback,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<DomReadStream> InvokeMethodStreamAsync(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        DomTransportDescriptor transport,
+        long maximumLength,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireStreamable(nameof(transport));
+        if (transport.Nullable)
+        {
+            throw new ArgumentException(
+                "Nullable stream results must use InvokeMethodNullableStreamAsync.",
+                nameof(transport));
+        }
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumLength);
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.InvokeMethodStreamAsync(
+            module,
+            reference,
+            name,
+            preparedArgs,
+            transport,
+            maximumLength,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<DomReadStream?> InvokeMethodNullableStreamAsync(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        DomTransportDescriptor transport,
+        long maximumLength,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(transport);
+        if (!transport.Nullable)
+        {
+            throw new ArgumentException(
+                "Nullable stream results require nullable transport metadata.",
+                nameof(transport));
+        }
+        transport.RequireStreamable(nameof(transport));
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumLength);
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.InvokeMethodNullableStreamAsync(
+            module,
+            reference,
+            name,
+            preparedArgs,
+            transport,
+            maximumLength,
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -166,9 +344,10 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     public async ValueTask<IJSObjectReference> ConstructAsync(
         string ctorPath, object?[]? args, CancellationToken cancellationToken = default)
     {
+        var preparedArgs = DomArguments.Prepare(args);
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<IJSObjectReference>(
-            "construct", cancellationToken, [ctorPath, DomArguments.Unwrap(args)])
+            "construct", cancellationToken, [ctorPath, preparedArgs])
             .ConfigureAwait(false);
     }
 
@@ -176,18 +355,77 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     public async ValueTask<TValue> GetIndexAsync<TValue>(
         IJSObjectReference reference, int index, CancellationToken cancellationToken = default)
     {
+        DomTransportValidator.ValidateJsonResult<TValue>();
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TValue>(
             "getIndex", cancellationToken, [reference, index]).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
+    public async ValueTask<IJSObjectReference> GetIndexRefAsync(
+        IJSObjectReference reference,
+        int index,
+        CancellationToken cancellationToken = default)
+    {
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.GetIndexObjectReferenceAsync(
+            module,
+            reference,
+            index,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<TProxy?> GetIndexReferenceAsync<TProxy>(
+        IJSObjectReference reference,
+        int index,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentNullException.ThrowIfNull(proxyFactory);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireReference(nameof(transport));
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.GetIndexReferenceAsync<TProxy>(
+            module,
+            proxyFactory,
+            reference,
+            index,
+            transport,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask SetIndexAsync(
         IJSObjectReference reference, int index, object? value, CancellationToken cancellationToken = default)
     {
+        var preparedValue = DomArguments.PrepareValue(value, $"index [{index}]");
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            "setIndex", cancellationToken, [reference, index, value]).ConfigureAwait(false);
+            "setIndex", cancellationToken, [reference, index, preparedValue]).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<DomReadStream> OpenReadStreamAsync(
+        IJSObjectReference reference,
+        DomTransportDescriptor transport,
+        long maximumLength,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireStreamable(nameof(transport));
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumLength);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.OpenReadStreamAsync(
+            module,
+            reference,
+            transport,
+            maximumLength,
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -197,24 +435,63 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
         Func<string, Task> callback,
         CancellationToken cancellationToken = default)
     {
-        var handler    = new DomCallbackHandler(callback);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+        ArgumentNullException.ThrowIfNull(callback);
+        var handler = new DomCallbackHandler(callback);
         var handlerRef = DotNetObjectReference.Create(handler);
         try
         {
             var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
-            var listenerId = await module.InvokeAsync<int>(
-                "addDotNetEventListener", cancellationToken,
-                [target, type, handlerRef, "HandleEvent"]).ConfigureAwait(false);
+            var listenerId = await DomRuntimeTransport.AddEventListenerAsync(
+                module,
+                target,
+                type,
+                handlerRef,
+                cancellationToken).ConfigureAwait(false);
 
             return new DomEventSubscription(this, listenerId, handlerRef);
         }
         catch
         {
-            // Dispose the GC-root reference on every failure path so it is not
-            // permanently held in the DotNet object reference table.
+            handler.Dispose();
             handlerRef.Dispose();
             throw;
         }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<DomReferenceEventSubscription<TProxy>>
+        AddReferenceEventListenerAsync<TProxy>(
+            IJSObjectReference target,
+            string type,
+            IDomProxyFactory proxyFactory,
+            DomTransportDescriptor transport,
+            Func<DomBorrowedReference<TProxy>, Task> callback,
+            CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+        ArgumentNullException.ThrowIfNull(proxyFactory);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireReference(nameof(transport));
+        if (transport.Nullable)
+        {
+            throw new ArgumentException(
+                "DOM event references are not nullable.",
+                nameof(transport));
+        }
+        ArgumentNullException.ThrowIfNull(callback);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.AddReferenceEventListenerAsync(
+            module,
+            proxyFactory,
+            target,
+            type,
+            transport,
+            callback,
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

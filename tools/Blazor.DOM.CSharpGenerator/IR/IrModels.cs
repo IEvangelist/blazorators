@@ -202,7 +202,17 @@ public abstract record TypeNode
     [JsonPropertyName("kind")] public abstract string Kind { get; }
     [JsonPropertyName("syntaxKind")] public string? SyntaxKind { get; init; }
     [JsonPropertyName("checkerType")] public string? CheckerType { get; init; }
+    [JsonPropertyName("transport")] public TransportModel? Transport { get; init; }
 }
+
+public sealed record TransportModel(
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("nullable")] bool Nullable,
+    [property: JsonPropertyName("sourceType")] string SourceType,
+    [property: JsonPropertyName("streamable")] bool Streamable,
+    [property: JsonPropertyName("structuredClone")] bool StructuredClone,
+    [property: JsonPropertyName("reason")] string? Reason
+);
 
 public sealed record KeywordTypeNode(string Name) : TypeNode
 {
@@ -306,6 +316,9 @@ public sealed class TypeNodeConverter : JsonConverter<TypeNode>
         var kind = root.GetProperty("kind").GetString() ?? "unknown";
         var syntaxKind = root.TryGetProperty("syntaxKind", out var sk) ? sk.GetString() : null;
         var checkerType = root.TryGetProperty("checkerType", out var ct) ? ct.GetString() : null;
+        var transport = root.TryGetProperty("transport", out var tm)
+            ? tm.Deserialize<TransportModel>(options)
+            : null;
 
         TypeNode node = kind switch
         {
@@ -384,7 +397,12 @@ public sealed class TypeNodeConverter : JsonConverter<TypeNode>
             _ => new UnknownTypeNode(kind),
         };
 
-        return node with { SyntaxKind = syntaxKind, CheckerType = checkerType };
+        return node with
+        {
+            SyntaxKind = syntaxKind,
+            CheckerType = checkerType,
+            Transport = transport,
+        };
     }
 
     public override void Write(Utf8JsonWriter writer, TypeNode value, JsonSerializerOptions options)

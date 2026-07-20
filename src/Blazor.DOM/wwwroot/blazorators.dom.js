@@ -64,6 +64,160 @@ export function invokeMethod(ref, name, args) {
     return ref[name](...(args ?? []));
 }
 
+export async function getPropertyDotNetObjectReference(
+    ref,
+    name,
+    dotnetRef,
+    callbackMethodName) {
+    await _sendDotNetObjectReference(
+        ref[name],
+        dotnetRef,
+        callbackMethodName);
+}
+
+export async function invokeMethodDotNetObjectReference(
+    ref,
+    name,
+    args,
+    dotnetRef,
+    callbackMethodName) {
+    const value = await ref[name](...(args ?? []));
+    await _sendDotNetObjectReference(value, dotnetRef, callbackMethodName);
+}
+
+/**
+ * Invoke a method whose one-shot callback receives a live JS object. The
+ * callback object is passed through Blazor's supported JS object-reference
+ * table and the returned Promise remains pending until the managed callback
+ * finishes.
+ *
+ * @param {object} ref
+ * @param {string} name
+ * @param {Array} args Arguments excluding the callback.
+ * @param {number} callbackArgumentIndex Callback insertion index.
+ * @param {DotNetObjectReference} dotnetRef
+ * @param {string} callbackMethodName
+ * @returns {Promise<void>}
+ */
+export function invokeMethodReferenceCallback(
+    ref,
+    name,
+    args,
+    callbackArgumentIndex,
+    dotnetRef,
+    callbackMethodName) {
+    return new Promise((resolve, reject) => {
+        const invocationArgs = [...(args ?? [])];
+        if (!Number.isInteger(callbackArgumentIndex) ||
+            callbackArgumentIndex < 0 ||
+            callbackArgumentIndex > invocationArgs.length) {
+            reject(new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`));
+            return;
+        }
+
+        let settled = false;
+        const callback = (value) => {
+            if (settled) return;
+            settled = true;
+            Promise.resolve(
+                _sendDotNetObjectReference(
+                    value,
+                    dotnetRef,
+                    callbackMethodName))
+                .then(resolve, reject);
+        };
+        invocationArgs.splice(callbackArgumentIndex, 0, callback);
+
+        try {
+            const invocation = ref[name](...invocationArgs);
+            if (invocation && typeof invocation.then === 'function') {
+                invocation.catch((error) => {
+                    if (!settled) {
+                        settled = true;
+                        reject(error);
+                    }
+                });
+            }
+        } catch (error) {
+            settled = true;
+            reject(error);
+        }
+    });
+}
+
+/**
+ * Pass Blob, ArrayBuffer, or typed-array bytes to .NET through the official
+ * JS stream-reference path.
+ *
+ * @param {Blob|ArrayBuffer|ArrayBufferView|null|undefined} value
+ * @param {DotNetObjectReference} dotnetRef
+ * @param {string} callbackMethodName
+ * @returns {Promise<void>}
+ */
+export async function createDotNetStreamReference(value, dotnetRef, callbackMethodName) {
+    if (value === null || value === undefined) {
+        const accepted = await dotnetRef.invokeMethodAsync(
+            callbackMethodName,
+            null,
+            0,
+            false);
+        _requireDeliveryAcknowledgement(accepted, 'stream');
+        return;
+    }
+
+    const length = value instanceof Blob
+        ? value.size
+        : value instanceof ArrayBuffer || ArrayBuffer.isView(value)
+            ? value.byteLength
+            : -1;
+    if (length < 0) {
+        throw new TypeError('Supplied value is not an ArrayBuffer, typed array, or Blob.');
+    }
+    if (length === 0) {
+        const accepted = await dotnetRef.invokeMethodAsync(
+            callbackMethodName,
+            null,
+            0,
+            true);
+        _requireDeliveryAcknowledgement(accepted, 'stream');
+        return;
+    }
+
+    const streamReference = DotNet.createJSStreamReference(value);
+    try {
+        const accepted = await dotnetRef.invokeMethodAsync(
+            callbackMethodName,
+            streamReference,
+            length,
+            true);
+        _requireDeliveryAcknowledgement(accepted, 'stream');
+    } catch (error) {
+        _disposeJSReference(streamReference);
+        throw error;
+    }
+}
+
+/**
+ * Invoke a method, await its Blob/ArrayBuffer/typed-array result, and pass the
+ * bytes to .NET through an official JS stream reference.
+ *
+ * @param {object} ref
+ * @param {string} name
+ * @param {Array} args
+ * @param {DotNetObjectReference} dotnetRef
+ * @param {string} callbackMethodName
+ * @returns {Promise<void>}
+ */
+export async function invokeMethodDotNetStreamReference(
+    ref,
+    name,
+    args,
+    dotnetRef,
+    callbackMethodName) {
+    const value = await ref[name](...(args ?? []));
+    await createDotNetStreamReference(value, dotnetRef, callbackMethodName);
+}
+
 // ─── Constructor ──────────────────────────────────────────────────────────────
 
 /**
@@ -101,6 +255,17 @@ export function setIndex(ref, index, value) {
     ref[index] = value;
 }
 
+export async function getIndexDotNetObjectReference(
+    ref,
+    index,
+    dotnetRef,
+    callbackMethodName) {
+    await _sendDotNetObjectReference(
+        ref[index],
+        dotnetRef,
+        callbackMethodName);
+}
+
 // ─── Event listeners ──────────────────────────────────────────────────────────
 
 /** @type {Map<number, {target: EventTarget, type: string, listener: function, dotnetRef: DotNetObjectReference}>} */
@@ -115,9 +280,17 @@ let _nextListenerId = 1;
  * @param {string}               type              Event type, e.g. "click"
  * @param {DotNetObjectReference} dotnetRef        Callback holder (DomCallbackHandler)
  * @param {string}               callbackMethodName JSInvokable method name on the dotnet side
- * @returns {number}             Listener ID – pass to removeEventListener to unsubscribe
+ * @param {DotNetObjectReference} registrationDotnetRef Registration receiver
+ * @param {string} registrationCallbackMethodName Registration callback method
+ * @returns {Promise<void>}
  */
-export function addDotNetEventListener(target, type, dotnetRef, callbackMethodName) {
+export async function addDotNetEventListener(
+    target,
+    type,
+    dotnetRef,
+    callbackMethodName,
+    registrationDotnetRef,
+    registrationCallbackMethodName) {
     const id = _nextListenerId++;
     const listener = (event) => {
         const eventData = _serializeEvent(event);
@@ -126,7 +299,67 @@ export function addDotNetEventListener(target, type, dotnetRef, callbackMethodNa
     };
     target.addEventListener(type, listener);
     _listeners.set(id, { target, type, listener, dotnetRef });
-    return id;
+    try {
+        const accepted = await registrationDotnetRef.invokeMethodAsync(
+            registrationCallbackMethodName,
+            id);
+        _requireDeliveryAcknowledgement(accepted, 'event registration');
+    } catch (error) {
+        removeDotNetEventListener(id);
+        throw error;
+    }
+}
+
+/**
+ * Attach a typed event listener without a manual object-handle registry. Each
+ * event is represented by DotNet.createJSObjectReference and the returned
+ * registration object is itself owned by IJSObjectReference on the .NET side.
+ *
+ * @param {EventTarget} target
+ * @param {string} type
+ * @param {DotNetObjectReference} dotnetRef
+ * @param {string} callbackMethodName
+ * @param {DotNetObjectReference} registrationDotnetRef
+ * @param {string} registrationCallbackMethodName
+ * @returns {Promise<void>}
+ */
+export async function addDotNetReferenceEventListener(
+    target,
+    type,
+    dotnetRef,
+    callbackMethodName,
+    registrationDotnetRef,
+    registrationCallbackMethodName) {
+    let disposed = false;
+    const listener = (event) => {
+        if (disposed) return;
+        _sendDotNetObjectReference(event, dotnetRef, callbackMethodName)
+            .catch((error) => {
+                console.error(`[blazorators.dom] event callback error (${type}):`, error);
+            });
+    };
+
+    const registration = {
+        dispose() {
+            if (disposed) return;
+            disposed = true;
+            target.removeEventListener(type, listener);
+        }
+    };
+    target.addEventListener(type, listener);
+
+    let registrationReference;
+    try {
+        registrationReference = DotNet.createJSObjectReference(registration);
+        const accepted = await registrationDotnetRef.invokeMethodAsync(
+            registrationCallbackMethodName,
+            registrationReference);
+        _requireDeliveryAcknowledgement(accepted, 'event registration');
+    } catch (error) {
+        registration.dispose();
+        _disposeJSReference(registrationReference);
+        throw error;
+    }
 }
 
 /**
@@ -143,6 +376,36 @@ export function removeDotNetEventListener(id) {
 }
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
+
+function _disposeJSReference(reference) {
+    if (reference === null || reference === undefined) return;
+    try {
+        DotNet.disposeJSObjectReference(reference);
+    } catch {
+        // The managed side may already have released a borrowed reference.
+    }
+}
+
+async function _sendDotNetObjectReference(value, dotnetRef, callbackMethodName) {
+    const reference = value === null || value === undefined
+        ? null
+        : DotNet.createJSObjectReference(value);
+    try {
+        const accepted = await dotnetRef.invokeMethodAsync(
+            callbackMethodName,
+            reference);
+        _requireDeliveryAcknowledgement(accepted, 'object reference');
+    } catch (error) {
+        _disposeJSReference(reference);
+        throw error;
+    }
+}
+
+function _requireDeliveryAcknowledgement(accepted, kind) {
+    if (accepted !== true) {
+        throw new Error(`.NET rejected ${kind} delivery; JavaScript rolled it back.`);
+    }
+}
 
 /**
  * Produce a plain-object snapshot of an event suitable for JSON.stringify.

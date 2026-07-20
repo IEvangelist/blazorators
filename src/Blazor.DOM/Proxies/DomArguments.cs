@@ -31,4 +31,34 @@ public static class DomArguments
         }
         return result ?? args;
     }
+
+    /// <summary>
+    /// Validates and prepares arguments for JS interop. Live proxies are unwrapped,
+    /// explicit dynamic values are checked against their descriptors, and arbitrary
+    /// object fallbacks are rejected.
+    /// </summary>
+    public static object?[]? Prepare(object?[]? args)
+    {
+        if (args is null or { Length: 0 })
+        {
+            return args;
+        }
+
+        object?[]? result = null;
+        for (var index = 0; index < args.Length; index++)
+        {
+            var prepared = DomTransportValidator.PrepareArgument(
+                args[index],
+                $"arguments[{index}]");
+            if (!ReferenceEquals(prepared, args[index]))
+            {
+                result ??= (object?[])args.Clone();
+                result[index] = prepared;
+            }
+        }
+        return result ?? args;
+    }
+
+    internal static object? PrepareValue(object? value, string path) =>
+        DomTransportValidator.PrepareArgument(value, path);
 }

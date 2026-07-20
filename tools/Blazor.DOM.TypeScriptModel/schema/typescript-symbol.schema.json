@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/typescript-symbol-v1.json",
+  "$id": "https://github.com/IEvangelist/blazorators/schemas/blazor-dom/typescript-symbol-v2.json",
   "title": "Blazor DOM TypeScript symbol record",
   "type": "object",
   "additionalProperties": false,
@@ -167,12 +167,77 @@
         }
       }
     },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "nullable",
+        "sourceType",
+        "streamable",
+        "structuredClone",
+        "reason"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "json-value",
+            "js-reference",
+            "js-stream",
+            "binary",
+            "transferable",
+            "unsupported"
+          ]
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "sourceType": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "streamable": {
+          "type": "boolean"
+        },
+        "structuredClone": {
+          "type": "boolean"
+        },
+        "reason": {
+          "$ref": "#/$defs/nullableString"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "unsupported"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reason": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
     "typeBase": {
       "type": "object",
       "required": [
         "syntaxKind",
         "checkerType",
-        "kind"
+        "kind",
+        "transport"
       ],
       "properties": {
         "syntaxKind": {
@@ -183,6 +248,9 @@
         },
         "kind": {
           "$ref": "#/$defs/nonEmptyString"
+        },
+        "transport": {
+          "$ref": "#/$defs/transport"
         }
       }
     },

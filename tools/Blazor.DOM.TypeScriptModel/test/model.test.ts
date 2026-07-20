@@ -415,6 +415,180 @@ test("regeneration is byte-identical and reconciliation is explicit", async () =
   assert.equal(symbol(model.symbols, "fetch").semantic.webIdlName, "Named");
 });
 
+test("classifies generated values without treating structured clone as JSON", async () => {
+  const transportDeclarations = `
+interface Blob {}
+interface BlobCallback {
+  (blob: Blob | null): void;
+}
+interface ReadableStream<T> {}
+interface MessagePort {}
+interface Options {
+  label: string;
+}
+interface UnsafeOptions {
+  payload: any;
+}
+interface AmbiguousOptions {
+  label: string;
+}
+declare var AmbiguousOptions: {
+  prototype: AmbiguousOptions;
+  new(): AmbiguousOptions;
+};
+type Mode = "one" | "two";
+type FixtureBufferSource = ArrayBufferView<ArrayBuffer> | ArrayBuffer;
+declare function transportFixture(
+  primitive: string,
+  options: Options,
+  mode: Mode,
+  blob: Blob,
+  arrayBuffer: ArrayBuffer,
+  bytes: Uint8Array<ArrayBuffer>,
+  view: ArrayBufferView<ArrayBuffer>,
+  sharedBytes: Uint8Array<SharedArrayBuffer>,
+  likeBytes: Uint8Array<ArrayBufferLike>,
+  defaultBytes: Uint8Array,
+  sharedView: ArrayBufferView<ArrayBufferLike>,
+  defaultView: ArrayBufferView,
+  shared: SharedArrayBuffer,
+  source: FixtureBufferSource,
+  stream: ReadableStream<Uint8Array<ArrayBuffer>>,
+  port: MessagePort,
+  dynamic: unknown,
+  unsafeOptions: UnsafeOptions,
+  ambiguousOptions: AmbiguousOptions,
+  bigintValue: bigint,
+  invalidRecord: Record<number, string>
+): void;
+`;
+  const transportIdl = `
+[Serializable] interface Blob {};
+callback BlobCallback = undefined (Blob? blob);
+dictionary Options { DOMString label; };
+dictionary UnsafeOptions { any payload; };
+dictionary AmbiguousOptions { DOMString label; };
+enum Mode { "one", "two" };
+[Transferable] interface ReadableStream {};
+[Transferable] interface MessagePort {};
+`;
+  const transportPath = path.join(directory, "transport.d.ts");
+  await writeFile(transportPath, transportDeclarations, "utf8");
+  const model = buildDomModel({
+    typescriptVersion: "fixture",
+    typescriptFiles: [{
+      path: transportPath,
+      label: "transport.d.ts",
+      sha256: sha256(transportDeclarations),
+    }],
+    typescriptAggregateSha256: sha256(
+      `transport.d.ts\0${sha256(transportDeclarations)}\n`,
+    ),
+    webrefVersion: "fixture",
+    webIdlFiles: [{
+      name: "transport",
+      text: transportIdl,
+      sha256: sha256(transportIdl),
+    }],
+    webIdlAggregateSha256: sha256(
+      `transport\0${sha256(transportIdl)}\n`,
+    ),
+    webidl2Version: "fixture",
+    overridesPath: "overrides.json",
+    overridesSha256: sha256("{}"),
+    overrideCount: 0,
+  });
+
+  const callback = symbol(model.symbols, "BlobCallback");
+  const callbackParameter =
+    callback.declarations[0]?.members[0]?.parameters[0]?.type;
+  assert.ok(callbackParameter);
+  assert.equal(callbackParameter.kind, "union");
+  assert.equal(callbackParameter.transport.kind, "js-reference");
+  assert.equal(callbackParameter.transport.nullable, true);
+  assert.equal(callbackParameter.transport.streamable, true);
+  assert.equal(callbackParameter.transport.structuredClone, true);
+  assert.equal(callback.semantic.serializable, false);
+  assert.equal(symbol(model.symbols, "Blob").semantic.serializable, true);
+  assert.equal(
+    webIdlSymbol(model.webIdlSymbols, "BlobCallback")
+      .declarations[0]?.arguments[0]?.type.nullable,
+    true,
+  );
+
+  const parameters = symbol(model.symbols, "transportFixture")
+    .declarations[0]?.parameters;
+  assert.ok(parameters);
+  assert.deepEqual(
+    parameters.map((parameter) => parameter.type?.transport.kind),
+    [
+      "json-value",
+      "json-value",
+      "json-value",
+      "js-reference",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "binary",
+      "transferable",
+      "transferable",
+      "unsupported",
+      "unsupported",
+      "unsupported",
+      "unsupported",
+      "unsupported",
+    ],
+  );
+  const parameter = (name: string) => {
+    const result = parameters.find((item) => item.name === name);
+    assert.ok(result, `Missing parameter '${name}'.`);
+    return result;
+  };
+  for (const name of ["arrayBuffer", "bytes", "view", "source"]) {
+    assert.equal(parameter(name).type?.transport.streamable, true, name);
+  }
+  for (const name of [
+    "sharedBytes",
+    "likeBytes",
+    "defaultBytes",
+    "sharedView",
+    "defaultView",
+    "shared",
+  ]) {
+    assert.equal(parameter(name).type?.transport.streamable, false, name);
+  }
+  assert.match(
+    parameter("dynamic").type?.transport.reason ?? "",
+    /explicit runtime transport escape hatch/,
+  );
+  assert.match(
+    parameter("unsafeOptions").type?.transport.reason ?? "",
+    /dictionary 'UnsafeOptions'.*explicit runtime transport escape hatch/,
+  );
+  assert.equal(
+    symbol(model.symbols, "AmbiguousOptions").semantic.status,
+    "ambiguous",
+  );
+  assert.match(
+    parameter("ambiguousOptions").type?.transport.reason ?? "",
+    /ambiguous Web IDL semantics/,
+  );
+  assert.match(
+    parameter("bigintValue").type?.transport.reason ?? "",
+    /not JSON-compatible/,
+  );
+  assert.match(
+    parameter("invalidRecord").type?.transport.reason ?? "",
+    /reviewed string key type/,
+  );
+});
+
 test("schemas validate nested IR and reject malformed records", async () => {
   const toolRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
   const validators = await loadArtifactValidators(toolRoot);
