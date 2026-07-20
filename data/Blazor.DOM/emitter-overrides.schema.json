@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EmitterOverrides",
+  "description": "Schema for emitter-overrides.json — explicit resolution of ambiguous symbols.",
+  "type": "object",
+  "required": ["schemaVersion", "ambiguousSymbolOverrides"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema version. Must be 1."
+    },
+    "description": {
+      "type": "string"
+    },
+    "ambiguousSymbolOverrides": {
+      "type": "array",
+      "description": "Explicit classification overrides for ambiguous symbols. Each entry requires a reviewed rationale.",
+      "items": {
+        "type": "object",
+        "required": ["symbol", "classification", "rationale"],
+        "additionalProperties": false,
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The TypeScript symbol name."
+          },
+          "classification": {
+            "type": "string",
+            "enum": ["dictionary", "interface", "mixin", "typedef", "callback", "callbackInterface", "enum", "namespace"],
+            "description": "The explicit classification to use for this symbol."
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Non-empty human-reviewed rationale explaining why this classification was chosen."
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

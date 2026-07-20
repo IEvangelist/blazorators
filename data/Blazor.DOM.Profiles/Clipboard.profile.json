@@ -1,0 +1,11 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Clipboard",
+  "description": "Clipboard API – secure-context read/write access to the system clipboard.",
+  "rootSymbols": ["Clipboard", "ClipboardItem"],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["clipboard-read", "clipboard-write"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Clipboard"
+}

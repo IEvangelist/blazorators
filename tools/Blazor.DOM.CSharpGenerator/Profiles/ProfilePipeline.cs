@@ -1,0 +1,228 @@
+// Runs the generation pipeline scoped to a focused DOM capability profile.
+// Resolves the transitive dependency closure, filters the IR, and produces
+// per-profile output + a coverage report.
+// FAIL-CLOSED: profile output is only written to canonical when all members project cleanly
+// AND byte-identity is proven across two isolated generation passes.
+
+using Blazor.DOM.CSharpGenerator.Accounting;
+using Blazor.DOM.CSharpGenerator.IR;
+using Blazor.DOM.CSharpGenerator.Output;
+using System.Text.Json;
+
+namespace Blazor.DOM.CSharpGenerator.Profiles;
+
+public static class ProfilePipeline
+{
+    public static ProfileGenerationResult Run(
+        ProfileDefinition profile,
+        IrBundle ir,
+        string baseOutputDirectory,
+        IReadOnlyDictionary<string, EmitterOverrideEntry>? overrides = null,
+        Action<OutputPromotionFailurePoint>? promotionFailureInjector = null)
+    {
+        var canonicalOutputDir = ProfileOutputPath.Resolve(
+            baseOutputDirectory,
+            profile.OutputSubdirectory);
+
+        var symbolIndex = ir.TypescriptSymbols
+            .ToDictionary(s => s.Name, StringComparer.Ordinal);
+
+        var closure = TransitiveDependencyResolver.Resolve(profile.RootSymbols, symbolIndex);
+
+        var includedSymbols = ir.TypescriptSymbols
+            .Where(s => closure.Contains(s.Name))
+            .OrderBy(s => s.Ordinal)
+            .ToList();
+        var externalRefs = closure
+            .Where(n => !symbolIndex.ContainsKey(n))
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToList();
+
+        var filteredIr = new IrBundle(
+            ir.Manifest,
+            includedSymbols,
+            ir.WebIdlSymbols);
+
+        // Sibling staging keeps candidate promotion and rollback on one volume.
+        var profileParent = Path.GetDirectoryName(canonicalOutputDir)
+            ?? throw new InvalidOperationException(
+                $"Profile output must have a parent: '{canonicalOutputDir}'.");
+        Directory.CreateDirectory(profileParent);
+        var stagingBase = Path.Combine(
+            profileParent,
+            $".{Path.GetFileName(canonicalOutputDir)}.generation-{Guid.NewGuid():N}");
+        var stagingPass1 = Path.Combine(stagingBase, "pass1");
+        var stagingPass2 = Path.Combine(stagingBase, "pass2");
+
+        GenerationResult result;
+        ProfileCoverageReport coverage;
+
+        try
+        {
+            // ── Pass 1 ──────────────────────────────────────────────────────
+            result = GenerationPipeline.Run(
+                filteredIr, stagingPass1, overrides, verboseFailures: false);
+
+            coverage = BuildCoverage(
+                profile, closure, includedSymbols, externalRefs, result,
+                byteIdentityVerified: false);
+
+            if (result.Errors.Count > 0 || !result.Validation.IsValid)
+            {
+                // Profile has failures — do NOT write to canonical.
+                return new ProfileGenerationResult(
+                    profile, includedSymbols.Count,
+                    closure.Count, externalRefs.Count, result, coverage);
+            }
+
+            // ── Pass 2 (byte-identity verification) ─────────────────────────
+            var result2 = GenerationPipeline.Run(
+                filteredIr, stagingPass2, overrides, verboseFailures: false);
+
+            var coverage2 = BuildCoverage(
+                profile, closure, includedSymbols, externalRefs, result2,
+                byteIdentityVerified: false);
+
+            WriteProfileCoverage(stagingPass1, coverage);
+            WriteProfileCoverage(stagingPass2, coverage2);
+
+            var files1 = ScanAllFiles(stagingPass1);
+            var files2 = ScanAllFiles(stagingPass2);
+            var verification = OutputVerifier.Verify(files1, files2);
+
+            if (!verification.Identical)
+            {
+                // Nondeterminism detected — refuse canonical write
+                var details = $"{verification.Mismatches.Count} file mismatch(es) between pass1 and pass2";
+                var biError = new GenerationError("profile-coverage",
+                    $"BYTE-IDENTITY FAIL for profile '{profile.Name}': {details}. " +
+                    "Generation is nondeterministic — canonical output not written.",
+                    "ByteIdentityException");
+                var biResult = result with
+                {
+                    Errors = [.. result.Errors, biError]
+                };
+                return new ProfileGenerationResult(
+                    profile, includedSymbols.Count,
+                    closure.Count, externalRefs.Count, biResult,
+                    coverage with { ByteIdentityVerified = false });
+            }
+
+            var verifiedCoverage = coverage with { ByteIdentityVerified = true };
+            var verifiedCoverage2 = coverage2 with { ByteIdentityVerified = true };
+            WriteProfileCoverage(stagingPass1, verifiedCoverage);
+            WriteProfileCoverage(stagingPass2, verifiedCoverage2);
+
+            var files1Final = ScanAllFiles(stagingPass1);
+            var files2Final = ScanAllFiles(stagingPass2);
+            var finalVerification = OutputVerifier.Verify(files1Final, files2Final);
+
+            if (!finalVerification.Identical)
+            {
+                var details = $"{finalVerification.Mismatches.Count} file mismatch(es) between pass1 and pass2";
+                var biError = new GenerationError("profile-coverage",
+                    $"BYTE-IDENTITY FAIL (final verification pass) for profile '{profile.Name}': {details}. " +
+                    "Generation is nondeterministic — canonical output not written.",
+                    "ByteIdentityException");
+                var biResult = result with
+                {
+                    Errors = [.. result.Errors, biError]
+                };
+                return new ProfileGenerationResult(
+                    profile, includedSymbols.Count,
+                    closure.Count, externalRefs.Count, biResult,
+                    coverage with { ByteIdentityVerified = false });
+            }
+
+            // ── Byte-identity PASS: promote pass1 to canonical ──────────────
+            OutputPromotion.PromoteProfile(
+                stagingPass1,
+                canonicalOutputDir,
+                promotionFailureInjector);
+
+            return new ProfileGenerationResult(profile, includedSymbols.Count,
+                closure.Count, externalRefs.Count, result, verifiedCoverage);
+        }
+        finally
+        {
+            OutputPromotion.DeleteDirectoryWithRetry(stagingBase);
+        }
+    }
+
+    /// <summary>
+    /// Scans a staging directory for all generated files (C# source AND emitter-manifest.json)
+    /// for byte-identity comparison across two passes.
+    /// </summary>
+    private static IReadOnlyList<GeneratedFile> ScanAllFiles(string directory)
+        => OutputVerifier.ScanDirectory(directory);
+
+    private static string SerializeCoverage(ProfileCoverageReport report)
+        => JsonSerializer.Serialize(report, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        });
+
+    private static ProfileCoverageReport BuildCoverage(
+        ProfileDefinition profile,
+        HashSet<string> closure,
+        IReadOnlyList<SymbolModel> includedSymbols,
+        IReadOnlyList<string> externalRefs,
+        GenerationResult pipelineResult,
+        bool byteIdentityVerified)
+    {
+        return new ProfileCoverageReport(
+            ProfileName: profile.Name,
+            Description: profile.Description,
+            RootSymbols: profile.RootSymbols.ToList(),
+            Features: profile.Features.ToList(),
+            SecureContext: profile.SecureContext,
+            RequiresUserActivation: profile.RequiresUserActivation,
+            ClosureSize: closure.Count,
+            IncludedSymbolCount: includedSymbols.Count,
+            ExternalReferenceCount: externalRefs.Count,
+            ExternalReferences: externalRefs,
+            Accounting: pipelineResult.Manifest.Accounting,
+            Errors: pipelineResult.Errors.Select(e => new ProfileErrorEntry(
+                e.SymbolName, e.ExceptionType, e.Message)).ToList(),
+            ByteIdentityVerified: byteIdentityVerified
+        );
+    }
+
+    private static void WriteProfileCoverage(string outputDir, ProfileCoverageReport report)
+    {
+        var path = Path.Combine(outputDir, "profile-coverage.json");
+        var json = SerializeCoverage(report).Replace("\r\n", "\n").Replace('\r', '\n');
+        File.WriteAllText(path, json, System.Text.Encoding.UTF8);
+    }
+}
+
+// ── Result types ────────────────────────────────────────────────────────────────
+
+public sealed record ProfileGenerationResult(
+    ProfileDefinition Profile,
+    int IncludedSymbolCount,
+    int ClosureSize,
+    int ExternalReferenceCount,
+    GenerationResult PipelineResult,
+    ProfileCoverageReport Coverage);
+
+public sealed record ProfileCoverageReport(
+    string ProfileName,
+    string Description,
+    IReadOnlyList<string> RootSymbols,
+    IReadOnlyList<string> Features,
+    bool SecureContext,
+    bool RequiresUserActivation,
+    int ClosureSize,
+    int IncludedSymbolCount,
+    int ExternalReferenceCount,
+    IReadOnlyList<string> ExternalReferences,
+    AccountingSummary Accounting,
+    IReadOnlyList<ProfileErrorEntry> Errors,
+    bool ByteIdentityVerified);
+
+public sealed record ProfileErrorEntry(
+    string SymbolName,
+    string ExceptionType,
+    string Message);
