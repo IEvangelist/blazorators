@@ -115,11 +115,35 @@ public sealed class AccountingLedger
             overloadOutcomes: overloadOutcomes);
     }
 
-    public void RecordExcluded(SymbolModel symbol, string reason)
-        => Add(symbol, AccountingOutcome.Excluded, reason);
+    public void RecordExcluded(
+        SymbolModel symbol,
+        string reason,
+        IReadOnlyList<MemberOutcome>? memberOutcomes = null,
+        IReadOnlyList<DeclarationOutcome>? declarationOutcomes = null,
+        IReadOnlyList<OverloadOutcome>? overloadOutcomes = null)
+        => Add(
+            symbol,
+            AccountingOutcome.Excluded,
+            reason,
+            memberOutcomes: memberOutcomes,
+            declarationOutcomes: declarationOutcomes,
+            overloadOutcomes: overloadOutcomes);
 
-    public void RecordDeferred(SymbolModel symbol, string phase, string reason)
-        => Add(symbol, AccountingOutcome.Deferred, reason, deferredPhase: phase);
+    public void RecordDeferred(
+        SymbolModel symbol,
+        string phase,
+        string reason,
+        IReadOnlyList<MemberOutcome>? memberOutcomes = null,
+        IReadOnlyList<DeclarationOutcome>? declarationOutcomes = null,
+        IReadOnlyList<OverloadOutcome>? overloadOutcomes = null)
+        => Add(
+            symbol,
+            AccountingOutcome.Deferred,
+            reason,
+            deferredPhase: phase,
+            memberOutcomes: memberOutcomes,
+            declarationOutcomes: declarationOutcomes,
+            overloadOutcomes: overloadOutcomes);
 
     public void RecordFailed(
         SymbolModel symbol,

@@ -53,6 +53,75 @@ public static class Naming
     }
 
     /// <summary>
+    /// Returns the unqualified C# type name for a TypeScript symbol. TypeScript
+    /// namespace segments are represented by generated C# namespaces instead of
+    /// being flattened into the public type name.
+    /// </summary>
+    public static string ToCSharpSimpleTypeName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "_Empty";
+        var separator = name.LastIndexOf('.');
+        return ToCSharpTypeName(separator >= 0 ? name[(separator + 1)..] : name);
+    }
+
+    /// <summary>
+    /// Maps a qualified TypeScript symbol to a collision-safe generated namespace.
+    /// For example, WebAssembly.Module becomes
+    /// Blazor.DOM.Namespaces.WebAssembly.
+    /// </summary>
+    public static string ToGeneratedNamespace(string rootNamespace, string symbolName)
+    {
+        var separator = symbolName.LastIndexOf('.');
+        if (separator < 0)
+            return rootNamespace;
+
+        var namespaceSegments = symbolName[..separator]
+            .Split('.', StringSplitOptions.RemoveEmptyEntries)
+            .Select(ToNamespaceSegment);
+        return $"{rootNamespace}.Namespaces.{string.Join(".", namespaceSegments)}";
+    }
+
+    /// <summary>
+    /// Returns a fully-qualified C# reference for a TypeScript symbol. Qualified
+    /// TypeScript symbols always use global:: so System and generated namespace
+    /// names cannot be resolved accidentally through the current C# scope.
+    /// </summary>
+    public static string ToCSharpTypeReference(
+        string rootNamespace,
+        string symbolName,
+        bool interfaceType)
+    {
+        var simpleName = ToCSharpSimpleTypeName(symbolName);
+        var typeName = interfaceType ? $"I{simpleName}" : simpleName;
+        return symbolName.Contains('.', StringComparison.Ordinal)
+            ? $"global::{ToGeneratedNamespace(rootNamespace, symbolName)}.{typeName}"
+            : typeName;
+    }
+
+    /// <summary>
+    /// Returns the deterministic output subdirectory for a generated symbol.
+    /// </summary>
+    public static string ToOutputSubdirectory(string category, string symbolName)
+    {
+        var separator = symbolName.LastIndexOf('.');
+        if (separator < 0)
+            return category;
+
+        var namespacePath = string.Join(
+            Path.DirectorySeparatorChar,
+            symbolName[..separator]
+                .Split('.', StringSplitOptions.RemoveEmptyEntries)
+                .Select(ToNamespaceSegment));
+        return Path.Combine(category, "Namespaces", namespacePath);
+    }
+
+    public static string? GetTypeScriptNamespace(string symbolName)
+    {
+        var separator = symbolName.LastIndexOf('.');
+        return separator < 0 ? null : symbolName[..separator];
+    }
+
+    /// <summary>
     /// Converts a JS member name to a PascalCase C# property/method name.
     /// </summary>
     public static string ToCSharpMemberName(string jsName)
@@ -176,6 +245,17 @@ public static class Naming
         var result = sb.ToString();
         if (char.IsDigit(result[0])) result = "_" + result;
         return result;
+    }
+
+    internal static string ToNamespaceSegment(string segment)
+    {
+        var sanitized = SanitizeIdentifier(segment.Replace('-', '_'));
+        return sanitized switch
+        {
+            "System" => "TypeScriptSystem",
+            "Microsoft" => "TypeScriptMicrosoft",
+            _ => EscapeKeyword(sanitized),
+        };
     }
 
     /// <summary>

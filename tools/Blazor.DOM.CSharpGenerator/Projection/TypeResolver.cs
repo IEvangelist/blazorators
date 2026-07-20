@@ -37,7 +37,8 @@ public sealed record TypeProjection(
     bool IsNullable,
     bool IsCollection,
     ClrTypeIdentity Identity,
-    string ProviderNote = "")
+    string ProviderNote = "",
+    TransportModel? Transport = null)
 {
     public string RenderedType
         => IsNullable
@@ -110,14 +111,17 @@ public sealed class TypeResolver
 
     private readonly IReadOnlyDictionary<string, SymbolModel> _symbolIndex;
     private readonly IReadOnlyDictionary<string, EmitterOverrideEntry> _overrides;
+    private readonly string _generatedNamespace;
 
     public TypeResolver(
         IReadOnlyList<SymbolModel> symbols,
-        IReadOnlyDictionary<string, EmitterOverrideEntry>? overrides = null)
+        IReadOnlyDictionary<string, EmitterOverrideEntry>? overrides = null,
+        string generatedNamespace = "Blazor.DOM")
     {
         _symbolIndex = symbols.ToDictionary(s => s.Name, StringComparer.Ordinal);
         _overrides = overrides
             ?? new Dictionary<string, EmitterOverrideEntry>(StringComparer.Ordinal);
+        _generatedNamespace = generatedNamespace;
     }
 
     /// <summary>Returns true if the named symbol is in the TypeScript IR symbol index.</summary>
@@ -140,6 +144,20 @@ public sealed class TypeResolver
         => _symbolIndex.TryGetValue(name, out var sym)
            && EffectiveClassificationPolicy.Classify(sym, _overrides).Name == "dictionary";
 
+    public string GetCSharpTypeReference(string symbolName)
+    {
+        if (!_symbolIndex.TryGetValue(symbolName, out var symbol))
+            throw new TypeProjectionException(
+                $"Unresolved type symbol '{symbolName}'.",
+                $"{symbolName}/symbol-resolution");
+
+        var classification = EffectiveClassificationPolicy.Classify(symbol, _overrides).Name;
+        return Naming.ToCSharpTypeReference(
+            _generatedNamespace,
+            symbol.Name,
+            classification is "interface" or "mixin");
+    }
+
     /// <summary>
     /// Projects a TypeScript type node to C#. Throws <see cref="TypeProjectionException"/>
     /// for unsupported projections. Never returns <c>object</c> for supported types.
@@ -153,7 +171,7 @@ public sealed class TypeResolver
             throw new TypeProjectionException(
                 $"Type recursion depth exceeded at '{provenance}'.", provenance);
 
-        return typeNode switch
+        var projection = typeNode switch
         {
             KeywordTypeNode kw => ProjectKeyword(kw, provenance),
             ReferenceTypeNode rf => ProjectReference(rf, provenance, depth),
@@ -163,8 +181,10 @@ public sealed class TypeResolver
             FunctionTypeNode fn => ProjectFunction(fn, provenance, depth),
             ParenthesizedTypeNode pt => Project(pt.InnerType, provenance, depth),
             HeritageReferenceTypeNode hr => ProjectHeritageReference(hr, provenance, depth),
-            IntersectionTypeNode => Fail(typeNode, provenance,
-                "intersection types are not supported for C# projection"),
+            IntersectionTypeNode intersection => ProjectIntersection(
+                intersection,
+                provenance,
+                depth),
             TypeLiteralTypeNode => Fail(typeNode, provenance,
                 "type literal (anonymous object type) is not supported for C# projection"),
             TemplateLiteralTypeNode => Fail(typeNode, provenance,
@@ -182,6 +202,7 @@ public sealed class TypeResolver
             _ => Fail(typeNode, provenance,
                 $"unhandled TypeNode subtype '{typeNode.GetType().Name}'"),
         };
+        return projection with { Transport = typeNode.Transport ?? projection.Transport };
     }
 
     private TypeProjection ProjectKeyword(KeywordTypeNode kw, string provenance)
@@ -342,10 +363,33 @@ public sealed class TypeResolver
                 $"EventHandler type '{name}' at '{provenance}' is deferred to the events phase.",
                 provenance);
 
-        // If the referenced symbol exists in our symbol index use its C# name
-        if (_symbolIndex.TryGetValue(name, out var sym))
+        // ResolvedSymbol is authoritative for namespace-local references. Falling
+        // back to Name is allowed only when the extractor did not resolve a
+        // symbol, or when both spellings are identical.
+        SymbolModel? sym = null;
+        var resolvedName = rf.ResolvedSymbol;
+        if (!string.IsNullOrWhiteSpace(resolvedName))
         {
-            var csharpName = Naming.ToCSharpTypeName(sym.Name);
+            _symbolIndex.TryGetValue(resolvedName, out sym);
+            if (sym is null
+                && !string.Equals(resolvedName, name, StringComparison.Ordinal))
+            {
+                throw new TypeProjectionException(
+                    $"Resolved type reference '{resolvedName}' (written as '{name}') at " +
+                    $"'{provenance}' is not in the TypeScript symbol index.",
+                    provenance);
+            }
+        }
+        if (sym is null)
+            _symbolIndex.TryGetValue(name, out sym);
+
+        if (sym is not null)
+        {
+            var classification = EffectiveClassificationPolicy.Classify(sym, _overrides).Name;
+            var csharpName = Naming.ToCSharpTypeReference(
+                _generatedNamespace,
+                sym.Name,
+                classification is "interface" or "mixin");
             // Warn on unsupported generics
             if (rf.TypeArguments.Count > 0)
             {
@@ -354,12 +398,6 @@ public sealed class TypeResolver
                     $"Generic reference '{name}<...>' at '{provenance}' uses type arguments " +
                     "but generic C# emission is deferred. Add an explicit override or emit non-generic projection.",
                     provenance);
-            }
-            // Interface and mixin symbols are emitted as I-prefixed partial interfaces.
-            var classification = EffectiveClassificationPolicy.Classify(sym, _overrides).Name;
-            if (classification is "interface" or "mixin")
-            {
-                csharpName = $"I{csharpName}";
             }
             return classification is "enum" or "typedef"
                 ? ValueType(csharpName)
@@ -460,6 +498,50 @@ public sealed class TypeResolver
             canonicalType: $"{elem.CanonicalType}[]");
     }
 
+    private TypeProjection ProjectIntersection(
+        IntersectionTypeNode intersection,
+        string provenance,
+        int depth)
+    {
+        if (intersection.Types.Count == 2)
+        {
+            var windowReference = intersection.Types
+                .OfType<ReferenceTypeNode>()
+                .SingleOrDefault(reference =>
+                    string.Equals(
+                        reference.ResolvedSymbol ?? reference.Name,
+                        "Window",
+                        StringComparison.Ordinal));
+            var globalThisQuery = intersection.Types
+                .OfType<QueryTypeNode>()
+                .SingleOrDefault(query =>
+                    string.Equals(
+                        query.ResolvedSymbol ?? query.ExpressionName,
+                        "globalThis",
+                        StringComparison.Ordinal)
+                    || string.Equals(
+                        query.CheckerType,
+                        "typeof globalThis",
+                        StringComparison.Ordinal));
+
+            if (windowReference is not null && globalThisQuery is not null)
+            {
+                return Project(
+                    windowReference,
+                    $"{provenance}/WindowProxy",
+                    depth + 1) with
+                {
+                    ProviderNote = "Window & typeof globalThis→WindowProxy",
+                };
+            }
+        }
+
+        return Fail(
+            intersection,
+            provenance,
+            "intersection types are not supported for C# projection");
+    }
+
     private TypeProjection ProjectFunction(FunctionTypeNode fn, string provenance, int depth)
     {
         // Function types project to Action<>/Func<> delegates.
@@ -499,7 +581,7 @@ public sealed class TypeResolver
         // Heritage references used in extends/implements clauses.
         // Note: the InterfaceEmitter adds the 'I' prefix itself for heritage clauses;
         // this method is used for type references, not heritage clause building.
-        var name = hr.Expression;
+        var name = hr.ResolvedSymbol ?? hr.Expression;
         if (hr.TypeArguments.Count > 0)
             throw new TypeProjectionException(
                 $"Generic heritage reference '{name}<...>' at '{provenance}' is not supported.",
@@ -507,12 +589,11 @@ public sealed class TypeResolver
 
         if (_symbolIndex.TryGetValue(name, out var sym))
         {
-            var csharpName = Naming.ToCSharpTypeName(sym.Name);
             var classification = EffectiveClassificationPolicy.Classify(sym, _overrides).Name;
-            if (classification is "interface" or "mixin")
-            {
-                csharpName = $"I{csharpName}";
-            }
+            var csharpName = Naming.ToCSharpTypeReference(
+                _generatedNamespace,
+                sym.Name,
+                classification is "interface" or "mixin");
             return classification is "enum" or "typedef"
                 ? ValueType(csharpName)
                 : ReferenceType(csharpName);

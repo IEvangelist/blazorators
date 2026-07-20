@@ -31,7 +31,7 @@ public static class EnumEmitter
         w.AppendLine("using System.Runtime.Serialization;");
         w.AppendLine("using System.Text.Json.Serialization;");
         w.AppendLine();
-        w.AppendLine($"namespace {ns};");
+        w.AppendLine($"namespace {Naming.ToGeneratedNamespace(ns, symbol.Name)};");
         w.AppendLine();
 
         var docText = decl.Documentation?.Text ?? "";
@@ -41,7 +41,7 @@ public static class EnumEmitter
         if (symbol.Semantic.SecureContext)
             w.AppendLine("// Requires secure context (HTTPS).");
 
-        var csName = Naming.ToCSharpTypeName(symbol.Name);
+        var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         w.AppendLine($"[JsonConverter(typeof(JsonStringEnumConverter<{csName}>))]");
         w.Block($"public enum {csName}", () =>
         {
