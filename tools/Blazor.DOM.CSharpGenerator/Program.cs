@@ -213,7 +213,10 @@ try
                     if (profileHasErrors)
                     {
                         Console.Error.WriteLine(
-                            $" FAILED — {acc.GenerationFailed} generation failures, " +
+                            $" FAILED — {profileResult.ClosureSize} identities in closure " +
+                            $"({profileResult.IncludedSymbolCount} included symbols, " +
+                            $"{profileResult.ExternalReferenceCount} external refs), " +
+                            $"{acc.GenerationFailed} generation failures, " +
                             $"{profileResult.PipelineResult.Errors.Count} errors, " +
                             $"byteIdentityVerified={profileResult.Coverage.ByteIdentityVerified}.");
                         profileFailures++;
@@ -221,8 +224,9 @@ try
                     else
                     {
                         Console.WriteLine(
-                            $" OK — {profileResult.IncludedSymbolCount} symbols in closure " +
-                            $"({profileResult.ExternalReferenceCount} external refs), " +
+                            $" OK — {profileResult.ClosureSize} identities in closure " +
+                            $"({profileResult.IncludedSymbolCount} included symbols, " +
+                            $"{profileResult.ExternalReferenceCount} external refs), " +
                             $"{acc.Projected} projected, 0 failures.");
                     }
                 }
