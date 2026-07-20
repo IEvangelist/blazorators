@@ -1,6 +1,6 @@
-// Resolves the transitive closure of type dependencies for a set of root symbols.
-// Walks the TypeScript IR type graph (ReferenceTypeNode, HeritageReferenceTypeNode, etc.)
-// to collect all symbol names reachable from the root set.
+// Resolves the transitive closure of generation dependencies for a set of root
+// symbols. In addition to the TypeScript type graph, profile generation needs
+// the declarations that own routed globals and namespace members.
 
 using Blazor.DOM.CSharpGenerator.IR;
 
@@ -9,58 +9,96 @@ namespace Blazor.DOM.CSharpGenerator.Profiles;
 public static class TransitiveDependencyResolver
 {
     /// <summary>
-    /// Returns the set of all symbol names reachable from <paramref name="rootSymbols"/>
-    /// by following type references within the TypeScript IR.
-    /// Symbols not present in <paramref name="symbolIndex"/> are included by name but not expanded
-    /// (they will be accounted as generation-failed or excluded by the pipeline).
+    /// Returns every symbol reachable from <paramref name="rootSymbols"/> through
+    /// TypeScript type identities and declaration-routing ownership.
+    /// Symbols not present in <paramref name="symbolIndex"/> are included by
+    /// identity but not expanded, so profile coverage reports them as external.
     /// </summary>
     public static HashSet<string> Resolve(
         IReadOnlyList<string> rootSymbols,
         IReadOnlyDictionary<string, SymbolModel> symbolIndex)
     {
-        var visited = new HashSet<string>(StringComparer.Ordinal);
-        var queue = new Queue<string>(rootSymbols);
+        var closure = new HashSet<string>(StringComparer.Ordinal);
+        var queue = new Queue<string>();
+
+        foreach (var rootSymbol in rootSymbols)
+            EnqueueName(rootSymbol);
 
         while (queue.Count > 0)
         {
             var name = queue.Dequeue();
-            if (!visited.Add(name)) continue;
             if (!symbolIndex.TryGetValue(name, out var symbol)) continue;
 
-            foreach (var decl in symbol.Declarations)
+            EnqueueParentNamespaces(symbol.Name);
+
+            if (string.Equals(
+                    symbol.Semantic.BindingKind,
+                    "globalMember",
+                    StringComparison.Ordinal)
+                && !string.IsNullOrWhiteSpace(symbol.Semantic.WebIdlName))
             {
+                EnqueueName(symbol.Semantic.WebIdlName);
+            }
+
+            foreach (var decl in symbol.Declarations
+                .OrderBy(declaration => declaration.Ordinal))
+            {
+                foreach (var namespaceMember in decl.NamespaceMembers)
+                    EnqueueName(namespaceMember);
+
                 // Heritage (extends / implements)
                 foreach (var heritage in decl.Heritage)
                     foreach (var type in heritage.Types)
-                        Enqueue(type, visited, queue);
+                        Enqueue(type);
 
                 // Members: property types, method return types, parameter types
-                foreach (var member in decl.Members)
-                {
-                    Enqueue(member.Type, visited, queue);
-                    Enqueue(member.ReturnType, visited, queue);
-                    foreach (var p in member.Parameters)
-                        Enqueue(p.Type, visited, queue);
-                }
+                foreach (var member in decl.Members
+                    .OrderBy(member => member.Ordinal))
+                    EnqueueMember(member);
 
                 // Type alias body
-                Enqueue(decl.Type, visited, queue);
+                Enqueue(decl.Type);
 
                 // Parameters at declaration level (global functions)
-                foreach (var p in decl.Parameters)
-                    Enqueue(p.Type, visited, queue);
-                Enqueue(decl.ReturnType, visited, queue);
+                foreach (var parameter in decl.Parameters
+                    .OrderBy(parameter => parameter.Ordinal))
+                    Enqueue(parameter.Type);
+                Enqueue(decl.ReturnType);
             }
         }
 
-        return visited;
-    }
+        return closure;
 
-    private static void Enqueue(TypeNode? node, HashSet<string> visited, Queue<string> queue)
-    {
-        foreach (var name in CollectTypeNames(node))
-            if (!visited.Contains(name))
-                queue.Enqueue(name);
+        void EnqueueName(string dependency)
+        {
+            if (closure.Add(dependency))
+                queue.Enqueue(dependency);
+        }
+
+        void EnqueueParentNamespaces(string symbolName)
+        {
+            var separator = symbolName.LastIndexOf('.');
+            while (separator > 0)
+            {
+                EnqueueName(symbolName[..separator]);
+                separator = symbolName.LastIndexOf('.', separator - 1);
+            }
+        }
+
+        void Enqueue(TypeNode? node)
+        {
+            foreach (var dependency in CollectTypeNames(node))
+                EnqueueName(dependency);
+        }
+
+        void EnqueueMember(MemberModel member)
+        {
+            Enqueue(member.Type);
+            Enqueue(member.ReturnType);
+            foreach (var parameter in member.Parameters
+                .OrderBy(parameter => parameter.Ordinal))
+                Enqueue(parameter.Type);
+        }
     }
 
     private static IEnumerable<string> CollectTypeNames(TypeNode? node)
@@ -70,13 +108,21 @@ public static class TransitiveDependencyResolver
         switch (node)
         {
             case ReferenceTypeNode r:
-                if (!string.IsNullOrEmpty(r.Name)) yield return r.Name;
+                var referenceIdentity = string.IsNullOrWhiteSpace(r.ResolvedSymbol)
+                    ? r.Name
+                    : r.ResolvedSymbol;
+                if (!string.IsNullOrEmpty(referenceIdentity))
+                    yield return referenceIdentity;
                 foreach (var ta in r.TypeArguments)
                     foreach (var n in CollectTypeNames(ta)) yield return n;
                 break;
 
             case HeritageReferenceTypeNode h:
-                if (!string.IsNullOrEmpty(h.Expression)) yield return h.Expression;
+                var heritageIdentity = string.IsNullOrWhiteSpace(h.ResolvedSymbol)
+                    ? h.Expression
+                    : h.ResolvedSymbol;
+                if (!string.IsNullOrEmpty(heritageIdentity))
+                    yield return heritageIdentity;
                 foreach (var ta in h.TypeArguments)
                     foreach (var n in CollectTypeNames(ta)) yield return n;
                 break;
@@ -116,12 +162,23 @@ public static class TransitiveDependencyResolver
                 }
                 break;
 
+            case QueryTypeNode query:
+                var queryIdentity = string.IsNullOrWhiteSpace(query.ResolvedSymbol)
+                    ? query.ExpressionName
+                    : query.ResolvedSymbol;
+                if (!string.IsNullOrEmpty(queryIdentity))
+                    yield return queryIdentity;
+                foreach (var n in CollectTypeNames(query.ExprType)) yield return n;
+                foreach (var argument in query.TypeArguments ?? [])
+                    foreach (var n in CollectTypeNames(argument)) yield return n;
+                break;
+
             case OperatorTypeNode op:
                 foreach (var n in CollectTypeNames(op.OperandType)) yield return n;
                 break;
 
-            // keyword, literal, templateLiteral, query, indexedAccess, unknown:
-            // no type names to collect that point to IR symbols.
+            // keyword, literal, templateLiteral, indexedAccess, parenthesized,
+            // and unknown nodes have no directly resolved symbol identity.
             default:
                 break;
         }
