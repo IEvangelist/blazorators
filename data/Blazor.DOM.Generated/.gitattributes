@@ -1,0 +1,4 @@
+# Generated files must use LF line endings to match generator output on all platforms.
+* text=auto
+*.g.cs text eol=lf
+*.json text eol=lf

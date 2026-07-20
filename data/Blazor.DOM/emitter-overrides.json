@@ -1,0 +1,6 @@
+{
+  "$schema": "./emitter-overrides.schema.json",
+  "schemaVersion": 1,
+  "description": "Explicit emitter overrides for ambiguous symbols. Each entry MUST have a non-empty rationale. An empty array causes all ambiguous symbols to fail generation — this is intentional while override decisions are pending review.",
+  "ambiguousSymbolOverrides": []
+}

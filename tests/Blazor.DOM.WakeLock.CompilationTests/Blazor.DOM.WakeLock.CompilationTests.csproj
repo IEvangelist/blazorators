@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Multi-target to prove warning-free compilation on all supported TFMs. -->
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- This project exists only to compile the generated output; no executable needed. -->
+    <OutputType>Library</OutputType>
+    <!-- Suppress the no-source warning so an empty project doesn't fail the build. -->
+    <NoWarn>CS2008</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include all generated WakeLock profile .g.cs files. -->
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\WakeLock\**\*.g.cs" />
+  </ItemGroup>
+
+</Project>
