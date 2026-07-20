@@ -1,6 +1,6 @@
 {
   "$schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/coverage.schema.json",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "typescript": {
     "symbolCount": 1866,
     "declarationCount": 2598,

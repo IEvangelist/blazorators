@@ -1,6 +1,6 @@
 {
   "$schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/manifest.schema.json",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "generationProfile": {
     "name": "Window",
     "includedExposures": [
@@ -14,7 +14,7 @@
       "format": "jsonl",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/typescript-symbol.schema.json",
       "records": 1866,
-      "sha256": "451c7967d2556d13441a3ecd81d4c5ca189a6adf315ae164652ed0c02eb14f8a"
+      "sha256": "e3795c0df5fffaaad69af5def9757c4889ceb2b94e60d04a7ecc3503fb3bd51e"
     },
     "webIdlSymbols": {
       "path": "webidl-symbols.jsonl",
@@ -28,7 +28,7 @@
       "format": "json",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/coverage.schema.json",
       "records": 1,
-      "sha256": "89a9012ff6ccb8c4d4e07e4e8db4a0f3bc65578a939a4587ac183fd962f0bd73"
+      "sha256": "fe4695dd004100f545d34c88c959e680387b19d6c8fe106db9d5dcf51d4fa555"
     }
   },
   "counts": {

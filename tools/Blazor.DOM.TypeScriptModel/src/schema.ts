@@ -1,4 +1,21 @@
-export const MODEL_SCHEMA_VERSION = 1;
+export const MODEL_SCHEMA_VERSION = 2;
+
+export type TransportKind =
+  | "json-value"
+  | "js-reference"
+  | "js-stream"
+  | "binary"
+  | "transferable"
+  | "unsupported";
+
+export interface TransportModel {
+  kind: TransportKind;
+  nullable: boolean;
+  sourceType: string;
+  streamable: boolean;
+  structuredClone: boolean;
+  reason: string | null;
+}
 
 export interface SourceLocation {
   source: string;
@@ -16,6 +33,7 @@ export interface TypeExpression {
   kind: string;
   syntaxKind: string;
   checkerType: string;
+  transport: TransportModel;
   [key: string]: unknown;
 }
 

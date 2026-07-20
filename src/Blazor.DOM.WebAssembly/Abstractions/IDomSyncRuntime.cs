@@ -13,8 +13,13 @@ public interface IDomSyncRuntime : IDomRuntime
 {
     // ── Sync property access ─────────────────────────────────────────────────
 
-    /// <summary>Reads a named property synchronously.</summary>
+    /// <summary>Reads a reviewed JSON-valued property synchronously.</summary>
     TValue GetProperty<TValue>(IJSInProcessObjectReference reference, string name);
+
+    /// <summary>Reads a named property synchronously as a live JS object reference.</summary>
+    IJSInProcessObjectReference GetPropertyRef(
+        IJSInProcessObjectReference reference,
+        string name);
 
     /// <summary>Writes a named property synchronously.</summary>
     void SetProperty(IJSInProcessObjectReference reference, string name, object? value);
@@ -40,8 +45,13 @@ public interface IDomSyncRuntime : IDomRuntime
 
     // ── Sync index access ────────────────────────────────────────────────────
 
-    /// <summary>Reads a numeric index synchronously.</summary>
+    /// <summary>Reads a reviewed JSON-valued numeric index synchronously.</summary>
     TValue GetIndex<TValue>(IJSInProcessObjectReference reference, int index);
+
+    /// <summary>Reads a numeric index synchronously as a live JS object reference.</summary>
+    IJSInProcessObjectReference GetIndexRef(
+        IJSInProcessObjectReference reference,
+        int index);
 
     /// <summary>Writes a numeric index synchronously.</summary>
     void SetIndex(IJSInProcessObjectReference reference, int index, object? value);

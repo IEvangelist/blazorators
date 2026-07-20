@@ -13,6 +13,7 @@ import {
 import { compareOrdinal } from "./stable-json.js";
 import { extractTypeScriptModel } from "./typescript-model.js";
 import { extractWebIdlModel } from "./webidl-model.js";
+import { classifyTransports } from "./transport.js";
 
 export function buildDomModel(inputs: InputSet): DomModel {
   const typeScript = extractTypeScriptModel(
@@ -67,6 +68,8 @@ export function buildDomModel(inputs: InputSet): DomModel {
     matchedWebIdlNames.add(compatible[0]!.symbol.name);
     matched++;
   }
+
+  classifyTransports(typeScript.symbols);
 
   return {
     schemaVersion: MODEL_SCHEMA_VERSION,

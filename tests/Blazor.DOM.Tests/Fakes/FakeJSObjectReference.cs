@@ -8,11 +8,15 @@ namespace Blazor.DOM.Tests.Fakes;
 /// returns configurable values.  Supports queuing exceptions to be thrown on
 /// specific identifier calls, and controlled (non-synchronous) import tasks.
 /// </summary>
-public sealed class FakeJSObjectReference : IJSObjectReference
+public sealed class FakeJSObjectReference : IConfigurableJSObjectReference
 {
     public bool IsDisposed { get; private set; }
+    public int DisposeCallCount { get; private set; }
     public List<(string Identifier, object?[]? Args)> Invocations { get; } = [];
     public Dictionary<string, object?> ReturnValues { get; } = [];
+    public Dictionary<
+        string,
+        Func<object?[]?, CancellationToken, ValueTask<object?>>> InvocationHandlers { get; } = [];
 
     /// <summary>
     /// Exceptions to throw when <c>InvokeAsync</c> is called
@@ -22,21 +26,69 @@ public sealed class FakeJSObjectReference : IJSObjectReference
 
     public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(
         string identifier, object?[]? args)
-    {
-        Invocations.Add((identifier, args));
-        if (ThrowValues.TryGetValue(identifier, out var ex))
-            return ValueTask.FromException<TValue>(ex);
-        if (ReturnValues.TryGetValue(identifier, out var val))
-            return ValueTask.FromResult((TValue)val!);
-        return ValueTask.FromResult<TValue>(default!);
-    }
+        => InvokeCoreAsync<TValue>(identifier, args, default);
 
     public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(
         string identifier, CancellationToken cancellationToken, object?[]? args)
-        => InvokeAsync<TValue>(identifier, args);
+        => InvokeCoreAsync<TValue>(identifier, args, cancellationToken);
+
+    private async ValueTask<TValue> InvokeCoreAsync<TValue>(
+        string identifier,
+        object?[]? args,
+        CancellationToken cancellationToken)
+    {
+        Invocations.Add((identifier, args));
+        if (ThrowValues.TryGetValue(identifier, out var ex))
+            throw ex;
+        if (InvocationHandlers.TryGetValue(identifier, out var handler))
+        {
+            var result = await handler(args, cancellationToken);
+            return result is null ? default! : (TValue)result;
+        }
+        if (TryGetReferenceResult(identifier, out var resultIdentifier))
+        {
+            ReturnValues.TryGetValue(resultIdentifier, out var value);
+            var delivery = (DotNetObjectReference<DomReferenceDeliveryHandler>)
+                args![^2]!;
+            var accepted = await delivery.Value.ReceiveReferenceAsync(
+                value as IJSObjectReference);
+            if (!accepted)
+            {
+                throw new JSException(".NET rejected object reference delivery.");
+            }
+            return default!;
+        }
+        if (ReturnValues.TryGetValue(identifier, out var val))
+        {
+            if (identifier == "addDotNetEventListener" && val is int listenerId)
+            {
+                var registration = (DotNetObjectReference<DomEventIdRegistrationHandler>)
+                    args![4]!;
+                await registration.Value.ReceiveRegistrationAsync(listenerId);
+                return default!;
+            }
+            return (TValue)val!;
+        }
+        return default!;
+    }
+
+    private static bool TryGetReferenceResult(
+        string identifier,
+        out string resultIdentifier)
+    {
+        resultIdentifier = identifier switch
+        {
+            "getPropertyDotNetObjectReference" => "getProperty",
+            "invokeMethodDotNetObjectReference" => "invokeMethod",
+            "getIndexDotNetObjectReference" => "getIndex",
+            _ => string.Empty,
+        };
+        return resultIdentifier.Length > 0;
+    }
 
     public ValueTask DisposeAsync()
     {
+        DisposeCallCount++;
         IsDisposed = true;
         return ValueTask.CompletedTask;
     }
