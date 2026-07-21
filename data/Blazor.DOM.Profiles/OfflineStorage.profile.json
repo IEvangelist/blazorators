@@ -1,0 +1,161 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "OfflineStorage",
+  "description": "Cache Storage and IndexedDB persistence through explicit Window entry points.",
+  "rootSymbols": [
+    "CacheStorage",
+    "Cache",
+    "Request",
+    "Response",
+    "IDBFactory",
+    "IDBDatabase",
+    "IDBRequest",
+    "IDBOpenDBRequest",
+    "IDBTransaction",
+    "IDBObjectStore",
+    "IDBIndex",
+    "IDBCursor",
+    "IDBCursorWithValue",
+    "IDBKeyRange",
+    "IDBVersionChangeEvent"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["cache-storage", "indexed-db", "structured-clone"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/OfflineStorage",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "CacheStorage": ["delete", "has", "keys", "match", "open"],
+    "Cache": ["add", "addAll", "delete", "keys", "match", "matchAll", "put"],
+    "Request": ["headers", "method", "url", "clone"],
+    "Response": ["headers", "ok", "redirected", "status", "statusText", "type", "url", "clone"],
+    "IDBFactory": ["cmp", "databases", "deleteDatabase", "open"],
+    "IDBDatabase": [
+      "name",
+      "objectStoreNames",
+      "version",
+      "close",
+      "createObjectStore",
+      "deleteObjectStore",
+      "transaction",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "IDBRequest": [
+      "error",
+      "readyState",
+      "result",
+      "transaction",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "IDBOpenDBRequest": [
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "IDBTransaction": [
+      "db",
+      "durability",
+      "error",
+      "mode",
+      "objectStoreNames",
+      "abort",
+      "commit",
+      "objectStore",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "IDBObjectStore": [
+      "autoIncrement",
+      "indexNames",
+      "keyPath",
+      "name",
+      "transaction",
+      "add",
+      "clear",
+      "count",
+      "createIndex",
+      "delete",
+      "deleteIndex",
+      "get",
+      "getAll",
+      "getAllKeys",
+      "getKey",
+      "index",
+      "openCursor",
+      "openKeyCursor",
+      "put"
+    ],
+    "IDBIndex": [
+      "keyPath",
+      "multiEntry",
+      "name",
+      "objectStore",
+      "unique",
+      "count",
+      "get",
+      "getAll",
+      "getAllKeys",
+      "getKey",
+      "openCursor",
+      "openKeyCursor"
+    ],
+    "IDBCursor": [
+      "direction",
+      "request",
+      "advance",
+      "continue",
+      "continuePrimaryKey",
+      "delete",
+      "update"
+    ],
+    "IDBCursorWithValue": ["value"],
+    "IDBKeyRange": ["lower", "lowerOpen", "upper", "upperOpen", "includes"],
+    "IDBVersionChangeEvent": ["newVersion", "oldVersion"],
+    "IDBDatabaseEventMap": ["abort", "close", "error", "versionchange"],
+    "IDBOpenDBRequestEventMap": ["blocked", "upgradeneeded"],
+    "IDBRequestEventMap": ["error", "success"],
+    "IDBTransactionEventMap": ["abort", "complete", "error"],
+    "EventListener": ["$callSignature"],
+    "EventListenerObject": ["handleEvent"]
+  },
+  "transportOverrides": [
+    {
+      "symbol": "IDBRequest",
+      "member": "result",
+      "kind": "runtime-inferred",
+      "rationale": "IDBRequest<T>.result is a live proxy when T is a DOM interface and an arbitrary structured-clone value when T is TypeScript any/object."
+    },
+    {
+      "symbol": "IDBCursorWithValue",
+      "member": "value",
+      "kind": "runtime-inferred",
+      "rationale": "Cursor values cross IndexedDB's structured-clone boundary and retain the source TypeScript any surface as object."
+    },
+    {
+      "symbol": "IDBKeyRange",
+      "member": "lower",
+      "kind": "runtime-inferred",
+      "rationale": "IndexedDB key bounds are declared as TypeScript any and are returned through the structured-clone value path."
+    },
+    {
+      "symbol": "IDBKeyRange",
+      "member": "upper",
+      "kind": "runtime-inferred",
+      "rationale": "IndexedDB key bounds are declared as TypeScript any and are returned through the structured-clone value path."
+    }
+  ],
+  "entryPoints": [
+    {
+      "name": "CacheStorage",
+      "symbol": "CacheStorage",
+      "javaScriptPath": "caches"
+    },
+    {
+      "name": "IDBFactory",
+      "symbol": "IDBFactory",
+      "javaScriptPath": "indexedDB"
+    }
+  ]
+}
