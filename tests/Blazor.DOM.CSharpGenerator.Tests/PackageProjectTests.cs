@@ -141,8 +141,8 @@ public sealed class PackageProjectTests
     [InlineData("StorageManagement", 11)]
     [InlineData("Screen", 30)]
     [InlineData("OfflineStorage", 252)]
-    [InlineData("Credentials", 29)]
-    [InlineData("WebCrypto", 43)]
+    [InlineData("Credentials", 43)]
+    [InlineData("WebCrypto", 29)]
     public void FocusedPackage_HostPairsHaveExpectedExactParity(
         string profileName,
         int operationCount)
