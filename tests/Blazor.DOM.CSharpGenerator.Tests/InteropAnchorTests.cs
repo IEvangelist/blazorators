@@ -105,6 +105,43 @@ public sealed class InteropAnchorTests
             () => InteropAnchorLoader.Apply(profile, anchors));
     }
 
+    [Fact]
+    public void FunctionEntryPoint_AllowsOperationNameDistinctFromReturnSymbol()
+    {
+        var anchors = new[]
+        {
+            new InteropAnchor(
+                "IWebMIDIService",
+                "MIDIAccess",
+                "navigator.requestMIDIAccess",
+                "Profiles/WebMIDI",
+                "IWebMIDIService.cs"),
+        };
+        var profile = new ProfileDefinition(
+            "WebMIDI",
+            "Web MIDI",
+            ["MIDIAccess"],
+            true,
+            false,
+            ["web-midi"],
+            "Blazor.DOM",
+            "Profiles/WebMIDI",
+            EntryPoints:
+            [
+                new HostEntryPoint(
+                    "RequestMIDIAccess",
+                    "MIDIAccess",
+                    "navigator.requestMIDIAccess",
+                    InvokesFunction: true),
+            ]);
+
+        var applied = InteropAnchorLoader.Apply(profile, anchors);
+
+        Assert.Equal(
+            "RequestMIDIAccess",
+            Assert.Single(applied.EntryPoints!).Name);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = AppContext.BaseDirectory;

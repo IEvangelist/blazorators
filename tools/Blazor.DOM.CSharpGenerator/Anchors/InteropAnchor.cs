@@ -79,15 +79,13 @@ public static partial class InteropAnchorLoader
                 scope,
                 StringComparison.Ordinal))
             .Select(ToEntryPoint)
-            .OrderBy(entryPoint => entryPoint.Name, StringComparer.Ordinal)
+            .Select(AnchorIdentity)
+            .OrderBy(entryPoint => entryPoint.Symbol, StringComparer.Ordinal)
             .ToList();
         var configured = profile.EntryPoints
-            .Select(entryPoint => new HostEntryPoint(
-                entryPoint.Name,
-                entryPoint.Symbol,
-                entryPoint.JavaScriptPath))
             .Select(Normalize)
-            .OrderBy(entryPoint => entryPoint.Name, StringComparer.Ordinal)
+            .Select(AnchorIdentity)
+            .OrderBy(entryPoint => entryPoint.Symbol, StringComparer.Ordinal)
             .ToList();
 
         if (!profileAnchors.SequenceEqual(configured))
@@ -155,6 +153,10 @@ public static partial class InteropAnchorLoader
         {
             JavaScriptPath = NormalizeJavaScriptPath(entryPoint.JavaScriptPath),
         };
+
+    private static (string Symbol, string JavaScriptPath) AnchorIdentity(
+        HostEntryPoint entryPoint)
+        => (entryPoint.Symbol, entryPoint.JavaScriptPath);
 
     private static string NormalizeJavaScriptPath(string path)
         => path.StartsWith("window.", StringComparison.Ordinal)
