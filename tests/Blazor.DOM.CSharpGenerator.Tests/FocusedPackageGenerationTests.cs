@@ -267,6 +267,7 @@ public sealed class FocusedPackageGenerationTests
                 "INotificationFactory.g.cs"));
 
             Assert.True(result.PipelineResult.HostPackages!.Parity.Exact);
+            Assert.Equal(["notifications"], result.Coverage.Permissions);
             Assert.Contains(
                 "ValueTask<global::Blazor.DOM.INotificationFactory> GetNotificationAsync",
                 serverSource,
