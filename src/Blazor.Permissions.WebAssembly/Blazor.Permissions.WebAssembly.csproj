@@ -67,6 +67,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
+    <Compile Include="..\Blazor.DOM.Anchors\Profiles\Permissions\IPermissionsService.cs"
+             Link="IPermissionsService.cs" />
   </ItemGroup>
 
   <ItemGroup Label="Files">
