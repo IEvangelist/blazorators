@@ -97,9 +97,8 @@ public sealed class HardeningRegressionTests
     // ── Defect 1: No object/void silent fallbacks ───────────────────────────────
 
     [Fact]
-    public void InterfaceEmitter_MethodParamFailure_Throws_NotObjectFallback()
+    public void InterfaceEmitter_UnsupportedMethodParam_IsNamedDeferral()
     {
-        // Intersection type as method parameter → must throw, not produce 'object'
         var resolver = EmptyResolver();
         var emitter = new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM");
 
@@ -116,12 +115,17 @@ public sealed class HardeningRegressionTests
             ])
         ]);
 
-        var ex = Assert.Throws<InterfaceEmitException>(() => emitter.Emit(symbol));
-        Assert.DoesNotContain("object", ex.Message.Replace("TypeProjection", ""));
+        var result = emitter.Emit(symbol);
+        var outcome = Assert.Single(result.MemberOutcomes);
+
+        Assert.Equal(MemberOutcomeStatus.Deferred, outcome.Status);
+        Assert.Equal("intersection-composition", outcome.Phase);
+        Assert.Contains("DEFERRED (intersection-composition)", result.Source);
+        Assert.DoesNotContain("object", result.Source);
     }
 
     [Fact]
-    public void InterfaceEmitter_MethodReturnFailure_Throws_NotCommentFallback()
+    public void InterfaceEmitter_UnsupportedMethodReturn_IsNamedDeferral()
     {
         var resolver = EmptyResolver();
         var emitter = new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM");
@@ -139,7 +143,13 @@ public sealed class HardeningRegressionTests
             ])
         ]);
 
-        Assert.Throws<InterfaceEmitException>(() => emitter.Emit(symbol));
+        var result = emitter.Emit(symbol);
+        var outcome = Assert.Single(result.MemberOutcomes);
+
+        Assert.Equal(MemberOutcomeStatus.Deferred, outcome.Status);
+        Assert.Equal("intersection-composition", outcome.Phase);
+        Assert.Contains("DEFERRED (intersection-composition)", result.Source);
+        Assert.DoesNotContain("BadReturn(", result.Source);
     }
 
     [Fact]
