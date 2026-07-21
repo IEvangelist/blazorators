@@ -109,6 +109,26 @@ internal sealed class SynthesizedTypeRegistry(
         return QualifiedStandard(name);
     }
 
+    public string RegisterTypeScriptNever()
+    {
+        const string identity = "Standard:TypeScript.never";
+        if (_byIdentity.TryGetValue(identity, out var existing))
+            return QualifiedStandard(existing.Name);
+
+        const string name = "TypeScriptNever";
+        const string fingerprint = "typescript:never:uninhabited";
+        _byIdentity.Add(
+            identity,
+            new SynthesizedTypeDefinition(
+                name,
+                "Never",
+                "typescript/never",
+                fingerprint,
+                Path.Combine("StandardTypes", $"{name}.g.cs"),
+                EmitTypeScriptNever(name)));
+        return QualifiedStandard(name);
+    }
+
     public string RegisterUnion(
         string provenance,
         NormalizedUnion normalized,
@@ -213,6 +233,21 @@ internal sealed class SynthesizedTypeRegistry(
             EmitStandardErrorProperty(writer, "message", "string", "Message", nullable: false);
             writer.AppendLine();
             EmitStandardErrorProperty(writer, "stack", "string?", "Stack", nullable: true);
+        });
+        return writer.ToString();
+    }
+
+    private string EmitTypeScriptNever(string name)
+    {
+        var writer = Header();
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.StandardTypes;");
+        writer.AppendLine();
+        writer.AppendLine(
+            "/// <summary>Represents TypeScript's uninhabited <c>never</c> type.</summary>");
+        writer.Block($"public sealed class {name}", () =>
+        {
+            writer.AppendLine($"private {name}() {{ }}");
         });
         return writer.ToString();
     }
