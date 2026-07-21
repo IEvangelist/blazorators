@@ -176,13 +176,13 @@ public sealed class FinalEmitterAuditTests
 
             Assert.True(result.Validation.IsValid);
             Assert.Equal(1866, accounting.TotalSymbols);
-            Assert.Equal(1518, accounting.Projected);
-            Assert.Equal(1264, accounting.ProjectedClean);
-            Assert.Equal(254, accounting.ProjectedWithDeferredMembers);
+            Assert.Equal(1494, accounting.Projected);
+            Assert.Equal(1170, accounting.ProjectedClean);
+            Assert.Equal(324, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
-            Assert.Equal(208, accounting.Deferred);
-            Assert.Equal(140, accounting.GenerationFailed);
-            Assert.Equal(2006, result.WrittenFiles.Count);
+            Assert.Equal(244, accounting.Deferred);
+            Assert.Equal(128, accounting.GenerationFailed);
+            Assert.Equal(1899, result.WrittenFiles.Count);
             Assert.Equal((2598, 2598), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
@@ -191,9 +191,9 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceMembers));
             Assert.Equal(11310, accounting.TotalMembers);
             Assert.Equal(11310, accounting.ExpectedMembers);
-            Assert.Equal(10020, accounting.ProjectedMembers);
-            Assert.Equal(852, accounting.DeferredMembers);
-            Assert.Equal(438, accounting.FailedMembers);
+            Assert.Equal(9534, accounting.ProjectedMembers);
+            Assert.Equal(1367, accounting.DeferredMembers);
+            Assert.Equal(409, accounting.FailedMembers);
             Assert.Equal((3666, 3666), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
@@ -202,8 +202,8 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceParameters));
             Assert.True(accounting.ParameterReconciliationValid);
             Assert.True(result.Validation.ParameterReconciliationValid);
-            Assert.Equal(140, result.Errors.Count);
-            Assert.Equal(140, result.Manifest.Diagnostics.Count);
+            Assert.Equal(128, result.Errors.Count);
+            Assert.Equal(128, result.Manifest.Diagnostics.Count);
             Assert.All(result.Manifest.Diagnostics, diagnostic =>
             {
                 Assert.Equal("GENERATION_FAILED", diagnostic.Code);
@@ -217,7 +217,10 @@ public sealed class FinalEmitterAuditTests
             Assert.Contains(
                 "PopoverInvokerElement",
                 accounting.ProjectedSymbols);
-            Assert.Contains("CustomElementConstructor", accounting.ProjectedSymbols);
+            Assert.Contains(
+                accounting.DeferredSymbols,
+                entry => entry.Symbol == "CustomElementConstructor"
+                    && entry.Phase == "standard-container-transport");
             Assert.Contains("NodeFilter", accounting.ProjectedSymbols);
             Assert.Contains("XPathNSResolver", accounting.ProjectedSymbols);
 
@@ -254,12 +257,15 @@ public sealed class FinalEmitterAuditTests
                         {
                             "factory-constructor",
                             "advanced-generic-constraints",
+                            "primary-contract",
+                            "promise-transport",
+                            "standard-container-transport",
                         });
                     deferredTypeLiteralDeclarations++;
                 }
             }
-            Assert.Equal(631, projectedTypeLiteralDeclarations);
-            Assert.Equal(18, deferredTypeLiteralDeclarations);
+            Assert.Equal(535, projectedTypeLiteralDeclarations);
+            Assert.Equal(114, deferredTypeLiteralDeclarations);
 
             var factoryMembers = (accounting.SourceMemberEntries ?? [])
                 .Where(entry => entry.QualifiedKey.Contains(
@@ -314,7 +320,7 @@ public sealed class FinalEmitterAuditTests
                 150,
                 globalFunctionOverloads.Sum(entry => entry.ParameterOutcomes.Count));
             Assert.Equal(
-                (113, 3, 4),
+                (109, 8, 3),
                 (
                     globalFunctionOverloads.Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Projected)),
@@ -323,7 +329,7 @@ public sealed class FinalEmitterAuditTests
                     globalFunctionOverloads.Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Failed))));
             Assert.Equal(
-                (136, 10, 4),
+                (125, 22, 3),
                 (
                     globalFunctionOverloads
                         .SelectMany(entry => entry.ParameterOutcomes)
@@ -425,18 +431,34 @@ public sealed class FinalEmitterAuditTests
                         StringComparison.Ordinal));
             Assert.Equal(2463, factoryMembers.Count);
             Assert.Equal(
-                2442,
+                2212,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Projected)));
             Assert.Equal(
-                20,
+                15,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Deferred)
                     && entry.Phase == "factory-constructor"));
-            Assert.Single(
-                factoryMembers,
+            Assert.Equal(
+                2,
+                factoryMembers.Count(
                 entry => entry.Status == nameof(MemberOutcomeStatus.Deferred)
-                    && entry.Phase == "advanced-generic-constraints");
+                    && entry.Phase == "advanced-generic-constraints"));
+            Assert.Equal(
+                196,
+                factoryMembers.Count(entry =>
+                entry.Status == nameof(MemberOutcomeStatus.Deferred)
+                && entry.Phase == "primary-contract"));
+            Assert.Equal(
+                2,
+                factoryMembers.Count(entry =>
+                entry.Status == nameof(MemberOutcomeStatus.Deferred)
+                && entry.Phase == "promise-transport"));
+            Assert.Equal(
+                36,
+                factoryMembers.Count(entry =>
+                entry.Status == nameof(MemberOutcomeStatus.Deferred)
+                && entry.Phase == "standard-container-transport"));
 
             var wakeLockMembers = factoryMembers
                 .Where(entry => entry.SymbolName == "WakeLock")
@@ -477,10 +499,11 @@ public sealed class FinalEmitterAuditTests
                 "Globals",
                 "IWindow.Globals.g.cs");
             var globalContract = File.ReadAllText(globalContractPath);
+            Assert.DoesNotContain("SetTimeout(", globalContract);
             Assert.Contains(
-                "double SetTimeout(TimerHandler handler, double timeout = default, " +
-                "params object[] arguments);",
-                globalContract);
+                accounting.DeferredSymbols,
+                entry => entry.Symbol == "setTimeout"
+                    && entry.Phase == "standard-container-transport");
             Assert.Contains(
                 "double InnerWidth { get; set; }",
                 globalContract);
@@ -522,8 +545,20 @@ public sealed class FinalEmitterAuditTests
                 "IModuleFactory.g.cs");
             var moduleFactory = File.ReadAllText(moduleFactoryPath);
             Assert.Contains("IModule Create(BufferSource bytes);", moduleFactory);
-            Assert.Contains("byte[][] CustomSections(", moduleFactory);
-            Assert.Contains("IModuleExportDescriptor[] Exports(", moduleFactory);
+            Assert.DoesNotContain("CustomSections(", moduleFactory);
+            Assert.Contains(
+                accounting.SourceMemberEntries ?? [],
+                entry => entry.SymbolName == "WebAssembly.Module"
+                    && entry.MemberName == "customSections"
+                    && entry.Status == nameof(MemberOutcomeStatus.Deferred)
+                    && entry.Phase == "standard-container-transport");
+            Assert.DoesNotContain(" Exports(", moduleFactory);
+            Assert.Contains(
+                accounting.SourceMemberEntries ?? [],
+                entry => entry.SymbolName == "WebAssembly.Module"
+                    && entry.MemberName == "exports"
+                    && entry.Status == nameof(MemberOutcomeStatus.Deferred)
+                    && entry.Phase == "standard-container-transport");
 
             foreach (var relativePath in new[]
             {

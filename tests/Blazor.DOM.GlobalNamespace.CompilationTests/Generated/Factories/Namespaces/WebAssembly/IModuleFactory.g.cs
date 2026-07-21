@@ -12,19 +12,4 @@ public partial interface IModuleFactory
     global::Blazor.DOM.Namespaces.WebAssembly.IModule Prototype { get; set; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.IModule Create(BufferSource bytes);
-
-    /// <summary>
-    /// [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/Module/customSections_static)
-    /// </summary>
-    byte[][] CustomSections(global::Blazor.DOM.Namespaces.WebAssembly.IModule moduleObject, string sectionName);
-
-    /// <summary>
-    /// [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/Module/exports_static)
-    /// </summary>
-    global::Blazor.DOM.Namespaces.WebAssembly.IModuleExportDescriptor[] Exports(global::Blazor.DOM.Namespaces.WebAssembly.IModule moduleObject);
-
-    /// <summary>
-    /// [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/Module/imports_static)
-    /// </summary>
-    global::Blazor.DOM.Namespaces.WebAssembly.IModuleImportDescriptor[] Imports(global::Blazor.DOM.Namespaces.WebAssembly.IModule moduleObject);
 }
