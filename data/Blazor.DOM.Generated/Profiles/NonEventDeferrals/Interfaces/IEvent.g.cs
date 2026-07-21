@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event)
 /// </summary>
-public partial interface IEvent
+public partial interface IEvent : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`bubbles`** read-only property of the Event interface indicates whether the event bubbles up through the DOM tree or not.

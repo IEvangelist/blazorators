@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IAnimatable
+public partial interface IAnimatable : global::Microsoft.JSInterop.IDomProxy
 {
 }

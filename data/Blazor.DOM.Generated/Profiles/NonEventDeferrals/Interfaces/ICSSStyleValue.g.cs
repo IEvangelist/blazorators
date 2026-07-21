@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleValue)
 /// </summary>
-public partial interface ICSSStyleValue
+public partial interface ICSSStyleValue : global::Microsoft.JSInterop.IDomProxy
 {
     string ToString();
 }

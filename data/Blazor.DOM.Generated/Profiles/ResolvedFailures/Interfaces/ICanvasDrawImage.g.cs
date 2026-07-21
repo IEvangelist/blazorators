@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasDrawImage
+public partial interface ICanvasDrawImage : global::Microsoft.JSInterop.IDomProxy
 {
 }

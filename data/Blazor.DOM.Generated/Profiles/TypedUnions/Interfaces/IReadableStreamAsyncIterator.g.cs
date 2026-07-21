@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IReadableStreamAsyncIterator<T> : global::Microsoft.JSInterop.IBrowserAsyncIterator<T, global::Microsoft.JSInterop.BrowserUndefined, object>
+public partial interface IReadableStreamAsyncIterator<T> : global::Microsoft.JSInterop.IBrowserAsyncIterator<T, global::Microsoft.JSInterop.BrowserUndefined, object>, global::Microsoft.JSInterop.IDomProxy
 {
     [global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.AsyncIterator)]
 IReadableStreamAsyncIterator<T> SymbolAsyncIterator();

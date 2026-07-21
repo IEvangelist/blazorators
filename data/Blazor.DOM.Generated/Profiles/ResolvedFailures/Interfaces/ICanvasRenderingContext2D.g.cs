@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D)
 /// </summary>
-public partial interface ICanvasRenderingContext2D : ICanvasCompositing, ICanvasDrawImage, ICanvasDrawPath, ICanvasFillStrokeStyles, ICanvasFilters, ICanvasImageData, ICanvasImageSmoothing, ICanvasPath, ICanvasPathDrawingStyles, ICanvasRect, ICanvasSettings, ICanvasShadowStyles, ICanvasState, ICanvasText, ICanvasTextDrawingStyles, ICanvasTransform, ICanvasUserInterface
+public partial interface ICanvasRenderingContext2D : ICanvasCompositing, ICanvasDrawImage, ICanvasDrawPath, ICanvasFillStrokeStyles, ICanvasFilters, ICanvasImageData, ICanvasImageSmoothing, ICanvasPath, ICanvasPathDrawingStyles, ICanvasRect, ICanvasSettings, ICanvasShadowStyles, ICanvasState, ICanvasText, ICanvasTextDrawingStyles, ICanvasTransform, ICanvasUserInterface, global::Microsoft.JSInterop.IDomProxy
 {
 }

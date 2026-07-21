@@ -769,7 +769,7 @@ public sealed class HardeningRegressionTests
     }
 
     [Fact]
-    public void InterfaceEmitter_EventSubscriptionOverload_Deferred()
+    public void InterfaceEmitter_EventSubscriptionSuffixWithoutMap_FailsClosed()
     {
         // addEventListener with K extends keyof SomeEventMap → event-subscription deferral
         var resolver = EmptyResolver();
@@ -793,15 +793,11 @@ public sealed class HardeningRegressionTests
             MakeInterfaceDecl("ITestTarget", [genericMethod])
         ]);
 
-        // Must succeed (deferred) and emit DEFERRED comment with event-subscription phase
-        var result = emitter.Emit(symbol);
-        Assert.Contains("DEFERRED", result.Source);
-        Assert.Contains("addEventListener", result.Source);
-        Assert.Contains("event-subscription", result.Source);
-        // Member outcome must be Deferred
-        var deferredMember = result.MemberOutcomes.SingleOrDefault(m =>
-            m.Status == MemberOutcomeStatus.Deferred);
-        Assert.NotNull(deferredMember);
+        var exception = Assert.Throws<InterfaceEmitException>(() =>
+            emitter.Emit(symbol));
+        Assert.Contains(
+            "does not resolve to an EventMap symbol",
+            exception.Message);
     }
 
     [Fact]
@@ -837,7 +833,7 @@ public sealed class HardeningRegressionTests
     // ── Finding 3: Member-level accounting ────────────────────────────────────
 
     [Fact]
-    public void InterfaceEmitter_EventDeferredMember_ReturnsProjectedWithDeferredMembersOutcome()
+    public void InterfaceEmitter_UnresolvedEventMapCannotCreateHiddenDeferral()
     {
         // A symbol with event-subscription deferred members must produce
         // ProjectedWithDeferredMembers outcome, not unqualified Projected.
@@ -857,18 +853,11 @@ public sealed class HardeningRegressionTests
             new LocationModel("test", new(0,0,0), new(0,0,0)));
 
         var symbol = MakeSymbol("IFoo", "interface", [MakeInterfaceDecl("IFoo", [eventMethod])]);
-        var result = emitter.Emit(symbol);
-
-        Assert.Single(result.MemberOutcomes);
-        Assert.Equal(MemberOutcomeStatus.Deferred, result.MemberOutcomes[0].Status);
-        Assert.Equal("event-subscription", result.MemberOutcomes[0].Phase);
-
-        // AccountingLedger must record as ProjectedWithDeferredMembers
-        var ledger = new AccountingLedger();
-        ledger.RecordProjected(symbol, "IFoo.g.cs", result.MemberOutcomes);
-
-        var entry = ledger.Entries.Single();
-        Assert.Equal(AccountingOutcome.ProjectedWithDeferredMembers, entry.Outcome);
+        var exception = Assert.Throws<InterfaceEmitException>(() =>
+            emitter.Emit(symbol));
+        Assert.Contains(
+            "does not resolve to an EventMap symbol",
+            exception.Message);
     }
 
     [Fact]

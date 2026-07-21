@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IHTMLOrSVGElement
+public partial interface IHTMLOrSVGElement : global::Microsoft.JSInterop.IDomProxy
 {
 }

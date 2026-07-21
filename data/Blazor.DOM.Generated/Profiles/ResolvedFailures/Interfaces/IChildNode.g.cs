@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IChildNode : INode
+public partial interface IChildNode : INode, global::Microsoft.JSInterop.IDomProxy
 {
 }

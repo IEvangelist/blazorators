@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IFontFaceSource
+public partial interface IFontFaceSource : global::Microsoft.JSInterop.IDomProxy
 {
 }

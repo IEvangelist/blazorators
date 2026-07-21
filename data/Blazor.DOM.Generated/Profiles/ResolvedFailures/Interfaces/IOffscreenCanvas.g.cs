@@ -13,7 +13,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas)
 /// </summary>
 // Transferable (supports postMessage transfer).
-public partial interface IOffscreenCanvas : IEventTarget
+public partial interface IOffscreenCanvas : IEventTarget, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`OffscreenCanvas.getContext()`** method returns a drawing context for an offscreen canvas, or `null` if the context identifier is not supported, or the offscreen canvas has already been set to a different context mode.

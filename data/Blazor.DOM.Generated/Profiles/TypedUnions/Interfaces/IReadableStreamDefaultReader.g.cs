@@ -13,7 +13,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader)
 /// </summary>
 // TypeScript generic default: R = object.
-public partial interface IReadableStreamDefaultReader<R> : IReadableStreamGenericReader
+public partial interface IReadableStreamDefaultReader<R> : IReadableStreamGenericReader, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`read()`** method of the ReadableStreamDefaultReader interface returns a Promise providing access to the next chunk in the stream's internal queue.

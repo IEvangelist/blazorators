@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM.Namespaces.WebAssembly;
 
-public partial interface ILinkError : global::Blazor.DOM.StandardTypes.ITypeScriptError
+public partial interface ILinkError : global::Blazor.DOM.StandardTypes.ITypeScriptError, global::Microsoft.JSInterop.IDomProxy
 {
 }

@@ -13,7 +13,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter)
 /// </summary>
 // TypeScript generic default: W = object.
-public partial interface IWritableStreamDefaultWriter<W>
+public partial interface IWritableStreamDefaultWriter<W> : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`closed`** read-only property of the the stream errors or the writer's lock is released.

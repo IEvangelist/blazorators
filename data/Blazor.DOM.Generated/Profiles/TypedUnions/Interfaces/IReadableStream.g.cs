@@ -14,7 +14,7 @@ namespace Blazor.DOM;
 /// </summary>
 // Transferable (supports postMessage transfer).
 // TypeScript generic default: R = object.
-public partial interface IReadableStream<R>
+public partial interface IReadableStream<R> : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`locked`** read-only property of the ReadableStream interface returns whether or not the readable stream is locked to a reader.

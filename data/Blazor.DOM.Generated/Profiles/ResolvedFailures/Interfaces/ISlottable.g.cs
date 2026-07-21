@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ISlottable
+public partial interface ISlottable : global::Microsoft.JSInterop.IDomProxy
 {
 }

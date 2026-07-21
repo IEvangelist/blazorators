@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IElementCSSInlineStyle
+public partial interface IElementCSSInlineStyle : global::Microsoft.JSInterop.IDomProxy
 {
 }

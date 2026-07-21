@@ -13,7 +13,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController)
 /// </summary>
 // TypeScript generic default: O = object.
-public partial interface ITransformStreamDefaultController<O>
+public partial interface ITransformStreamDefaultController<O> : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`desiredSize`** read-only property of the TransformStreamDefaultController interface returns the desired size to fill the queue of the associated ReadableStream.

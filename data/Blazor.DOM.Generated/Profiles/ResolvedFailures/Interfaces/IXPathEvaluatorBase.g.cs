@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IXPathEvaluatorBase
+public partial interface IXPathEvaluatorBase : global::Microsoft.JSInterop.IDomProxy
 {
 }

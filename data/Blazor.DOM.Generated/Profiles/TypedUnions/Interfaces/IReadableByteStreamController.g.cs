@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController)
 /// </summary>
-public partial interface IReadableByteStreamController
+public partial interface IReadableByteStreamController : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`byobRequest`** read-only property of the ReadableByteStreamController interface returns the current BYOB request, or `null` if there are no pending requests.

@@ -12,7 +12,8 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal)
 /// </summary>
-public partial interface IAbortSignal : IEventTarget
+[global::Microsoft.JSInterop.DomEventTarget("AbortSignal", "AbortSignalEventMap")]
+public partial interface IAbortSignal : IEventTarget, global::Microsoft.JSInterop.IDomEventTargetProxy
 {
     /// <summary>
 /// The **`aborted`** read-only property returns a value that indicates whether the asynchronous operations the signal is communicating with are aborted (`true`) or not (`false`).
@@ -44,15 +45,11 @@ object Reason { get; }
 /// </summary>
 void ThrowIfAborted();
 
-    // DEFERRED (event-subscription): addEventListener<K> — deferred to typed event subscription phase.
-
     void AddEventListener(string type, EventListenerOrEventListenerObject listener);
 
     void AddEventListener(string type, EventListenerOrEventListenerObject listener, bool capture);
 
     void AddEventListener(string type, EventListenerOrEventListenerObject listener, AddEventListenerOptions? options);
-
-    // DEFERRED (event-subscription): removeEventListener<K> — deferred to typed event subscription phase.
 
     void RemoveEventListener(string type, EventListenerOrEventListenerObject listener);
 

@@ -14,7 +14,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager)
 /// </summary>
 // Requires secure context (HTTPS).
-public partial interface ILockManager
+public partial interface ILockManager : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`query()`** method of the LockManager interface returns a Promise that resolves with an object containing information about held and pending locks.

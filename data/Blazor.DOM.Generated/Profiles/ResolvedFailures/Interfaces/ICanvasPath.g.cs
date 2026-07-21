@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasPath
+public partial interface ICanvasPath : global::Microsoft.JSInterop.IDomProxy
 {
 }

@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy)
 /// </summary>
-public partial interface IByteLengthQueuingStrategy : IQueuingStrategyContract<byte[]>
+public partial interface IByteLengthQueuingStrategy : IQueuingStrategyContract<byte[]>, global::Microsoft.JSInterop.IDomProxy
 {
 }

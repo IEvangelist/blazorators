@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers)
 /// </summary>
-public partial interface IHeaders
+public partial interface IHeaders : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`append()`** method of the Headers interface appends a new value onto an existing header inside a `Headers` object, or adds the header if it does not already exist.

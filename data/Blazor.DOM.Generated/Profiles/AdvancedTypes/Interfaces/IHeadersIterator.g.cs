@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IHeadersIterator<T> : global::Microsoft.JSInterop.IBrowserIterator<T, global::Microsoft.JSInterop.BrowserUndefined, object>
+public partial interface IHeadersIterator<T> : global::Microsoft.JSInterop.IBrowserIterator<T, global::Microsoft.JSInterop.BrowserUndefined, object>, global::Microsoft.JSInterop.IDomProxy
 {
     [global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.Iterator)]
 IHeadersIterator<T> SymbolIterator();

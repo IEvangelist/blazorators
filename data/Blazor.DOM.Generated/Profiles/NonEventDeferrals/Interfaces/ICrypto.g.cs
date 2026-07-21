@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto)
 /// </summary>
-public partial interface ICrypto
+public partial interface ICrypto : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`Crypto.subtle`** read-only property returns a cryptographic operations.

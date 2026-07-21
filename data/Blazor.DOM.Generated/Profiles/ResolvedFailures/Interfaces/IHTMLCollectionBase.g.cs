@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCollection)
 /// </summary>
-public partial interface IHTMLCollectionBase
+public partial interface IHTMLCollectionBase : global::Microsoft.JSInterop.IDomProxy
 {
 }

@@ -338,15 +338,15 @@ public sealed class TypeResolverTests
         Assert.DoesNotContain("object", ex.Message.Replace("TypeProjection", ""));
     }
 
-    // ── EventHandler deferred ──────────────────────────────────────────────────
+    // ── Unresolved EventHandler ────────────────────────────────────────────────
 
     [Fact]
-    public void Project_EventHandler_ThrowsDeferredProjectionException()
+    public void Project_UnresolvedEventHandler_FailsClosed()
     {
         var resolver = EmptyResolver();
         var node = new ReferenceTypeNode("EventHandler", null, []);
         var ex = Assert.Throws<TypeProjectionException>(() => resolver.Project(node, "test"));
-        Assert.Contains("deferred", ex.Message.ToLowerInvariant());
+        Assert.Contains("unresolved type reference", ex.Message.ToLowerInvariant());
     }
 
     // ── Array types ────────────────────────────────────────────────────────────

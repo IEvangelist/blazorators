@@ -14,7 +14,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey)
 /// </summary>
 // Requires secure context (HTTPS).
-public partial interface ICryptoKey
+public partial interface ICryptoKey : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The read-only **`algorithm`** property of the CryptoKey interface returns an object describing the algorithm for which this key can be used, and any associated extra parameters.

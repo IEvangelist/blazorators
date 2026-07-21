@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageBitmapRenderingContext)
 /// </summary>
-public partial interface IImageBitmapRenderingContext
+public partial interface IImageBitmapRenderingContext : global::Microsoft.JSInterop.IDomProxy
 {
 }

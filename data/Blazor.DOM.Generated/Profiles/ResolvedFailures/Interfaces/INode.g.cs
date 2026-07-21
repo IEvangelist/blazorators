@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node)
 /// </summary>
-public partial interface INode : IEventTarget
+public partial interface INode : IEventTarget, global::Microsoft.JSInterop.IDomProxy
 {
 }
