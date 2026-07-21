@@ -13,6 +13,7 @@ namespace Microsoft.JSInterop;
 public sealed class DomProxyFactory(IDomRuntime runtime) : IDomProxyFactory
 {
     private readonly ConcurrentDictionary<Type, Func<IJSObjectReference, IDomProxy>> _registry = new();
+    private readonly ConcurrentDictionary<Type, Type> _openGenericRegistry = new();
 
     /// <inheritdoc />
     public void Register<TProxy>(
@@ -45,6 +46,33 @@ public sealed class DomProxyFactory(IDomRuntime runtime) : IDomProxyFactory
     }
 
     /// <inheritdoc />
+    public void RegisterOpenGeneric(Type contractType, Type proxyType)
+    {
+        ArgumentNullException.ThrowIfNull(contractType);
+        ArgumentNullException.ThrowIfNull(proxyType);
+        if (!contractType.IsGenericTypeDefinition)
+        {
+            throw new ArgumentException(
+                $"Contract '{contractType}' must be an open generic type.",
+                nameof(contractType));
+        }
+        if (!proxyType.IsGenericTypeDefinition)
+        {
+            throw new ArgumentException(
+                $"Proxy '{proxyType}' must be an open generic type.",
+                nameof(proxyType));
+        }
+        if (contractType.GetGenericArguments().Length
+            != proxyType.GetGenericArguments().Length)
+        {
+            throw new ArgumentException(
+                "Open generic contract and proxy arity must match.",
+                nameof(proxyType));
+        }
+        _openGenericRegistry[contractType] = proxyType;
+    }
+
+    /// <inheritdoc />
     public TProxy Create<TProxy>(IJSObjectReference reference) where TProxy : class, IDomProxy
         => (TProxy)Create(typeof(TProxy), reference);
 
@@ -56,6 +84,21 @@ public sealed class DomProxyFactory(IDomRuntime runtime) : IDomProxyFactory
         if (_registry.TryGetValue(contractType, out var factory))
         {
             return factory(reference);
+        }
+        if (contractType.IsConstructedGenericType
+            && _openGenericRegistry.TryGetValue(
+                contractType.GetGenericTypeDefinition(),
+                out var proxyDefinition))
+        {
+            var proxyType = proxyDefinition.MakeGenericType(
+                contractType.GetGenericArguments());
+            return (IDomProxy)(Activator.CreateInstance(
+                proxyType,
+                reference,
+                runtime,
+                this)
+                ?? throw new InvalidOperationException(
+                    $"Generated proxy '{proxyType}' could not be constructed."));
         }
 
         throw new InvalidOperationException(

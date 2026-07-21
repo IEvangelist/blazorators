@@ -28,6 +28,9 @@ public interface IDomProxyFactory
         Type contractType,
         Func<IJSObjectReference, IDomRuntime, IDomProxyFactory, IDomProxy> factory);
 
+    /// <summary>Registers a generated open generic contract and proxy pair.</summary>
+    void RegisterOpenGeneric(Type contractType, Type proxyType);
+
     /// <summary>
     /// Creates a <typeparamref name="TProxy"/> wrapping <paramref name="reference"/>.
     /// </summary>

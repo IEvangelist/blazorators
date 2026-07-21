@@ -27,4 +27,10 @@ public interface IBrowser : IAsyncDisposable
     /// <param name="cancellationToken">Optional cancellation token.</param>
     ValueTask<IJSObjectReference> GetGlobalAsync(
         string path, CancellationToken cancellationToken = default);
+
+    /// <summary>Resolves an authoritative global path as an owned typed proxy.</summary>
+    ValueTask<TProxy> GetGlobalAsync<TProxy>(
+        string path,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
 }
