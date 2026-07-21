@@ -11,6 +11,4 @@ namespace Blazor.DOM;
 
 public record PermissionDescriptor
 {
-    [JsonPropertyName("name")]
-    public required PermissionName Name { get; init; }
 }

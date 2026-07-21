@@ -24,6 +24,22 @@ public sealed class FocusedPackageGenerationTests
                 ["screen-wake-lock"],
                 "Blazor.DOM",
                 "Profiles/WakeLock",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["WakeLock"] = ["request"],
+                    ["WakeLockSentinel"] =
+                    [
+                        "released",
+                        "type",
+                        "release",
+                        "addEventListener",
+                        "removeEventListener",
+                    ],
+                    ["EventListener"] = ["*"],
+                    ["EventListenerObject"] = ["*"],
+                    ["WakeLockSentinelEventMap"] = ["*"],
+                },
+                true,
                 EntryPoints:
                 [
                     new HostEntryPoint(
@@ -124,6 +140,48 @@ public sealed class FocusedPackageGenerationTests
                 output,
                 "Profiles",
                 "Missing")));
+        }
+
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
+    public void PackageProfile_UnsupportedTransportFailsWithoutCanonicalOutput()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "Unsupported",
+                "Unfiltered wake lock.",
+                ["WakeLock", "WakeLockSentinel"],
+                true,
+                false,
+                ["screen-wake-lock"],
+                "Blazor.DOM",
+                "Profiles/Unsupported",
+                EntryPoints:
+                [
+                    new HostEntryPoint(
+                        "WakeLock",
+                        "WakeLock",
+                        "navigator.wakeLock"),
+                ]);
+
+            Assert.Throws<InvalidDataException>(() => ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data)));
+            Assert.False(Directory.Exists(Path.Combine(
+                output,
+                "Profiles",
+                "Unsupported")));
         }
         finally
         {

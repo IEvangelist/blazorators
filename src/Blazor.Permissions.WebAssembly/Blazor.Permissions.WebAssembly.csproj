@@ -45,6 +45,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsPackable>true</IsPackable>
     <PackageIcon>logo.png</PackageIcon>
+    <DomProfileName>Permissions</DomProfileName>
+    <DomProfileHost>WebAssembly</DomProfileHost>
   </PropertyGroup>
 
   <ItemGroup>
@@ -72,5 +74,7 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <Import Project="..\Blazor.DOM.FocusedPackage.props" />
 
 </Project>

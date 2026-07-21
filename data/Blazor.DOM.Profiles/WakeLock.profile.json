@@ -8,6 +8,20 @@
   "features": ["screen-wake-lock"],
   "outputNamespace": "Blazor.DOM",
   "outputSubdirectory": "Profiles/WakeLock",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "WakeLock": ["request"],
+    "WakeLockSentinel": [
+      "released",
+      "type",
+      "release",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"],
+    "WakeLockSentinelEventMap": ["*"]
+  },
   "entryPoints": [
     {
       "name": "WakeLock",

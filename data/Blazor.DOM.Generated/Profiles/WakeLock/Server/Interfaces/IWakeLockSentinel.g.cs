@@ -18,15 +18,6 @@ namespace Blazor.DOM;
 public partial interface IWakeLockSentinel : IEventTarget, global::Microsoft.JSInterop.IDomDispatchProxy
 {
     /// <summary>
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/release_event)
-/// </summary>
-    [global::Microsoft.JSInterop.DomAccessor("onrelease", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: WakeLockSentinel, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.")]
-    global::System.Threading.Tasks.ValueTask<Func<IEvent, object>?> GetOnreleaseAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<Func<IEvent, object>?>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "onrelease", global::Microsoft.JSInterop.DomTransportDescriptor.Unsupported("((this: WakeLockSentinel, ev: Event) => any) | null", "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.", nullable: true), cancellationToken);
-
-    [global::Microsoft.JSInterop.DomAccessor("onrelease", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: WakeLockSentinel, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.")]
-    global::System.Threading.Tasks.ValueTask SetOnreleaseAsync(Func<IEvent, object>? value, global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.SetPropertyAsync((global::Microsoft.JSInterop.IDomDispatchProxy)this, "onrelease", value, cancellationToken);
-
-    /// <summary>
 /// The **`released`** read-only property of the WakeLockSentinel interface returns a boolean that indicates whether a WakeLockSentinel has been released.
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/released)

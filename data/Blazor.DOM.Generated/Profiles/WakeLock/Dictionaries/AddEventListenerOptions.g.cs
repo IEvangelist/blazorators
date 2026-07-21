@@ -11,12 +11,4 @@ namespace Blazor.DOM;
 
 public record AddEventListenerOptions : EventListenerOptions
 {
-    [JsonPropertyName("once")]
-    public bool? Once { get; init; }
-
-    [JsonPropertyName("passive")]
-    public bool? Passive { get; init; }
-
-    [JsonPropertyName("signal")]
-    public IAbortSignal? Signal { get; init; }
 }
