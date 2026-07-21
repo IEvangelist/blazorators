@@ -252,6 +252,25 @@ public sealed record TupleTypeNode(IReadOnlyList<TypeNode> Elements) : TypeNode
     public override string Kind => "tuple";
 }
 
+public sealed record NamedTupleMemberTypeNode(
+    string Name,
+    bool Optional,
+    bool Rest,
+    TypeNode ElementType) : TypeNode
+{
+    public override string Kind => "namedTupleMember";
+}
+
+public sealed record OptionalTypeNode(TypeNode InnerType) : TypeNode
+{
+    public override string Kind => "optional";
+}
+
+public sealed record RestTypeNode(TypeNode InnerType) : TypeNode
+{
+    public override string Kind => "rest";
+}
+
 public sealed record FunctionTypeNode(
     IReadOnlyList<TypeParameterModel> TypeParameters,
     IReadOnlyList<ParameterModel> Parameters,
@@ -353,6 +372,28 @@ public sealed class TypeNodeConverter : JsonConverter<TypeNode>
                 root.TryGetProperty("elements", out var tte)
                     ? tte.Deserialize<IReadOnlyList<TypeNode>>(options) ?? []
                     : []),
+            "namedTupleMember" => new NamedTupleMemberTypeNode(
+                root.TryGetProperty("name", out var ntmn)
+                    ? ntmn.GetString() ?? ""
+                    : "",
+                root.TryGetProperty("optional", out var ntmo)
+                    && ntmo.GetBoolean(),
+                root.TryGetProperty("rest", out var ntmr)
+                    && ntmr.GetBoolean(),
+                root.TryGetProperty("type", out var ntmt)
+                    ? ntmt.Deserialize<TypeNode>(options)
+                        ?? new UnknownTypeNode("namedTupleMember/unknown")
+                    : new UnknownTypeNode("namedTupleMember/missing")),
+            "optional" => new OptionalTypeNode(
+                root.TryGetProperty("type", out var opt)
+                    ? opt.Deserialize<TypeNode>(options)
+                        ?? new UnknownTypeNode("optional/unknown")
+                    : new UnknownTypeNode("optional/missing")),
+            "rest" => new RestTypeNode(
+                root.TryGetProperty("type", out var rest)
+                    ? rest.Deserialize<TypeNode>(options)
+                        ?? new UnknownTypeNode("rest/unknown")
+                    : new UnknownTypeNode("rest/missing")),
             "function" => new FunctionTypeNode(
                 root.TryGetProperty("typeParameters", out var ftp)
                     ? ftp.Deserialize<IReadOnlyList<TypeParameterModel>>(options) ?? []

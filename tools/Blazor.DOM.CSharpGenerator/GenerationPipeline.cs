@@ -80,6 +80,14 @@ public sealed class GenerationPipeline
             routingPlan,
             primaryEmissions).Emit(writer);
 
+        foreach (var synthesized in resolver.SynthesizedTypes)
+        {
+            writer.Write(
+                synthesized.Name,
+                synthesized.Source,
+                "AdvancedTypes");
+        }
+
         var errors = new List<GenerationError>();
         foreach (var symbol in ir.TypescriptSymbols.OrderBy(symbol => symbol.Ordinal))
         {
@@ -95,7 +103,17 @@ public sealed class GenerationPipeline
         }
 
         var validation = ledger.Validate(ir.TypescriptSymbols.Count);
-        var manifest = ledger.BuildManifest(GeneratorVersion, ir.Manifest);
+        var manifest = ledger.BuildManifest(GeneratorVersion, ir.Manifest) with
+        {
+            SynthesizedTypes = resolver.SynthesizedTypes
+                .Select(type => new SynthesizedTypeManifestEntry(
+                    type.Name,
+                    type.Kind,
+                    type.Provenance,
+                    type.Fingerprint,
+                    type.RelativePath))
+                .ToList(),
+        };
         writer.WriteManifest(manifest);
 
         return new GenerationResult(

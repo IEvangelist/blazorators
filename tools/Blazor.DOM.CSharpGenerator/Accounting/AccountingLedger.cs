@@ -934,7 +934,15 @@ public sealed record EmitterManifest(
     string GeneratorVersion,
     ManifestReference SourceManifest,
     AccountingSummary Accounting,
-    IReadOnlyList<ManifestDiagnostic> Diagnostics);
+    IReadOnlyList<ManifestDiagnostic> Diagnostics,
+    IReadOnlyList<SynthesizedTypeManifestEntry>? SynthesizedTypes = null);
+
+public sealed record SynthesizedTypeManifestEntry(
+    string Name,
+    string Kind,
+    string Provenance,
+    string Fingerprint,
+    string RelativePath);
 
 public sealed record ManifestDiagnostic(
     string Code,

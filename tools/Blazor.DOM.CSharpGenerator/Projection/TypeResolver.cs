@@ -115,6 +115,10 @@ public sealed class TypeResolver
     private readonly IReadOnlyDictionary<string, SymbolModel> _symbolIndex;
     private readonly IReadOnlyDictionary<string, EmitterOverrideEntry> _overrides;
     private readonly string _generatedNamespace;
+    private readonly SynthesizedTypeRegistry _synthesizedTypes;
+
+    public IReadOnlyList<SynthesizedTypeDefinition> SynthesizedTypes
+        => _synthesizedTypes.Definitions;
 
     public TypeResolver(
         IReadOnlyList<SymbolModel> symbols,
@@ -125,6 +129,7 @@ public sealed class TypeResolver
         _overrides = overrides
             ?? new Dictionary<string, EmitterOverrideEntry>(StringComparer.Ordinal);
         _generatedNamespace = generatedNamespace;
+        _synthesizedTypes = new SynthesizedTypeRegistry(generatedNamespace);
     }
 
     /// <summary>Returns true if the named symbol is in the TypeScript IR symbol index.</summary>
@@ -372,8 +377,11 @@ public sealed class TypeResolver
                 provenance,
                 scope,
                 depth),
-            TypeLiteralTypeNode => Fail(typeNode, provenance,
-                "type literal (anonymous object type) is not supported for C# projection"),
+            TypeLiteralTypeNode literal => ProjectTypeLiteral(
+                literal,
+                provenance,
+                scope,
+                depth),
             TemplateLiteralTypeNode => Fail(typeNode, provenance,
                 "template literal types are not supported for C# projection"),
             QueryTypeNode => Fail(typeNode, provenance,
@@ -388,8 +396,26 @@ public sealed class TypeResolver
                 provenance,
                 scope,
                 depth),
-            TupleTypeNode => Fail(typeNode, provenance,
-                "tuple types are not supported for C# projection"),
+            TupleTypeNode tuple => ProjectTuple(
+                tuple,
+                provenance,
+                scope,
+                depth),
+            NamedTupleMemberTypeNode named => Project(
+                named.ElementType,
+                $"{provenance}/namedTupleMember",
+                scope,
+                depth + 1),
+            OptionalTypeNode optional => Project(
+                optional.InnerType,
+                $"{provenance}/optional",
+                scope,
+                depth + 1) with { IsNullable = true },
+            RestTypeNode rest => Project(
+                rest.InnerType,
+                $"{provenance}/rest",
+                scope,
+                depth + 1),
             UnknownTypeNode u => Fail(typeNode, provenance,
                 $"unknown type node kind '{u.RawKind}' cannot be projected"),
             _ => Fail(typeNode, provenance,
@@ -1048,11 +1074,359 @@ public sealed class TypeResolver
             }
         }
 
-        return Fail(
-            intersection,
+        if (intersection.Types.Any(ContainsUnion))
+        {
+            throw new GenericDeferralException(
+                $"Intersection at '{provenance}' contains a union arm and cannot be " +
+                "composed without the dedicated typed-union phase.",
+                provenance,
+                "intersection-union-arms");
+        }
+
+        if (intersection.Types.All(type => type is TypeLiteralTypeNode)
+            && intersection.Transport?.Kind is null or "json-value")
+        {
+            var merged = new List<MemberModel>();
+            foreach (var member in intersection.Types
+                .Cast<TypeLiteralTypeNode>()
+                .SelectMany(type => type.Members))
+            {
+                var sourceName = member.Name?.Text;
+                var existing = merged.FirstOrDefault(candidate =>
+                    string.Equals(
+                        candidate.Name?.Text,
+                        sourceName,
+                        StringComparison.Ordinal));
+                if (existing is null)
+                {
+                    merged.Add(member);
+                    continue;
+                }
+                if (existing.Type is null
+                    || member.Type is null
+                    || TypeFingerprint(existing.Type) != TypeFingerprint(member.Type))
+                {
+                    throw new GenericDeferralException(
+                        $"Intersection at '{provenance}' has incompatible duplicate " +
+                        $"member '{sourceName ?? "(computed)"}'.",
+                        provenance,
+                        "intersection-member-collision");
+                }
+                var index = merged.IndexOf(existing);
+                merged[index] = existing with
+                {
+                    Optional = existing.Optional && member.Optional,
+                    Readonly = existing.Readonly || member.Readonly,
+                };
+            }
+            return ProjectTypeLiteral(
+                new TypeLiteralTypeNode(merged)
+                {
+                    CheckerType = intersection.CheckerType,
+                    Transport = intersection.Transport,
+                },
+                $"{provenance}/intersection",
+                scope,
+                depth + 1);
+        }
+
+        if (intersection.Types.Any(type => type is KeywordTypeNode or LiteralTypeNode)
+            && intersection.Types.Any(type =>
+                type is TypeLiteralTypeNode or ReferenceTypeNode))
+        {
+            throw new GenericDeferralException(
+                $"Intersection at '{provenance}' is a branded primitive and cannot be " +
+                "represented as its underlying CLR primitive without losing the brand.",
+                provenance,
+                "branded-intersection");
+        }
+
+        var transports = intersection.Types
+            .Select(type => type.Transport?.Kind)
+            .Where(kind => kind is not null)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        if (transports.Count > 1
+            || transports.Contains("unsupported", StringComparer.Ordinal))
+        {
+            throw new GenericDeferralException(
+                $"Intersection at '{provenance}' has incompatible or unsupported arm " +
+                $"transports [{string.Join(", ", transports)}].",
+                provenance,
+                "intersection-transport");
+        }
+
+        throw new GenericDeferralException(
+            $"Intersection at '{provenance}' requires a named collision-free CLR " +
+            "composition that has not been proven.",
             provenance,
-            "intersection types are not supported for C# projection");
+            "intersection-composition");
     }
+
+    private TypeProjection ProjectTuple(
+        TupleTypeNode tuple,
+        string provenance,
+        GenericScope? scope,
+        int depth)
+    {
+        if (tuple.Transport?.Kind is not (null or "json-value"))
+        {
+            throw new GenericDeferralException(
+                $"Tuple at '{provenance}' has authoritative transport " +
+                $"'{tuple.Transport.Kind}': " +
+                $"{tuple.Transport.Reason ?? "no faithful JSON array transport"}",
+                $"{provenance}/transport",
+                "tuple-transport");
+        }
+        if (tuple.Elements.Count == 0)
+        {
+            throw new GenericDeferralException(
+                $"Empty tuple at '{provenance}' requires an explicit unit-array contract.",
+                provenance,
+                "tuple-json-contract");
+        }
+
+        var elements = new List<SynthesizedTupleElement>();
+        var seenNames = new HashSet<string>(StringComparer.Ordinal);
+        var optionalSeen = false;
+        for (var index = 0; index < tuple.Elements.Count; index++)
+        {
+            var source = tuple.Elements[index];
+            var sourceName = $"item{index + 1}";
+            var optional = false;
+            var rest = false;
+            TypeNode elementType;
+            switch (source)
+            {
+                case NamedTupleMemberTypeNode named:
+                    sourceName = named.Name;
+                    optional = named.Optional;
+                    rest = named.Rest;
+                    elementType = named.ElementType;
+                    break;
+                case OptionalTypeNode optionalType:
+                    optional = true;
+                    elementType = optionalType.InnerType;
+                    break;
+                case RestTypeNode restType:
+                    rest = true;
+                    elementType = restType.InnerType;
+                    break;
+                default:
+                    elementType = source;
+                    break;
+            }
+
+            if (rest && index != tuple.Elements.Count - 1)
+                throw TupleShapeDeferral(
+                    provenance,
+                    "a rest element is not last");
+            if (rest)
+            {
+                elementType = elementType switch
+                {
+                    ArrayTypeNode array => array.ElementType,
+                    ReferenceTypeNode
+                    {
+                        Name: "Array" or "ReadonlyArray",
+                        TypeArguments.Count: 1,
+                    } reference => reference.TypeArguments[0],
+                    _ => throw TupleShapeDeferral(
+                        provenance,
+                        "the rest element is not a homogeneous array type"),
+                };
+            }
+            if (!optional && !rest && optionalSeen)
+                throw TupleShapeDeferral(
+                    provenance,
+                    "a required element follows an optional element");
+            optionalSeen |= optional;
+            EnsureRecursiveJsonTransport(
+                elementType,
+                $"{provenance}/element[{index}]",
+                "tuple-transport");
+            var projection = Project(
+                elementType,
+                $"{provenance}/element[{index}]",
+                scope,
+                depth + 1);
+            ValidateGenericArgument("tuple", projection, provenance, index);
+            var csharpName = Naming.ToCSharpMemberName(sourceName);
+            if (!seenNames.Add(csharpName))
+            {
+                throw new GenericDeferralException(
+                    $"Tuple labels at '{provenance}' collide on CLR member " +
+                    $"'{csharpName}'.",
+                    $"{provenance}/element[{index}]",
+                    "synthesized-identity-collision");
+            }
+            elements.Add(new SynthesizedTupleElement(
+                sourceName,
+                csharpName,
+                projection,
+                optional,
+                rest));
+        }
+
+        var typeName = _synthesizedTypes.RegisterTuple(provenance, elements);
+        return ReferenceType(
+            typeName,
+            isCollection: true,
+            providerNote: "json-array-tuple",
+            canonicalType: typeName,
+            typeArguments: elements
+                .Select(element => element.Projection.Identity)
+                .ToList());
+    }
+
+    private TypeProjection ProjectTypeLiteral(
+        TypeLiteralTypeNode literal,
+        string provenance,
+        GenericScope? scope,
+        int depth)
+    {
+        if (literal.Transport?.Kind is not (null or "json-value"))
+        {
+            var phase = literal.Members.Any(member =>
+                member.Kind is "callSignature" or "constructSignature" or "indexSignature")
+                ? "anonymous-structural-members"
+                : "anonymous-js-reference";
+            throw new GenericDeferralException(
+                $"Anonymous structural type at '{provenance}' has authoritative " +
+                $"transport '{literal.Transport.Kind}' and cannot be emitted as a JSON record.",
+                $"{provenance}/transport",
+                phase);
+        }
+        if (literal.Members.Any(member => member.Kind != "property"))
+        {
+            var facets = string.Join(
+                ", ",
+                literal.Members
+                    .Where(member => member.Kind != "property")
+                    .Select(member => member.Kind)
+                    .Distinct(StringComparer.Ordinal));
+            throw new GenericDeferralException(
+                $"Anonymous structural type at '{provenance}' contains advanced member " +
+                $"facets [{facets}].",
+                provenance,
+                "anonymous-structural-members");
+        }
+
+        var properties = new List<SynthesizedProperty>();
+        var seenNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var member in literal.Members.OrderBy(member => member.Ordinal))
+        {
+            if (member.Name is null
+                || member.Name.Kind is "computed" or "private"
+                || string.IsNullOrWhiteSpace(member.Name.Text)
+                || member.Type is null)
+            {
+                throw new GenericDeferralException(
+                    $"Anonymous structural member at '{provenance}/member[{member.Ordinal}]' " +
+                    "does not have a stable string property identity and value type.",
+                    $"{provenance}/member[{member.Ordinal}]",
+                    "anonymous-structural-members");
+            }
+            if (ContainsConstrainedLiteral(member.Type))
+            {
+                throw new GenericDeferralException(
+                    $"Anonymous structural member '{member.Name.Text}' at '{provenance}' " +
+                    "contains a constrained literal value that cannot be widened.",
+                    $"{provenance}/member[{member.Ordinal}]",
+                    "literal-value-domain");
+            }
+            EnsureRecursiveJsonTransport(
+                member.Type,
+                $"{provenance}/member[{member.Ordinal}]",
+                "anonymous-json-transport");
+            var projection = Project(
+                member.Type,
+                $"{provenance}/member[{member.Ordinal}]",
+                scope,
+                depth + 1);
+            ValidateGenericArgument(
+                "anonymous JSON record",
+                projection,
+                provenance,
+                member.Ordinal);
+            var csharpName = Naming.ToCSharpMemberName(member.Name.Text);
+            if (!seenNames.Add(csharpName))
+            {
+                throw new GenericDeferralException(
+                    $"Anonymous structural members at '{provenance}' collide on CLR " +
+                    $"property '{csharpName}'.",
+                    $"{provenance}/member[{member.Ordinal}]",
+                    "synthesized-identity-collision");
+            }
+            properties.Add(new SynthesizedProperty(
+                member.Name.Text,
+                csharpName,
+                projection,
+                member.Optional,
+                member.Documentation.Text,
+                member.Documentation.Deprecated));
+        }
+        if (properties.Count == 0)
+        {
+            throw new GenericDeferralException(
+                $"Empty anonymous structural type at '{provenance}' has no deterministic " +
+                "JSON value contract.",
+                provenance,
+                "anonymous-structural-members");
+        }
+
+        var typeName = _synthesizedTypes.RegisterJsonRecord(provenance, properties);
+        return ReferenceType(
+            typeName,
+            providerNote: "anonymous-json-record",
+            canonicalType: typeName,
+            typeArguments: properties
+                .Select(property => property.Projection.Identity)
+                .ToList());
+    }
+
+    private static GenericDeferralException TupleShapeDeferral(
+        string provenance,
+        string reason)
+        => new(
+            $"Tuple at '{provenance}' cannot preserve positional arity because {reason}.",
+            provenance,
+            "tuple-json-contract");
+
+    private static void EnsureRecursiveJsonTransport(
+        TypeNode type,
+        string provenance,
+        string phase)
+    {
+        if (type.Transport?.Kind is null or "json-value")
+            return;
+        throw new GenericDeferralException(
+            $"JSON value at '{provenance}' cannot prove recursive compatibility: " +
+            $"child transport is '{type.Transport.Kind}' " +
+            $"({type.Transport.Reason ?? "no reviewed transport"}).",
+            $"{provenance}/transport",
+            phase);
+    }
+
+    private static bool ContainsUnion(TypeNode type)
+        => type switch
+        {
+            UnionTypeNode => true,
+            ParenthesizedTypeNode parenthesized => ContainsUnion(parenthesized.InnerType),
+            _ => false,
+        };
+
+    private static bool ContainsConstrainedLiteral(TypeNode type)
+        => type switch
+        {
+            LiteralTypeNode literal when literal.LiteralKind is
+                "StringLiteral" or "TrueLiteral" or "FalseLiteral"
+                => true,
+            UnionTypeNode union => union.Types.Any(ContainsConstrainedLiteral),
+            ParenthesizedTypeNode parenthesized
+                => ContainsConstrainedLiteral(parenthesized.InnerType),
+            _ => false,
+        };
 
     public bool TryResolveFiniteStringDomain(
         TypeNode type,
@@ -1871,6 +2245,13 @@ public sealed class TypeResolver
             ArrayTypeNode array => $"array({TypeFingerprint(array.ElementType)})",
             TupleTypeNode tuple =>
                 $"tuple({string.Join(",", tuple.Elements.Select(TypeFingerprint))})",
+            NamedTupleMemberTypeNode named =>
+                $"namedTuple:{named.Name}:{named.Optional}:{named.Rest}:" +
+                TypeFingerprint(named.ElementType),
+            OptionalTypeNode optional =>
+                $"optional({TypeFingerprint(optional.InnerType)})",
+            RestTypeNode rest =>
+                $"rest({TypeFingerprint(rest.InnerType)})",
             LiteralTypeNode literal =>
                 $"literal:{literal.LiteralKind}:{literal.Text}",
             ParenthesizedTypeNode parenthesized =>
@@ -2154,6 +2535,14 @@ public sealed class TypeResolver
         => projection.Identity.CanonicalName is
             "bool" or "byte" or "sbyte" or "short" or "ushort" or "int" or "uint" or
             "long" or "ulong" or "float" or "double" or "decimal" or "char" or "string";
+    private static bool IsProvablyImmutable(TypeProjection projection)
+        => projection.Identity.Kind == ClrTypeKind.Value
+            || string.Equals(
+                projection.Identity.CanonicalName,
+                "string",
+                StringComparison.Ordinal)
+            || projection.ProviderNote is
+                "json-array-tuple" or "anonymous-json-record";
 
     private static void ValidateOptionalBufferArgument(
         ReferenceTypeNode reference,
