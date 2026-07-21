@@ -22,7 +22,8 @@ public sealed record HostApiManifest(
     IReadOnlyList<string> SharedSymbols,
     IReadOnlyList<string> HostSymbols,
     IReadOnlyList<HostApiOperation> Operations,
-    IReadOnlyList<string> GeneratedFiles)
+    IReadOnlyList<string> GeneratedFiles,
+    HostCapabilityMetadata? Capability = null)
 {
     public IReadOnlyList<string> CoveredSymbols => SharedSymbols
         .Concat(HostSymbols)
@@ -37,6 +38,12 @@ public sealed record HostApiManifest(
             throw new InvalidOperationException(
                 $"{Host} host coverage accounts for {CoveredSymbols.Count} of " +
                 $"{SourceSymbolCount} source symbols.");
+        }
+
+        if (Capability is not null && Capability.EntryPoints.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"{Host} host capability metadata has no entry points.");
         }
 
         var duplicateOperation = Operations
