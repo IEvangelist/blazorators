@@ -1749,6 +1749,9 @@ public sealed class FinalEmitterAuditTests
             WriteFile(
                 Path.Combine(canonical, "Interfaces", "IStale.g.cs"),
                 "stale\n");
+            WriteFile(
+                Path.Combine(canonical, "AdvancedTypes", "StaleShape.g.cs"),
+                "stale\n");
 
             var attributes = File.ReadAllBytes(Path.Combine(canonical, ".gitattributes"));
             var wakeLock = File.ReadAllBytes(
@@ -1773,6 +1776,8 @@ public sealed class FinalEmitterAuditTests
                     Path.Combine(canonical, "reviewed", "nested", "metadata.json")));
             Assert.False(File.Exists(
                 Path.Combine(canonical, "Interfaces", "IStale.g.cs")));
+            Assert.False(File.Exists(
+                Path.Combine(canonical, "AdvancedTypes", "StaleShape.g.cs")));
             Assert.True(File.Exists(
                 Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
             AssertNoPromotionDebris(root, canonical);

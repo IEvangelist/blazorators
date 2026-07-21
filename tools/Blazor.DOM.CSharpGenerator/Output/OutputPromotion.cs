@@ -35,6 +35,7 @@ public static class OutputPromotion
 {
     private static readonly string[] ExhaustiveOwnedDirectories =
     [
+        "AdvancedTypes",
         "Callbacks",
         "Dictionaries",
         "Enums",
