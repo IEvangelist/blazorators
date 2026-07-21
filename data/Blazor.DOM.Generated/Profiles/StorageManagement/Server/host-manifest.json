@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "host": 0,
+  "sourceSymbolCount": 4,
+  "sharedSymbols": [
+    "StorageEstimate"
+  ],
+  "hostSymbols": [
+    "FileSystemDirectoryHandle",
+    "FileSystemHandle",
+    "StorageManager"
+  ],
+  "operations": [
+    {
+      "logicalIdentity": "FileSystemDirectoryHandle/factory-method:FileSystemDirectoryHandle:Create()",
+      "symbol": "FileSystemDirectoryHandle",
+      "kind": "constructor",
+      "javaScriptName": "FileSystemDirectoryHandle",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CIFileSystemDirectoryHandle\u003E CreateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "FileSystemDirectoryHandle/factory-property:prototype",
+      "symbol": "FileSystemDirectoryHandle",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IFileSystemDirectoryHandle Prototype"
+    },
+    {
+      "logicalIdentity": "FileSystemHandle/factory-method:FileSystemHandle:Create()",
+      "symbol": "FileSystemHandle",
+      "kind": "constructor",
+      "javaScriptName": "FileSystemHandle",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CIFileSystemHandle\u003E CreateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "FileSystemHandle/factory-property:prototype",
+      "symbol": "FileSystemHandle",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IFileSystemHandle Prototype"
+    },
+    {
+      "logicalIdentity": "StorageManager/factory-method:StorageManager:Create()",
+      "symbol": "StorageManager",
+      "kind": "constructor",
+      "javaScriptName": "StorageManager",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CIStorageManager\u003E CreateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "StorageManager/factory-property:prototype",
+      "symbol": "StorageManager",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IStorageManager Prototype"
+    },
+    {
+      "logicalIdentity": "StorageManager/js:estimate\u00600\u003C\u003E()[clr:]-\u003EValueTask\u003CStorageEstimate\u003E@transport:json-value:False:False:True:Promise\u003CStorageEstimate\u003E",
+      "symbol": "StorageManager",
+      "kind": "method",
+      "javaScriptName": "estimate",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CStorageEstimate\u003E EstimateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "StorageManager/js:getDirectory\u00600\u003C\u003E()[clr:]-\u003EValueTask\u003CIFileSystemDirectoryHandle\u003E@transport:js-reference:False:False:True:Promise\u003CFileSystemDirectoryHandle\u003E",
+      "symbol": "StorageManager",
+      "kind": "method",
+      "javaScriptName": "getDirectory",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CIFileSystemDirectoryHandle\u003E GetDirectoryAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "StorageManager/js:persist\u00600\u003C\u003E()[clr:]-\u003EValueTask\u003Cbool\u003E@transport:json-value:False:False:True:Promise\u003Cboolean\u003E",
+      "symbol": "StorageManager",
+      "kind": "method",
+      "javaScriptName": "persist",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003Cbool\u003E PersistAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "StorageManager/js:persisted\u00600\u003C\u003E()[clr:]-\u003EValueTask\u003Cbool\u003E@transport:json-value:False:False:True:Promise\u003Cboolean\u003E",
+      "symbol": "StorageManager",
+      "kind": "method",
+      "javaScriptName": "persisted",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003Cbool\u003E PersistedAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "global:navigator.storage",
+      "symbol": "StorageManager",
+      "kind": "global",
+      "javaScriptName": "navigator.storage",
+      "promise": false,
+      "hostSignature": "ValueTask\u003CIStorageManager\u003E GetStorageManagerProxyAsync(CancellationToken)"
+    }
+  ],
+  "generatedFiles": [
+    "Server\\Factories\\IFileSystemDirectoryHandleFactory.g.cs",
+    "Server\\Factories\\IFileSystemHandleFactory.g.cs",
+    "Server\\Factories\\IStorageManagerFactory.g.cs",
+    "Server\\GeneratedDomHost.g.cs",
+    "Server\\Interfaces\\IFileSystemDirectoryHandle.g.cs",
+    "Server\\Interfaces\\IFileSystemHandle.g.cs",
+    "Server\\Interfaces\\IStorageManager.g.cs"
+  ],
+  "capability": {
+    "name": "StorageManagement",
+    "description": "Storage API - estimate usage, request persistence, and access the origin-private file system.",
+    "features": [
+      "storage",
+      "origin-private-file-system"
+    ],
+    "secureContext": true,
+    "requiresUserActivation": false,
+    "entryPoints": [
+      {
+        "name": "StorageManager",
+        "symbol": "StorageManager",
+        "javaScriptPath": "navigator.storage"
+      }
+    ]
+  },
+  "coveredSymbols": [
+    "FileSystemDirectoryHandle",
+    "FileSystemHandle",
+    "StorageEstimate",
+    "StorageManager"
+  ]
+}

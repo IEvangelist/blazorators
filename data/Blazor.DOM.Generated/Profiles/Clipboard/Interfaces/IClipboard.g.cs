@@ -17,15 +17,6 @@ namespace Blazor.DOM;
 public partial interface IClipboard : IEventTarget, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
-/// The **`read()`** method of the Clipboard interface requests a copy of the clipboard's contents, fulfilling the returned Promise with the data.
-///
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Clipboard/read)
-/// </summary>
-[global::Microsoft.JSInterop.DomOperation("js:read`0<>()[clr:]->ValueTask<ClipboardItems>@transport:unsupported:False:False:False:Promise<ClipboardItems>", "read", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<ClipboardItems>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Collection 'ClipboardItems' contains a non-JSON transport.")]
-[global::Microsoft.JSInterop.DomJavaScriptName("read")]
-ValueTask<ClipboardItems> ReadAsync();
-
-    /// <summary>
 /// The **`readText()`** method of the Clipboard interface returns a Promise which fulfills with a copy of the textual contents of the system clipboard.
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Clipboard/readText)
@@ -33,15 +24,6 @@ ValueTask<ClipboardItems> ReadAsync();
 [global::Microsoft.JSInterop.DomOperation("js:readText`0<>()[clr:]->ValueTask<string>@transport:json-value:False:False:True:Promise<string>", "readText", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<string>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("readText")]
 ValueTask<string> ReadTextAsync();
-
-    /// <summary>
-/// The **`write()`** method of the Clipboard interface writes arbitrary ClipboardItem data such as images and text to the clipboard, fulfilling the returned Promise on completion.
-///
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Clipboard/write)
-/// </summary>
-[global::Microsoft.JSInterop.DomOperation("js:write`0<>(ClipboardItems<>:optional=False:rest=False)[clr:ClipboardItems]->ValueTask@transport:json-value:False:False:True:Promise<void>", "write", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
-[global::Microsoft.JSInterop.DomJavaScriptName("write")]
-ValueTask WriteAsync(ClipboardItems data);
 
     /// <summary>
 /// The **`writeText()`** method of the Clipboard interface writes the specified text to the system clipboard, returning a Promise that is resolved once the system clipboard has been updated.

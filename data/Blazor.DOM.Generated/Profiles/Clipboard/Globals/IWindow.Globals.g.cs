@@ -12,33 +12,7 @@ namespace Blazor.DOM;
 /// </summary>
 public partial interface IWindow
 {
-    IAbortSignalFactory AbortSignalConstructor { get; }
-
-    IBlobFactory BlobConstructor { get; }
-
     IClipboardFactory ClipboardConstructor { get; }
 
-    IClipboardItemFactory ClipboardItemConstructor { get; }
-
-    IEventFactory EventConstructor { get; }
-
     IEventTargetFactory EventTargetConstructor { get; }
-
-    IReadableByteStreamControllerFactory ReadableByteStreamControllerConstructor { get; }
-
-    IReadableStreamFactory ReadableStreamConstructor { get; }
-
-    IReadableStreamBYOBReaderFactory ReadableStreamBYOBReaderConstructor { get; }
-
-    IReadableStreamBYOBRequestFactory ReadableStreamBYOBRequestConstructor { get; }
-
-    IReadableStreamDefaultControllerFactory ReadableStreamDefaultControllerConstructor { get; }
-
-    IReadableStreamDefaultReaderFactory ReadableStreamDefaultReaderConstructor { get; }
-
-    IWritableStreamFactory WritableStreamConstructor { get; }
-
-    IWritableStreamDefaultControllerFactory WritableStreamDefaultControllerConstructor { get; }
-
-    IWritableStreamDefaultWriterFactory WritableStreamDefaultWriterConstructor { get; }
 }

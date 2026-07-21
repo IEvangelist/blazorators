@@ -1,0 +1,449 @@
+﻿{
+  "profileName": "Share",
+  "description": "Web Share API - invoke the platform sharing mechanism with text, title, or URL data.",
+  "rootSymbols": [
+    "Navigator",
+    "ShareData"
+  ],
+  "features": [
+    "web-share"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": true,
+  "closureSize": 15,
+  "includedSymbolCount": 14,
+  "externalReferenceCount": 1,
+  "externalReferences": [
+    "Promise"
+  ],
+  "accounting": {
+    "totalSymbols": 14,
+    "projected": 14,
+    "projectedClean": 14,
+    "projectedWithDeferredMembers": 0,
+    "excluded": 0,
+    "deferred": 0,
+    "generationFailed": 0,
+    "projectedSymbols": [
+      "Navigator",
+      "NavigatorAutomationInformation",
+      "NavigatorBadge",
+      "NavigatorConcurrentHardware",
+      "NavigatorContentUtils",
+      "NavigatorCookies",
+      "NavigatorGPU",
+      "NavigatorID",
+      "NavigatorLanguage",
+      "NavigatorLocks",
+      "NavigatorOnLine",
+      "NavigatorPlugins",
+      "NavigatorStorage",
+      "ShareData"
+    ],
+    "excludedSymbols": [],
+    "deferredSymbols": [],
+    "failedSymbols": [],
+    "deferredMemberEntries": [],
+    "failedMemberEntries": [],
+    "totalMembers": 7,
+    "projectedMembers": 7,
+    "deferredMembers": 0,
+    "failedMembers": 0,
+    "expectedMembers": 7,
+    "memberReconciliationValid": true,
+    "failedSymbolMemberOutcomes": [],
+    "notAttemptedAfterFailureMembers": 0,
+    "sourceDeclarations": 22,
+    "accountedSourceDeclarations": 22,
+    "sourceMembers": 7,
+    "accountedSourceMembers": 7,
+    "sourceOverloads": 3,
+    "accountedSourceOverloads": 3,
+    "sourceParameters": 2,
+    "accountedSourceParameters": 2,
+    "declarationReconciliationValid": true,
+    "overloadReconciliationValid": true,
+    "parameterReconciliationValid": true,
+    "sourceDeclarationEntries": [
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21369:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 1,
+        "kind": "globalVariable",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Logical factory contract emitted.",
+        "provenance": "Navigator/decl[1]/globalVariable",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21496:13"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 2,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[2]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:268:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 3,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[3]/interface",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:8:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 4,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[4]/interface",
+        "sourceLocation": "supplemental/webref/serial.d.ts:11:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 5,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[5]/interface",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:290:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 6,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[6]/interface",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:140:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 7,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[7]/interface",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:15:1"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 8,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Navigator/decl[8]/interface",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3298:1"
+      },
+      {
+        "symbolName": "NavigatorAutomationInformation",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorAutomationInformation/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21501:1"
+      },
+      {
+        "symbolName": "NavigatorBadge",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorBadge/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21507:1"
+      },
+      {
+        "symbolName": "NavigatorConcurrentHardware",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorConcurrentHardware/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21514:1"
+      },
+      {
+        "symbolName": "NavigatorContentUtils",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorContentUtils/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21519:1"
+      },
+      {
+        "symbolName": "NavigatorCookies",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorCookies/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21528:1"
+      },
+      {
+        "symbolName": "NavigatorGPU",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorGPU/decl[0]/interface",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2096:1"
+      },
+      {
+        "symbolName": "NavigatorID",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorID/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21533:1"
+      },
+      {
+        "symbolName": "NavigatorLanguage",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorLanguage/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21586:1"
+      },
+      {
+        "symbolName": "NavigatorLocks",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorLocks/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21594:1"
+      },
+      {
+        "symbolName": "NavigatorOnLine",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorOnLine/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21619:1"
+      },
+      {
+        "symbolName": "NavigatorPlugins",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorPlugins/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21624:1"
+      },
+      {
+        "symbolName": "NavigatorStorage",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "NavigatorStorage/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21648:1"
+      },
+      {
+        "symbolName": "ShareData",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "ShareData/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2160:1"
+      }
+    ],
+    "sourceMemberEntries": [
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 13,
+        "memberName": "canShare",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Navigator/decl[0]/member[13]/method/canShare",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21454:5",
+        "qualifiedKey": "Navigator/decl[0]/member[13]"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 18,
+        "memberName": "share",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Navigator/decl[0]/member[18]/method/share",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21487:5",
+        "qualifiedKey": "Navigator/decl[0]/member[18]"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 0,
+        "memberName": "prototype",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "Navigator/decl[1]/typeLiteral/member[0]/property/prototype",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21497:5",
+        "qualifiedKey": "Navigator/decl[1]/typeLiteral/member[0]"
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "memberName": "constructSignature",
+        "memberKind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "Navigator/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21498:5",
+        "qualifiedKey": "Navigator/decl[1]/typeLiteral/member[1]"
+      },
+      {
+        "symbolName": "ShareData",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "memberName": "text",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "ShareData/decl[0]/member[1]/property/text",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2162:5",
+        "qualifiedKey": "ShareData/decl[0]/member[1]"
+      },
+      {
+        "symbolName": "ShareData",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 2,
+        "memberName": "title",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "ShareData/decl[0]/member[2]/property/title",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2163:5",
+        "qualifiedKey": "ShareData/decl[0]/member[2]"
+      },
+      {
+        "symbolName": "ShareData",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 3,
+        "memberName": "url",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "ShareData/decl[0]/member[3]/property/url",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2164:5",
+        "qualifiedKey": "ShareData/decl[0]/member[3]"
+      }
+    ],
+    "sourceOverloadEntries": [
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 13,
+        "name": "canShare",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Navigator/decl[0]/member[13]/overload",
+        "provenance": "Navigator/decl[0]/member[13]/method/canShare/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21454:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "data",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Navigator/decl[0]/member[13]/method/canShare/overload/parameter[0]/data",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:21454:14"
+          }
+        ]
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 18,
+        "name": "share",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Navigator/decl[0]/member[18]/overload",
+        "provenance": "Navigator/decl[0]/member[18]/method/share/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21487:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "data",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Navigator/decl[0]/member[18]/method/share/overload/parameter[0]/data",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:21487:11"
+          }
+        ]
+      },
+      {
+        "symbolName": "Navigator",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "name": "constructSignature",
+        "kind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "qualifiedKey": "Navigator/decl[1]/typeLiteral/member[1]/overload",
+        "provenance": "Navigator/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:21498:5",
+        "parameterOutcomes": []
+      }
+    ]
+  },
+  "errors": [],
+  "byteIdentityVerified": true
+}

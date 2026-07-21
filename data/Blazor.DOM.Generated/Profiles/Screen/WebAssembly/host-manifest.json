@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "host": 1,
+  "sourceSymbolCount": 12,
+  "sharedSymbols": [
+    "AddEventListenerOptions",
+    "EventInit",
+    "EventListener",
+    "EventListenerOptions",
+    "EventListenerOrEventListenerObject",
+    "OrientationType",
+    "ScreenOrientationEventMap"
+  ],
+  "hostSymbols": [
+    "Event",
+    "EventListenerObject",
+    "EventTarget",
+    "Screen",
+    "ScreenOrientation"
+  ],
+  "operations": [
+    {
+      "logicalIdentity": "Event/factory-method:Event:Create(string type,EventInit? eventInitDict = default)",
+      "symbol": "Event",
+      "kind": "constructor",
+      "javaScriptName": "Event",
+      "promise": false,
+      "hostSignature": "IEvent Create(string type, EventInit? eventInitDict = default)"
+    },
+    {
+      "logicalIdentity": "Event/factory-property:AT_TARGET",
+      "symbol": "Event",
+      "kind": "factory-property",
+      "javaScriptName": "AT_TARGET",
+      "promise": false,
+      "hostSignature": "double ATTARGET"
+    },
+    {
+      "logicalIdentity": "Event/factory-property:BUBBLING_PHASE",
+      "symbol": "Event",
+      "kind": "factory-property",
+      "javaScriptName": "BUBBLING_PHASE",
+      "promise": false,
+      "hostSignature": "double BUBBLINGPHASE"
+    },
+    {
+      "logicalIdentity": "Event/factory-property:CAPTURING_PHASE",
+      "symbol": "Event",
+      "kind": "factory-property",
+      "javaScriptName": "CAPTURING_PHASE",
+      "promise": false,
+      "hostSignature": "double CAPTURINGPHASE"
+    },
+    {
+      "logicalIdentity": "Event/factory-property:NONE",
+      "symbol": "Event",
+      "kind": "factory-property",
+      "javaScriptName": "NONE",
+      "promise": false,
+      "hostSignature": "double NONE"
+    },
+    {
+      "logicalIdentity": "Event/factory-property:prototype",
+      "symbol": "Event",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IEvent Prototype"
+    },
+    {
+      "logicalIdentity": "EventListenerObject/js:handleEvent\u00600\u003C\u003E(Event\u003C\u003E:optional=False:rest=False)[clr:IEvent]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "EventListenerObject",
+      "kind": "method",
+      "javaScriptName": "handleEvent",
+      "promise": false,
+      "hostSignature": "void HandleEvent(IEvent @object)"
+    },
+    {
+      "logicalIdentity": "EventTarget/factory-method:EventTarget:Create()",
+      "symbol": "EventTarget",
+      "kind": "constructor",
+      "javaScriptName": "EventTarget",
+      "promise": false,
+      "hostSignature": "IEventTarget Create()"
+    },
+    {
+      "logicalIdentity": "EventTarget/factory-property:prototype",
+      "symbol": "EventTarget",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IEventTarget Prototype"
+    },
+    {
+      "logicalIdentity": "Screen/availHeight:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "availHeight",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "Screen/availWidth:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "availWidth",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "Screen/colorDepth:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "colorDepth",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "Screen/factory-method:Screen:Create()",
+      "symbol": "Screen",
+      "kind": "constructor",
+      "javaScriptName": "Screen",
+      "promise": false,
+      "hostSignature": "IScreen Create()"
+    },
+    {
+      "logicalIdentity": "Screen/factory-property:prototype",
+      "symbol": "Screen",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IScreen Prototype"
+    },
+    {
+      "logicalIdentity": "Screen/height:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "height",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "Screen/orientation:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "orientation",
+      "promise": false,
+      "hostSignature": "IScreenOrientation"
+    },
+    {
+      "logicalIdentity": "Screen/pixelDepth:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "pixelDepth",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "Screen/width:get",
+      "symbol": "Screen",
+      "kind": "property-get",
+      "javaScriptName": "width",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/angle:get",
+      "symbol": "ScreenOrientation",
+      "kind": "property-get",
+      "javaScriptName": "angle",
+      "promise": false,
+      "hostSignature": "double"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/factory-method:ScreenOrientation:Create()",
+      "symbol": "ScreenOrientation",
+      "kind": "constructor",
+      "javaScriptName": "ScreenOrientation",
+      "promise": false,
+      "hostSignature": "IScreenOrientation Create()"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/factory-property:prototype",
+      "symbol": "ScreenOrientation",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IScreenOrientation Prototype"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,AddEventListenerOptions]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "addEventListener",
+      "promise": false,
+      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject listener, AddEventListenerOptions? options)"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,bool]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "addEventListener",
+      "promise": false,
+      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject listener, bool capture)"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "addEventListener",
+      "promise": false,
+      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject listener)"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,EventListenerOptions]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "removeEventListener",
+      "promise": false,
+      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, EventListenerOptions? options)"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,bool]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "removeEventListener",
+      "promise": false,
+      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, bool capture)"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "removeEventListener",
+      "promise": false,
+      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener)"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/js:unlock\u00600\u003C\u003E()[clr:]-\u003Evoid@transport:json-value:False:False:True:void",
+      "symbol": "ScreenOrientation",
+      "kind": "method",
+      "javaScriptName": "unlock",
+      "promise": false,
+      "hostSignature": "void Unlock()"
+    },
+    {
+      "logicalIdentity": "ScreenOrientation/type:get",
+      "symbol": "ScreenOrientation",
+      "kind": "property-get",
+      "javaScriptName": "type",
+      "promise": false,
+      "hostSignature": "OrientationType"
+    },
+    {
+      "logicalIdentity": "global:window.screen",
+      "symbol": "Screen",
+      "kind": "global",
+      "javaScriptName": "window.screen",
+      "promise": false,
+      "hostSignature": "ValueTask\u003CIScreen\u003E GetScreenProxyAsync(CancellationToken)"
+    }
+  ],
+  "generatedFiles": [
+    "WebAssembly\\Factories\\IEventFactory.g.cs",
+    "WebAssembly\\Factories\\IEventTargetFactory.g.cs",
+    "WebAssembly\\Factories\\IScreenFactory.g.cs",
+    "WebAssembly\\Factories\\IScreenOrientationFactory.g.cs",
+    "WebAssembly\\GeneratedDomHost.g.cs",
+    "WebAssembly\\Interfaces\\IEvent.g.cs",
+    "WebAssembly\\Interfaces\\IEventListenerObject.g.cs",
+    "WebAssembly\\Interfaces\\IEventTarget.g.cs",
+    "WebAssembly\\Interfaces\\IScreen.g.cs",
+    "WebAssembly\\Interfaces\\IScreenOrientation.g.cs"
+  ],
+  "capability": {
+    "name": "Screen",
+    "description": "Screen API - inspect display dimensions and monitor screen orientation.",
+    "features": [
+      "screen",
+      "screen-orientation"
+    ],
+    "secureContext": false,
+    "requiresUserActivation": false,
+    "entryPoints": [
+      {
+        "name": "Screen",
+        "symbol": "Screen",
+        "javaScriptPath": "window.screen"
+      }
+    ]
+  },
+  "coveredSymbols": [
+    "AddEventListenerOptions",
+    "Event",
+    "EventInit",
+    "EventListener",
+    "EventListenerObject",
+    "EventListenerOptions",
+    "EventListenerOrEventListenerObject",
+    "EventTarget",
+    "OrientationType",
+    "Screen",
+    "ScreenOrientation",
+    "ScreenOrientationEventMap"
+  ]
+}

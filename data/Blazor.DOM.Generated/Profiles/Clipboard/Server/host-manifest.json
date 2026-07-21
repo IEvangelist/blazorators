@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "host": 0,
+  "sourceSymbolCount": 2,
+  "sharedSymbols": [],
+  "hostSymbols": [
+    "Clipboard",
+    "EventTarget"
+  ],
+  "operations": [
+    {
+      "logicalIdentity": "Clipboard/factory-method:Clipboard:Create()",
+      "symbol": "Clipboard",
+      "kind": "constructor",
+      "javaScriptName": "Clipboard",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CIClipboard\u003E CreateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "Clipboard/factory-property:prototype",
+      "symbol": "Clipboard",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IClipboard Prototype"
+    },
+    {
+      "logicalIdentity": "Clipboard/js:readText\u00600\u003C\u003E()[clr:]-\u003EValueTask\u003Cstring\u003E@transport:json-value:False:False:True:Promise\u003Cstring\u003E",
+      "symbol": "Clipboard",
+      "kind": "method",
+      "javaScriptName": "readText",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003Cstring\u003E ReadTextAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "Clipboard/js:writeText\u00600\u003C\u003E(StringKeyword:optional=False:rest=False)[clr:string]-\u003EValueTask@transport:json-value:False:False:True:Promise\u003Cvoid\u003E",
+      "symbol": "Clipboard",
+      "kind": "method",
+      "javaScriptName": "writeText",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask WriteTextAsync(string data, global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "EventTarget/factory-method:EventTarget:Create()",
+      "symbol": "EventTarget",
+      "kind": "constructor",
+      "javaScriptName": "EventTarget",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CIEventTarget\u003E CreateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "EventTarget/factory-property:prototype",
+      "symbol": "EventTarget",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "IEventTarget Prototype"
+    },
+    {
+      "logicalIdentity": "global:navigator.clipboard",
+      "symbol": "Clipboard",
+      "kind": "global",
+      "javaScriptName": "navigator.clipboard",
+      "promise": false,
+      "hostSignature": "ValueTask\u003CIClipboard\u003E GetClipboardProxyAsync(CancellationToken)"
+    }
+  ],
+  "generatedFiles": [
+    "Server\\Factories\\IClipboardFactory.g.cs",
+    "Server\\Factories\\IEventTargetFactory.g.cs",
+    "Server\\GeneratedDomHost.g.cs",
+    "Server\\Interfaces\\IClipboard.g.cs",
+    "Server\\Interfaces\\IEventTarget.g.cs"
+  ],
+  "capability": {
+    "name": "Clipboard",
+    "description": "Clipboard API \u2013 secure-context plain-text read/write access to the system clipboard.",
+    "features": [
+      "clipboard-read",
+      "clipboard-write"
+    ],
+    "secureContext": true,
+    "requiresUserActivation": false,
+    "entryPoints": [
+      {
+        "name": "Clipboard",
+        "symbol": "Clipboard",
+        "javaScriptPath": "navigator.clipboard"
+      }
+    ]
+  },
+  "coveredSymbols": [
+    "Clipboard",
+    "EventTarget"
+  ]
+}

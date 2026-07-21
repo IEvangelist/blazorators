@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "host": 0,
+  "sourceSymbolCount": 14,
+  "sharedSymbols": [
+    "ShareData"
+  ],
+  "hostSymbols": [
+    "Navigator",
+    "NavigatorAutomationInformation",
+    "NavigatorBadge",
+    "NavigatorConcurrentHardware",
+    "NavigatorContentUtils",
+    "NavigatorCookies",
+    "NavigatorGPU",
+    "NavigatorID",
+    "NavigatorLanguage",
+    "NavigatorLocks",
+    "NavigatorOnLine",
+    "NavigatorPlugins",
+    "NavigatorStorage"
+  ],
+  "operations": [
+    {
+      "logicalIdentity": "Navigator/factory-method:Navigator:Create()",
+      "symbol": "Navigator",
+      "kind": "constructor",
+      "javaScriptName": "Navigator",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003CINavigator\u003E CreateAsync(global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "Navigator/factory-property:prototype",
+      "symbol": "Navigator",
+      "kind": "factory-property",
+      "javaScriptName": "prototype",
+      "promise": false,
+      "hostSignature": "INavigator Prototype"
+    },
+    {
+      "logicalIdentity": "Navigator/js:canShare\u00600\u003C\u003E(ShareData\u003C\u003E:optional=True:rest=False)[clr:ShareData]-\u003Ebool@transport:json-value:False:False:True:boolean",
+      "symbol": "Navigator",
+      "kind": "method",
+      "javaScriptName": "canShare",
+      "promise": false,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask\u003Cbool\u003E CanShareAsync(ShareData? data = default, global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "Navigator/js:share\u00600\u003C\u003E(ShareData\u003C\u003E:optional=True:rest=False)[clr:ShareData]-\u003EValueTask@transport:json-value:False:False:True:Promise\u003Cvoid\u003E",
+      "symbol": "Navigator",
+      "kind": "method",
+      "javaScriptName": "share",
+      "promise": true,
+      "hostSignature": "global::System.Threading.Tasks.ValueTask ShareAsync(ShareData? data = default, global::System.Threading.CancellationToken cancellationToken = default)"
+    },
+    {
+      "logicalIdentity": "global:navigator",
+      "symbol": "Navigator",
+      "kind": "global",
+      "javaScriptName": "navigator",
+      "promise": false,
+      "hostSignature": "ValueTask\u003CINavigator\u003E GetNavigatorProxyAsync(CancellationToken)"
+    }
+  ],
+  "generatedFiles": [
+    "Server\\Factories\\INavigatorFactory.g.cs",
+    "Server\\GeneratedDomHost.g.cs",
+    "Server\\Interfaces\\INavigator.g.cs",
+    "Server\\Interfaces\\INavigatorAutomationInformation.g.cs",
+    "Server\\Interfaces\\INavigatorBadge.g.cs",
+    "Server\\Interfaces\\INavigatorConcurrentHardware.g.cs",
+    "Server\\Interfaces\\INavigatorContentUtils.g.cs",
+    "Server\\Interfaces\\INavigatorCookies.g.cs",
+    "Server\\Interfaces\\INavigatorGPU.g.cs",
+    "Server\\Interfaces\\INavigatorID.g.cs",
+    "Server\\Interfaces\\INavigatorLanguage.g.cs",
+    "Server\\Interfaces\\INavigatorLocks.g.cs",
+    "Server\\Interfaces\\INavigatorOnLine.g.cs",
+    "Server\\Interfaces\\INavigatorPlugins.g.cs",
+    "Server\\Interfaces\\INavigatorStorage.g.cs"
+  ],
+  "capability": {
+    "name": "Share",
+    "description": "Web Share API - invoke the platform sharing mechanism with text, title, or URL data.",
+    "features": [
+      "web-share"
+    ],
+    "secureContext": true,
+    "requiresUserActivation": true,
+    "entryPoints": [
+      {
+        "name": "Navigator",
+        "symbol": "Navigator",
+        "javaScriptPath": "navigator"
+      }
+    ]
+  },
+  "coveredSymbols": [
+    "Navigator",
+    "NavigatorAutomationInformation",
+    "NavigatorBadge",
+    "NavigatorConcurrentHardware",
+    "NavigatorContentUtils",
+    "NavigatorCookies",
+    "NavigatorGPU",
+    "NavigatorID",
+    "NavigatorLanguage",
+    "NavigatorLocks",
+    "NavigatorOnLine",
+    "NavigatorPlugins",
+    "NavigatorStorage",
+    "ShareData"
+  ]
+}
