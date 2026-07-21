@@ -23,6 +23,8 @@
     <_DomGenerationInput Include="$(DomAnchorsDirectory)\**\*.cs" />
     <_DomGenerationInput Include="$(DomGenerationSentinel)"
                          Condition="'$(DomGenerationSentinel)' != ''" />
+    <_DomGenerationInput Include="$(MSBuildProjectFullPath)" />
+    <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\Blazor.DOM.Generation.targets" />
     <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\**\*.cs"
                          Exclude="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\obj\**\*;$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\bin\**\*" />
     <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\Blazor.DOM.CSharpGenerator.csproj" />
