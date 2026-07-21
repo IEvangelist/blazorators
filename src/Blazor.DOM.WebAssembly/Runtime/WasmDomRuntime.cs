@@ -126,6 +126,19 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
     // ── IDomSyncRuntime ────────────────────────────────────────────────────
 
     /// <inheritdoc />
+    public IJSInProcessObjectReference GetGlobalRef(string path) =>
+        GetSyncModule().Invoke<IJSInProcessObjectReference>("getGlobal", path);
+
+    /// <inheritdoc />
+    public IJSInProcessObjectReference ConstructRef(
+        string constructorPath,
+        object?[]? args) =>
+        GetSyncModule().Invoke<IJSInProcessObjectReference>(
+            "construct",
+            constructorPath,
+            DomArguments.Prepare(args));
+
+    /// <inheritdoc />
     public TValue GetProperty<TValue>(IJSInProcessObjectReference reference, string name) =>
         GetJsonProperty<TValue>(reference, name);
 

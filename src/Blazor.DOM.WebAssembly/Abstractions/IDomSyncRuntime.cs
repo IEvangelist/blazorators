@@ -11,6 +11,12 @@ namespace Microsoft.JSInterop;
 /// </summary>
 public interface IDomSyncRuntime : IDomRuntime
 {
+    /// <summary>Resolves an authoritative global path synchronously.</summary>
+    IJSInProcessObjectReference GetGlobalRef(string path);
+
+    /// <summary>Constructs a JavaScript object synchronously.</summary>
+    IJSInProcessObjectReference ConstructRef(string constructorPath, object?[]? args);
+
     // ── Sync property access ─────────────────────────────────────────────────
 
     /// <summary>Reads a reviewed JSON-valued property synchronously.</summary>
