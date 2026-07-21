@@ -186,11 +186,13 @@ public static class HostPackageEmitter
         var serverInfrastructure = EmitInfrastructure(
             DomHostKind.Server,
             proxyRegistrations,
+            rootFactories,
             options.Capability,
             options.EmitCapabilityFacade);
         var wasmInfrastructure = EmitInfrastructure(
             DomHostKind.WebAssembly,
             proxyRegistrations,
+            rootFactories,
             options.Capability,
             options.EmitCapabilityFacade);
         serverFiles.Add(writer.Write(
@@ -255,6 +257,7 @@ public static class HostPackageEmitter
     private static InfrastructureResult EmitInfrastructure(
         DomHostKind host,
         IReadOnlyList<ProxyRegistration> registrations,
+        IReadOnlyList<RootFactory> rootFactories,
         HostCapabilityMetadata capability,
         bool emitCapabilityFacade)
     {
@@ -278,14 +281,18 @@ public static class HostPackageEmitter
                 {
                     var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
                     var name = Naming.ToCSharpMemberName(entry.Name);
+                    var contract = ResolveEntryPointContract(
+                        entry,
+                        type,
+                        rootFactories);
                     writer.AppendLine(
                         "public static global::System.Threading.Tasks.ValueTask<" +
-                        $"global::Blazor.DOM.I{type}> Get{name}ProxyAsync(");
+                        $"{contract}> Get{name}ProxyAsync(");
                     writer.AppendLine(
                         "    this IBrowser browser, global::System.Threading." +
                         "CancellationToken cancellationToken = default) =>");
                     writer.AppendLine(
-                        $"    browser.GetGlobalAsync<global::Blazor.DOM.I{type}>(" +
+                        $"    browser.GetGlobalAsync<{contract}>(" +
                         $"\"{entry.JavaScriptPath}\", cancellationToken);");
                     writer.AppendLine();
                 }
@@ -306,7 +313,7 @@ public static class HostPackageEmitter
         if (emitCapabilityFacade)
         {
             writer.AppendLine();
-            EmitCapabilityFacade(writer, host, capability);
+            EmitCapabilityFacade(writer, host, rootFactories, capability);
         }
         var operations = capability.EntryPoints
             .Select(entry => new HostApiOperation(
@@ -315,7 +322,10 @@ public static class HostPackageEmitter
                 "global",
                 entry.JavaScriptPath,
                 false,
-                $"ValueTask<I{Naming.ToCSharpSimpleTypeName(entry.Symbol)}> " +
+                $"ValueTask<{ResolveEntryPointContract(
+                    entry,
+                    Naming.ToCSharpSimpleTypeName(entry.Symbol),
+                    rootFactories)}> " +
                 $"Get{Naming.ToCSharpMemberName(entry.Name)}ProxyAsync(CancellationToken)"))
             .ToList();
         return new InfrastructureResult(writer.ToString(), operations);
@@ -324,6 +334,7 @@ public static class HostPackageEmitter
     private static void EmitCapabilityFacade(
         CSharpWriter writer,
         DomHostKind host,
+        IReadOnlyList<RootFactory> rootFactories,
         HostCapabilityMetadata capability)
     {
         var capabilityName = Naming.ToCSharpSimpleTypeName(capability.Name);
@@ -335,14 +346,18 @@ public static class HostPackageEmitter
                 {
                     var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
                     var name = Naming.ToCSharpMemberName(entry.Name);
+                    var contract = ResolveEntryPointContract(
+                        entry,
+                        type,
+                        rootFactories);
                     writer.AppendLine(
-                        $"global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.I{type}> " +
+                        $"global::System.Threading.Tasks.ValueTask<{contract}> " +
                         $"Get{name}Async(global::System.Threading.CancellationToken " +
                         "cancellationToken = default);");
                     if (host == DomHostKind.WebAssembly)
                     {
                         writer.AppendLine(
-                            $"global::Blazor.DOM.I{type} Get{name}();");
+                            $"{contract} Get{name}();");
                     }
                 }
             });
@@ -359,20 +374,24 @@ public static class HostPackageEmitter
                 {
                     var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
                     var name = Naming.ToCSharpMemberName(entry.Name);
+                    var contract = ResolveEntryPointContract(
+                        entry,
+                        type,
+                        rootFactories);
                     writer.AppendLine(
-                        $"public global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.I{type}> " +
+                        $"public global::System.Threading.Tasks.ValueTask<{contract}> " +
                         $"Get{name}Async(global::System.Threading.CancellationToken " +
                         "cancellationToken = default) =>");
                     writer.AppendLine(
-                        $"    browser.GetGlobalAsync<global::Blazor.DOM.I{type}>(" +
+                        $"    browser.GetGlobalAsync<{contract}>(" +
                         $"\"{entry.JavaScriptPath}\", cancellationToken);");
                     if (host == DomHostKind.WebAssembly)
                     {
                         writer.AppendLine();
                         writer.AppendLine(
-                            $"public global::Blazor.DOM.I{type} Get{name}() =>");
+                            $"public {contract} Get{name}() =>");
                         writer.AppendLine(
-                            $"    proxyFactory.Create<global::Blazor.DOM.I{type}>(" +
+                            $"    proxyFactory.Create<{contract}>(" +
                             "((IDomSyncRuntime)runtime).GetGlobalRef(" +
                             $"\"{entry.JavaScriptPath}\"));");
                     }
@@ -449,6 +468,25 @@ public static class HostPackageEmitter
                 writer.AppendLine("    return services;");
                 writer.AppendLine("}");
             });
+    }
+
+    private static string ResolveEntryPointContract(
+        HostEntryPoint entry,
+        string interfaceType,
+        IReadOnlyList<RootFactory> rootFactories)
+    {
+        var rootFactory = rootFactories.SingleOrDefault(factory =>
+            string.Equals(
+                factory.JavaScriptName,
+                entry.Symbol,
+                StringComparison.Ordinal)
+            && string.Equals(
+                entry.JavaScriptPath,
+                entry.Symbol,
+                StringComparison.Ordinal));
+        return rootFactory is null
+            ? $"global::Blazor.DOM.I{interfaceType}"
+            : $"global::{rootFactory.Namespace}.{rootFactory.ContractType}";
     }
 
     private static void ValidateEntryPoints(
