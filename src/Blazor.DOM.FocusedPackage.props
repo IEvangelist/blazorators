@@ -1,21 +1,19 @@
 <Project>
-  <ItemGroup Label="Generated focused DOM contracts">
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\AdvancedTypes\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Callbacks\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Dictionaries\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Enums\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\EventMaps\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Typedefs\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\Interfaces\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\Factories\**\*.cs" />
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\GeneratedDomHost.g.cs" />
-    <None Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\host-manifest.json"
+  <PropertyGroup>
+    <DomGenerationProfile>$(DomProfileName)</DomGenerationProfile>
+    <DomGenerationHost>$(DomProfileHost)</DomGenerationHost>
+  </PropertyGroup>
+
+  <Import Project="Blazor.DOM.Generation.targets" />
+
+  <ItemGroup Label="Generated focused DOM package metadata">
+    <None Include="$(DomGeneratedSourceRoot)\$(DomProfileHost)\host-manifest.json"
           Pack="true"
           PackagePath="build\$(PackageId).host-manifest.json" />
-    <None Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\host-parity.json"
+    <None Include="$(DomGeneratedSourceRoot)\host-parity.json"
           Pack="true"
           PackagePath="build\$(PackageId).host-parity.json" />
-    <None Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\profile-coverage.json"
+    <None Include="$(DomGeneratedSourceRoot)\profile-coverage.json"
           Pack="true"
           PackagePath="build\$(PackageId).profile-coverage.json" />
   </ItemGroup>

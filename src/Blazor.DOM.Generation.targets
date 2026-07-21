@@ -1,0 +1,37 @@
+<Project>
+  <PropertyGroup>
+    <_DomLowerConfiguration>$([System.String]::Copy('$(Configuration)').ToLowerInvariant())</_DomLowerConfiguration>
+    <DomGeneratedOutputRoot>$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_DomLowerConfiguration)\dom'))</DomGeneratedOutputRoot>
+    <DomGeneratedSourceRoot Condition="'$(DomGenerationProfile)' == ''">$(DomGeneratedOutputRoot)</DomGeneratedSourceRoot>
+    <DomGeneratedSourceRoot Condition="'$(DomGenerationProfile)' != ''">$(DomGeneratedOutputRoot)\Profiles\$(DomGenerationProfile)</DomGeneratedSourceRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)Blazor.DOM.Generation\Blazor.DOM.Generation.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all"
+                      SkipGetTargetFrameworkProperties="true"
+                      AdditionalProperties="TargetFramework=net10.0" />
+  </ItemGroup>
+
+  <Target Name="IncludeGeneratedDomContracts"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="ResolveProjectReferences">
+    <Error Condition="!Exists('$(DomGeneratedOutputRoot)\emitter-manifest.json')"
+           Text="DOM generation completed without producing $(DomGeneratedOutputRoot)\emitter-manifest.json." />
+    <ItemGroup>
+      <Compile Include="$(DomGeneratedSourceRoot)\AdvancedTypes\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Callbacks\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Dictionaries\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Enums\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\EventMaps\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Typedefs\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\$(DomGenerationHost)\Interfaces\**\*.cs"
+               Condition="'$(DomGenerationHost)' != ''" />
+      <Compile Include="$(DomGeneratedSourceRoot)\$(DomGenerationHost)\Factories\**\*.cs"
+               Condition="'$(DomGenerationHost)' != ''" />
+      <Compile Include="$(DomGeneratedSourceRoot)\$(DomGenerationHost)\GeneratedDomHost.g.cs"
+               Condition="'$(DomGenerationHost)' != ''" />
+    </ItemGroup>
+  </Target>
+</Project>
