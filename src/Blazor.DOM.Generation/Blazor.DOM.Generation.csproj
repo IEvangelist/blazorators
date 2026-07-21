@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <NoWarn>CS2008</NoWarn>
+    <_LowerConfiguration>$([System.String]::Copy('$(Configuration)').ToLowerInvariant())</_LowerConfiguration>
+    <DomGeneratedOutputRoot>$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_LowerConfiguration)\dom'))</DomGeneratedOutputRoot>
+    <DomGenerationStamp>$(DomGeneratedOutputRoot)\generation.stamp</DomGenerationStamp>
+    <DomGeneratorAssembly>$(ArtifactsPath)\bin\Blazor.DOM.CSharpGenerator\$(_LowerConfiguration)\Blazor.DOM.CSharpGenerator.dll</DomGeneratorAssembly>
+    <DomDataDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\data\Blazor.DOM'))</DomDataDirectory>
+    <DomProfilesDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\data\Blazor.DOM.Profiles'))</DomProfilesDirectory>
+    <DomAnchorsDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM.Anchors'))</DomAnchorsDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\tools\Blazor.DOM.CSharpGenerator\Blazor.DOM.CSharpGenerator.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+    <_DomGenerationInput Include="$(DomDataDirectory)\**\*" />
+    <_DomGenerationInput Include="$(DomProfilesDirectory)\**\*.json" />
+    <_DomGenerationInput Include="$(DomAnchorsDirectory)\**\*.cs" />
+    <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\**\*.cs"
+                         Exclude="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\obj\**\*;$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\bin\**\*" />
+    <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\Blazor.DOM.CSharpGenerator.csproj" />
+  </ItemGroup>
+
+  <Target Name="GenerateDomContracts"
+          BeforeTargets="Build"
+          DependsOnTargets="ResolveProjectReferences"
+          Inputs="@(_DomGenerationInput)"
+          Outputs="$(DomGenerationStamp);$(DomGeneratedOutputRoot)\emitter-manifest.json;$(DomGeneratedOutputRoot)\host-parity.json">
+    <MakeDir Directories="$(DomGeneratedOutputRoot)" />
+    <Exec Command="dotnet &quot;$(DomGeneratorAssembly)&quot; --data &quot;$(DomDataDirectory)&quot; --output &quot;$(DomGeneratedOutputRoot)&quot; --profiles &quot;$(DomProfilesDirectory)&quot; --anchors &quot;$(DomAnchorsDirectory)&quot;" />
+    <WriteLinesToFile File="$(DomGenerationStamp)"
+                      Lines="@(_DomGenerationInput->'%(FullPath)')"
+                      Overwrite="true" />
+  </Target>
+</Project>

@@ -23,13 +23,11 @@ public sealed class PackageProjectTests
         Assert.Contains(
             values,
             value => value.Contains(
-                $@"Blazor.DOM.Generated\{hostDirectory}\Interfaces",
+                "Blazor.DOM.Generation.targets",
                 StringComparison.Ordinal));
-        Assert.Contains(
-            values,
-            value => value.Contains(
-                $@"Blazor.DOM.Generated\{hostDirectory}\Factories",
-                StringComparison.Ordinal));
+        Assert.Equal(
+            hostDirectory,
+            project.Descendants("DomGenerationHost").Single().Value);
         Assert.Contains(
             values,
             value => value.Contains("host-manifest.json", StringComparison.Ordinal));
@@ -95,18 +93,20 @@ public sealed class PackageProjectTests
             host,
             project.Descendants("DomProfileHost").Single().Value);
 
-        var profile = Path.Combine(
+        var focusedProps = XDocument.Load(Path.Combine(
             root,
-            "data",
-            "Blazor.DOM.Generated",
-            "Profiles",
-            profileName);
-        Assert.True(File.Exists(Path.Combine(
-            profile,
-            host,
-            "host-manifest.json")));
-        Assert.True(File.Exists(Path.Combine(profile, "host-parity.json")));
-        Assert.True(File.Exists(Path.Combine(profile, "profile-coverage.json")));
+            "src",
+            "Blazor.DOM.FocusedPackage.props"));
+        Assert.Contains(
+            focusedProps.Descendants("Import"),
+            element => element.Attribute("Project")?.Value.Contains(
+                "Blazor.DOM.Generation.targets",
+                StringComparison.Ordinal) == true);
+        Assert.DoesNotContain(
+            focusedProps.Descendants()
+                .SelectMany(element => element.Attributes())
+                .Select(attribute => attribute.Value),
+            value => value.Contains("data\\Blazor.DOM.Generated", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -128,7 +128,9 @@ public sealed class PackageProjectTests
         Assert.True(File.Exists(Path.Combine(
             root,
             "src",
-            "Blazor.Permissions.WebAssembly",
+            "Blazor.DOM.Anchors",
+            "Profiles",
+            "Permissions",
             "IPermissionsService.cs")));
     }
 

@@ -15,6 +15,7 @@
 //   5 = profile generation had failures
 
 using Blazor.DOM.CSharpGenerator;
+using Blazor.DOM.CSharpGenerator.Anchors;
 using Blazor.DOM.CSharpGenerator.IR;
 using Blazor.DOM.CSharpGenerator.Output;
 using Blazor.DOM.CSharpGenerator.Profiles;
@@ -27,6 +28,7 @@ Console.WriteLine($"  Output    : {cliArgs.OutputDirectory}");
 Console.WriteLine($"  Verify    : {cliArgs.Verify}");
 if (cliArgs.ProfilesDirectory is not null)
     Console.WriteLine($"  Profiles  : {cliArgs.ProfilesDirectory}");
+Console.WriteLine($"  Anchors   : {cliArgs.AnchorsDirectory}");
 Console.WriteLine();
 
 // ── Step 1: Load and validate the IR ─────────────────────────────────────────
@@ -58,6 +60,22 @@ catch (EmitterOverridesException ex)
 }
 Console.WriteLine($" OK — {overrides.Count} override(s) loaded.");
 
+Console.Write("Loading handwritten anchors...");
+IReadOnlyList<InteropAnchor> anchors;
+try
+{
+    anchors = InteropAnchorLoader.Load(cliArgs.AnchorsDirectory);
+}
+catch (Exception ex) when (
+    ex is IOException
+    or UnauthorizedAccessException
+    or InvalidDataException)
+{
+    Console.Error.WriteLine($"\nAnchor validation failed: {ex.Message}");
+    return 1;
+}
+Console.WriteLine($" OK — {anchors.Count} anchor(s) loaded.");
+
 // ── Step 2: Run full generation pipeline into sibling staging directories ─────
 // Sibling staging guarantees that the final directory renames stay on one volume.
 var canonicalOutputDirectory = Path.TrimEndingDirectorySeparator(
@@ -80,7 +98,8 @@ try
         ir,
         stagingRun1,
         overrides,
-        emitHosts: true);
+        emitHosts: true,
+        hostPackageOptions: InteropAnchorLoader.CreateExhaustiveOptions(anchors));
 
     Console.WriteLine($" done — {result1.WrittenFiles.Count} files.");
     Console.WriteLine($"  Projected         : {result1.Manifest.Accounting.Projected}");
@@ -151,7 +170,8 @@ try
             ir,
             stagingRun2,
             overrides,
-            emitHosts: true);
+            emitHosts: true,
+            hostPackageOptions: InteropAnchorLoader.CreateExhaustiveOptions(anchors));
 
         var scan1 = OutputVerifier.ScanDirectory(stagingRun1);
         var scan2 = OutputVerifier.ScanDirectory(stagingRun2);
@@ -202,8 +222,9 @@ try
         else
         {
             var profileFailures = 0;
-            foreach (var profile in profiles)
+            foreach (var loadedProfile in profiles)
             {
+                var profile = InteropAnchorLoader.Apply(loadedProfile, anchors);
                 Console.Write($"  Profile '{profile.Name}'...");
                 try
                 {
@@ -279,11 +300,12 @@ internal sealed record Args(
     string DataDirectory,
     string OutputDirectory,
     bool Verify,
-    string? ProfilesDirectory)
+    string? ProfilesDirectory,
+    string AnchorsDirectory)
 {
     public static Args Parse(string[] args)
     {
-        string? data = null, output = null, profiles = null;
+        string? data = null, output = null, profiles = null, anchors = null;
         var verify = false;
         for (var i = 0; i < args.Length; i++)
         {
@@ -295,6 +317,8 @@ internal sealed record Args(
                     output = args[++i]; break;
                 case "--profiles" when i + 1 < args.Length:
                     profiles = args[++i]; break;
+                case "--anchors" when i + 1 < args.Length:
+                    anchors = args[++i]; break;
                 case "--verify":
                     verify = true; break;
             }
@@ -303,8 +327,9 @@ internal sealed record Args(
         // Default to checked-in data path relative to the solution root
         data ??= ResolveDefault("data", "Blazor.DOM");
         output ??= ResolveDefault("data", "Blazor.DOM.Generated");
+        anchors ??= ResolveDefault("src", "Blazor.DOM.Anchors");
 
-        return new Args(data, output, verify, profiles);
+        return new Args(data, output, verify, profiles, anchors);
     }
 
     private static string ResolveDefault(params string[] parts)
