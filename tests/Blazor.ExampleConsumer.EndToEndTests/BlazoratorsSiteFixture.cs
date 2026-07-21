@@ -39,11 +39,17 @@ public abstract class BlazorSiteFixture(
 
         var repoRoot = FindRepositoryRoot();
         var projectPath = Path.Combine(repoRoot, "samples", projectName, $"{projectName}.csproj");
+        var configuration = new DirectoryInfo(AppContext.BaseDirectory).Name;
+        if (configuration is not ("debug" or "release"))
+        {
+            throw new InvalidOperationException(
+                $"Unable to infer the build configuration from {AppContext.BaseDirectory}.");
+        }
 
         var startInfo = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"run --no-build --no-restore --configuration Release --project \"{projectPath}\" --framework net10.0 --no-launch-profile --urls {BaseUrl}",
+            Arguments = $"run --no-build --no-restore --configuration {configuration} --project \"{projectPath}\" --framework net10.0 --no-launch-profile --urls {BaseUrl}",
             WorkingDirectory = repoRoot,
             UseShellExecute = false,
             RedirectStandardOutput = true,
