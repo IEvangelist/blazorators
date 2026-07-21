@@ -9,7 +9,11 @@ namespace Blazor.DOM;
 
 public partial interface IReadableStreamReadDoneResult<T>
 {
-    bool Done { get; set; }
+    [global::Microsoft.JSInterop.DomAccessor("done", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "true", Nullable = false, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomAccessor("done", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "true", Nullable = false, Streamable = false, StructuredClone = true)]
+bool Done { get; set; }
 
-    global::Blazor.DOM.AdvancedTypes.ReadableStreamReadDoneResultUnionShape_f2d5ea4ede<T> Value { get; set; }
+    [global::Microsoft.JSInterop.DomAccessor("value", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "T | undefined", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'T | undefined' is unsupported: Named TypeScript type 'ReadableStreamReadDoneResult.T' has no reviewed DOM transport classification.")]
+[global::Microsoft.JSInterop.DomAccessor("value", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "T | undefined", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'T | undefined' is unsupported: Named TypeScript type 'ReadableStreamReadDoneResult.T' has no reviewed DOM transport classification.")]
+global::Blazor.DOM.AdvancedTypes.ReadableStreamReadDoneResultUnionShape_f2d5ea4ede<T> Value { get; set; }
 }

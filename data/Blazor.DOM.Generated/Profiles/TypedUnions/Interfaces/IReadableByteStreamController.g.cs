@@ -19,6 +19,7 @@ public partial interface IReadableByteStreamController
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/byobRequest)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("byobRequest", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "ReadableStreamBYOBRequest | null", Nullable = true, Streamable = false, StructuredClone = false)]
 IReadableStreamBYOBRequest? ByobRequest { get; }
 
     /// <summary>
@@ -26,6 +27,7 @@ IReadableStreamBYOBRequest? ByobRequest { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/desiredSize)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("desiredSize", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number | null", Nullable = true, Streamable = false, StructuredClone = true)]
 double? DesiredSize { get; }
 
     /// <summary>

@@ -20,6 +20,7 @@ public partial interface IWritableStreamDefaultWriter<W>
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("closed", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = true)]
 ValueTask Closed { get; }
 
     /// <summary>
@@ -27,6 +28,7 @@ ValueTask Closed { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("desiredSize", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number | null", Nullable = true, Streamable = false, StructuredClone = true)]
 double? DesiredSize { get; }
 
     /// <summary>
@@ -34,6 +36,7 @@ double? DesiredSize { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("ready", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = true)]
 ValueTask Ready { get; }
 
     /// <summary>

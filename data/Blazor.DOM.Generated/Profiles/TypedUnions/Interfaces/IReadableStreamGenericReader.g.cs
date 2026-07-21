@@ -12,6 +12,7 @@ public partial interface IReadableStreamGenericReader
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("closed", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = true)]
 ValueTask Closed { get; }
 
     /// <summary>

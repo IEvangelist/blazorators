@@ -341,7 +341,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027aborted\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "AbortSignal/decl[0]/member[0]/property/aborted",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2752:5",
         "qualifiedKey": "AbortSignal/decl[0]/member[0]"
@@ -354,7 +354,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027onabort\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "AbortSignal/decl[0]/member[1]/property/onabort",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2754:5",
         "qualifiedKey": "AbortSignal/decl[0]/member[1]"
@@ -367,7 +367,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027reason\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "AbortSignal/decl[0]/member[2]/property/reason",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2760:5",
         "qualifiedKey": "AbortSignal/decl[0]/member[2]"
@@ -562,7 +562,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027bubbles\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[0]/property/bubbles",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11353:5",
         "qualifiedKey": "Event/decl[0]/member[0]"
@@ -575,7 +575,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027cancelBubble\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "Event/decl[0]/member[1]/property/cancelBubble",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11360:5",
         "qualifiedKey": "Event/decl[0]/member[1]"
@@ -588,7 +588,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027cancelable\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[2]/property/cancelable",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11366:5",
         "qualifiedKey": "Event/decl[0]/member[2]"
@@ -601,7 +601,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027composed\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[3]/property/composed",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11372:5",
         "qualifiedKey": "Event/decl[0]/member[3]"
@@ -614,7 +614,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027currentTarget\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[4]/property/currentTarget",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11378:5",
         "qualifiedKey": "Event/decl[0]/member[4]"
@@ -627,7 +627,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027defaultPrevented\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[5]/property/defaultPrevented",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11384:5",
         "qualifiedKey": "Event/decl[0]/member[5]"
@@ -640,7 +640,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027eventPhase\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[6]/property/eventPhase",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11390:5",
         "qualifiedKey": "Event/decl[0]/member[6]"
@@ -653,7 +653,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027isTrusted\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[7]/property/isTrusted",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11396:5",
         "qualifiedKey": "Event/decl[0]/member[7]"
@@ -666,7 +666,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027returnValue\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "Event/decl[0]/member[8]/property/returnValue",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11403:5",
         "qualifiedKey": "Event/decl[0]/member[8]"
@@ -679,7 +679,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027srcElement\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[9]/property/srcElement",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11410:5",
         "qualifiedKey": "Event/decl[0]/member[9]"
@@ -692,7 +692,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027target\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[10]/property/target",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11416:5",
         "qualifiedKey": "Event/decl[0]/member[10]"
@@ -705,7 +705,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027timeStamp\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[11]/property/timeStamp",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11422:5",
         "qualifiedKey": "Event/decl[0]/member[11]"
@@ -718,7 +718,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027type\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[12]/property/type",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11428:5",
         "qualifiedKey": "Event/decl[0]/member[12]"
@@ -796,7 +796,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027NONE\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[18]/property/NONE",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11460:5",
         "qualifiedKey": "Event/decl[0]/member[18]"
@@ -809,7 +809,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027CAPTURING_PHASE\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[19]/property/CAPTURING_PHASE",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11461:5",
         "qualifiedKey": "Event/decl[0]/member[19]"
@@ -822,7 +822,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027AT_TARGET\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[20]/property/AT_TARGET",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11462:5",
         "qualifiedKey": "Event/decl[0]/member[20]"
@@ -835,7 +835,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027BUBBLING_PHASE\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Event/decl[0]/member[21]/property/BUBBLING_PHASE",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11463:5",
         "qualifiedKey": "Event/decl[0]/member[21]"
@@ -1108,7 +1108,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027onrelease\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "WakeLockSentinel/decl[0]/member[0]/property/onrelease",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33744:5",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[0]"
@@ -1121,7 +1121,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027released\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "WakeLockSentinel/decl[0]/member[1]/property/released",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33750:5",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[1]"
@@ -1134,7 +1134,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Reconciled into canonical \u0027type\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "WakeLockSentinel/decl[0]/member[2]/property/type",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33756:5",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[2]"

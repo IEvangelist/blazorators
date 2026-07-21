@@ -19,6 +19,7 @@ public partial interface IBlob
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/size)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("size", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
 double Size { get; }
 
     /// <summary>
@@ -26,6 +27,7 @@ double Size { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/type)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("type", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
 string Type { get; }
 
     /// <summary>

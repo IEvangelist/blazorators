@@ -10,9 +10,17 @@ namespace Blazor.DOM;
 // TypeScript generic default: R = object.
 public partial interface IUnderlyingDefaultSource<R>
 {
-    UnderlyingSourceCancelCallback? Cancel { get; set; }
+    // DEFERRED (undefined-type): type — UnderlyingDefaultSource/decl[0]/member[3]/property/type
 
-    Func<IReadableStreamDefaultController<R>, global::Blazor.DOM.AdvancedTypes.UnderlyingDefaultSourceUnionShape_d730ede0a6<R>>? Pull { get; set; }
+    [global::Microsoft.JSInterop.DomAccessor("cancel", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "UnderlyingSourceCancelCallback", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Callback type 'UnderlyingSourceCancelCallback' requires generated callback marshalling.")]
+[global::Microsoft.JSInterop.DomAccessor("cancel", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "UnderlyingSourceCancelCallback", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Callback type 'UnderlyingSourceCancelCallback' requires generated callback marshalling.")]
+UnderlyingSourceCancelCallback? Cancel { get; set; }
 
-    Func<IReadableStreamDefaultController<R>, object>? Start { get; set; }
+    [global::Microsoft.JSInterop.DomAccessor("pull", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableStreamDefaultController<R>) => void | PromiseLike<void>", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableStreamDefaultController<R>) => void | PromiseLike<void>' has an ambiguous function shape.")]
+[global::Microsoft.JSInterop.DomAccessor("pull", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableStreamDefaultController<R>) => void | PromiseLike<void>", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableStreamDefaultController<R>) => void | PromiseLike<void>' has an ambiguous function shape.")]
+Func<IReadableStreamDefaultController<R>, global::Blazor.DOM.AdvancedTypes.UnderlyingDefaultSourceUnionShape_d730ede0a6<R>>? Pull { get; set; }
+
+    [global::Microsoft.JSInterop.DomAccessor("start", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableStreamDefaultController<R>) => any", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableStreamDefaultController<R>) => any' has an ambiguous function shape.")]
+[global::Microsoft.JSInterop.DomAccessor("start", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableStreamDefaultController<R>) => any", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableStreamDefaultController<R>) => any' has an ambiguous function shape.")]
+Func<IReadableStreamDefaultController<R>, object>? Start { get; set; }
 }

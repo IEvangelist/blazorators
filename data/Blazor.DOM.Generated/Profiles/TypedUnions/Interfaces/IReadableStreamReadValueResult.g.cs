@@ -9,7 +9,11 @@ namespace Blazor.DOM;
 
 public partial interface IReadableStreamReadValueResult<T>
 {
-    bool Done { get; set; }
+    [global::Microsoft.JSInterop.DomAccessor("done", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "false", Nullable = false, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomAccessor("done", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "false", Nullable = false, Streamable = false, StructuredClone = true)]
+bool Done { get; set; }
 
-    T Value { get; set; }
+    [global::Microsoft.JSInterop.DomAccessor("value", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "T", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'ReadableStreamReadValueResult.T' has no reviewed DOM transport classification.")]
+[global::Microsoft.JSInterop.DomAccessor("value", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "T", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'ReadableStreamReadValueResult.T' has no reviewed DOM transport classification.")]
+T Value { get; set; }
 }

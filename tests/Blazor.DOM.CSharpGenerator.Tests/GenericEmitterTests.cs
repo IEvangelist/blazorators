@@ -47,7 +47,7 @@ public sealed class GenericEmitterTests
                 Read(output, "Factories", "ICustomEventFactory.g.cs"));
             Assert.Contains(
                 "T StructuredClone<T>(T @value, StructuredSerializeOptions? options = default);",
-                Read(output, "Globals", "IWindow.Globals.g.cs"));
+                Read(output, "Interfaces", "IWindowOrWorkerGlobalScope.g.cs"));
             Assert.Contains(
                 result.Manifest.Accounting.DeferredSymbols,
                 entry => entry.Symbol == "FormDataIterator"
