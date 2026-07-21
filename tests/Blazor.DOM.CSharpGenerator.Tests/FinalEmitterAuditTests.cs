@@ -167,21 +167,22 @@ public sealed class FinalEmitterAuditTests
         try
         {
             var ir = IrLoader.Load(data);
+            var overrides = EmitterOverridesLoader.Load(data);
             var result = GenerationPipeline.Run(
                 ir,
                 output,
-                EmitterOverridesLoader.Load(data));
+                overrides);
             var accounting = result.Manifest.Accounting;
 
             Assert.True(result.Validation.IsValid);
             Assert.Equal(1866, accounting.TotalSymbols);
-            Assert.Equal(1603, accounting.Projected);
-            Assert.Equal(1225, accounting.ProjectedClean);
+            Assert.Equal(1606, accounting.Projected);
+            Assert.Equal(1228, accounting.ProjectedClean);
             Assert.Equal(378, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
             Assert.Equal(260, accounting.Deferred);
-            Assert.Equal(3, accounting.GenerationFailed);
-            Assert.Equal(2283, result.WrittenFiles.Count);
+            Assert.Equal(0, accounting.GenerationFailed);
+            Assert.Equal(2289, result.WrittenFiles.Count);
             Assert.Equal((2598, 2598), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
@@ -190,9 +191,9 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceMembers));
             Assert.Equal(11310, accounting.TotalMembers);
             Assert.Equal(11310, accounting.ExpectedMembers);
-            Assert.Equal(10085, accounting.ProjectedMembers);
-            Assert.Equal(1208, accounting.DeferredMembers);
-            Assert.Equal(17, accounting.FailedMembers);
+            Assert.Equal(10108, accounting.ProjectedMembers);
+            Assert.Equal(1202, accounting.DeferredMembers);
+            Assert.Equal(0, accounting.FailedMembers);
             Assert.Equal((3666, 3666), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
@@ -201,8 +202,8 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceParameters));
             Assert.True(accounting.ParameterReconciliationValid);
             Assert.True(result.Validation.ParameterReconciliationValid);
-            Assert.Equal(3, result.Errors.Count);
-            Assert.Equal(3, result.Manifest.Diagnostics.Count);
+            Assert.Empty(result.Errors);
+            Assert.Empty(result.Manifest.Diagnostics);
             Assert.Equal(207, result.Manifest.SynthesizedTypes?.Count);
             Assert.Equal(
                 (5, 1, 136, 63, 1, 1),
@@ -225,28 +226,21 @@ public sealed class FinalEmitterAuditTests
                     group => group.Key,
                     group => group.Count(),
                     StringComparer.Ordinal);
-            Assert.Equal(3, failureCategories["override"]);
-            Assert.Single(failureCategories);
-            Assert.Equal(
-                new[]
-                {
-                    "CSPViolationReportBody",
-                    "Report",
-                    "ReportBody",
-                },
-                accounting.FailedSymbols
-                    .Select(entry => entry.Symbol)
-                    .Order(StringComparer.Ordinal));
+            Assert.Empty(failureCategories);
+            Assert.Empty(accounting.FailedSymbols);
             var newlyProjected = new[]
             {
                 "ByteLengthQueuingStrategy",
                 "CountQueuingStrategy",
+                "CSPViolationReportBody",
                 "DOMException",
                 "Document",
                 "Element",
                 "HTMLCanvasElement",
                 "OffscreenCanvas",
                 "OnErrorEventHandlerNonNull",
+                "Report",
+                "ReportBody",
                 "SubtleCrypto",
                 "WebAssembly.CompileError",
                 "WebAssembly.LinkError",
@@ -259,6 +253,51 @@ public sealed class FinalEmitterAuditTests
                 symbolName => Assert.Contains(
                     symbolName,
                     accounting.ProjectedSymbols));
+            var resolver = new TypeResolver(ir.TypescriptSymbols, overrides);
+            foreach (var symbolName in new[]
+                {
+                    "CSPViolationReportBody",
+                    "Report",
+                    "ReportBody",
+                })
+            {
+                var symbol = Assert.Single(
+                    ir.TypescriptSymbols,
+                    candidate => candidate.Name == symbolName);
+                var classification = EffectiveClassificationPolicy.Classify(
+                    symbol,
+                    overrides);
+                Assert.Equal("interface", classification.Name);
+                Assert.Equal(
+                    EffectiveClassificationSource.ReviewedOverride,
+                    classification.Source);
+                Assert.True(resolver.IsInterfaceOrMixin(symbolName));
+                Assert.True(overrides[symbolName].Rationale.Length >= 10);
+                Assert.True(File.Exists(Path.Combine(
+                    output,
+                    "Interfaces",
+                    $"I{symbolName}.g.cs")));
+                Assert.True(File.Exists(Path.Combine(
+                    output,
+                    "Factories",
+                    $"I{symbolName}Factory.g.cs")));
+                Assert.False(File.Exists(Path.Combine(
+                    output,
+                    "Dictionaries",
+                    $"{symbolName}.g.cs")));
+            }
+            Assert.Contains(
+                "public partial interface ICSPViolationReportBody : IReportBody",
+                File.ReadAllText(Path.Combine(
+                    output,
+                    "Interfaces",
+                    "ICSPViolationReportBody.g.cs")));
+            Assert.Contains(
+                "IReportBody? Body { get; }",
+                File.ReadAllText(Path.Combine(
+                    output,
+                    "Interfaces",
+                    "IReport.g.cs")));
             var resolvedAccessorFailures = new[]
             {
                 ("CSSFontFaceRule", "Style"),
@@ -375,8 +414,8 @@ public sealed class FinalEmitterAuditTests
                     deferredTypeLiteralDeclarations++;
                 }
             }
-            Assert.Equal(616, projectedTypeLiteralDeclarations);
-            Assert.Equal(33, deferredTypeLiteralDeclarations);
+            Assert.Equal(619, projectedTypeLiteralDeclarations);
+            Assert.Equal(30, deferredTypeLiteralDeclarations);
 
             var factoryMembers = (accounting.SourceMemberEntries ?? [])
                 .Where(entry => entry.QualifiedKey.Contains(
@@ -542,7 +581,7 @@ public sealed class FinalEmitterAuditTests
                         StringComparison.Ordinal));
             Assert.Equal(2463, factoryMembers.Count);
             Assert.Equal(
-                2414,
+                2420,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Projected)));
             Assert.Equal(
@@ -556,7 +595,7 @@ public sealed class FinalEmitterAuditTests
                 entry => entry.Status == nameof(MemberOutcomeStatus.Deferred)
                     && entry.Phase == "advanced-generic-constraints"));
             Assert.Equal(
-                6,
+                0,
                 factoryMembers.Count(entry =>
                 entry.Status == nameof(MemberOutcomeStatus.Deferred)
                 && entry.Phase == "primary-contract"));

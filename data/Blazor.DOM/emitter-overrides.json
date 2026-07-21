@@ -1,6 +1,22 @@
 {
   "$schema": "./emitter-overrides.schema.json",
   "schemaVersion": 1,
-  "description": "Explicit emitter overrides for ambiguous symbols. Each entry MUST have a non-empty rationale. An empty array causes all ambiguous symbols to fail generation — this is intentional while override decisions are pending review.",
-  "ambiguousSymbolOverrides": []
+  "description": "Explicit emitter overrides for ambiguous symbols. Each entry MUST have a non-empty rationale.",
+  "ambiguousSymbolOverrides": [
+    {
+      "symbol": "CSPViolationReportBody",
+      "classification": "interface",
+      "rationale": "TypeScript is authoritative for the public shape and declares a readonly runtime interface extending ReportBody, with toJSON and a global constructor. Treating the stale Web IDL dictionary shape as a JSON value would misclassify browser-owned report objects."
+    },
+    {
+      "symbol": "Report",
+      "classification": "interface",
+      "rationale": "TypeScript is authoritative for the public shape and declares a readonly runtime interface with body, type, url, toJSON, and a global constructor. The Web IDL dictionary classification would incorrectly project browser-owned Report instances as JSON records."
+    },
+    {
+      "symbol": "ReportBody",
+      "classification": "interface",
+      "rationale": "TypeScript is authoritative for the public shape and declares a runtime interface with toJSON and a global constructor. The Web IDL dictionary classification has no members and would erase the live object contract used by Report and its specialized body interfaces."
+    }
+  ]
 }
