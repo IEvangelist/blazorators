@@ -47,6 +47,23 @@ public sealed class DomProxyFactoryTests
     }
 
     [Fact]
+    public void Create_by_contract_type_returns_registered_proxy()
+    {
+        var (factory, _) = CreateFactory();
+        factory.Register(
+            typeof(ITestDomContract),
+            (reference, runtime, owner) =>
+                new ContractDomProxy(reference, runtime, owner));
+
+        var proxy = factory.Create(
+            typeof(ITestDomContract),
+            new FakeJSObjectReference());
+
+        Assert.IsType<ContractDomProxy>(proxy);
+        Assert.IsAssignableFrom<ITestDomContract>(proxy);
+    }
+
+    [Fact]
     public void Register_overwrites_previous_registration_for_same_type()
     {
         var (factory, _) = CreateFactory();
@@ -98,4 +115,12 @@ public sealed class DomProxyFactoryTests
         public IDomRuntime     RuntimeExposed => Runtime;
         public IDomProxyFactory FactoryExposed => Factory;
     }
+
+    internal interface ITestDomContract : IDomProxy;
+
+    internal sealed class ContractDomProxy(
+        IJSObjectReference reference,
+        IDomRuntime runtime,
+        IDomProxyFactory factory)
+        : DomProxyBase(reference, runtime, factory), ITestDomContract;
 }

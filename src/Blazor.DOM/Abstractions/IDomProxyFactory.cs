@@ -23,6 +23,11 @@ public interface IDomProxyFactory
         Func<IJSObjectReference, IDomRuntime, IDomProxyFactory, TProxy> factory)
         where TProxy : class, IDomProxy;
 
+    /// <summary>Registers a generated proxy factory by its public contract type.</summary>
+    void Register(
+        Type contractType,
+        Func<IJSObjectReference, IDomRuntime, IDomProxyFactory, IDomProxy> factory);
+
     /// <summary>
     /// Creates a <typeparamref name="TProxy"/> wrapping <paramref name="reference"/>.
     /// </summary>
@@ -30,4 +35,7 @@ public interface IDomProxyFactory
     /// Thrown when no factory has been registered for <typeparamref name="TProxy"/>.
     /// </exception>
     TProxy Create<TProxy>(IJSObjectReference reference) where TProxy : class, IDomProxy;
+
+    /// <summary>Creates a generated proxy for a runtime-known public contract type.</summary>
+    IDomProxy Create(Type contractType, IJSObjectReference reference);
 }

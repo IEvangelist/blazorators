@@ -1,0 +1,90 @@
+// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Microsoft.JSInterop;
+
+/// <summary>In-process dispatch primitives used by generated WebAssembly interfaces.</summary>
+public static class WasmDomDispatch
+{
+    /// <summary>Reads a property synchronously.</summary>
+    public static TResult GetProperty<TResult>(
+        IDomDispatchProxy proxy,
+        string name,
+        DomTransportDescriptor transport)
+    {
+        DomDispatch.Validate(proxy, name, transport);
+        var runtime = RequireSyncRuntime(proxy);
+        var reference = RequireSyncReference(proxy);
+        if (typeof(IDomProxy).IsAssignableFrom(typeof(TResult)))
+        {
+            transport.RequireReference(nameof(transport));
+            return (TResult)proxy.DispatchFactory.Create(
+                typeof(TResult),
+                runtime.GetPropertyRef(reference, name));
+        }
+
+        DomDispatch.RequireJsonLike(transport);
+        return runtime.GetProperty<TResult>(reference, name);
+    }
+
+    /// <summary>Writes a property synchronously.</summary>
+    public static void SetProperty<TValue>(
+        IDomDispatchProxy proxy,
+        string name,
+        TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(proxy);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        RequireSyncRuntime(proxy).SetProperty(
+            RequireSyncReference(proxy),
+            name,
+            value);
+    }
+
+    /// <summary>Invokes a non-Promise method synchronously.</summary>
+    public static TResult Invoke<TResult>(
+        IDomDispatchProxy proxy,
+        string name,
+        object?[]? arguments,
+        DomTransportDescriptor transport)
+    {
+        DomDispatch.Validate(proxy, name, transport);
+        var runtime = RequireSyncRuntime(proxy);
+        var reference = RequireSyncReference(proxy);
+        if (typeof(IDomProxy).IsAssignableFrom(typeof(TResult)))
+        {
+            transport.RequireReference(nameof(transport));
+            return (TResult)proxy.DispatchFactory.Create(
+                typeof(TResult),
+                runtime.InvokeMethodRef(reference, name, arguments));
+        }
+
+        DomDispatch.RequireJsonLike(transport);
+        return runtime.InvokeMethod<TResult>(reference, name, arguments);
+    }
+
+    /// <summary>Invokes a non-Promise void method synchronously.</summary>
+    public static void InvokeVoid(
+        IDomDispatchProxy proxy,
+        string name,
+        object?[]? arguments)
+    {
+        ArgumentNullException.ThrowIfNull(proxy);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        RequireSyncRuntime(proxy).InvokeMethodVoid(
+            RequireSyncReference(proxy),
+            name,
+            arguments);
+    }
+
+    private static IDomSyncRuntime RequireSyncRuntime(IDomDispatchProxy proxy) =>
+        proxy.DispatchRuntime as IDomSyncRuntime
+        ?? throw new InvalidOperationException(
+            "Synchronous DOM dispatch requires the Blazor WebAssembly package.");
+
+    private static IJSInProcessObjectReference RequireSyncReference(
+        IDomDispatchProxy proxy) =>
+        proxy.Reference as IJSInProcessObjectReference
+        ?? throw new InvalidOperationException(
+            "Synchronous DOM dispatch requires an in-process JS object reference.");
+}

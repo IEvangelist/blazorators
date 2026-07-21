@@ -20,21 +20,47 @@ public sealed class DomProxyFactory(IDomRuntime runtime) : IDomProxyFactory
         where TProxy : class, IDomProxy
     {
         ArgumentNullException.ThrowIfNull(factory);
-        _registry[typeof(TProxy)] = reference => factory(reference, runtime, this);
+        Register(
+            typeof(TProxy),
+            (reference, dispatchRuntime, proxyFactory) =>
+                factory(reference, dispatchRuntime, proxyFactory));
+    }
+
+    /// <inheritdoc />
+    public void Register(
+        Type contractType,
+        Func<IJSObjectReference, IDomRuntime, IDomProxyFactory, IDomProxy> factory)
+    {
+        ArgumentNullException.ThrowIfNull(contractType);
+        ArgumentNullException.ThrowIfNull(factory);
+        if (!typeof(IDomProxy).IsAssignableFrom(contractType))
+        {
+            throw new ArgumentException(
+                $"Generated proxy contract '{contractType}' must implement {nameof(IDomProxy)}.",
+                nameof(contractType));
+        }
+
+        _registry[contractType] =
+            reference => factory(reference, runtime, this);
     }
 
     /// <inheritdoc />
     public TProxy Create<TProxy>(IJSObjectReference reference) where TProxy : class, IDomProxy
+        => (TProxy)Create(typeof(TProxy), reference);
+
+    /// <inheritdoc />
+    public IDomProxy Create(Type contractType, IJSObjectReference reference)
     {
+        ArgumentNullException.ThrowIfNull(contractType);
         ArgumentNullException.ThrowIfNull(reference);
-        if (_registry.TryGetValue(typeof(TProxy), out var factory))
+        if (_registry.TryGetValue(contractType, out var factory))
         {
-            return (TProxy)factory(reference);
+            return factory(reference);
         }
 
         throw new InvalidOperationException(
-            $"No proxy factory registered for '{typeof(TProxy).Name}'. " +
-            $"Call Register<{typeof(TProxy).Name}>() on {nameof(IDomProxyFactory)} " +
-            $"before calling Create<{typeof(TProxy).Name}>().");
+            $"No proxy factory registered for '{contractType.Name}'. " +
+            "Register every generated proxy contract through the generated " +
+            "service collection extension before creating live DOM references.");
     }
 }
