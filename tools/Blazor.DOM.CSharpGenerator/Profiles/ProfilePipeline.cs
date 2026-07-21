@@ -24,17 +24,25 @@ public static class ProfilePipeline
             baseOutputDirectory,
             profile.OutputSubdirectory);
 
-        var symbolIndex = ir.TypescriptSymbols
+        var sourceIndex = ir.TypescriptSymbols
             .ToDictionary(s => s.Name, StringComparer.Ordinal);
+        var generationIndex = profile.MinimalDependencyContracts
+            ? sourceIndex.ToDictionary(
+                pair => pair.Key,
+                pair => SelectProfileMembers(pair.Value, profile),
+                StringComparer.Ordinal)
+            : sourceIndex;
 
-        var closure = TransitiveDependencyResolver.Resolve(profile.RootSymbols, symbolIndex);
+        var closure = TransitiveDependencyResolver.Resolve(
+            profile.RootSymbols,
+            generationIndex);
 
-        var includedSymbols = ir.TypescriptSymbols
-            .Where(s => closure.Contains(s.Name))
+        var includedSymbols = generationIndex.Values
+            .Where(symbol => closure.Contains(symbol.Name))
             .OrderBy(s => s.Ordinal)
             .ToList();
         var externalRefs = closure
-            .Where(n => !symbolIndex.ContainsKey(n))
+            .Where(n => !sourceIndex.ContainsKey(n))
             .OrderBy(n => n, StringComparer.Ordinal)
             .ToList();
 
@@ -155,6 +163,58 @@ public static class ProfilePipeline
     /// </summary>
     private static IReadOnlyList<GeneratedFile> ScanAllFiles(string directory)
         => OutputVerifier.ScanDirectory(directory);
+
+    private static SymbolModel SelectProfileMembers(
+        SymbolModel symbol,
+        ProfileDefinition profile)
+    {
+        if (profile.MemberIncludes?.TryGetValue(
+                symbol.Name,
+                out var includes) == true)
+        {
+            var includeAll = includes.Contains("*", StringComparer.Ordinal);
+            var names = includes.ToHashSet(StringComparer.Ordinal);
+            return symbol with
+            {
+                Declarations = symbol.Declarations
+                    .Select(declaration =>
+                        declaration with
+                        {
+                            Members = includeAll
+                                ? declaration.Members
+                                : declaration.Members
+                                    .Where(member =>
+                                    {
+                                        var memberName = member.Name?.Text
+                                            ?? $"${member.Kind}";
+                                        return names.Contains(memberName)
+                                            || names.Contains(
+                                                $"{memberName}@{declaration.Ordinal}/{member.Ordinal}");
+                                    })
+                                    .ToList(),
+                        })
+                    .ToList(),
+            };
+        }
+
+        if (profile.RootSymbols.Contains(symbol.Name, StringComparer.Ordinal))
+            return symbol;
+
+        var classification = symbol.Semantic.Classifications.FirstOrDefault();
+        if (classification is "enum")
+            return symbol;
+
+        return symbol with
+        {
+            Declarations = symbol.Declarations
+                .Select(declaration => declaration with
+                {
+                    Members = [],
+                    NamespaceMembers = [],
+                })
+                .ToList(),
+        };
+    }
 
     private static string SerializeCoverage(ProfileCoverageReport report)
         => JsonSerializer.Serialize(report, new JsonSerializerOptions

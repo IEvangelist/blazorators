@@ -17,5 +17,9 @@ public sealed record ProfileDefinition(
     [property: JsonPropertyName("requiresUserActivation")] bool RequiresUserActivation,
     [property: JsonPropertyName("features")] IReadOnlyList<string> Features,
     [property: JsonPropertyName("outputNamespace")] string OutputNamespace,
-    [property: JsonPropertyName("outputSubdirectory")] string OutputSubdirectory
+    [property: JsonPropertyName("outputSubdirectory")] string OutputSubdirectory,
+    [property: JsonPropertyName("memberIncludes")]
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? MemberIncludes = null,
+    [property: JsonPropertyName("minimalDependencyContracts")]
+        bool MinimalDependencyContracts = false
 );

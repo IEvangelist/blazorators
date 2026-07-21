@@ -168,7 +168,11 @@ public sealed class ProfileSystemTests
                     "requiresUserActivation": false,
                     "features": ["feature-x"],
                     "outputNamespace": "Test.Namespace",
-                    "outputSubdirectory": "Profiles/Test"
+                    "outputSubdirectory": "Profiles/Test",
+                    "minimalDependencyContracts": true,
+                    "memberIncludes": {
+                        "TypeA": ["run@0/1"]
+                    }
                 }
                 """;
             var path = Path.Combine(dir, "test.profile.json");
@@ -179,6 +183,8 @@ public sealed class ProfileSystemTests
             Assert.Equal(["TypeA", "TypeB"], profile.RootSymbols);
             Assert.True(profile.SecureContext);
             Assert.Equal("Test.Namespace", profile.OutputNamespace);
+            Assert.True(profile.MinimalDependencyContracts);
+            Assert.Equal(["run@0/1"], profile.MemberIncludes!["TypeA"]);
         }
         finally { Directory.Delete(dir, true); }
     }

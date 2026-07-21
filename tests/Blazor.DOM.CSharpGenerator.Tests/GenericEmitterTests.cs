@@ -818,13 +818,16 @@ public sealed class GenericEmitterTests
             new TypeResolver([collisionHost]),
             "1.0.0",
             "Blazor.DOM").Emit(collisionHost);
-        Assert.Contains("double Pick();", collisionResult.Source);
-        Assert.DoesNotContain("T Pick<T>();", collisionResult.Source);
-        Assert.Equal(
-            "generic-method-defaults",
-            Assert.Single(
-                collisionResult.MemberOutcomes,
-                outcome => outcome.Ordinal == 1).Phase);
+        Assert.Contains(
+            "global::Blazor.DOM.AdvancedTypes.CollisionHostUnionShape_",
+            collisionResult.Source);
+        Assert.Contains(" Pick();", collisionResult.Source);
+        Assert.Contains("T Pick<T>();", collisionResult.Source);
+        var collisionOutcome = Assert.Single(
+            collisionResult.MemberOutcomes,
+            outcome => outcome.Ordinal == 1);
+        Assert.Equal(MemberOutcomeStatus.Projected, collisionOutcome.Status);
+        Assert.Null(collisionOutcome.Phase);
     }
 
     [Fact]
@@ -920,14 +923,17 @@ public sealed class GenericEmitterTests
             new TypeResolver([orderingHost]),
             "1.0.0",
             "Blazor.DOM").Emit(orderingHost);
-        Assert.Contains("double Choose<T>();", orderingResult.Source);
-        Assert.DoesNotContain("U Choose<T, U>();", orderingResult.Source);
-        Assert.DoesNotContain("string Choose();", orderingResult.Source);
+        Assert.Contains(
+            "global::Blazor.DOM.AdvancedTypes.OrderingHostUnionShape_",
+            orderingResult.Source);
+        Assert.Contains(" Choose<T>();", orderingResult.Source);
+        Assert.Contains("U Choose<T, U>();", orderingResult.Source);
+        Assert.Contains("string Choose();", orderingResult.Source);
         var orderingOutcome = Assert.Single(
             orderingResult.MemberOutcomes,
             outcome => outcome.Ordinal == 1);
-        Assert.Equal(MemberOutcomeStatus.Deferred, orderingOutcome.Status);
-        Assert.Equal("generic-method-defaults", orderingOutcome.Phase);
+        Assert.Equal(MemberOutcomeStatus.Projected, orderingOutcome.Status);
+        Assert.Null(orderingOutcome.Phase);
 
         var legalVoid = MakeInterfaceSymbol(
             "VoidHost",
