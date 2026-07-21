@@ -55,6 +55,17 @@ public interface IDomRuntime
         object?[]? args,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Invokes a method whose result requires a proven JavaScript-side union
+    /// discriminator before JSON or reference transport is selected.
+    /// </summary>
+    ValueTask<TResult> InvokeMethodUnionAsync<TResult>(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        IReadOnlyList<DomUnionInboundArm<TResult>> arms,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Invokes a void method on a live JS object.</summary>
     ValueTask InvokeMethodVoidAsync(
         IJSObjectReference reference,

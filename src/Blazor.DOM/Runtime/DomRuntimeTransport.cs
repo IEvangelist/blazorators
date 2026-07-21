@@ -96,6 +96,59 @@ internal static class DomRuntimeTransport
             [target, name, args],
             cancellationToken);
 
+    public static async ValueTask<TResult> InvokeMethodUnionAsync<TResult>(
+        IJSObjectReference module,
+        IJSObjectReference target,
+        string name,
+        object?[]? args,
+        IReadOnlyList<DomUnionInboundArm<TResult>> arms,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(module);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(arms);
+        if (arms.Count == 0)
+            throw new ArgumentException("At least one union arm is required.", nameof(arms));
+        var identities = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var arm in arms)
+        {
+            var identity = $"{arm.Discriminator}:{arm.Brand}:{arm.Literal}";
+            if (!identities.Add(identity))
+            {
+                throw new ArgumentException(
+                    $"Duplicate inbound union discriminator '{identity}'.",
+                    nameof(arms));
+            }
+        }
+
+        var handler = new DomUnionDeliveryHandler<TResult>(arms);
+        var handlerReference = DotNetObjectReference.Create(handler);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await module.InvokeVoidAsync(
+                "invokeMethodUnion",
+                cancellationToken,
+                [
+                    target,
+                    name,
+                    args,
+                    arms.Select(arm => arm.ToJavaScriptDescriptor()).ToArray(),
+                    handlerReference,
+                    "ReceiveUnionJson",
+                    "ReceiveUnionReference",
+                ]).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            return await handler.TakeResultAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            await handler.DisposeAsync().ConfigureAwait(false);
+            handlerReference.Dispose();
+        }
+    }
+
     public static ValueTask<IJSObjectReference> GetIndexObjectReferenceAsync(
         IJSObjectReference module,
         IJSObjectReference target,
