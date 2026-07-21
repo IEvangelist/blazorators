@@ -46,6 +46,20 @@ jobs:
         - Blazor.StorageManagement.WebAssembly
         - Blazor.Screen
         - Blazor.Screen.WebAssembly
+        - Blazor.OfflineStorage
+        - Blazor.OfflineStorage.WebAssembly
+        - Blazor.BrowserCoordination
+        - Blazor.BrowserCoordination.WebAssembly
+        - Blazor.Performance
+        - Blazor.Performance.WebAssembly
+        - Blazor.Credentials
+        - Blazor.Credentials.WebAssembly
+        - Blazor.WebCrypto
+        - Blazor.WebCrypto.WebAssembly
+        - Blazor.MediaDevices
+        - Blazor.MediaDevices.WebAssembly
+        - Blazor.Notifications
+        - Blazor.Notifications.WebAssembly
     steps:
     - uses: actions/checkout@main
 
@@ -97,6 +111,14 @@ jobs:
         dotnet test ./tests/Blazor.Share.Tests/Blazor.Share.Tests.csproj --configuration Release --verbosity normal
         dotnet test ./tests/Blazor.StorageManagement.Tests/Blazor.StorageManagement.Tests.csproj --configuration Release --verbosity normal
         dotnet test ./tests/Blazor.Screen.Tests/Blazor.Screen.Tests.csproj --configuration Release --verbosity normal
+
+    - name: Run platform focused package tests
+      run: |
+        dotnet test ./tests/Blazor.OfflineStorage.Tests/Blazor.OfflineStorage.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.BrowserCoordination.Tests/Blazor.BrowserCoordination.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.Performance.Tests/Blazor.Performance.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.Credentials.Tests/Blazor.Credentials.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.WebCrypto.Tests/Blazor.WebCrypto.Tests.csproj --configuration Release --verbosity normal
 
     - name: Restore DOM global namespace compilation tests
       run: |
