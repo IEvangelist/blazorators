@@ -71,6 +71,22 @@ internal sealed class SynthesizedTypeRegistry(
             name => EmitRecord(name, properties));
     }
 
+    public string RegisterStringDomain(
+        string provenance,
+        IReadOnlyList<string> values)
+    {
+        var ordered = values
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+        var fingerprint = $"string-domain({string.Join("|", ordered)})";
+        return Register(
+            "String",
+            provenance,
+            fingerprint,
+            name => EmitStringDomain(name, ordered));
+    }
+
     private string Register(
         string kind,
         string provenance,
@@ -180,6 +196,47 @@ internal sealed class SynthesizedTypeRegistry(
             EmitTupleRead(writer, name, elements);
             writer.AppendLine();
             EmitTupleWrite(writer, name, elements);
+        });
+        return writer.ToString();
+    }
+
+    private string EmitStringDomain(
+        string name,
+        IReadOnlyList<string> values)
+    {
+        var writer = Header();
+        writer.AppendLine("using System.Runtime.Serialization;");
+        writer.AppendLine("using System.Text.Json.Serialization;");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
+        writer.AppendLine();
+        writer.AppendLine($"[JsonConverter(typeof(JsonStringEnumConverter<{name}>))]");
+        writer.Block($"public enum {name}", () =>
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            for (var index = 0; index < values.Count; index++)
+            {
+                var value = values[index];
+                var memberName = Naming.ToEnumMemberName(value);
+                if (!names.Add(memberName))
+                {
+                    throw new GenericDeferralException(
+                        $"Finite string values at '{name}' collide on CLR enum member " +
+                        $"'{memberName}'.",
+                        name,
+                        "synthesized-identity-collision");
+                }
+                writer.AppendLine(
+                    $"[EnumMember(Value = \"{EscapeString(value)}\")]");
+                writer.AppendLine("#if NET9_0_OR_GREATER");
+                writer.AppendLine(
+                    $"[JsonStringEnumMemberName(\"{EscapeString(value)}\")]");
+                writer.AppendLine("#endif");
+                writer.AppendLine(
+                    index == values.Count - 1 ? memberName : $"{memberName},");
+                if (index != values.Count - 1)
+                    writer.AppendLine();
+            }
         });
         return writer.ToString();
     }

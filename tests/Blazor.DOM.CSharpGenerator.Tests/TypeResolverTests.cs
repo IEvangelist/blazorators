@@ -114,11 +114,14 @@ public sealed class TypeResolverTests
     }
 
     [Fact]
-    public void Project_TemplateLiteral_ThrowsTypeProjectionException()
+    public void Project_EmptyTemplateLiteral_UsesFiniteValueType()
     {
         var resolver = EmptyResolver();
         var node = new TemplateLiteralTypeNode([]);
-        Assert.Throws<TypeProjectionException>(() => resolver.Project(node, "test/templateLiteral"));
+        var projection = resolver.Project(node, "test/templateLiteral");
+        Assert.Equal("finite-template-string", projection.ProviderNote);
+        Assert.NotEqual("string", projection.RenderedType);
+        Assert.Single(resolver.SynthesizedTypes);
     }
 
     [Fact]
