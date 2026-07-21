@@ -792,10 +792,8 @@ public sealed class HardeningRegressionTests
     }
 
     [Fact]
-    public void InterfaceEmitter_NonEventGenericMethod_Throws()
+    public void InterfaceEmitter_NonEventGenericMethod_Emits()
     {
-        // A generic method that is NOT addEventListener/removeEventListener must throw,
-        // not silently defer to events/generics.
         var resolver = EmptyResolver();
         var emitter = new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM");
 
@@ -814,9 +812,13 @@ public sealed class HardeningRegressionTests
             MakeInterfaceDecl("ITestTarget", [nonEventGeneric])
         ]);
 
-        // Must throw with provenance — not silently produce deferred output
-        var ex = Assert.Throws<InterfaceEmitException>(() => emitter.Emit(symbol));
-        Assert.Contains("generic-emission", ex.Message);
+        var result = emitter.Emit(symbol);
+        Assert.Contains(
+            "void SomeGenericMethod<T>(T @value);",
+            result.Source);
+        Assert.DoesNotContain(
+            result.MemberOutcomes,
+            outcome => outcome.Status != MemberOutcomeStatus.Projected);
     }
 
     // ── Finding 3: Member-level accounting ────────────────────────────────────
@@ -1423,8 +1425,8 @@ public sealed class HardeningRegressionTests
         ]);
 
         var ex = Assert.Throws<InterfaceEmitException>(() => emitter.Emit(symbol));
-        Assert.Contains("generic type", ex.Message);
-        Assert.Contains("Derived/extends/KnownBase", ex.Provenance);
+        Assert.Contains("target arity is 0", ex.Message);
+        Assert.Contains("Derived/decl[0]/extends/KnownBase", ex.Provenance);
     }
 
     [Fact]

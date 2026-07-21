@@ -51,6 +51,10 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         {
             return EmitCore(symbol).Source;
         }
+        catch (GenericDeferralException)
+        {
+            throw;
+        }
         catch (DictionaryEmitException exception)
         {
             throw new TypeProjectionException(
@@ -74,6 +78,10 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                 DeclarationOutcomes = outcomes.DeclarationOutcomes,
                 OverloadOutcomes = outcomes.OverloadOutcomes,
             };
+        }
+        catch (GenericDeferralException)
+        {
+            throw;
         }
         catch (DictionaryEmitException ex)
         {
@@ -108,6 +116,9 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         // Use first declaration for documentation and header.
         var primaryDecl = decls[0];
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
+        var generic = typeResolver.CreateGenericDeclaration(
+            symbol,
+            symbol.Name);
 
         // ── Collect all member outputs; deduplicate by member name; fail before writing ──
         var propertyOutputs = new List<(string DocLines, string PropertyLine, bool HasJsonAttr, string JsonAttr)>();
@@ -150,7 +161,11 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                         continue;
                     }
 
-                    var entry = BuildProperty(member, symbol.Name, decl.Ordinal);
+                    var entry = BuildProperty(
+                        member,
+                        symbol.Name,
+                        decl.Ordinal,
+                        generic.Scope);
                     if (entry is null)
                     {
                         memberOutcomes.Add(new MemberOutcome(
@@ -172,6 +187,17 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                         MemberOutcomeStatus.Projected,
                         null,
                         null,
+                        decl.Ordinal));
+                }
+                catch (GenericDeferralException exception)
+                {
+                    memberOutcomes.Add(new MemberOutcome(
+                        member.Ordinal,
+                        memberName ?? "",
+                        member.Kind,
+                        MemberOutcomeStatus.Deferred,
+                        exception.Phase,
+                        exception.Message,
                         decl.Ordinal));
                 }
                 catch (TypeProjectionException ex)
@@ -209,6 +235,8 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
             w.AppendLine("// Requires secure context (HTTPS).");
         if (symbol.Semantic.Serializable)
             w.AppendLine("// Serializable dictionary (supports structured clone).");
+        foreach (var defaultNote in generic.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
 
         // NOTE: C# records are NOT sealed by default. When the base type is also a dictionary
         // (record) in our symbol index, we inherit from it correctly.
@@ -216,7 +244,11 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         string baseClause;
         try
         {
-            baseClause = BuildBaseClause(symbol.Name, decls);
+            baseClause = BuildBaseClause(symbol.Name, decls, generic.Scope);
+        }
+        catch (GenericDeferralException)
+        {
+            throw;
         }
         catch (TypeProjectionException exception)
         {
@@ -226,9 +258,10 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                 memberOutcomes);
         }
 
+        var declaredName = $"{csName}{generic.TypeParameterList}";
         var header = string.IsNullOrEmpty(baseClause)
-            ? $"public record {csName}"
-            : $"public record {csName} : {baseClause}";
+            ? $"public record {declaredName}{generic.ConstraintSuffix}"
+            : $"public record {declaredName} : {baseClause}{generic.ConstraintSuffix}";
 
         w.Block(header, () =>
         {
@@ -268,7 +301,8 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
     private (string DocLines, string PropertyLine, bool HasJsonAttr, string JsonAttr)? BuildProperty(
         MemberModel member,
         string symbolName,
-        int declarationOrdinal)
+        int declarationOrdinal,
+        GenericScope genericScope)
     {
         var memberName = member.Name?.Text;
         if (memberName is null) return null;
@@ -276,7 +310,10 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         var provenance =
             $"{symbolName}/decl[{declarationOrdinal}]/member[{member.Ordinal}]/{member.Kind}/{memberName}";
         // Throws on failure — fail closed, no comment fallback
-        var projection = typeResolver.Project(member.Type, provenance);
+        var projection = typeResolver.Project(
+            member.Type,
+            provenance,
+            genericScope);
 
         var docText = member.Documentation?.Text ?? "";
         var deprecated = member.Documentation?.Deprecated ?? false;
@@ -309,9 +346,12 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
     /// Throws <see cref="TypeProjectionException"/> if the base type exists but is not a known dictionary.
     /// Returns an empty string if there is no base.
     /// </summary>
-    private string BuildBaseClause(string symbolName, IReadOnlyList<DeclarationModel> decls)
+    private string BuildBaseClause(
+        string symbolName,
+        IReadOnlyList<DeclarationModel> decls,
+        GenericScope genericScope)
     {
-        var bases = new List<string>();
+        var bases = new List<HeritageReferenceTypeNode>();
         foreach (var decl in decls)
         {
             foreach (var heritage in decl.Heritage.Where(h => h.Token == "extends"))
@@ -326,40 +366,43 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                             $"{symbolName}/extends");
                     }
 
-                    if (referenceNode.TypeArguments.Count > 0)
-                    {
-                        throw new TypeProjectionException(
-                            $"DictionaryEmitter: '{symbolName}' decl[{decl.Ordinal}] extends generic type '{referenceNode.Expression}<...>'. " +
-                            "Generic heritage requires a dedicated generic-heritage phase.",
-                            $"{symbolName}/extends/{referenceNode.Expression}");
-                    }
-
-                    bases.Add(referenceNode.ResolvedSymbol ?? referenceNode.Expression);
+                    bases.Add(referenceNode);
                 }
             }
         }
 
-        bases = bases.Distinct(StringComparer.Ordinal).ToList();
+        bases = bases
+            .GroupBy(
+                node => $"{node.ResolvedSymbol ?? node.Expression}:" +
+                    $"{string.Join(",", node.TypeArguments.Select(
+                        argument => argument.CheckerType ?? argument.Kind))}",
+                StringComparer.Ordinal)
+            .Select(group => group.First())
+            .ToList();
 
         if (bases.Count == 0) return "";
 
         // Validate: every base must be a known dictionary so record inheritance is safe.
         var csNames = new List<string>();
-        foreach (var baseName in bases)
+        foreach (var baseNode in bases)
         {
+            var baseName = baseNode.ResolvedSymbol ?? baseNode.Expression;
             if (!typeResolver.IsDictionarySymbol(baseName))
                 throw new TypeProjectionException(
                     $"DictionaryEmitter: '{symbolName}' extends '{baseName}' which is not a known dictionary symbol. " +
                     "Record inheritance requires the base to also be a dictionary (record). " +
                     "Add an emitter override or remove the unsupported inheritance.",
                     $"{symbolName}/extends/{baseName}");
-            csNames.Add(typeResolver.GetCSharpTypeReference(baseName));
+            csNames.Add(typeResolver.Project(
+                baseNode,
+                $"{symbolName}/extends/{baseName}",
+                genericScope).RenderedType);
         }
 
         // C# records support single inheritance only.
         if (csNames.Count > 1)
             throw new TypeProjectionException(
-                $"DictionaryEmitter: '{symbolName}' extends multiple bases ({string.Join(", ", bases)}). " +
+                $"DictionaryEmitter: '{symbolName}' extends multiple bases ({string.Join(", ", bases.Select(node => node.Expression))}). " +
                 "C# records support single inheritance only.",
                 $"{symbolName}/extends");
 

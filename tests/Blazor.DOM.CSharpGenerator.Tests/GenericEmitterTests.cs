@@ -1,0 +1,491 @@
+using System.Security.Cryptography;
+using Blazor.DOM.CSharpGenerator.Emitters;
+using Blazor.DOM.CSharpGenerator.IR;
+using Blazor.DOM.CSharpGenerator.Output;
+using Blazor.DOM.CSharpGenerator.Profiles;
+using Blazor.DOM.CSharpGenerator.Projection;
+using Xunit;
+
+namespace Blazor.DOM.CSharpGenerator.Tests;
+
+public sealed class GenericEmitterTests
+{
+    [Fact]
+    public void Corpus_EmitsGenericDeclarationsMethodsFactoriesAliasesAndHeritage()
+    {
+        var (ir, resolver) = LoadCorpus();
+        var output = CreateTempDirectory();
+        try
+        {
+            var result = GenerationPipeline.Run(
+                ir,
+                output,
+                EmitterOverridesLoader.Load(Path.Combine(
+                    FindRepositoryRoot(),
+                    "data",
+                    "Blazor.DOM")));
+
+            Assert.Contains(
+                "public partial interface IHTMLCollectionOf<T> : IHTMLCollectionBase where T : IElement",
+                Read(output, "Interfaces", "IHTMLCollectionOf.g.cs"));
+            Assert.Contains(
+                "T AppendChild<T>(T node) where T : INode;",
+                Read(output, "Interfaces", "INode.g.cs"));
+            Assert.Contains(
+                "public delegate T LockGrantedCallback<T>(ILock? @lock);",
+                Read(output, "Callbacks", "LockGrantedCallback.g.cs"));
+            Assert.Contains(
+                "public record QueuingStrategy<T>",
+                Read(output, "Dictionaries", "QueuingStrategy.g.cs"));
+            Assert.Contains(
+                "public readonly struct ReadableStreamController<T>",
+                Read(output, "Typedefs", "ReadableStreamController.g.cs"));
+            Assert.Contains(
+                "ICustomEvent<T> Create<T>(string type, CustomEventInit<T>? eventInitDict = default);",
+                Read(output, "Factories", "ICustomEventFactory.g.cs"));
+            Assert.Contains(
+                "T StructuredClone<T>(T @value, StructuredSerializeOptions? options = default);",
+                Read(output, "Globals", "IWindow.Globals.g.cs"));
+            Assert.Contains(
+                "public partial interface IFormDataIterator<T> : IEnumerable<T>",
+                Read(output, "Interfaces", "IFormDataIterator.g.cs"));
+            Assert.DoesNotContain(
+                result.Errors,
+                error => error.Message.Contains(
+                    "generic C# emission is deferred",
+                    StringComparison.Ordinal));
+            var genericConstraintDeferral = Assert.Single(
+                result.Manifest.Accounting.DeferredSymbols,
+                entry => entry.Symbol == "WebAssembly.GlobalDescriptor");
+            Assert.Equal(
+                "advanced-generic-constraints",
+                genericConstraintDeferral.Phase);
+            Assert.All(
+                new[] { "OptionalPrefixToken", "OptionalPostfixToken" },
+                symbolName => Assert.Contains(
+                    result.Manifest.Accounting.DeferredSymbols,
+                    entry => entry.Symbol == symbolName
+                        && entry.Phase == "advanced-generic-constraints"));
+            Assert.Contains(
+                result.Manifest.Accounting.DeferredMemberEntries,
+                entry => entry.SymbolName == "ReadableStreamBYOBReader"
+                    && entry.MemberName == "read"
+                    && entry.Phase == "advanced-generic-constraints");
+            Assert.Contains(
+                result.Manifest.Accounting.DeferredMemberEntries,
+                entry => entry.MemberName == "addEventListener"
+                    && entry.Phase == "event-subscription");
+
+            var blob = Assert.Single(
+                ir.TypescriptSymbols,
+                symbol => symbol.Name == "Blob");
+            var stream = blob.Declarations.SelectMany(declaration => declaration.Members)
+                .Single(member => member.Name?.Text == "stream").ReturnType!;
+            var projection = resolver.Project(stream, "Blob/stream/return");
+            Assert.Equal("transferable", projection.Transport?.Kind);
+            Assert.Equal(1, projection.Identity.GenericArity);
+            Assert.Equal(ClrTypeKind.Reference, projection.Identity.Kind);
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Resolver_ValidatesArityDefaultsNestedContainersAndQualifiedIdentity()
+    {
+        var (ir, resolver) = LoadCorpus();
+        var customEvent = Assert.Single(
+            ir.TypescriptSymbols,
+            symbol => symbol.Name == "CustomEvent");
+        Assert.Equal(1, resolver.GetGenericArity(customEvent.Name));
+
+        var defaulted = resolver.Project(
+            new ReferenceTypeNode("CustomEvent", "CustomEvent", []),
+            "fixture/defaulted");
+        Assert.Equal("ICustomEvent<object>", defaulted.RenderedType);
+
+        var nested = resolver.Project(
+            new ReferenceTypeNode(
+                "Promise",
+                "Promise",
+                [
+                    new ReferenceTypeNode(
+                        "ReadonlyArray",
+                        "ReadonlyArray",
+                        [
+                            new ReferenceTypeNode(
+                                "CustomEvent",
+                                "CustomEvent",
+                                [new KeywordTypeNode("StringKeyword")])
+                        ])
+                ]),
+            "fixture/nested");
+        Assert.Equal(
+            "ValueTask<ICustomEvent<string>[]>",
+            nested.RenderedType);
+        Assert.Equal(
+            "ValueTask<ICustomEvent<string>[]>",
+            nested.CanonicalType);
+
+        var exception = Assert.Throws<TypeProjectionException>(() =>
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "CustomEvent",
+                    "CustomEvent",
+                    [
+                        new KeywordTypeNode("StringKeyword"),
+                        new KeywordTypeNode("NumberKeyword")
+                    ]),
+                "fixture/arity"));
+        Assert.Contains("target arity is 1", exception.Message);
+        Assert.Equal("fixture/arity", exception.Provenance);
+
+        Assert.Equal(
+            "IReadOnlyDictionary<string, double>",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "ReadonlyMap",
+                    null,
+                    [
+                        new KeywordTypeNode("StringKeyword"),
+                        new KeywordTypeNode("NumberKeyword")
+                    ]),
+                "fixture/map").RenderedType);
+        Assert.Equal(
+            "IReadOnlySet<string>",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "ReadonlySet",
+                    null,
+                    [new KeywordTypeNode("StringKeyword")]),
+                "fixture/set").RenderedType);
+        Assert.Equal(
+            "ValueTask",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "PromiseLike",
+                    null,
+                    [new KeywordTypeNode("VoidKeyword")]),
+                "fixture/promise-like").RenderedType);
+        Assert.Equal(
+            "IAsyncEnumerable<string>",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "AsyncIteratorObject",
+                    null,
+                    [
+                        new KeywordTypeNode("StringKeyword"),
+                        new ReferenceTypeNode(
+                            "BuiltinIteratorReturn",
+                            "BuiltinIteratorReturn",
+                            []),
+                        new KeywordTypeNode("UnknownKeyword")
+                    ]),
+                "fixture/async-iterator").RenderedType);
+    }
+
+    [Fact]
+    public void GenericScopes_AreLexicalShadowingSafeAndRejectNormalizedCollisions()
+    {
+        var outer = GenericScope.Create(
+            [new TypeParameterModel(0, "T", null, null)],
+            "Outer");
+        var inner = GenericScope.Create(
+            [new TypeParameterModel(0, "T", null, null)],
+            "Outer/decl[0]/Map",
+            outer,
+            "!!");
+        var resolver = new TypeResolver([]);
+
+        Assert.Equal(
+            "!!0",
+            resolver.Project(
+                new ReferenceTypeNode("T", "Outer.Map.T", []),
+                "fixture/inner",
+                inner).CanonicalType);
+        Assert.Equal(
+            "!0",
+            resolver.Project(
+                new ReferenceTypeNode("T", "Outer.T", []),
+                "fixture/outer",
+                inner).CanonicalType);
+
+        var collision = Assert.Throws<TypeProjectionException>(() =>
+            GenericScope.Create(
+                [
+                    new TypeParameterModel(0, "T-U", null, null),
+                    new TypeParameterModel(1, "T_U", null, null)
+                ],
+                "Collision"));
+        Assert.Contains("duplicate C# name 'T_U'", collision.Message);
+
+        var outOfScope = Assert.Throws<TypeProjectionException>(() =>
+            resolver.Project(
+                new ReferenceTypeNode("T", "Other.T", []),
+                "fixture/out-of-scope",
+                inner));
+        Assert.Contains("outside the active lexical generic scope", outOfScope.Message);
+    }
+
+    [Fact]
+    public void Constraints_DefaultsAndOverloadIdentity_FailClosed()
+    {
+        var baseType = MakeInterfaceSymbol("BaseType", []);
+        var otherType = MakeInterfaceSymbol("OtherType", []);
+        var target = MakeInterfaceSymbol(
+            "Target",
+            [
+                GenericMethod(0, "Map", "BaseType"),
+                GenericMethod(1, "Map", "OtherType")
+            ]);
+        var resolver = new TypeResolver([baseType, otherType, target]);
+
+        var collision = Assert.Throws<InterfaceEmitException>(() =>
+            new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM").Emit(target));
+        Assert.Contains("incompatible generic constraints", collision.Message);
+
+        var unsupportedConstraint = Assert.Throws<GenericDeferralException>(() =>
+            resolver.CreateGenericDeclaration(
+                [
+                    new TypeParameterModel(
+                        0,
+                        "T",
+                        new OperatorTypeNode(
+                            "keyof",
+                            new ReferenceTypeNode("BaseType", "BaseType", [])),
+                        null)
+                ],
+                "Target/Map"));
+        Assert.Equal(
+            "advanced-generic-constraints",
+            unsupportedConstraint.Phase);
+
+        var unsupportedDefault = Assert.Throws<GenericDeferralException>(() =>
+            resolver.CreateGenericDeclaration(
+                [
+                    new TypeParameterModel(
+                        0,
+                        "T",
+                        null,
+                        new UnknownTypeNode("conditional"))
+                ],
+                "Target"));
+        Assert.Equal("generic-defaults", unsupportedDefault.Phase);
+    }
+
+    [Fact]
+    public void GenericArtifacts_AreByteIdenticalAcrossRecursiveTwoPassGeneration()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var ir = IrLoader.Load(data);
+        var overrides = EmitterOverridesLoader.Load(data);
+        var first = CreateTempDirectory();
+        var second = CreateTempDirectory();
+        try
+        {
+            var run1 = GenerationPipeline.Run(ir, first, overrides);
+            var run2 = GenerationPipeline.Run(ir, second, overrides);
+            Assert.True(run1.Validation.IsValid);
+            Assert.True(run2.Validation.IsValid);
+
+            var genericPaths = new[]
+            {
+                Path.Combine("Interfaces", "IHTMLCollectionOf.g.cs"),
+                Path.Combine("Interfaces", "INode.g.cs"),
+                Path.Combine("Callbacks", "LockGrantedCallback.g.cs"),
+                Path.Combine("Dictionaries", "QueuingStrategy.g.cs"),
+                Path.Combine("Typedefs", "ReadableStreamController.g.cs"),
+                Path.Combine("Factories", "ICustomEventFactory.g.cs"),
+                Path.Combine("Globals", "IWindow.Globals.g.cs"),
+            };
+            foreach (var path in genericPaths)
+            {
+                var left = File.ReadAllBytes(Path.Combine(first, path));
+                var right = File.ReadAllBytes(Path.Combine(second, path));
+                Assert.Equal(left, right);
+                Assert.Equal(
+                    Convert.ToHexString(SHA256.HashData(left)),
+                    Convert.ToHexString(SHA256.HashData(right)));
+                Assert.DoesNotContain((byte)'\r', left);
+            }
+
+        }
+        finally
+        {
+            Directory.Delete(first, recursive: true);
+            Directory.Delete(second, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Corpus_GenericContractsProfile_IsFailureFreeAndByteIdentical()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var profile = ProfileLoader.Load(Path.Combine(
+            root,
+            "data",
+            "Blazor.DOM.Profiles",
+            "GenericContracts.profile.json"));
+        var output = CreateTempDirectory();
+        try
+        {
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+            Assert.True(result.Coverage.ByteIdentityVerified);
+            Assert.True(result.PipelineResult.Validation.IsValid);
+            Assert.Empty(result.PipelineResult.Errors);
+            Assert.Equal(0, result.PipelineResult.Manifest.Accounting.GenerationFailed);
+            Assert.Equal((19, 18, 1), (
+                result.ClosureSize,
+                result.IncludedSymbolCount,
+                result.ExternalReferenceCount));
+            Assert.Equal(17, result.PipelineResult.Manifest.Accounting.Projected);
+            Assert.Equal(1, result.PipelineResult.Manifest.Accounting.Deferred);
+            Assert.DoesNotContain(
+                result.Coverage.ExternalReferences,
+                reference => reference is "T" or "K"
+                    || reference.EndsWith(".T", StringComparison.Ordinal));
+            Assert.Contains(
+                result.PipelineResult.WrittenFiles,
+                file => file.RelativePath == Path.Combine(
+                    "Interfaces",
+                    "ILockManager.g.cs"));
+            Assert.Contains(
+                result.PipelineResult.WrittenFiles,
+                file => file.RelativePath == Path.Combine(
+                    "Callbacks",
+                    "LockGrantedCallback.g.cs"));
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
+    }
+
+    private static MemberModel GenericMethod(
+        int ordinal,
+        string name,
+        string constraint)
+        => new(
+            ordinal,
+            "method",
+            new NameNode("identifier", name),
+            false,
+            false,
+            false,
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    new ReferenceTypeNode(constraint, constraint, []),
+                    null)
+            ],
+            [
+                new ParameterModel(
+                    0,
+                    "value",
+                    false,
+                    false,
+                    new ReferenceTypeNode("T", $"Target.{name}.T", []),
+                    null,
+                    EmptyDocumentation,
+                    EmptyLocation)
+            ],
+            null,
+            new ReferenceTypeNode("T", $"Target.{name}.T", []),
+            EmptyDocumentation,
+            EmptyLocation);
+
+    private static SymbolModel MakeInterfaceSymbol(
+        string name,
+        IReadOnlyList<MemberModel> members)
+        => new(
+            0,
+            name,
+            0,
+            [
+                new DeclarationModel(
+                    0,
+                    "interface",
+                    name,
+                    [],
+                    [],
+                    [],
+                    members,
+                    null,
+                    [],
+                    null,
+                    EmptyDocumentation,
+                    EmptyLocation,
+                    null,
+                    false,
+                    new EventMapModel(false, []),
+                    [])
+            ],
+            false,
+            new SemanticModel(
+                "matched",
+                name,
+                null,
+                null,
+                ["interface"],
+                [],
+                ["Window"],
+                true,
+                false,
+                [],
+                false,
+                false,
+                false,
+                [],
+                []));
+
+    private static (IrBundle Ir, TypeResolver Resolver) LoadCorpus()
+    {
+        var data = Path.Combine(FindRepositoryRoot(), "data", "Blazor.DOM");
+        var ir = IrLoader.Load(data);
+        return (
+            ir,
+            new TypeResolver(
+                ir.TypescriptSymbols,
+                EmitterOverridesLoader.Load(data)));
+    }
+
+    private static string Read(string root, params string[] path)
+        => File.ReadAllText(Path.Combine([root, .. path]));
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = AppContext.BaseDirectory;
+        while (directory is not null)
+        {
+            if (File.Exists(Path.Combine(directory, "blazorators.sln")))
+                return directory;
+            directory = Path.GetDirectoryName(directory);
+        }
+        throw new InvalidOperationException("Repository root not found.");
+    }
+
+    private static string CreateTempDirectory()
+    {
+        var path = Path.Combine(
+            FindRepositoryRoot(),
+            "artifacts",
+            "generic-emitter-tests",
+            Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(path);
+        return path;
+    }
+
+    private static readonly DocumentationModel EmptyDocumentation =
+        new("", [], false);
+    private static readonly LocationModel EmptyLocation =
+        new("fixture.d.ts", new PositionModel(1, 1, 0), new PositionModel(1, 1, 0));
+}

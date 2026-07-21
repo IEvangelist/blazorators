@@ -210,6 +210,10 @@ public sealed class GenerationPipeline
                 TypeAliasDeclarationKinds);
             return Projected(path, outcomes);
         }
+        catch (GenericDeferralException exception)
+        {
+            return Deferred(exception);
+        }
         catch (Exception exception)
         {
             return CompletePrimaryFailure(
@@ -238,6 +242,10 @@ public sealed class GenerationPipeline
                 MemberOutcomes: result.MemberOutcomes,
                 DeclarationOutcomes: result.DeclarationOutcomes,
                 OverloadOutcomes: result.OverloadOutcomes);
+        }
+        catch (GenericDeferralException exception)
+        {
+            return Deferred(exception);
         }
         catch (DictionaryEmitException exception)
         {
@@ -277,6 +285,10 @@ public sealed class GenerationPipeline
                 TypeAliasDeclarationKinds);
             return Projected(path, outcomes);
         }
+        catch (GenericDeferralException exception)
+        {
+            return Deferred(exception);
+        }
         catch (Exception exception)
         {
             return CompletePrimaryFailure(
@@ -305,6 +317,10 @@ public sealed class GenerationPipeline
                 MemberOutcomes: result.MemberOutcomes,
                 DeclarationOutcomes: result.DeclarationOutcomes,
                 OverloadOutcomes: result.OverloadOutcomes);
+        }
+        catch (GenericDeferralException exception)
+        {
+            return Deferred(exception);
         }
         catch (CallbackEmitException exception)
         {
@@ -344,6 +360,10 @@ public sealed class GenerationPipeline
                 MemberOutcomes: result.MemberOutcomes,
                 DeclarationOutcomes: result.DeclarationOutcomes,
                 OverloadOutcomes: result.OverloadOutcomes);
+        }
+        catch (GenericDeferralException exception)
+        {
+            return Deferred(exception);
         }
         catch (InterfaceEmitException exception)
         {
@@ -385,6 +405,13 @@ public sealed class GenerationPipeline
             MemberOutcomes: members,
             DeclarationOutcomes: declarations,
             OverloadOutcomes: overloads);
+
+    private static PrimarySymbolEmission Deferred(
+        GenericDeferralException exception)
+        => new(
+            SymbolEmissionDisposition.Deferred,
+            Phase: exception.Phase,
+            Reason: exception.Message);
 
     private static PrimarySymbolEmission CompletePrimaryFailure(
         SymbolModel symbol,

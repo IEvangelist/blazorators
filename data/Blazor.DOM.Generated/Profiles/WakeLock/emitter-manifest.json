@@ -6,12 +6,12 @@
     "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
   },
   "accounting": {
-    "totalSymbols": 13,
+    "totalSymbols": 15,
     "projected": 13,
     "projectedClean": 11,
     "projectedWithDeferredMembers": 2,
     "excluded": 0,
-    "deferred": 0,
+    "deferred": 2,
     "generationFailed": 0,
     "projectedSymbols": [
       "AbortSignal",
@@ -29,7 +29,18 @@
       "WakeLockType"
     ],
     "excludedSymbols": [],
-    "deferredSymbols": [],
+    "deferredSymbols": [
+      {
+        "symbol": "AbortSignalEventMap",
+        "phase": "event-subscription",
+        "reason": "Event map interface is deferred to the typed event subscription emission phase."
+      },
+      {
+        "symbol": "WakeLockSentinelEventMap",
+        "phase": "event-subscription",
+        "reason": "Event map interface is deferred to the typed event subscription emission phase."
+      }
+    ],
     "failedSymbols": [],
     "deferredMemberEntries": [
       {
@@ -78,18 +89,18 @@
       }
     ],
     "failedMemberEntries": [],
-    "totalMembers": 68,
+    "totalMembers": 70,
     "projectedMembers": 64,
-    "deferredMembers": 4,
+    "deferredMembers": 6,
     "failedMembers": 0,
-    "expectedMembers": 68,
+    "expectedMembers": 70,
     "memberReconciliationValid": true,
     "failedSymbolMemberOutcomes": [],
     "notAttemptedAfterFailureMembers": 0,
-    "sourceDeclarations": 18,
-    "accountedSourceDeclarations": 18,
-    "sourceMembers": 68,
-    "accountedSourceMembers": 68,
+    "sourceDeclarations": 20,
+    "accountedSourceDeclarations": 20,
+    "sourceMembers": 70,
+    "accountedSourceMembers": 70,
     "sourceOverloads": 29,
     "accountedSourceOverloads": 29,
     "sourceParameters": 42,
@@ -117,6 +128,16 @@
         "reason": "Logical factory contract emitted.",
         "provenance": "AbortSignal/decl[1]/globalVariable",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2773:13"
+      },
+      {
+        "symbolName": "AbortSignalEventMap",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Deferred",
+        "phase": "event-subscription",
+        "reason": "Event map interface is deferred to the typed event subscription emission phase.",
+        "provenance": "AbortSignalEventMap/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2737:1"
       },
       {
         "symbolName": "AddEventListenerOptions",
@@ -267,6 +288,16 @@
         "reason": "Logical factory contract emitted.",
         "provenance": "WakeLockSentinel/decl[1]/globalVariable",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33769:13"
+      },
+      {
+        "symbolName": "WakeLockSentinelEventMap",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Deferred",
+        "phase": "event-subscription",
+        "reason": "Event map interface is deferred to the typed event subscription emission phase.",
+        "provenance": "WakeLockSentinelEventMap/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:33732:1"
       },
       {
         "symbolName": "WakeLockType",
@@ -448,6 +479,19 @@
         "provenance": "AbortSignal/decl[1]/typeLiteral/member[4]/method/timeout",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2793:5",
         "qualifiedKey": "AbortSignal/decl[1]/typeLiteral/member[4]"
+      },
+      {
+        "symbolName": "AbortSignalEventMap",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "abort",
+        "memberKind": "property",
+        "status": "Deferred",
+        "phase": "event-subscription",
+        "reason": "Event map interface is deferred to the typed event subscription emission phase.",
+        "provenance": "AbortSignalEventMap/decl[0]/member[0]/property/abort",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2738:5",
+        "qualifiedKey": "AbortSignalEventMap/decl[0]/member[0]"
       },
       {
         "symbolName": "AddEventListenerOptions",
@@ -1163,6 +1207,19 @@
         "provenance": "WakeLockSentinel/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33771:5",
         "qualifiedKey": "WakeLockSentinel/decl[1]/typeLiteral/member[1]"
+      },
+      {
+        "symbolName": "WakeLockSentinelEventMap",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "release",
+        "memberKind": "property",
+        "status": "Deferred",
+        "phase": "event-subscription",
+        "reason": "Event map interface is deferred to the typed event subscription emission phase.",
+        "provenance": "WakeLockSentinelEventMap/decl[0]/member[0]/property/release",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:33733:5",
+        "qualifiedKey": "WakeLockSentinelEventMap/decl[0]/member[0]"
       }
     ],
     "sourceOverloadEntries": [

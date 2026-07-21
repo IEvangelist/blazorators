@@ -1,28 +1,17 @@
-﻿{
-  "profileName": "WakeLock",
-  "description": "Screen Wake Lock API \u2013 prevent device screens from dimming or locking.",
-  "rootSymbols": [
-    "WakeLock",
-    "WakeLockSentinel"
-  ],
-  "features": [
-    "screen-wake-lock"
-  ],
-  "secureContext": true,
-  "requiresUserActivation": false,
-  "closureSize": 16,
-  "includedSymbolCount": 15,
-  "externalReferenceCount": 1,
-  "externalReferences": [
-    "Promise"
-  ],
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "sourceManifest": {
+    "typescriptSymbolsSha256": "e3795c0df5fffaaad69af5def9757c4889ceb2b94e60d04a7ecc3503fb3bd51e",
+    "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
+  },
   "accounting": {
-    "totalSymbols": 15,
-    "projected": 13,
-    "projectedClean": 11,
-    "projectedWithDeferredMembers": 2,
+    "totalSymbols": 18,
+    "projected": 17,
+    "projectedClean": 16,
+    "projectedWithDeferredMembers": 1,
     "excluded": 0,
-    "deferred": 2,
+    "deferred": 1,
     "generationFailed": 0,
     "projectedSymbols": [
       "AbortSignal",
@@ -35,19 +24,18 @@
       "EventListenerOptions",
       "EventListenerOrEventListenerObject",
       "EventTarget",
-      "WakeLock",
-      "WakeLockSentinel",
-      "WakeLockType"
+      "Lock",
+      "LockGrantedCallback",
+      "LockInfo",
+      "LockManager",
+      "LockManagerSnapshot",
+      "LockMode",
+      "LockOptions"
     ],
     "excludedSymbols": [],
     "deferredSymbols": [
       {
         "symbol": "AbortSignalEventMap",
-        "phase": "event-subscription",
-        "reason": "Event map interface is deferred to the typed event subscription emission phase."
-      },
-      {
-        "symbol": "WakeLockSentinelEventMap",
         "phase": "event-subscription",
         "reason": "Event map interface is deferred to the typed event subscription emission phase."
       }
@@ -75,47 +63,25 @@
         "memberOrdinal": 6,
         "provenance": "AbortSignal/decl[0]/member[6]/method/removeEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2769:5"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "memberName": "addEventListener",
-        "memberKind": "method",
-        "phase": "event-subscription",
-        "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 4,
-        "provenance": "WakeLockSentinel/decl[0]/member[4]/method/addEventListener",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33763:5"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "memberName": "removeEventListener",
-        "memberKind": "method",
-        "phase": "event-subscription",
-        "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 6,
-        "provenance": "WakeLockSentinel/decl[0]/member[6]/method/removeEventListener",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33765:5"
       }
     ],
     "failedMemberEntries": [],
-    "totalMembers": 70,
-    "projectedMembers": 64,
-    "deferredMembers": 6,
+    "totalMembers": 75,
+    "projectedMembers": 72,
+    "deferredMembers": 3,
     "failedMembers": 0,
-    "expectedMembers": 70,
+    "expectedMembers": 75,
     "memberReconciliationValid": true,
     "failedSymbolMemberOutcomes": [],
     "notAttemptedAfterFailureMembers": 0,
-    "sourceDeclarations": 20,
-    "accountedSourceDeclarations": 20,
-    "sourceMembers": 70,
-    "accountedSourceMembers": 70,
-    "sourceOverloads": 29,
-    "accountedSourceOverloads": 29,
-    "sourceParameters": 42,
-    "accountedSourceParameters": 42,
+    "sourceDeclarations": 23,
+    "accountedSourceDeclarations": 23,
+    "sourceMembers": 75,
+    "accountedSourceMembers": 75,
+    "sourceOverloads": 27,
+    "accountedSourceOverloads": 27,
+    "sourceParameters": 35,
+    "accountedSourceParameters": 35,
     "declarationReconciliationValid": true,
     "overloadReconciliationValid": true,
     "parameterReconciliationValid": true,
@@ -261,64 +227,94 @@
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11584:13"
       },
       {
-        "symbolName": "WakeLock",
+        "symbolName": "Lock",
         "declarationOrdinal": 0,
         "kind": "interface",
         "status": "Projected",
         "phase": null,
         "reason": "emitted",
-        "provenance": "WakeLock/decl[0]/interface",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33718:1"
+        "provenance": "Lock/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19377:1"
       },
       {
-        "symbolName": "WakeLock",
+        "symbolName": "Lock",
         "declarationOrdinal": 1,
         "kind": "globalVariable",
         "status": "Projected",
         "phase": null,
         "reason": "Logical factory contract emitted.",
-        "provenance": "WakeLock/decl[1]/globalVariable",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33727:13"
+        "provenance": "Lock/decl[1]/globalVariable",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19392:13"
       },
       {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockGrantedCallback",
         "declarationOrdinal": 0,
         "kind": "interface",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Declaration contains explicitly deferred members or overloads.",
-        "provenance": "WakeLockSentinel/decl[0]/interface",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33742:1"
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "LockGrantedCallback/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:38017:1"
       },
       {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockInfo",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "LockInfo/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:966:1"
+      },
+      {
+        "symbolName": "LockManager",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "LockManager/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19403:1"
+      },
+      {
+        "symbolName": "LockManager",
         "declarationOrdinal": 1,
         "kind": "globalVariable",
         "status": "Projected",
         "phase": null,
         "reason": "Logical factory contract emitted.",
-        "provenance": "WakeLockSentinel/decl[1]/globalVariable",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33769:13"
+        "provenance": "LockManager/decl[1]/globalVariable",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19419:13"
       },
       {
-        "symbolName": "WakeLockSentinelEventMap",
+        "symbolName": "LockManagerSnapshot",
         "declarationOrdinal": 0,
         "kind": "interface",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Event map interface is deferred to the typed event subscription emission phase.",
-        "provenance": "WakeLockSentinelEventMap/decl[0]/interface",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33732:1"
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "LockManagerSnapshot/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:972:1"
       },
       {
-        "symbolName": "WakeLockType",
+        "symbolName": "LockMode",
         "declarationOrdinal": 0,
         "kind": "typeAlias",
         "status": "Projected",
         "phase": null,
         "reason": "emitted",
-        "provenance": "WakeLockType/decl[0]/typeAlias",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:39423:1"
+        "provenance": "LockMode/decl[0]/typeAlias",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:39320:1"
+      },
+      {
+        "symbolName": "LockOptions",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "LockOptions/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:977:1"
       }
     ],
     "sourceMemberEntries": [
@@ -1051,150 +1047,150 @@
         "qualifiedKey": "EventTarget/decl[1]/typeLiteral/member[1]"
       },
       {
-        "symbolName": "WakeLock",
+        "symbolName": "Lock",
         "declarationOrdinal": 0,
         "memberOrdinal": 0,
+        "memberName": "mode",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Lock/decl[0]/member[0]/property/mode",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19383:5",
+        "qualifiedKey": "Lock/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "Lock",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "memberName": "name",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Lock/decl[0]/member[1]/property/name",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19389:5",
+        "qualifiedKey": "Lock/decl[0]/member[1]"
+      },
+      {
+        "symbolName": "Lock",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 0,
+        "memberName": "prototype",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "Lock/decl[1]/typeLiteral/member[0]/property/prototype",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19393:5",
+        "qualifiedKey": "Lock/decl[1]/typeLiteral/member[0]"
+      },
+      {
+        "symbolName": "Lock",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "memberName": "constructSignature",
+        "memberKind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "Lock/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19394:5",
+        "qualifiedKey": "Lock/decl[1]/typeLiteral/member[1]"
+      },
+      {
+        "symbolName": "LockGrantedCallback",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "callSignature",
+        "memberKind": "callSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockGrantedCallback/decl[0]/member[0]/callSignature/(unnamed)",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:38018:5",
+        "qualifiedKey": "LockGrantedCallback/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "LockInfo",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "clientId",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockInfo/decl[0]/member[0]/property/clientId",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:967:5",
+        "qualifiedKey": "LockInfo/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "LockInfo",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "memberName": "mode",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockInfo/decl[0]/member[1]/property/mode",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:968:5",
+        "qualifiedKey": "LockInfo/decl[0]/member[1]"
+      },
+      {
+        "symbolName": "LockInfo",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 2,
+        "memberName": "name",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockInfo/decl[0]/member[2]/property/name",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:969:5",
+        "qualifiedKey": "LockInfo/decl[0]/member[2]"
+      },
+      {
+        "symbolName": "LockManager",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "query",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockManager/decl[0]/member[0]/method/query",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19409:5",
+        "qualifiedKey": "LockManager/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "LockManager",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
         "memberName": "request",
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
         "reason": "",
-        "provenance": "WakeLock/decl[0]/member[0]/method/request",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33724:5",
-        "qualifiedKey": "WakeLock/decl[0]/member[0]"
+        "provenance": "LockManager/decl[0]/member[1]/method/request",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19415:5",
+        "qualifiedKey": "LockManager/decl[0]/member[1]"
       },
       {
-        "symbolName": "WakeLock",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 0,
-        "memberName": "prototype",
-        "memberKind": "property",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "WakeLock/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33728:5",
-        "qualifiedKey": "WakeLock/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "WakeLock",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "WakeLock/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33729:5",
-        "qualifiedKey": "WakeLock/decl[1]/typeLiteral/member[1]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 0,
-        "memberName": "onrelease",
-        "memberKind": "property",
-        "status": "Projected",
-        "phase": null,
-        "reason": "",
-        "provenance": "WakeLockSentinel/decl[0]/member[0]/property/onrelease",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33744:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[0]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 1,
-        "memberName": "released",
-        "memberKind": "property",
-        "status": "Projected",
-        "phase": null,
-        "reason": "",
-        "provenance": "WakeLockSentinel/decl[0]/member[1]/property/released",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33750:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[1]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockManager",
         "declarationOrdinal": 0,
         "memberOrdinal": 2,
-        "memberName": "type",
-        "memberKind": "property",
-        "status": "Projected",
-        "phase": null,
-        "reason": "",
-        "provenance": "WakeLockSentinel/decl[0]/member[2]/property/type",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33756:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[2]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 3,
-        "memberName": "release",
+        "memberName": "request",
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
         "reason": "",
-        "provenance": "WakeLockSentinel/decl[0]/member[3]/method/release",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33762:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[3]"
+        "provenance": "LockManager/decl[0]/member[2]/method/request",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19416:5",
+        "qualifiedKey": "LockManager/decl[0]/member[2]"
       },
       {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 4,
-        "memberName": "addEventListener",
-        "memberKind": "method",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-        "provenance": "WakeLockSentinel/decl[0]/member[4]/method/addEventListener",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33763:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[4]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 5,
-        "memberName": "addEventListener",
-        "memberKind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-        "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[5]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 6,
-        "memberName": "removeEventListener",
-        "memberKind": "method",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-        "provenance": "WakeLockSentinel/decl[0]/member[6]/method/removeEventListener",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33765:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[6]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 7,
-        "memberName": "removeEventListener",
-        "memberKind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-        "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:5",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[7]"
-      },
-      {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockManager",
         "declarationOrdinal": 1,
         "memberOrdinal": 0,
         "memberName": "prototype",
@@ -1202,12 +1198,12 @@
         "status": "Projected",
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
-        "provenance": "WakeLockSentinel/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33770:5",
-        "qualifiedKey": "WakeLockSentinel/decl[1]/typeLiteral/member[0]"
+        "provenance": "LockManager/decl[1]/typeLiteral/member[0]/property/prototype",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19420:5",
+        "qualifiedKey": "LockManager/decl[1]/typeLiteral/member[0]"
       },
       {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockManager",
         "declarationOrdinal": 1,
         "memberOrdinal": 1,
         "memberName": "constructSignature",
@@ -1215,22 +1211,87 @@
         "status": "Projected",
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
-        "provenance": "WakeLockSentinel/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33771:5",
-        "qualifiedKey": "WakeLockSentinel/decl[1]/typeLiteral/member[1]"
+        "provenance": "LockManager/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19421:5",
+        "qualifiedKey": "LockManager/decl[1]/typeLiteral/member[1]"
       },
       {
-        "symbolName": "WakeLockSentinelEventMap",
+        "symbolName": "LockManagerSnapshot",
         "declarationOrdinal": 0,
         "memberOrdinal": 0,
-        "memberName": "release",
+        "memberName": "held",
         "memberKind": "property",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Event map interface is deferred to the typed event subscription emission phase.",
-        "provenance": "WakeLockSentinelEventMap/decl[0]/member[0]/property/release",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33733:5",
-        "qualifiedKey": "WakeLockSentinelEventMap/decl[0]/member[0]"
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockManagerSnapshot/decl[0]/member[0]/property/held",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:973:5",
+        "qualifiedKey": "LockManagerSnapshot/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "LockManagerSnapshot",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "memberName": "pending",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockManagerSnapshot/decl[0]/member[1]/property/pending",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:974:5",
+        "qualifiedKey": "LockManagerSnapshot/decl[0]/member[1]"
+      },
+      {
+        "symbolName": "LockOptions",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "ifAvailable",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockOptions/decl[0]/member[0]/property/ifAvailable",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:978:5",
+        "qualifiedKey": "LockOptions/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "LockOptions",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "memberName": "mode",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockOptions/decl[0]/member[1]/property/mode",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:979:5",
+        "qualifiedKey": "LockOptions/decl[0]/member[1]"
+      },
+      {
+        "symbolName": "LockOptions",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 2,
+        "memberName": "signal",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockOptions/decl[0]/member[2]/property/signal",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:980:5",
+        "qualifiedKey": "LockOptions/decl[0]/member[2]"
+      },
+      {
+        "symbolName": "LockOptions",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 3,
+        "memberName": "steal",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "LockOptions/decl[0]/member[3]/property/steal",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:981:5",
+        "qualifiedKey": "LockOptions/decl[0]/member[3]"
       }
     ],
     "sourceOverloadEntries": [
@@ -1804,227 +1865,134 @@
         "parameterOutcomes": []
       },
       {
-        "symbolName": "WakeLock",
+        "symbolName": "Lock",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "name": "constructSignature",
+        "kind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "qualifiedKey": "Lock/decl[1]/typeLiteral/member[1]/overload",
+        "provenance": "Lock/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19394:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "LockGrantedCallback",
         "declarationOrdinal": 0,
         "memberOrdinal": 0,
+        "name": "callSignature",
+        "kind": "callSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "projected",
+        "qualifiedKey": "LockGrantedCallback/decl[0]/member[0]/overload",
+        "provenance": "LockGrantedCallback/decl[0]/member[0]/callSignature/(unnamed)/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:38018:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "lock",
+            "status": "Projected",
+            "phase": null,
+            "reason": "projected",
+            "provenance": "LockGrantedCallback/decl[0]/member[0]/callSignature/(unnamed)/overload/parameter[0]/lock",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:38018:6"
+          }
+        ]
+      },
+      {
+        "symbolName": "LockManager",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "name": "query",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "LockManager/decl[0]/member[0]/overload",
+        "provenance": "LockManager/decl[0]/member[0]/method/query/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19409:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "LockManager",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
         "name": "request",
         "kind": "method",
         "status": "Projected",
         "phase": null,
         "reason": "",
-        "qualifiedKey": "WakeLock/decl[0]/member[0]/overload",
-        "provenance": "WakeLock/decl[0]/member[0]/method/request/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33724:5",
+        "qualifiedKey": "LockManager/decl[0]/member[1]/overload",
+        "provenance": "LockManager/decl[0]/member[1]/method/request/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19415:5",
         "parameterOutcomes": [
           {
             "ordinal": 0,
-            "name": "type",
+            "name": "name",
             "status": "Projected",
             "phase": null,
             "reason": "",
-            "provenance": "WakeLock/decl[0]/member[0]/method/request/overload/parameter[0]/type",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33724:13"
+            "provenance": "LockManager/decl[0]/member[1]/method/request/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:19415:16"
+          },
+          {
+            "ordinal": 1,
+            "name": "callback",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "LockManager/decl[0]/member[1]/method/request/overload/parameter[1]/callback",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:19415:30"
           }
         ]
       },
       {
-        "symbolName": "WakeLock",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "WakeLock/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "WakeLock/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33729:5",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockManager",
         "declarationOrdinal": 0,
-        "memberOrdinal": 3,
-        "name": "release",
+        "memberOrdinal": 2,
+        "name": "request",
         "kind": "method",
         "status": "Projected",
         "phase": null,
         "reason": "",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[3]/overload",
-        "provenance": "WakeLockSentinel/decl[0]/member[3]/method/release/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33762:5",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 4,
-        "name": "addEventListener",
-        "kind": "method",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[4]/overload",
-        "provenance": "WakeLockSentinel/decl[0]/member[4]/method/addEventListener/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33763:5",
+        "qualifiedKey": "LockManager/decl[0]/member[2]/overload",
+        "provenance": "LockManager/decl[0]/member[2]/method/request/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19416:5",
         "parameterOutcomes": [
           {
             "ordinal": 0,
-            "name": "type",
-            "status": "Deferred",
-            "phase": "event-subscription",
-            "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-            "provenance": "WakeLockSentinel/decl[0]/member[4]/method/addEventListener/overload/parameter[0]/type",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33763:64"
+            "name": "name",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "LockManager/decl[0]/member[2]/method/request/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:19416:16"
           },
           {
             "ordinal": 1,
-            "name": "listener",
-            "status": "Deferred",
-            "phase": "event-subscription",
-            "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-            "provenance": "WakeLockSentinel/decl[0]/member[4]/method/addEventListener/overload/parameter[1]/listener",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33763:73"
+            "name": "options",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "LockManager/decl[0]/member[2]/method/request/overload/parameter[1]/options",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:19416:30"
           },
           {
             "ordinal": 2,
-            "name": "options",
-            "status": "Deferred",
-            "phase": "event-subscription",
-            "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-            "provenance": "WakeLockSentinel/decl[0]/member[4]/method/addEventListener/overload/parameter[2]/options",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33763:149"
+            "name": "callback",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "LockManager/decl[0]/member[2]/method/request/overload/parameter[2]/callback",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:19416:52"
           }
         ]
       },
       {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 5,
-        "name": "addEventListener",
-        "kind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[5]/overload",
-        "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:5",
-        "parameterOutcomes": [
-          {
-            "ordinal": 0,
-            "name": "type",
-            "status": "Projected",
-            "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-            "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload/parameter[0]/type",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:22"
-          },
-          {
-            "ordinal": 1,
-            "name": "listener",
-            "status": "Projected",
-            "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-            "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload/parameter[1]/listener",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:36"
-          },
-          {
-            "ordinal": 2,
-            "name": "options",
-            "status": "Projected",
-            "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-            "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload/parameter[2]/options",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:82"
-          }
-        ]
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 6,
-        "name": "removeEventListener",
-        "kind": "method",
-        "status": "Deferred",
-        "phase": "event-subscription",
-        "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[6]/overload",
-        "provenance": "WakeLockSentinel/decl[0]/member[6]/method/removeEventListener/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33765:5",
-        "parameterOutcomes": [
-          {
-            "ordinal": 0,
-            "name": "type",
-            "status": "Deferred",
-            "phase": "event-subscription",
-            "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-            "provenance": "WakeLockSentinel/decl[0]/member[6]/method/removeEventListener/overload/parameter[0]/type",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33765:67"
-          },
-          {
-            "ordinal": 1,
-            "name": "listener",
-            "status": "Deferred",
-            "phase": "event-subscription",
-            "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-            "provenance": "WakeLockSentinel/decl[0]/member[6]/method/removeEventListener/overload/parameter[1]/listener",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33765:76"
-          },
-          {
-            "ordinal": 2,
-            "name": "options",
-            "status": "Deferred",
-            "phase": "event-subscription",
-            "reason": "Event-map-keyed generic overload deferred to event-subscription phase.",
-            "provenance": "WakeLockSentinel/decl[0]/member[6]/method/removeEventListener/overload/parameter[2]/options",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33765:152"
-          }
-        ]
-      },
-      {
-        "symbolName": "WakeLockSentinel",
-        "declarationOrdinal": 0,
-        "memberOrdinal": 7,
-        "name": "removeEventListener",
-        "kind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-        "qualifiedKey": "WakeLockSentinel/decl[0]/member[7]/overload",
-        "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:5",
-        "parameterOutcomes": [
-          {
-            "ordinal": 0,
-            "name": "type",
-            "status": "Projected",
-            "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-            "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload/parameter[0]/type",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:25"
-          },
-          {
-            "ordinal": 1,
-            "name": "listener",
-            "status": "Projected",
-            "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-            "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload/parameter[1]/listener",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:39"
-          },
-          {
-            "ordinal": 2,
-            "name": "options",
-            "status": "Projected",
-            "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
-            "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload/parameter[2]/options",
-            "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:85"
-          }
-        ]
-      },
-      {
-        "symbolName": "WakeLockSentinel",
+        "symbolName": "LockManager",
         "declarationOrdinal": 1,
         "memberOrdinal": 1,
         "name": "constructSignature",
@@ -2032,13 +2000,12 @@
         "status": "Projected",
         "phase": null,
         "reason": "emitted",
-        "qualifiedKey": "WakeLockSentinel/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "WakeLockSentinel/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "typescript/lib/lib.dom.d.ts:33771:5",
+        "qualifiedKey": "LockManager/decl[1]/typeLiteral/member[1]/overload",
+        "provenance": "LockManager/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:19421:5",
         "parameterOutcomes": []
       }
     ]
   },
-  "errors": [],
-  "byteIdentityVerified": true
+  "diagnostics": []
 }

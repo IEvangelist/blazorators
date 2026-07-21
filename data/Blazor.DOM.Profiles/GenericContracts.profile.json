@@ -1,0 +1,11 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "GenericContracts",
+  "description": "Representative generic methods and callback contracts.",
+  "rootSymbols": ["LockManager", "LockGrantedCallback", "Lock"],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["generic-contracts"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/GenericContracts"
+}

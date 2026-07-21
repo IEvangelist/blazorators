@@ -9,6 +9,7 @@ internal sealed record ContractSignature(
     string Rendered,
     string CanonicalKey,
     string CanonicalReturnType,
+    string CanonicalConstraints,
     int OptionalParameterCount);
 
 internal sealed record ContractCallableResult(
@@ -46,42 +47,56 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
         string provenance,
         string? csharpNameOverride = null)
     {
-        if (typeParameters.Count > 0)
+        if (typeParameters.Count > 0 && IsEventSubscriptionOverload(jsName, typeParameters))
         {
-            if (IsEventSubscriptionOverload(jsName, typeParameters))
-            {
-                const string phase = "event-subscription";
-                const string eventReason =
-                    "Event-map-keyed generic overload is deferred to the typed " +
-                    "event-subscription phase.";
-                return new ContractCallableResult(
-                    [],
-                    [BuildTypeScriptShapeKey(
-                        jsName,
-                        typeParameters,
-                        parameters,
-                        returnType)],
-                    MemberOutcomeStatus.Deferred,
-                    phase,
-                    eventReason,
-                    CreateParameterOutcomes(
-                        parameters,
-                        provenance,
-                        MemberOutcomeStatus.Deferred,
-                        phase,
-                        eventReason));
-            }
-
-            throw new ContractCallableException(
-                $"Generic callable '{jsName}' at '{provenance}' requires the " +
-                "generic-emission phase.",
-                provenance,
+            const string phase = "event-subscription";
+            const string eventReason =
+                "Event-map-keyed generic overload is deferred to the typed " +
+                "event-subscription phase.";
+            return new ContractCallableResult(
+                [],
+                [BuildTypeScriptShapeKey(
+                    jsName,
+                    typeParameters,
+                    parameters,
+                    returnType)],
+                MemberOutcomeStatus.Deferred,
+                phase,
+                eventReason,
                 CreateParameterOutcomes(
                     parameters,
                     provenance,
-                    MemberOutcomeStatus.NotAttemptedAfterFailure,
-                    null,
-                    "Not attempted because the callable is generic."));
+                    MemberOutcomeStatus.Deferred,
+                    phase,
+                    eventReason));
+        }
+
+        GenericDeclaration generic;
+        try
+        {
+            generic = typeResolver.CreateGenericDeclaration(
+                typeParameters,
+                provenance,
+                canonicalPrefix: "!!");
+        }
+        catch (GenericDeferralException exception)
+        {
+            return new ContractCallableResult(
+                [],
+                [BuildTypeScriptShapeKey(
+                    jsName,
+                    typeParameters,
+                    parameters,
+                    returnType)],
+                MemberOutcomeStatus.Deferred,
+                exception.Phase,
+                exception.Message,
+                CreateParameterOutcomes(
+                    parameters,
+                    provenance,
+                    MemberOutcomeStatus.Deferred,
+                    exception.Phase,
+                    exception.Message));
         }
 
         TypeProjection returnProjection;
@@ -89,7 +104,18 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
         {
             returnProjection = typeResolver.Project(
                 returnType,
-                $"{provenance}/return");
+                $"{provenance}/return",
+                generic.Scope);
+        }
+        catch (GenericDeferralException exception)
+        {
+            return CreateGenericDeferral(
+                jsName,
+                typeParameters,
+                parameters,
+                returnType,
+                provenance,
+                exception);
         }
         catch (TypeProjectionException exception)
         {
@@ -134,13 +160,15 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                             optionsTypeName,
                             optionsTypeName,
                             []),
-                        $"{parameterProvenance}/options");
+                        $"{parameterProvenance}/options",
+                        generic.Scope);
                 }
                 else
                 {
                     projection = typeResolver.Project(
                         parameter.Type,
-                        parameterProvenance);
+                        parameterProvenance,
+                        generic.Scope);
                 }
                 if (projection.Identity.Kind is ClrTypeKind.Null or ClrTypeKind.Void)
                 {
@@ -156,6 +184,16 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     MemberOutcomeStatus.Projected,
                     null,
                     "emitted"));
+            }
+            catch (GenericDeferralException exception)
+            {
+                return CreateGenericDeferral(
+                    jsName,
+                    typeParameters,
+                    parameters,
+                    returnType,
+                    provenance,
+                    exception);
             }
             catch (TypeProjectionException exception)
             {
@@ -192,7 +230,8 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                 out var optionsTypeName);
             var optionsType = typeResolver.Project(
                 new ReferenceTypeNode(optionsTypeName, optionsTypeName, []),
-                $"{provenance}/options");
+                $"{provenance}/options",
+                generic.Scope);
             signatures =
             [
                 BuildSignature(
@@ -201,6 +240,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     orderedParameters,
                     projections,
                     documentation,
+                    generic,
                     dropFromIndex: boolOptionsIndex),
                 BuildSignature(
                     emittedName,
@@ -208,6 +248,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     orderedParameters,
                     projections,
                     new DocumentationModel("", [], false),
+                    generic,
                     substituteIndex: boolOptionsIndex,
                     substituteType: "bool",
                     substituteCanonicalType: "bool",
@@ -218,6 +259,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     orderedParameters,
                     projections,
                     new DocumentationModel("", [], false),
+                    generic,
                     substituteIndex: boolOptionsIndex,
                     substituteType: $"{optionsType.RenderedType}?",
                     substituteCanonicalType: optionsType.CanonicalType,
@@ -236,7 +278,8 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     returnProjection,
                     orderedParameters,
                     projections,
-                    documentation)
+                    documentation,
+                    generic)
             ];
             reason = "emitted";
         }
@@ -249,6 +292,30 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
             reason,
             parameterOutcomes);
     }
+
+    private static ContractCallableResult CreateGenericDeferral(
+        string jsName,
+        IReadOnlyList<TypeParameterModel> typeParameters,
+        IReadOnlyList<ParameterModel> parameters,
+        TypeNode? returnType,
+        string provenance,
+        GenericDeferralException exception)
+        => new(
+            [],
+            [BuildTypeScriptShapeKey(
+                jsName,
+                typeParameters,
+                parameters,
+                returnType)],
+            MemberOutcomeStatus.Deferred,
+            exception.Phase,
+            exception.Message,
+            CreateParameterOutcomes(
+                parameters,
+                provenance,
+                MemberOutcomeStatus.Deferred,
+                exception.Phase,
+                exception.Message));
 
     internal ContractPropertyResult EmitProperty(
         string jsName,
@@ -290,6 +357,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
         IReadOnlyList<ParameterModel> parameters,
         IReadOnlyList<TypeProjection> projections,
         DocumentationModel documentation,
+        GenericDeclaration generic,
         int substituteIndex = -1,
         string? substituteType = null,
         string? substituteCanonicalType = null,
@@ -347,12 +415,15 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
         var writer = new CSharpWriter();
         writer.XmlDoc(documentation.Text, documentation.Deprecated);
         writer.AppendLine(
-            $"{returnProjection.RenderedType} {emittedName}(" +
-            $"{string.Join(", ", parts)});");
+            $"{returnProjection.RenderedType} {emittedName}" +
+            $"{generic.TypeParameterList}({string.Join(", ", parts)})" +
+            $"{generic.ConstraintSuffix};");
         return new ContractSignature(
             writer.ToString().TrimEnd(),
-            $"{emittedName}({string.Join(",", canonicalTypes)})",
+            $"{emittedName}`{generic.Scope.Parameters.Count}(" +
+            $"{string.Join(",", canonicalTypes)})",
             returnProjection.CanonicalType,
+            generic.CanonicalConstraints,
             optionalCount);
     }
 
