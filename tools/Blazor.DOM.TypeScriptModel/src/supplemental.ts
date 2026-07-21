@@ -86,6 +86,7 @@ export function generateWebIdlSupplement(
 export function filterWebGpuWindowSource(
   text: string,
   namespaceNames: ReadonlySet<string>,
+  constructibleNames: ReadonlySet<string> = new Set(),
 ): string {
   const source = ts.createSourceFile(
     "webgpu.d.ts",
@@ -144,6 +145,7 @@ export function filterWebGpuWindowSource(
   for (const [name, declaration] of namespaceInterfaces) {
     replacements.set(declaration, renderWebGpuNamespace(name, declaration, source));
   }
+
   for (const statement of source.statements) {
     if (
       ts.isInterfaceDeclaration(statement) &&
@@ -156,6 +158,16 @@ export function filterWebGpuWindowSource(
         flattenRequiredHeritage(statement, source),
       );
     }
+    if (ts.isVariableStatement(statement)) {
+      const replacement = renderWebGpuInterfaceObject(
+        statement,
+        source,
+        constructibleNames,
+      );
+      if (replacement !== null) {
+        replacements.set(statement, replacement);
+      }
+    }
   }
 
   const output = source.statements
@@ -165,6 +177,85 @@ export function filterWebGpuWindowSource(
     )
     .join("");
   return normalizeLf(`${output.trimEnd()}\n`);
+}
+
+export function webIdlWindowConstructors(text: string): ReadonlySet<string> {
+  const names = new Set<string>();
+  for (const raw of parse(text)) {
+    if (
+      typeof raw !== "object" ||
+      raw === null ||
+      !("toJSON" in raw) ||
+      typeof raw.toJSON !== "function"
+    ) {
+      throw new Error("Malformed WebGPU Web IDL definition.");
+    }
+    const value: unknown = raw.toJSON();
+    if (
+      typeof value !== "object" ||
+      value === null ||
+      !("type" in value) ||
+      value.type !== "interface" ||
+      !("name" in value) ||
+      typeof value.name !== "string" ||
+      !("members" in value) ||
+      !Array.isArray(value.members)
+    ) {
+      continue;
+    }
+    if (value.members.some((member: unknown) =>
+      typeof member === "object" &&
+      member !== null &&
+      "type" in member &&
+      member.type === "constructor"
+    )) {
+      names.add(value.name);
+    }
+  }
+  return names;
+}
+
+function renderWebGpuInterfaceObject(
+  statement: ts.VariableStatement,
+  source: ts.SourceFile,
+  constructibleNames: ReadonlySet<string>,
+): string | null {
+  if (statement.declarationList.declarations.length !== 1) {
+    return null;
+  }
+  const declaration = statement.declarationList.declarations[0]!;
+  if (
+    !ts.isIdentifier(declaration.name) ||
+    declaration.type === undefined ||
+    !ts.isTypeLiteralNode(declaration.type)
+  ) {
+    return null;
+  }
+  const constructs = declaration.type.members.filter(
+    ts.isConstructSignatureDeclaration,
+  );
+  if (constructs.length === 0 || constructibleNames.has(declaration.name.text)) {
+    return null;
+  }
+  for (const construct of constructs) {
+    if (construct.type?.kind !== ts.SyntaxKind.NeverKeyword) {
+      throw new Error(
+        `@webgpu/types exposes non-WebIDL constructor '${declaration.name.text}' with return type '${construct.type?.getText(source) ?? "(missing)"}'.`,
+      );
+    }
+  }
+  const members = declaration.type.members
+    .filter((member) => !ts.isConstructSignatureDeclaration(member))
+    .map((member) =>
+      member.getFullText(source).trim().split("\n")
+        .map((line) => `  ${line}`)
+        .join("\n")
+    );
+  return [
+    `\ndeclare var ${declaration.name.text}: {`,
+    ...members,
+    "};",
+  ].join("\n");
 }
 
 export function webIdlWindowNamespaces(text: string): ReadonlySet<string> {
@@ -587,9 +678,7 @@ function renderInterfaceObject(
     member.kind === "operation" && member.special === "static"
   );
   const members = [`  prototype: ${identifier(symbol.name)};`];
-  if (constructors.length === 0) {
-    members.push(`  new(): never;`);
-  } else {
+  if (constructors.length > 0) {
     members.push(...constructors.map((member) =>
       `  new(${renderArguments(member.arguments, symbol.name)}): ${identifier(symbol.name)};`
     ));

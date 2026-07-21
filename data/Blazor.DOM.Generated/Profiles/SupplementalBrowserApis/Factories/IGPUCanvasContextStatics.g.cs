@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUFactory
+public partial interface IGPUCanvasContextStatics
 {
-    IGPU Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUCanvasContext Prototype { get; set; }
 }

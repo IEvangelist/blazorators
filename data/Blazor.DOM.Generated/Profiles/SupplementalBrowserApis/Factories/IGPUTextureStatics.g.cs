@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUBufferFactory
+public partial interface IGPUTextureStatics
 {
-    IGPUBuffer Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUTexture Prototype { get; set; }
 }

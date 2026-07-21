@@ -191,15 +191,15 @@ public sealed class FinalEmitterAuditTests
                 entry => Assert.Equal(
                     nameof(MemberOutcomeStatus.Projected),
                     entry.Status));
-            Assert.Equal((12251, 12251), (
+            Assert.Equal((12197, 12197), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
-            Assert.Equal(12251, accounting.TotalMembers);
-            Assert.Equal(12251, accounting.ExpectedMembers);
-            Assert.Equal(12251, accounting.ProjectedMembers);
+            Assert.Equal(12197, accounting.TotalMembers);
+            Assert.Equal(12197, accounting.ExpectedMembers);
+            Assert.Equal(12197, accounting.ProjectedMembers);
             Assert.Equal(0, accounting.DeferredMembers);
             Assert.Equal(0, accounting.FailedMembers);
-            Assert.Equal((3928, 3928), (
+            Assert.Equal((3874, 3874), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
             Assert.Equal((6517, 6517), (
@@ -229,7 +229,7 @@ public sealed class FinalEmitterAuditTests
             Assert.Empty(accounting.DeferredMemberEntries ?? []);
             Assert.Empty(accounting.FailedSymbols);
             Assert.Equal(
-                (3928, 0, 0),
+                (3874, 0, 0),
                 (
                     (accounting.SourceOverloadEntries ?? []).Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Projected)),
@@ -405,6 +405,29 @@ public sealed class FinalEmitterAuditTests
                 accounting.ProjectedSymbols);
             Assert.Contains("NodeFilter", accounting.ProjectedSymbols);
             Assert.Contains("XPathNSResolver", accounting.ProjectedSymbols);
+
+            var windowGlobals = File.ReadAllText(Path.Combine(
+                output,
+                "Globals",
+                "IWindow.Globals.g.cs"));
+            foreach (var name in new[] { "Bluetooth", "USB", "GPUAdapter" })
+            {
+                var statics = File.ReadAllText(Path.Combine(
+                    output,
+                    "Factories",
+                    $"I{name}Statics.g.cs"));
+                Assert.DoesNotContain(" Create(", statics);
+                Assert.Contains($"I{name}Statics {name}Statics", windowGlobals);
+                Assert.DoesNotContain($"{name}Constructor", windowGlobals);
+            }
+            var presentationRequestFactory = File.ReadAllText(Path.Combine(
+                output,
+                "Factories",
+                "IPresentationRequestFactory.g.cs"));
+            Assert.Contains("IPresentationRequest Create(", presentationRequestFactory);
+            Assert.Contains(
+                "IPresentationRequestFactory PresentationRequestConstructor",
+                windowGlobals);
 
             var typeLiteralDeclarations = ir.TypescriptSymbols
                 .SelectMany(symbol => symbol.Declarations
@@ -613,9 +636,9 @@ public sealed class FinalEmitterAuditTests
                     && entry.QualifiedKey.StartsWith(
                         "WebAssembly.Global/decl[",
                         StringComparison.Ordinal));
-            Assert.Equal(2630, factoryMembers.Count);
+            Assert.Equal(2576, factoryMembers.Count);
             Assert.Equal(
-                2630,
+                2576,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Projected)));
             Assert.Equal(

@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IBluetoothRemoteGATTCharacteristicFactory
+public partial interface IBluetoothRemoteGATTCharacteristicStatics
 {
     IBluetoothRemoteGATTCharacteristic Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
 }

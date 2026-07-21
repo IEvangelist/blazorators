@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IPresentationFactory
+public partial interface IBluetoothManufacturerDataMapStatics
 {
-    IPresentation Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IBluetoothManufacturerDataMap Prototype { get; set; }
 }

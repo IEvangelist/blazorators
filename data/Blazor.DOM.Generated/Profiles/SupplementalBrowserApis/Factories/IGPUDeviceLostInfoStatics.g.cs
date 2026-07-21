@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUAdapterInfoFactory
+public partial interface IGPUDeviceLostInfoStatics
 {
-    IGPUAdapterInfo Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUDeviceLostInfo Prototype { get; set; }
 }

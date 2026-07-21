@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUDeviceLostInfoFactory
+public partial interface IHIDDeviceStatics
 {
-    IGPUDeviceLostInfo Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IHIDDevice Prototype { get; set; }
 }

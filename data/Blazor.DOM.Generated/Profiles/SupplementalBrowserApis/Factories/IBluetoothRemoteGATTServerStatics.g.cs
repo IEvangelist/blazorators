@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUCommandBufferFactory
+public partial interface IBluetoothRemoteGATTServerStatics
 {
-    IGPUCommandBuffer Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IBluetoothRemoteGATTServer Prototype { get; set; }
 }

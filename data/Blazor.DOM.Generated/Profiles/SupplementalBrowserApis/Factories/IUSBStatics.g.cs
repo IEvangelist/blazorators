@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IHIDFactory
+public partial interface IUSBStatics
 {
-    IHID Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IUSB Prototype { get; set; }
 }

@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUErrorFactory
+public partial interface IBluetoothLEScanStatics
 {
-    IGPUError Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IBluetoothLEScan Prototype { get; set; }
 }

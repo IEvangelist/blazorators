@@ -9,6 +9,7 @@ import {
   generateWebIdlSupplement,
   SupplementalBuildResult,
   WebIdlSupplementalSource,
+  webIdlWindowConstructors,
   webIdlWindowNamespaces,
 } from "./supplemental.js";
 
@@ -150,6 +151,7 @@ async function loadSupplementalInputs(
   const webgpuText = filterWebGpuWindowSource(
     webgpuSource,
     webIdlWindowNamespaces(webgpuIdl.text),
+    webIdlWindowConstructors(webgpuIdl.text),
   );
   const webgpuSourceHash = sha256(webgpuSource);
   const webgpuOutputHash = sha256(webgpuText);
@@ -181,7 +183,7 @@ async function loadSupplementalInputs(
         }],
         output: { name: webgpuLabel, sha256: webgpuOutputHash },
         generationMethod:
-          "Exact package declaration filtered to Window exposure; Web IDL namespaces are normalized from interface/value pairs and finite Required/Omit mapped heritage is flattened without widening.",
+          "Exact package declaration filtered to Window exposure; non-WebIDL new(): never signatures are removed, Web IDL namespaces are normalized from interface/value pairs, and finite Required/Omit mapped heritage is flattened without widening.",
       },
     ],
   };
