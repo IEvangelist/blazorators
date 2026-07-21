@@ -181,6 +181,24 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Nullable_union_arm_normalizes_inside_JSON_container(bool wasm)
+    {
+        var host = CreateHost(wasm);
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            new FakeJSObjectReference(),
+            "nestedUnion",
+            [new[] { FixtureUnion.FromNull() }]);
+
+        var invocation = Assert.Single(host.Module.Invocations);
+        var arguments = Assert.IsType<object?[]>(invocation.Args![2]);
+        var values = Assert.IsType<object?[]>(arguments[0]);
+        Assert.Null(Assert.Single(values));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Unsupported_transport_fails_before_JS_invocation(bool wasm)
     {
         var host = CreateHost(wasm);
@@ -1805,6 +1823,9 @@ public sealed class TransportRuntimeTests
 
         public static FixtureUnion FromReference(IJSObjectReference value) =>
             new(2, value, DomTransportDescriptor.JsReference("Blob"));
+
+        public static FixtureUnion FromNull() =>
+            new(3, null, DomTransportDescriptor.JsonValue("null", nullable: true));
 
         public static FixtureUnion WithWrongReferenceValue(object value) =>
             new(2, value, DomTransportDescriptor.JsReference("Blob"));
