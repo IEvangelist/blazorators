@@ -608,7 +608,7 @@ public sealed class FinalEmitterAuditTests
                 result.ClosureSize,
                 result.IncludedSymbolCount,
                 result.ExternalReferenceCount));
-            Assert.Equal((13, 11, 2), (
+            Assert.Equal((13, 10, 3), (
                 accounting.Projected,
                 accounting.ProjectedClean,
                 accounting.ProjectedWithDeferredMembers));

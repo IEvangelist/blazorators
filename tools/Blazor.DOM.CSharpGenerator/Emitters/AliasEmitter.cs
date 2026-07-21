@@ -187,6 +187,15 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         UnionTypeNode un,
         GenericDeclaration generic)
     {
+        if (generic.Scope.Parameters.Count > 0)
+        {
+            throw new GenericDeferralException(
+                $"Generic union alias '{symbol.Name}' requires discriminated named " +
+                "factories; implicit conversion operators are ambiguous when type " +
+                "arguments coincide.",
+                $"{symbol.Name}/typeAlias",
+                "typed-union");
+        }
         // All arms must project successfully — throws with provenance on any failure.
         // No object fallback arms are permitted.
         var memberTypes = un.Types.Select((t, i) =>

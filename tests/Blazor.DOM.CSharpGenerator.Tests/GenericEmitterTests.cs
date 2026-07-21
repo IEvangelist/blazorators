@@ -38,8 +38,9 @@ public sealed class GenericEmitterTests
                 "public record QueuingStrategy<T>",
                 Read(output, "Dictionaries", "QueuingStrategy.g.cs"));
             Assert.Contains(
-                "public readonly struct ReadableStreamController<T>",
-                Read(output, "Typedefs", "ReadableStreamController.g.cs"));
+                result.Manifest.Accounting.DeferredSymbols,
+                entry => entry.Symbol == "ReadableStreamController"
+                    && entry.Phase == "typed-union");
             Assert.Contains(
                 "ICustomEvent<T> Create<T>(string type, CustomEventInit<T>? eventInitDict = default);",
                 Read(output, "Factories", "ICustomEventFactory.g.cs"));
@@ -47,8 +48,9 @@ public sealed class GenericEmitterTests
                 "T StructuredClone<T>(T @value, StructuredSerializeOptions? options = default);",
                 Read(output, "Globals", "IWindow.Globals.g.cs"));
             Assert.Contains(
-                "public partial interface IFormDataIterator<T> : IEnumerable<T>",
-                Read(output, "Interfaces", "IFormDataIterator.g.cs"));
+                result.Manifest.Accounting.DeferredSymbols,
+                entry => entry.Symbol == "FormDataIterator"
+                    && entry.Phase == "iterator-transport");
             Assert.DoesNotContain(
                 result.Errors,
                 error => error.Message.Contains(
@@ -388,6 +390,160 @@ public sealed class GenericEmitterTests
     }
 
     [Fact]
+    public void IllegalClrGenericArguments_AreDeferredExceptPromiseVoid()
+    {
+        var box = MakeGenericInterfaceSymbol(
+            "Box",
+            [new TypeParameterModel(0, "T", null, null)]);
+        var resolver = new TypeResolver([box]);
+
+        foreach (var keyword in new[]
+                 {
+                     "UndefinedKeyword",
+                     "NullKeyword",
+                     "VoidKeyword",
+                 })
+        {
+            var error = Assert.Throws<GenericDeferralException>(() =>
+                resolver.Project(
+                    new ReferenceTypeNode(
+                        "Box",
+                        "Box",
+                        [new KeywordTypeNode(keyword)]),
+                    $"fixture/Box/{keyword}"));
+            Assert.Equal("illegal-clr-generic-arguments", error.Phase);
+            Assert.Equal(
+                $"fixture/Box/{keyword}/typeArgument[0]",
+                error.Provenance);
+        }
+
+        Assert.Equal(
+            "ValueTask",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Promise",
+                    "Promise",
+                    [new KeywordTypeNode("VoidKeyword")]),
+                "fixture/PromiseVoid").RenderedType);
+    }
+
+    [Fact]
+    public void Constraints_RequireNominalGeneratedInterfaces()
+    {
+        var valid = MakeInterfaceSymbol("ValidContract", []);
+        var structural = MakeInterfaceSymbol("StructuralAlias", []) with
+        {
+            Declarations =
+            [
+                MakeInterfaceSymbol("StructuralAlias", []).Declarations[0] with
+                {
+                    Kind = "typeAlias",
+                    Type = new TypeLiteralTypeNode([]),
+                }
+            ],
+            Semantic = MakeInterfaceSymbol("StructuralAlias", []).Semantic with
+            {
+                Classifications = ["typedef"],
+            },
+        };
+        var resolver = new TypeResolver([valid, structural]);
+        var constraints = new TypeNode[]
+        {
+            new FunctionTypeNode([], [], new KeywordTypeNode("VoidKeyword")),
+            new ArrayTypeNode(new KeywordTypeNode("UnknownKeyword")),
+            new ReferenceTypeNode(
+                "StructuralAlias",
+                "StructuralAlias",
+                []),
+        };
+
+        foreach (var constraint in constraints)
+        {
+            var error = Assert.Throws<GenericDeferralException>(() =>
+                resolver.CreateGenericDeclaration(
+                    [new TypeParameterModel(0, "T", constraint, null)],
+                    "ConstraintFixture"));
+            Assert.Equal("advanced-generic-constraints", error.Phase);
+        }
+
+        var declaration = resolver.CreateGenericDeclaration(
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    new ReferenceTypeNode(
+                        "ValidContract",
+                        "ValidContract",
+                        []),
+                    null)
+            ],
+            "ConstraintFixture");
+        Assert.Equal(["where T : IValidContract"], declaration.ConstraintClauses);
+    }
+
+    [Fact]
+    public void UnsupportedIteratorTransport_ReadonlyMutation_AndGenericUnionDefer()
+    {
+        var unsupportedTransport = new TransportModel(
+            "unsupported",
+            false,
+            "IteratorObject<string>",
+            false,
+            false,
+            "Iterator proxy transport is not implemented.");
+        var resolver = new TypeResolver([MakeInterfaceSymbol("Mutable", [])]);
+
+        var iteratorError = Assert.Throws<GenericDeferralException>(() =>
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "IteratorObject",
+                    "IteratorObject",
+                    [new KeywordTypeNode("StringKeyword")])
+                {
+                    Transport = unsupportedTransport,
+                },
+                "fixture/iterator"));
+        Assert.Equal("iterator-transport", iteratorError.Phase);
+        Assert.Equal("fixture/iterator/transport", iteratorError.Provenance);
+
+        var readonlyError = Assert.Throws<GenericDeferralException>(() =>
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Readonly",
+                    "Readonly",
+                    [new ReferenceTypeNode("Mutable", "Mutable", [])]),
+                "fixture/readonly"));
+        Assert.Equal("readonly-mapped-types", readonlyError.Phase);
+        Assert.Equal(
+            "string",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Readonly",
+                    "Readonly",
+                    [new KeywordTypeNode("StringKeyword")]),
+                "fixture/readonly-string").RenderedType);
+
+        var either = MakeGenericAliasSymbol(
+            "Either",
+            [
+                new TypeParameterModel(0, "T", null, null),
+                new TypeParameterModel(1, "U", null, null),
+            ],
+            new UnionTypeNode(
+            [
+                new ReferenceTypeNode("T", "Either.T", []),
+                new ReferenceTypeNode("U", "Either.U", []),
+            ]));
+        var unionError = Assert.Throws<GenericDeferralException>(() =>
+            new AliasEmitter(
+                new TypeResolver([either]),
+                "1.0.0",
+                "Blazor.DOM").Emit(either));
+        Assert.Equal("typed-union", unionError.Phase);
+        Assert.Equal("Either/typeAlias", unionError.Provenance);
+    }
+
+    [Fact]
     public void GenericArtifacts_AreByteIdenticalAcrossRecursiveTwoPassGeneration()
     {
         var root = FindRepositoryRoot();
@@ -409,7 +565,6 @@ public sealed class GenericEmitterTests
                 Path.Combine("Interfaces", "INode.g.cs"),
                 Path.Combine("Callbacks", "LockGrantedCallback.g.cs"),
                 Path.Combine("Dictionaries", "QueuingStrategy.g.cs"),
-                Path.Combine("Typedefs", "ReadableStreamController.g.cs"),
                 Path.Combine("Factories", "ICustomEventFactory.g.cs"),
                 Path.Combine("Globals", "IWindow.Globals.g.cs"),
             };
@@ -573,6 +728,30 @@ public sealed class GenericEmitterTests
                         TypeParameters = typeParameters,
                     }
                 ],
+        };
+    }
+
+    private static SymbolModel MakeGenericAliasSymbol(
+        string name,
+        IReadOnlyList<TypeParameterModel> typeParameters,
+        TypeNode type)
+    {
+        var symbol = MakeInterfaceSymbol(name, []);
+        return symbol with
+        {
+            Declarations =
+            [
+                symbol.Declarations[0] with
+                {
+                    Kind = "typeAlias",
+                    TypeParameters = typeParameters,
+                    Type = type,
+                }
+            ],
+            Semantic = symbol.Semantic with
+            {
+                Classifications = ["typedef"],
+            },
         };
     }
 
