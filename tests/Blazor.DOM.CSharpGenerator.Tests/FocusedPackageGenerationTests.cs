@@ -8,6 +8,71 @@ namespace Blazor.DOM.CSharpGenerator.Tests;
 public sealed class FocusedPackageGenerationTests
 {
     [Fact]
+    public void BinaryConstrainedGenericProfile_EmitsSupportedHostPair()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "CryptoBinary",
+                "Binary-constrained generic fixture.",
+                ["Crypto"],
+                true,
+                false,
+                ["web-crypto"],
+                "Blazor.DOM",
+                "Profiles/CryptoBinary",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["Crypto"] = ["getRandomValues"],
+                },
+                true,
+                EntryPoints:
+                [
+                    new HostEntryPoint("Crypto", "Crypto", "crypto"),
+                ]);
+
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+
+            Assert.Empty(result.PipelineResult.Errors);
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            Assert.True(hosts.Parity.Exact);
+
+            var generated = Path.Combine(
+                output,
+                "Profiles",
+                "CryptoBinary",
+                "Server",
+                "Interfaces",
+                "ICrypto.g.cs");
+            var source = File.ReadAllText(generated);
+            Assert.Contains(
+                "where T : global::System.Collections.IList",
+                source,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "DomTransportKind.Binary",
+                source,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "DomTransportKind.Unsupported",
+                source,
+                StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
     public void PackageProfile_EmitsDeterministicHostPairsAndCapabilityMetadata()
     {
         var root = FindRepositoryRoot();
