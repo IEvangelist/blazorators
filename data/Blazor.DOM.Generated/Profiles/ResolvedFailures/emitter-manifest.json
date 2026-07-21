@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generatorVersion": "1.0.0",
   "sourceManifest": {
-    "typescriptSymbolsSha256": "e3795c0df5fffaaad69af5def9757c4889ceb2b94e60d04a7ecc3503fb3bd51e",
+    "typescriptSymbolsSha256": "a32344da18a6fe899dd5f81a25849bc7b27a323ee7e136f459d9d524b97b1e0e",
     "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
   },
   "accounting": {
@@ -94,8 +94,8 @@
     "memberReconciliationValid": true,
     "failedSymbolMemberOutcomes": [],
     "notAttemptedAfterFailureMembers": 0,
-    "sourceDeclarations": 92,
-    "accountedSourceDeclarations": 92,
+    "sourceDeclarations": 94,
+    "accountedSourceDeclarations": 94,
     "sourceMembers": 106,
     "accountedSourceMembers": 106,
     "sourceOverloads": 38,
@@ -617,6 +617,16 @@
         "sourceLocation": "typescript/lib/lib.dom.d.ts:13434:13"
       },
       {
+        "symbolName": "HTMLCanvasElement",
+        "declarationOrdinal": 2,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "HTMLCanvasElement/decl[2]/interface",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:21:1"
+      },
+      {
         "symbolName": "HTMLCollectionBase",
         "declarationOrdinal": 0,
         "kind": "interface",
@@ -795,6 +805,16 @@
         "reason": "Logical factory contract emitted.",
         "provenance": "OffscreenCanvas/decl[1]/globalVariable",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:22412:13"
+      },
+      {
+        "symbolName": "OffscreenCanvas",
+        "declarationOrdinal": 2,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "OffscreenCanvas/decl[2]/interface",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:27:1"
       },
       {
         "symbolName": "OffscreenCanvasRenderingContext2D",

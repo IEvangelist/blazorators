@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generatorVersion": "1.0.0",
   "sourceManifest": {
-    "typescriptSymbolsSha256": "e3795c0df5fffaaad69af5def9757c4889ceb2b94e60d04a7ecc3503fb3bd51e",
+    "typescriptSymbolsSha256": "a32344da18a6fe899dd5f81a25849bc7b27a323ee7e136f459d9d524b97b1e0e",
     "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
   },
   "accounting": {
