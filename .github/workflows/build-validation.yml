@@ -172,6 +172,10 @@ jobs:
       run: |
         pwsh ./artifacts/bin/Blazor.ExampleConsumer.EndToEndTests/release/playwright.ps1 install --with-deps
 
-    - name: Run WebAssembly and Server end-to-end tests
+    - name: Run WebAssembly and Server DOM end-to-end tests
       run: |
-        dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release --no-build --verbosity normal
+        dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release --no-build --filter "Category=DOMEndToEnd" --verbosity normal
+
+    - name: Run existing end-to-end tests
+      run: |
+        dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --filter "Category!=DOMEndToEnd" --verbosity normal
