@@ -1,0 +1,48 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "ResolvedFailures",
+  "description": "Contracts that previously failed standard-type, heritage, advanced-shape, or CLR-overload projection.",
+  "rootSymbols": [
+    "ByteLengthQueuingStrategy",
+    "CountQueuingStrategy",
+    "DOMException",
+    "Document",
+    "Element",
+    "HTMLCanvasElement",
+    "OffscreenCanvas",
+    "OnErrorEventHandlerNonNull",
+    "SubtleCrypto",
+    "WebAssembly.CompileError",
+    "WebAssembly.LinkError",
+    "WebAssembly.RuntimeError",
+    "WebAssembly.ValueTypeMap",
+    "WebGLRenderingContextBase"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": [
+    "standard-types",
+    "structural-heritage",
+    "never-shape",
+    "literal-overload-dispatch"
+  ],
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "ByteLengthQueuingStrategy": [],
+    "CountQueuingStrategy": [],
+    "DOMException": [],
+    "Document": ["createElementNS@0/68", "createElementNS@0/70"],
+    "Element": ["getElementsByTagNameNS@0/47", "getElementsByTagNameNS@0/48"],
+    "HTMLCanvasElement": ["getContext@0/3", "getContext@0/4"],
+    "OffscreenCanvas": ["getContext@0/5", "getContext@0/6"],
+    "OnErrorEventHandlerNonNull": ["$callSignature"],
+    "SubtleCrypto": ["exportKey"],
+    "WebAssembly.CompileError": ["*"],
+    "WebAssembly.LinkError": ["*"],
+    "WebAssembly.RuntimeError": ["*"],
+    "WebAssembly.ValueTypeMap": ["v128"],
+    "WebGLRenderingContextBase": ["getExtension@0/62", "getExtension@0/63"]
+  },
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/ResolvedFailures"
+}

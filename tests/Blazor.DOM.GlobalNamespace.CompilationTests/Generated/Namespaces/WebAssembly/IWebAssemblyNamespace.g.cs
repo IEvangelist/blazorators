@@ -12,11 +12,17 @@ namespace Blazor.DOM.Namespaces.WebAssembly;
 /// </summary>
 public partial interface IWebAssemblyNamespace
 {
+    global::Blazor.DOM.Namespaces.WebAssembly.ICompileErrorFactory CompileErrorConstructor { get; }
+
     global::Blazor.DOM.Namespaces.WebAssembly.IInstanceFactory InstanceConstructor { get; }
+
+    global::Blazor.DOM.Namespaces.WebAssembly.ILinkErrorFactory LinkErrorConstructor { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.IMemoryFactory MemoryConstructor { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.IModuleFactory ModuleConstructor { get; }
+
+    global::Blazor.DOM.Namespaces.WebAssembly.IRuntimeErrorFactory RuntimeErrorConstructor { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.ITableFactory TableConstructor { get; }
 
