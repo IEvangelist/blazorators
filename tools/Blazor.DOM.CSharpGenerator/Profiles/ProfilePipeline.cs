@@ -444,6 +444,7 @@ public static class ProfilePipeline
             ExternalReferences: externalRefs,
             Accounting: pipelineResult.Manifest.Accounting,
             TransportOverrides: profile.TransportOverrides ?? [],
+            ReviewedExclusions: profile.ReviewedExclusions ?? [],
             Errors: pipelineResult.Errors.Select(e => new ProfileErrorEntry(
                 e.SymbolName, e.ExceptionType, e.Message)).ToList(),
             ByteIdentityVerified: byteIdentityVerified
@@ -482,6 +483,7 @@ public sealed record ProfileCoverageReport(
     IReadOnlyList<string> ExternalReferences,
     AccountingSummary Accounting,
     IReadOnlyList<ProfileTransportOverride> TransportOverrides,
+    IReadOnlyList<ProfileReviewedExclusion> ReviewedExclusions,
     IReadOnlyList<ProfileErrorEntry> Errors,
     bool ByteIdentityVerified);
 

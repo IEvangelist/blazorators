@@ -262,6 +262,45 @@ public sealed class ProfileSystemTests
     }
 
     [Fact]
+    public void Load_ReviewedExclusionRequiresRationaleAndExcludedMember()
+    {
+        var dir = CreateTempDir();
+        try
+        {
+            var json = """
+                {
+                    "name": "Invalid",
+                    "description": "Invalid exclusion",
+                    "rootSymbols": ["Root"],
+                    "secureContext": false,
+                    "requiresUserActivation": false,
+                    "features": [],
+                    "outputNamespace": "Blazor.DOM",
+                    "outputSubdirectory": "Profiles/Invalid",
+                    "memberIncludes": {
+                        "Root": ["included"]
+                    },
+                    "reviewedExclusions": [
+                        {
+                            "symbol": "Root",
+                            "member": "excluded",
+                            "rationale": ""
+                        }
+                    ]
+                }
+                """;
+            var path = Path.Combine(dir, "invalid.profile.json");
+            File.WriteAllText(path, json);
+
+            var exception = Assert.Throws<InvalidDataException>(
+                () => ProfileLoader.Load(path));
+
+            Assert.Contains("incomplete reviewed exclusion", exception.Message);
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
     public void LoadAll_LoadsAllProfileJsonFiles()
     {
         var dir = CreateTempDir();

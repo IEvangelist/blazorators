@@ -84,6 +84,42 @@ public static class ProfileLoader
                     $"unsupported kind '{transportOverride.Kind}'.");
             }
         }
+        var duplicateExclusion = (profile.ReviewedExclusions ?? [])
+            .GroupBy(item => (item.Symbol, item.Member))
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateExclusion is not null)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' has duplicate reviewed exclusion " +
+                $"'{duplicateExclusion.Key.Symbol}.{duplicateExclusion.Key.Member}'.");
+        }
+        foreach (var exclusion in profile.ReviewedExclusions ?? [])
+        {
+            if (string.IsNullOrWhiteSpace(exclusion.Symbol)
+                || string.IsNullOrWhiteSpace(exclusion.Member)
+                || string.IsNullOrWhiteSpace(exclusion.Rationale))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' has an incomplete reviewed " +
+                    "exclusion; symbol, member, and rationale are required.");
+            }
+            if (profile.MemberIncludes?.TryGetValue(
+                    exclusion.Symbol,
+                    out var includedMembers) != true)
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' reviewed exclusion " +
+                    $"'{exclusion.Symbol}.{exclusion.Member}' must target a symbol " +
+                    "with an explicit member include list.");
+            }
+            if (includedMembers.Contains("*", StringComparer.Ordinal)
+                || includedMembers.Contains(exclusion.Member, StringComparer.Ordinal))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' reviewed exclusion " +
+                    $"'{exclusion.Symbol}.{exclusion.Member}' is also included.");
+            }
+        }
 
         if (profile.EntryPoints is null)
             return;

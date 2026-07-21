@@ -28,11 +28,18 @@ public sealed record ProfileDefinition(
     [property: JsonPropertyName("transportOverrides")]
         IReadOnlyList<ProfileTransportOverride>? TransportOverrides = null,
     [property: JsonPropertyName("permissions")]
-        IReadOnlyList<string>? Permissions = null
+        IReadOnlyList<string>? Permissions = null,
+    [property: JsonPropertyName("reviewedExclusions")]
+        IReadOnlyList<ProfileReviewedExclusion>? ReviewedExclusions = null
 );
 
 public sealed record ProfileTransportOverride(
     [property: JsonPropertyName("symbol")] string Symbol,
     [property: JsonPropertyName("member")] string Member,
     [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("rationale")] string Rationale);
+
+public sealed record ProfileReviewedExclusion(
+    [property: JsonPropertyName("symbol")] string Symbol,
+    [property: JsonPropertyName("member")] string Member,
     [property: JsonPropertyName("rationale")] string Rationale);
