@@ -1,0 +1,141 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Performance",
+  "description": "Performance Timeline APIs for marks, measures, entries, observers, and navigation and resource timing.",
+  "rootSymbols": [
+    "Performance",
+    "PerformanceObserver",
+    "PerformanceObserverEntryList",
+    "PerformanceEntry",
+    "PerformanceMark",
+    "PerformanceMeasure",
+    "PerformanceNavigationTiming",
+    "PerformanceResourceTiming"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": [
+    "performance-timeline",
+    "user-timing",
+    "performance-observer",
+    "navigation-timing",
+    "resource-timing"
+  ],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Performance",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"],
+    "Performance": [
+      "navigation",
+      "timeOrigin",
+      "timing",
+      "clearMarks",
+      "clearMeasures",
+      "clearResourceTimings",
+      "getEntries",
+      "getEntriesByName",
+      "getEntriesByType",
+      "mark",
+      "measure",
+      "now",
+      "setResourceTimingBufferSize",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "PerformanceEntry": ["duration", "entryType", "name", "startTime"],
+    "PerformanceEventMap": ["resourcetimingbufferfull"],
+    "PerformanceMark": [],
+    "PerformanceMarkOptions": ["*"],
+    "PerformanceMeasure": [],
+    "PerformanceMeasureOptions": ["*"],
+    "PerformanceNavigation": [
+      "redirectCount",
+      "type",
+      "TYPE_NAVIGATE",
+      "TYPE_RELOAD",
+      "TYPE_BACK_FORWARD",
+      "TYPE_RESERVED"
+    ],
+    "PerformanceNavigationTiming": [
+      "domComplete",
+      "domContentLoadedEventEnd",
+      "domContentLoadedEventStart",
+      "domInteractive",
+      "loadEventEnd",
+      "loadEventStart",
+      "redirectCount",
+      "type",
+      "unloadEventEnd",
+      "unloadEventStart"
+    ],
+    "PerformanceObserver": [
+      "prototype",
+      "$constructSignature",
+      "disconnect",
+      "observe",
+      "takeRecords"
+    ],
+    "PerformanceObserverCallback": ["*"],
+    "PerformanceObserverEntryList": ["*"],
+    "PerformanceObserverInit": ["*"],
+    "PerformanceResourceTiming": [
+      "connectEnd",
+      "connectStart",
+      "decodedBodySize",
+      "domainLookupEnd",
+      "domainLookupStart",
+      "encodedBodySize",
+      "fetchStart",
+      "initiatorType",
+      "nextHopProtocol",
+      "redirectEnd",
+      "redirectStart",
+      "requestStart",
+      "responseEnd",
+      "responseStart",
+      "responseStatus",
+      "secureConnectionStart",
+      "serverTiming",
+      "transferSize",
+      "workerStart"
+    ],
+    "PerformanceServerTiming": ["description", "duration", "name"],
+    "PerformanceTiming": [
+      "connectEnd",
+      "connectStart",
+      "domComplete",
+      "domContentLoadedEventEnd",
+      "domContentLoadedEventStart",
+      "domInteractive",
+      "domLoading",
+      "domainLookupEnd",
+      "domainLookupStart",
+      "fetchStart",
+      "loadEventEnd",
+      "loadEventStart",
+      "navigationStart",
+      "redirectEnd",
+      "redirectStart",
+      "requestStart",
+      "responseEnd",
+      "responseStart",
+      "secureConnectionStart",
+      "unloadEventEnd",
+      "unloadEventStart"
+    ]
+  },
+  "entryPoints": [
+    {
+      "name": "Performance",
+      "symbol": "Performance",
+      "javaScriptPath": "performance"
+    },
+    {
+      "name": "PerformanceObserver",
+      "symbol": "PerformanceObserver",
+      "javaScriptPath": "PerformanceObserver"
+    }
+  ]
+}
