@@ -6,11 +6,13 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>Library</OutputType>
+    <DomGenerationProfile>WakeLock</DomGenerationProfile>
+    <DomIncludeSupplemental>true</DomIncludeSupplemental>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\WakeLock\**\*.g.cs" />
     <ProjectReference Include="..\Blazor.DOM.ProfileRuntime\Blazor.DOM.ProfileRuntime.csproj" />
   </ItemGroup>
 
+  <Import Project="..\..\src\Blazor.DOM.Generation.targets" />
 </Project>

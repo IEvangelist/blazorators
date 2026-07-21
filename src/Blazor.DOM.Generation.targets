@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <_DomLowerConfiguration>$([System.String]::Copy('$(Configuration)').ToLowerInvariant())</_DomLowerConfiguration>
-    <DomGeneratedOutputRoot>$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_DomLowerConfiguration)\dom'))</DomGeneratedOutputRoot>
-    <DomGeneratedSourceRoot Condition="'$(DomGenerationProfile)' == ''">$(DomGeneratedOutputRoot)</DomGeneratedSourceRoot>
-    <DomGeneratedSourceRoot Condition="'$(DomGenerationProfile)' != ''">$(DomGeneratedOutputRoot)\Profiles\$(DomGenerationProfile)</DomGeneratedSourceRoot>
+    <DomGeneratedOutputRoot Condition="'$(DomGeneratedOutputRoot)' == ''">$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_DomLowerConfiguration)\dom'))</DomGeneratedOutputRoot>
+    <DomGeneratedSourceRoot Condition="'$(DomGeneratedSourceRoot)' == '' and '$(DomGenerationProfile)' == ''">$(DomGeneratedOutputRoot)</DomGeneratedSourceRoot>
+    <DomGeneratedSourceRoot Condition="'$(DomGeneratedSourceRoot)' == '' and '$(DomGenerationProfile)' != ''">$(DomGeneratedOutputRoot)\Profiles\$(DomGenerationProfile)</DomGeneratedSourceRoot>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +11,7 @@
                       ReferenceOutputAssembly="false"
                       PrivateAssets="all"
                       SkipGetTargetFrameworkProperties="true"
-                      AdditionalProperties="TargetFramework=net10.0" />
+                      AdditionalProperties="TargetFramework=net10.0;DomGeneratedOutputRoot=$(DomGeneratedOutputRoot);DomGenerationSentinel=$(DomGenerationSentinel)" />
   </ItemGroup>
 
   <Target Name="IncludeGeneratedDomContracts"
@@ -25,13 +25,23 @@
       <Compile Include="$(DomGeneratedSourceRoot)\Dictionaries\**\*.cs" />
       <Compile Include="$(DomGeneratedSourceRoot)\Enums\**\*.cs" />
       <Compile Include="$(DomGeneratedSourceRoot)\EventMaps\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Globals\**\*.cs"
+               Condition="'$(DomIncludeSupplemental)' == 'true'" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Namespaces\**\*.cs"
+               Condition="'$(DomIncludeSupplemental)' == 'true'" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Shared\**\*.cs"
+               Condition="'$(DomIncludeSupplemental)' == 'true'" />
       <Compile Include="$(DomGeneratedSourceRoot)\Typedefs\**\*.cs" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Interfaces\**\*.cs"
+               Condition="'$(DomGenerationHost)' == ''" />
+      <Compile Include="$(DomGeneratedSourceRoot)\Factories\**\*.cs"
+               Condition="'$(DomGenerationHost)' == ''" />
       <Compile Include="$(DomGeneratedSourceRoot)\$(DomGenerationHost)\Interfaces\**\*.cs"
                Condition="'$(DomGenerationHost)' != ''" />
       <Compile Include="$(DomGeneratedSourceRoot)\$(DomGenerationHost)\Factories\**\*.cs"
                Condition="'$(DomGenerationHost)' != ''" />
       <Compile Include="$(DomGeneratedSourceRoot)\$(DomGenerationHost)\GeneratedDomHost.g.cs"
-               Condition="'$(DomGenerationHost)' != ''" />
+               Condition="'$(DomGenerationHost)' != '' and '$(DomIncludeGeneratedHost)' != 'false'" />
     </ItemGroup>
   </Target>
 </Project>

@@ -6,6 +6,12 @@ JavaScript reference proxy runtime for exhaustive Blazor DOM bindings — Server
 
 `Blazor.DOM` provides the exhaustive generated Server/hosting-neutral DOM API and its runtime. It targets **Blazor Server** and hosting models where JavaScript interop is inherently asynchronous. Non-Promise members are cancellable `ValueTask` methods; Promise members are awaited through the same async surface.
 
+## Build-time generation
+
+DOM contracts are generated during build into `artifacts/obj/Blazor.DOM.Generation/<configuration>/dom`; generated C# is not checked in. `Blazor.DOM.Generation.csproj` is the single incremental generation node shared by exhaustive, WebAssembly, and focused packages, so multi-target builds reuse one strict semantic projection. Its inputs are the manifest-locked IR in `data/Blazor.DOM`, profile definitions in `data/Blazor.DOM.Profiles`, handwritten `[JSAutoInterop]` roots in `src/Blazor.DOM.Anchors`, and the strict emitter source.
+
+The existing Roslyn generator remains responsible for its narrower declaration-driven services. The exhaustive DOM surface uses the strict semantic IR/emitter because it preserves merged declarations, advanced types, host parity, and exact zero-deferral accounting that the older projection does not model. Package projects import `Blazor.DOM.Generation.targets` to select their host/profile slice and pack manifests directly from intermediate output.
+
 ## Key services
 
 | Service | Description |

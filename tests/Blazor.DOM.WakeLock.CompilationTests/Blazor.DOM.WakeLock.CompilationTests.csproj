@@ -10,12 +10,12 @@
     <OutputType>Library</OutputType>
     <!-- Suppress the no-source warning so an empty project doesn't fail the build. -->
     <NoWarn>CS2008</NoWarn>
+    <DomGenerationProfile>WakeLock</DomGenerationProfile>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Include all generated WakeLock profile .g.cs files. -->
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\WakeLock\**\*.g.cs" />
     <ProjectReference Include="..\Blazor.DOM.ProfileRuntime\Blazor.DOM.ProfileRuntime.csproj" />
   </ItemGroup>
 
+  <Import Project="..\..\src\Blazor.DOM.Generation.targets" />
 </Project>
