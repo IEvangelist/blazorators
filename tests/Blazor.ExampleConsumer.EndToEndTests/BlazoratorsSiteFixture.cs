@@ -89,7 +89,7 @@ public abstract class BlazorSiteFixture(
     static string NormalizeBaseUrl(string value) =>
         value.Trim().TrimEnd('/');
 
-    static string FindRepositoryRoot()
+    internal static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
