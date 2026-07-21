@@ -92,7 +92,7 @@ internal static class DomTransportValidator
         _ = NormalizeJsonValue(value, path);
     }
 
-    private static object NormalizeJsonValue(object value, string path)
+    private static object? NormalizeJsonValue(object value, string path)
     {
         return NormalizeJsonValue(
             value,
@@ -101,7 +101,7 @@ internal static class DomTransportValidator
             containerDepth: 0);
     }
 
-    private static object NormalizeJsonValue(
+    private static object? NormalizeJsonValue(
         object value,
         string path,
         Dictionary<object, string> visiting,
@@ -109,9 +109,7 @@ internal static class DomTransportValidator
     {
         if (value is IDomUnionValue union)
         {
-            return PrepareUnion(union, path)
-                ?? throw new DomTransportException(
-                    $"JSON union value at '{path}' selected a null arm.");
+            return PrepareUnion(union, path);
         }
         if (value is JsonElement element)
         {
@@ -470,7 +468,7 @@ internal static class DomTransportValidator
         };
     }
 
-    private static object PrepareDynamicJson(object value, string path)
+    private static object? PrepareDynamicJson(object value, string path)
         => NormalizeJsonValue(value, path);
 
     private static object PrepareDynamicReference(
