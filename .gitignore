@@ -52,6 +52,7 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+/data/Blazor.DOM.Generated/
 **/Properties/launchSettings.json
 
 # StyleCop

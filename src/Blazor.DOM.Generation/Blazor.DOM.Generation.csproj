@@ -6,8 +6,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <NoWarn>CS2008</NoWarn>
     <_LowerConfiguration>$([System.String]::Copy('$(Configuration)').ToLowerInvariant())</_LowerConfiguration>
-    <DomGeneratedOutputRoot>$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_LowerConfiguration)\dom'))</DomGeneratedOutputRoot>
-    <DomGenerationStamp>$(DomGeneratedOutputRoot)\generation.stamp</DomGenerationStamp>
+    <DomGeneratedOutputRoot Condition="'$(DomGeneratedOutputRoot)' == ''">$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_LowerConfiguration)\dom'))</DomGeneratedOutputRoot>
+    <DomGenerationStamp Condition="'$(DomGenerationStamp)' == ''">$(DomGeneratedOutputRoot)\generation.stamp</DomGenerationStamp>
     <DomGeneratorAssembly>$(ArtifactsPath)\bin\Blazor.DOM.CSharpGenerator\$(_LowerConfiguration)\Blazor.DOM.CSharpGenerator.dll</DomGeneratorAssembly>
     <DomDataDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\data\Blazor.DOM'))</DomDataDirectory>
     <DomProfilesDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\data\Blazor.DOM.Profiles'))</DomProfilesDirectory>
@@ -21,6 +21,8 @@
     <_DomGenerationInput Include="$(DomDataDirectory)\**\*" />
     <_DomGenerationInput Include="$(DomProfilesDirectory)\**\*.json" />
     <_DomGenerationInput Include="$(DomAnchorsDirectory)\**\*.cs" />
+    <_DomGenerationInput Include="$(DomGenerationSentinel)"
+                         Condition="'$(DomGenerationSentinel)' != ''" />
     <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\**\*.cs"
                          Exclude="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\obj\**\*;$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\bin\**\*" />
     <_DomGenerationInput Include="$(MSBuildProjectDirectory)\..\..\tools\Blazor.DOM.CSharpGenerator\Blazor.DOM.CSharpGenerator.csproj" />
@@ -36,5 +38,10 @@
     <WriteLinesToFile File="$(DomGenerationStamp)"
                       Lines="@(_DomGenerationInput->'%(FullPath)')"
                       Overwrite="true" />
+  </Target>
+
+  <Target Name="CleanDomContracts"
+          AfterTargets="Clean">
+    <RemoveDir Directories="$(DomGeneratedOutputRoot)" />
   </Target>
 </Project>

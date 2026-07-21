@@ -80,6 +80,7 @@ Console.WriteLine($" OK — {anchors.Count} anchor(s) loaded.");
 // Sibling staging guarantees that the final directory renames stay on one volume.
 var canonicalOutputDirectory = Path.TrimEndingDirectorySeparator(
     Path.GetFullPath(cliArgs.OutputDirectory));
+using var generationLock = GenerationLock.Acquire(canonicalOutputDirectory);
 var outputParent = Path.GetDirectoryName(canonicalOutputDirectory)
     ?? throw new InvalidOperationException(
         $"Output directory must have a parent: '{canonicalOutputDirectory}'.");
@@ -326,7 +327,12 @@ internal sealed record Args(
 
         // Default to checked-in data path relative to the solution root
         data ??= ResolveDefault("data", "Blazor.DOM");
-        output ??= ResolveDefault("data", "Blazor.DOM.Generated");
+        output ??= ResolveDefault(
+            "artifacts",
+            "obj",
+            "Blazor.DOM.Generation",
+            "manual",
+            "dom");
         anchors ??= ResolveDefault("src", "Blazor.DOM.Anchors");
 
         return new Args(data, output, verify, profiles, anchors);
