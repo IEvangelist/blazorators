@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.JSInterop" />
+    <Using Include="System.Collections.Concurrent" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Blazor.DOM\Abstractions\**\*.cs"
+             LinkBase="SharedRuntime\Abstractions" />
+    <Compile Include="..\..\src\Blazor.DOM\Exceptions\**\*.cs"
+             LinkBase="SharedRuntime\Exceptions" />
+    <Compile Include="..\..\src\Blazor.DOM\Proxies\**\*.cs"
+             LinkBase="SharedRuntime\Proxies" />
+    <Compile Include="..\..\src\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
+             Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
+  </ItemGroup>
+
+</Project>

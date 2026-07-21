@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\Accessors\**\*.g.cs" />
-    <ProjectReference Include="..\..\src\Blazor.DOM\Blazor.DOM.csproj" />
+    <ProjectReference Include="..\Blazor.DOM.ProfileRuntime\Blazor.DOM.ProfileRuntime.csproj" />
   </ItemGroup>
 
 </Project>
