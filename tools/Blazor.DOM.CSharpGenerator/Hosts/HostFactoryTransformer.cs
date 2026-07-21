@@ -176,6 +176,9 @@ public sealed partial class HostFactoryTransformer(DomHostKind host)
     {
         var method = ParseMethod(declaration);
         var construct = method.Name is "Create" or "Invoke";
+        var promise = TryUnwrapValueTask(
+            method.ReturnType,
+            out var resultType);
         var sourceMemberName = method.Name.EndsWith("Async", StringComparison.Ordinal)
             ? method.Name[..^5]
             : method.Name;
@@ -188,28 +191,28 @@ public sealed partial class HostFactoryTransformer(DomHostKind host)
             ? "null"
             : $"[{string.Join(", ", method.Names)}]";
         string signature;
-        if (host == DomHostKind.Server)
+        if (host == DomHostKind.Server || promise)
         {
             var parameters = AddCancellation(method.Parameters);
             var name = method.Name.EndsWith("Async", StringComparison.Ordinal)
                 ? method.Name
                 : method.Name + "Async";
-            signature = method.ReturnType == "void"
+            signature = resultType == "void"
                 ? $"global::System.Threading.Tasks.ValueTask {name}{method.Generic}(" +
                     $"{string.Join(", ", parameters)})"
-                : $"global::System.Threading.Tasks.ValueTask<{method.ReturnType}> " +
+                : $"global::System.Threading.Tasks.ValueTask<{resultType}> " +
                     $"{name}{method.Generic}({string.Join(", ", parameters)})";
-            var invocation = method.ReturnType == "void"
+            var invocation = resultType == "void"
                 ? $"global::Microsoft.JSInterop.DomDispatch.InvokeVoidAsync(" +
                     $"{DispatchCast}, \"{jsName}\", {arguments}, cancellationToken)"
                 : construct
                 ? $"global::Microsoft.JSInterop.DomDispatch.ConstructAsync<" +
-                    $"{method.ReturnType}>({DispatchCast}, \"{constructorPath}\", " +
+                    $"{resultType}>({DispatchCast}, \"{constructorPath}\", " +
                     $"{arguments}, cancellationToken)"
                 : $"global::Microsoft.JSInterop.DomDispatch.InvokeAsync<" +
-                    $"{method.ReturnType}>({DispatchCast}, \"{jsName}\", {arguments}, " +
+                    $"{resultType}>({DispatchCast}, \"{jsName}\", {arguments}, " +
                     $"global::Microsoft.JSInterop.DomDispatch.InferTransport<" +
-                    $"{method.ReturnType}>(\"{jsName}\"), cancellationToken)";
+                    $"{resultType}>(\"{jsName}\"), cancellationToken)";
             output.Add($"    {signature} => {invocation};");
         }
         else
@@ -234,8 +237,35 @@ public sealed partial class HostFactoryTransformer(DomHostKind host)
             symbol.Name,
             construct ? "constructor" : "factory-method",
             jsName,
-            false,
+            promise,
             signature));
+    }
+
+    private static bool TryUnwrapValueTask(
+        string returnType,
+        out string resultType)
+    {
+        const string valueTask = "ValueTask";
+        const string qualifiedValueTask =
+            "global::System.Threading.Tasks.ValueTask";
+        if (returnType is valueTask or qualifiedValueTask)
+        {
+            resultType = "void";
+            return true;
+        }
+
+        foreach (var prefix in new[] { valueTask + "<", qualifiedValueTask + "<" })
+        {
+            if (returnType.StartsWith(prefix, StringComparison.Ordinal)
+                && returnType.EndsWith('>'))
+            {
+                resultType = returnType[prefix.Length..^1];
+                return true;
+            }
+        }
+
+        resultType = returnType;
+        return false;
     }
 
     private static ParsedMethod ParseMethod(string declaration)

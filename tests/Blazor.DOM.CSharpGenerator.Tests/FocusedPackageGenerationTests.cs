@@ -255,6 +255,16 @@ public sealed class FocusedPackageGenerationTests
                 generated,
                 "WebAssembly",
                 "GeneratedDomHost.g.cs"));
+            var serverFactory = File.ReadAllText(Path.Combine(
+                generated,
+                "Server",
+                "Factories",
+                "INotificationFactory.g.cs"));
+            var wasmFactory = File.ReadAllText(Path.Combine(
+                generated,
+                "WebAssembly",
+                "Factories",
+                "INotificationFactory.g.cs"));
 
             Assert.True(result.PipelineResult.HostPackages!.Parity.Exact);
             Assert.Contains(
@@ -276,6 +286,30 @@ public sealed class FocusedPackageGenerationTests
             Assert.Contains(
                 "[\"notifications\"]",
                 serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<NotificationPermission> RequestPermissionAsync(",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "DomDispatch.InvokeAsync<NotificationPermission>",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<NotificationPermission> RequestPermissionAsync(",
+                wasmFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "DomDispatch.InvokeAsync<NotificationPermission>",
+                wasmFactory,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "ValueTask<ValueTask<NotificationPermission>>",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "WasmDomDispatch.Invoke<ValueTask<NotificationPermission>>",
+                wasmFactory,
                 StringComparison.Ordinal);
         }
         finally
