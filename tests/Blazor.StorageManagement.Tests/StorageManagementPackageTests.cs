@@ -45,7 +45,7 @@ public sealed class StorageManagementPackageTests
         Assert.Equal(
             DomTransportKind.JsReference,
             getDirectory.GetCustomAttribute<DomOperationAttribute>()
-                ?.TransportKind);
+                ?.ReturnTransport);
         Assert.True(typeof(IAsyncDisposable).IsAssignableFrom(
             typeof(IFileSystemDirectoryHandle)));
     }

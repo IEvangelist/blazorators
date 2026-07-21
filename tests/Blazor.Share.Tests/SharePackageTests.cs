@@ -41,7 +41,8 @@ public sealed class SharePackageTests
         Assert.Equal(typeof(ValueTask), share?.ReturnType);
         Assert.Equal(
             DomTransportKind.JsonValue,
-            share?.GetCustomAttribute<DomOperationAttribute>()?.TransportKind);
+            share?.GetCustomAttribute<DomOperationAttribute>()
+                ?.ReturnTransport);
 
         Assert.NotNull(typeof(ShareData).GetProperty("Text"));
         Assert.NotNull(typeof(ShareData).GetProperty("Title"));
