@@ -227,6 +227,27 @@ public sealed class AccessorLoweringTests
     }
 
     [Fact]
+    public void Method_EmitsAuthoritativeLogicalOperationMetadata()
+    {
+        var symbol = Symbol(
+            "MethodHost",
+            [
+                Declaration(
+                    "MethodHost",
+                    0,
+                    Method("read-value", [], 7))
+            ]);
+
+        var source = Emit([symbol], symbol).Source;
+
+        Assert.Contains("DomOperation(", source);
+        Assert.Contains("\"read-value\"", source);
+        Assert.Contains("DomTransportKind.JsonValue", source);
+        Assert.Contains("Promise = false", source);
+        Assert.Contains("ReadValue", source);
+    }
+
+    [Fact]
     public void IncompatibleInheritedAccessor_LowersToExplicitGetterMethod()
     {
         var baseSymbol = Symbol(

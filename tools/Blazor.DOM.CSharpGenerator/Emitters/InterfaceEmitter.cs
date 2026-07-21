@@ -1249,6 +1249,15 @@ public sealed class InterfaceEmitter(
         w.XmlDoc(docText, deprecated);
         foreach (var defaultNote in methodGeneric.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        w.AppendLine(RenderOperationMetadata(
+            BuildSourceIdentity(
+                memberName,
+                methodGeneric,
+                paramList,
+                canonicalParamTypes,
+                returnProj),
+            memberName,
+            returnProj));
         if (!string.Equals(
                 emittedName,
                 Naming.ToCSharpMemberName(memberName),
@@ -1388,6 +1397,15 @@ public sealed class InterfaceEmitter(
             w.XmlDoc(docText, deprecated);
         foreach (var defaultNote in methodGeneric.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        w.AppendLine(RenderOperationMetadata(
+            BuildSourceIdentity(
+                javaScriptName,
+                methodGeneric,
+                paramList,
+                canonicalParamTypes,
+                returnProjection),
+            javaScriptName,
+            returnProjection));
         if (!string.Equals(
                 emittedName,
                 Naming.ToCSharpMemberName(javaScriptName),
@@ -1424,6 +1442,52 @@ public sealed class InterfaceEmitter(
             ReturnProjection: returnProjection,
             ReturnSources: [returnSource],
             Scope: methodGeneric.Scope);
+    }
+
+    private static string RenderOperationMetadata(
+        string logicalIdentity,
+        string javaScriptName,
+        TypeProjection returnProjection)
+    {
+        var transport = returnProjection.Transport;
+        var transportKind = transport?.Kind switch
+        {
+            "json-value" => "JsonValue",
+            "js-reference" => "JsReference",
+            "js-stream" => "JsStream",
+            "binary" => "Binary",
+            "transferable" => "Transferable",
+            _ when returnProjection.Identity.Kind == ClrTypeKind.Void => "JsonValue",
+            _ => "Unsupported",
+        };
+        var sourceType = transport?.SourceType
+            ?? (returnProjection.Identity.Kind == ClrTypeKind.Void
+                ? "void"
+                : returnProjection.CSharpType);
+        var namedArguments = new List<string>
+        {
+            $"Nullable = {(returnProjection.IsNullable || transport?.Nullable == true).ToString().ToLowerInvariant()}",
+            $"Promise = {returnProjection.Identity.IsAwaitable.ToString().ToLowerInvariant()}",
+            $"Streamable = {(transport?.Streamable == true).ToString().ToLowerInvariant()}",
+            $"StructuredClone = {(transport?.StructuredClone == true).ToString().ToLowerInvariant()}",
+        };
+        var unsupportedReason = transport?.Reason
+            ?? (transport is null && returnProjection.Identity.Kind != ClrTypeKind.Void
+                ? "Source IR does not provide reviewed transport metadata."
+                : null);
+        if (unsupportedReason is not null)
+        {
+            namedArguments.Add(
+                $"UnsupportedReason = \"{EscapeCSharp(unsupportedReason)}\"");
+        }
+
+        return
+            "[global::Microsoft.JSInterop.DomOperation(" +
+            $"\"{EscapeCSharp(logicalIdentity)}\", " +
+            $"\"{EscapeCSharp(javaScriptName)}\", " +
+            $"global::Microsoft.JSInterop.DomTransportKind.{transportKind}, " +
+            $"\"{EscapeCSharp(sourceType)}\", " +
+            $"{string.Join(", ", namedArguments)})]";
     }
 
     private sealed record IndexAccessorBuild(string Rendered, string CanonicalKey);
