@@ -586,6 +586,9 @@ public sealed class TypeResolver
             "readonly-array" or
             "resolved-import-type"
             || projection.ProviderNote.StartsWith(
+                "browser-",
+                StringComparison.Ordinal)
+            || projection.ProviderNote.StartsWith(
                 "Window & typeof globalThis",
                 StringComparison.Ordinal);
         return projection with
@@ -753,13 +756,12 @@ public sealed class TypeResolver
                     null));
         }
 
-        // Promise<T> -> ValueTask<T>
+        // Method-returned promises are awaited by generated proxy methods. Promise
+        // values elsewhere retain their live JavaScript identity.
         if (isGlobalBuiltIn && name == "Promise")
         {
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
-            if (rf.TypeArguments[0] is not UnionTypeNode)
-                EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             var inner = Project(
                 rf.TypeArguments[0],
                 $"{provenance}/Promise<T>",
@@ -767,6 +769,23 @@ public sealed class TypeResolver
                 depth + 1);
             if (inner.Identity.Kind == ClrTypeKind.Null)
                 throw IllegalGenericArgument(name, inner, provenance, 0);
+            if (!IsCallableReturn(provenance))
+            {
+                var browserPromise = inner.Identity.Kind == ClrTypeKind.Void
+                    ? "global::Microsoft.JSInterop.IBrowserPromise"
+                    : $"global::Microsoft.JSInterop.IBrowserPromise<{inner.RenderedType}>";
+                var canonicalPromise = inner.Identity.Kind == ClrTypeKind.Void
+                    ? "global::Microsoft.JSInterop.IBrowserPromise"
+                    : $"global::Microsoft.JSInterop.IBrowserPromise<{inner.CanonicalType}>";
+                return ReferenceType(
+                    browserPromise,
+                    providerNote: "browser-promise-reference",
+                    canonicalType: canonicalPromise,
+                    typeArguments: inner.Identity.Kind == ClrTypeKind.Void
+                        ? []
+                        : [inner.Identity],
+                    transport: BrowserReferenceTransport(rf));
+            }
             var promiseType = inner.Identity.Kind == ClrTypeKind.Void
                 ? "ValueTask"
                 : $"ValueTask<{inner.RenderedType}>";
@@ -853,10 +872,6 @@ public sealed class TypeResolver
         // Generic collections
         if (isGlobalBuiltIn && name is "Array" or "ReadonlyArray")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "standard-container-transport");
             if (rf.TypeArguments.Count == 1)
             {
                 var elem = Project(
@@ -865,6 +880,20 @@ public sealed class TypeResolver
                     scope,
                     depth + 1);
                 ValidateGenericArgument(name, elem, provenance, 0);
+                if (RequiresLiveContainer(rf))
+                {
+                    var contract = name == "ReadonlyArray"
+                        ? "IReadOnlyBrowserArray"
+                        : "IBrowserArray";
+                    return ReferenceType(
+                        $"global::Microsoft.JSInterop.{contract}<{elem.RenderedType}>",
+                        isCollection: true,
+                        providerNote: "browser-array-reference",
+                        canonicalType:
+                            $"global::Microsoft.JSInterop.{contract}<{elem.CanonicalType}>",
+                        typeArguments: [elem.Identity],
+                        transport: BrowserReferenceTransport(rf));
+                }
                 return ReferenceType(
                     $"{elem.RenderedType}[]",
                     isCollection: true,
@@ -976,10 +1005,6 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name == "Record")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "standard-container-transport");
             if (rf.TypeArguments.Count != 2)
                 throw ArityError(name, 2, rf.TypeArguments.Count, provenance);
             var key = Project(
@@ -994,6 +1019,17 @@ public sealed class TypeResolver
                 scope,
                 depth + 1);
             ValidateGenericArgument(name, val, provenance, 1);
+            if (RequiresLiveContainer(rf))
+            {
+                return ReferenceType(
+                    $"global::Microsoft.JSInterop.IBrowserRecord<{key.RenderedType}, {val.RenderedType}>",
+                    isCollection: true,
+                    providerNote: "browser-record-reference",
+                    canonicalType:
+                        $"global::Microsoft.JSInterop.IBrowserRecord<{key.CanonicalType},{val.CanonicalType}>",
+                    typeArguments: [key.Identity, val.Identity],
+                    transport: BrowserReferenceTransport(rf));
+            }
             return ReferenceType(
                 $"IReadOnlyDictionary<{key.RenderedType},{val.RenderedType}>",
                 canonicalType: $"IReadOnlyDictionary<{key.CanonicalType},{val.CanonicalType}>",
@@ -1002,19 +1038,11 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name is "Map" or "ReadonlyMap")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "standard-container-transport");
             return ProjectDictionaryContainer(rf, provenance, scope, depth, name);
         }
 
         if (isGlobalBuiltIn && name is "Set" or "ReadonlySet")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "standard-container-transport");
             return ProjectSetContainer(rf, provenance, scope, depth, name);
         }
 
@@ -1031,8 +1059,6 @@ public sealed class TypeResolver
         {
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
-            if (rf.TypeArguments[0] is not UnionTypeNode)
-                EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             var inner = Project(
                 rf.TypeArguments[0],
                 $"{provenance}/PromiseLike<T>",
@@ -1040,6 +1066,23 @@ public sealed class TypeResolver
                 depth + 1);
             if (inner.Identity.Kind == ClrTypeKind.Null)
                 throw IllegalGenericArgument(name, inner, provenance, 0);
+            if (!IsCallableReturn(provenance))
+            {
+                var browserPromise = inner.Identity.Kind == ClrTypeKind.Void
+                    ? "global::Microsoft.JSInterop.IBrowserPromise"
+                    : $"global::Microsoft.JSInterop.IBrowserPromiseLike<{inner.RenderedType}>";
+                var canonicalPromise = inner.Identity.Kind == ClrTypeKind.Void
+                    ? "global::Microsoft.JSInterop.IBrowserPromise"
+                    : $"global::Microsoft.JSInterop.IBrowserPromiseLike<{inner.CanonicalType}>";
+                return ReferenceType(
+                    browserPromise,
+                    providerNote: "browser-promise-like-reference",
+                    canonicalType: canonicalPromise,
+                    typeArguments: inner.Identity.Kind == ClrTypeKind.Void
+                        ? []
+                        : [inner.Identity],
+                    transport: BrowserReferenceTransport(rf));
+            }
             var promiseLikeType = inner.Identity.Kind == ClrTypeKind.Void
                 ? "ValueTask"
                 : $"ValueTask<{inner.RenderedType}>";
@@ -1296,20 +1339,23 @@ public sealed class TypeResolver
         GenericScope? scope,
         int depth)
     {
-        if (arr.Transport?.Kind == "unsupported")
-        {
-            throw new GenericDeferralException(
-                $"Array at '{provenance}' has authoritative unsupported transport " +
-                $"metadata: {arr.Transport.Reason ?? "no reviewed transport"}",
-                $"{provenance}/transport",
-                "standard-container-transport");
-        }
         var elem = Project(
             arr.ElementType,
             $"{provenance}[]",
             scope,
             depth + 1);
         ValidateGenericArgument("array", elem, provenance, 0);
+        if (arr.Transport?.Kind is "unsupported" or "js-reference")
+        {
+            return ReferenceType(
+                $"global::Microsoft.JSInterop.IBrowserArray<{elem.RenderedType}>",
+                isCollection: true,
+                providerNote: "browser-array-reference",
+                canonicalType:
+                    $"global::Microsoft.JSInterop.IBrowserArray<{elem.CanonicalType}>",
+                typeArguments: [elem.Identity],
+                transport: BrowserReferenceTransport(arr));
+        }
         return ReferenceType(
             $"{elem.RenderedType}[]",
             isCollection: true,
@@ -2840,12 +2886,17 @@ public sealed class TypeResolver
             depth + 1);
         ValidateGenericArgument(name, key, provenance, 0);
         ValidateGenericArgument(name, value, provenance, 1);
+        var contract = name == "ReadonlyMap"
+            ? "IReadOnlyBrowserMap"
+            : "IBrowserMap";
         return ReferenceType(
-            $"IReadOnlyDictionary<{key.RenderedType}, {value.RenderedType}>",
+            $"global::Microsoft.JSInterop.{contract}<{key.RenderedType}, {value.RenderedType}>",
             isCollection: true,
             canonicalType:
-                $"IReadOnlyDictionary<{key.CanonicalType},{value.CanonicalType}>",
-            typeArguments: [key.Identity, value.Identity]);
+                $"global::Microsoft.JSInterop.{contract}<{key.CanonicalType},{value.CanonicalType}>",
+            providerNote: "browser-map-reference",
+            typeArguments: [key.Identity, value.Identity],
+            transport: BrowserReferenceTransport(reference));
     }
 
     private TypeProjection ProjectSetContainer(
@@ -2863,11 +2914,17 @@ public sealed class TypeResolver
             scope,
             depth + 1);
         ValidateGenericArgument(name, item, provenance, 0);
+        var contract = name == "ReadonlySet"
+            ? "IReadOnlyBrowserSet"
+            : "IBrowserSet";
         return ReferenceType(
-            $"IReadOnlySet<{item.RenderedType}>",
+            $"global::Microsoft.JSInterop.{contract}<{item.RenderedType}>",
             isCollection: true,
-            canonicalType: $"IReadOnlySet<{item.CanonicalType}>",
-            typeArguments: [item.Identity]);
+            canonicalType:
+                $"global::Microsoft.JSInterop.{contract}<{item.CanonicalType}>",
+            providerNote: "browser-set-reference",
+            typeArguments: [item.Identity],
+            transport: BrowserReferenceTransport(reference));
     }
 
     private static TypeProjectionException ArityError(
@@ -2930,6 +2987,38 @@ public sealed class TypeResolver
             $"{provenance}/transport",
             phase);
     }
+
+    private static bool IsCallableReturn(string provenance)
+        => provenance.EndsWith("/return", StringComparison.Ordinal)
+            || provenance.EndsWith("/return/defaultExpansion", StringComparison.Ordinal);
+
+    private static bool RequiresLiveContainer(ReferenceTypeNode reference)
+        => reference.Transport?.Kind is "unsupported" or "js-reference"
+            && reference.Transport?.Reason?.Contains(
+                "contains a non-JSON transport",
+                StringComparison.Ordinal) != false;
+
+    private static TransportModel BrowserReferenceTransport(ReferenceTypeNode reference)
+        => new(
+            "js-reference",
+            reference.Transport?.Nullable == true,
+            reference.Transport?.SourceType
+                ?? reference.CheckerType
+                ?? reference.Name,
+            false,
+            false,
+            null);
+
+    private static TransportModel BrowserReferenceTransport(TypeNode node)
+        => new(
+            "js-reference",
+            node.Transport?.Nullable == true,
+            node.Transport?.SourceType
+                ?? node.CheckerType
+                ?? node.Kind,
+            false,
+            false,
+            null);
 
     private bool IsSemanticallyImmutable(
         TypeNode node,

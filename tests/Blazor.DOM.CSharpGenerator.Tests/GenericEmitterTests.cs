@@ -135,11 +135,29 @@ public sealed class GenericEmitterTests
                 ]),
             "fixture/nested");
         Assert.Equal(
-            "ValueTask<ICustomEvent<string>[]>",
+            "global::Microsoft.JSInterop.IBrowserPromise<ICustomEvent<string>[]>",
             nested.RenderedType);
         Assert.Equal(
-            "ValueTask<ICustomEvent<string>[]>",
+            "global::Microsoft.JSInterop.IBrowserPromise<ICustomEvent<string>[]>",
             nested.CanonicalType);
+        Assert.Equal(
+            "ValueTask<ICustomEvent<string>[]>",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Promise",
+                    "Promise",
+                    [
+                        new ReferenceTypeNode(
+                            "ReadonlyArray",
+                            "ReadonlyArray",
+                            [
+                                new ReferenceTypeNode(
+                                    "CustomEvent",
+                                    "CustomEvent",
+                                    [new KeywordTypeNode("StringKeyword")])
+                            ])
+                    ]),
+                "fixture/method/return").RenderedType);
 
         var exception = Assert.Throws<TypeProjectionException>(() =>
             resolver.Project(
@@ -155,7 +173,7 @@ public sealed class GenericEmitterTests
         Assert.Equal("fixture/arity", exception.Provenance);
 
         Assert.Equal(
-            "IReadOnlyDictionary<string, double>",
+            "global::Microsoft.JSInterop.IReadOnlyBrowserMap<string, double>",
             resolver.Project(
                 new ReferenceTypeNode(
                     "ReadonlyMap",
@@ -166,15 +184,35 @@ public sealed class GenericEmitterTests
                     ]),
                 "fixture/map").RenderedType);
         Assert.Equal(
-            "IReadOnlySet<string>",
+            "global::Microsoft.JSInterop.IReadOnlyBrowserSet<string>",
             resolver.Project(
                 new ReferenceTypeNode(
                     "ReadonlySet",
                     null,
                     [new KeywordTypeNode("StringKeyword")]),
                 "fixture/set").RenderedType);
+        var liveArray = resolver.Project(
+            new ArrayTypeNode(
+                new ReferenceTypeNode(
+                    "CustomEvent",
+                    "CustomEvent",
+                    [new KeywordTypeNode("StringKeyword")]))
+            {
+                Transport = new TransportModel(
+                    "unsupported",
+                    false,
+                    "CustomEvent<string>[]",
+                    false,
+                    false,
+                    "Collection contains a non-JSON transport."),
+            },
+            "fixture/live-array");
         Assert.Equal(
-            "ValueTask",
+            "global::Microsoft.JSInterop.IBrowserArray<ICustomEvent<string>>",
+            liveArray.RenderedType);
+        Assert.Equal("js-reference", liveArray.Transport?.Kind);
+        Assert.Equal(
+            "global::Microsoft.JSInterop.IBrowserPromise",
             resolver.Project(
                 new ReferenceTypeNode(
                     "PromiseLike",
@@ -445,13 +483,21 @@ public sealed class GenericEmitterTests
         }
 
         Assert.Equal(
-            "ValueTask",
+            "global::Microsoft.JSInterop.IBrowserPromise",
             resolver.Project(
                 new ReferenceTypeNode(
                     "Promise",
                     "Promise",
                     [new KeywordTypeNode("VoidKeyword")]),
                 "fixture/PromiseVoid").RenderedType);
+        Assert.Equal(
+            "ValueTask",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Promise",
+                    "Promise",
+                    [new KeywordTypeNode("VoidKeyword")]),
+                "fixture/PromiseVoid/return").RenderedType);
     }
 
     [Fact]
