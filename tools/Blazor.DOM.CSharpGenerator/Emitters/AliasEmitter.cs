@@ -30,9 +30,23 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         if (typeNode is null)
             throw new InvalidOperationException($"AliasEmitter: '{symbol.Name}' has null type.");
 
+        var generic = typeResolver.CreateGenericDeclaration(
+            symbol,
+            symbol.Name);
+
         // If all-string-literal union -> emit as enum
         if (IsAllStringLiteralUnion(typeNode))
+        {
+            if (generic.Scope.Parameters.Count > 0)
+            {
+                throw new GenericDeferralException(
+                    $"Generic string-literal alias '{symbol.Name}' cannot be emitted " +
+                    "as a non-generic C# enum without losing its type parameters.",
+                    $"{symbol.Name}/typeAlias",
+                    "generic-alias-enum");
+            }
             return EnumEmitter.Emit(symbol, generatorVersion, ns);
+        }
 
         // If T | null/undefined union -> simple nullable alias
         if (typeNode is UnionTypeNode un)
@@ -47,19 +61,22 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             {
                 // T | null -> emit as alias to T?
                 // Throws on failure — fail closed (no EmitFailedAlias fallback)
-                var proj = typeResolver.Project(nonNull[0], $"{symbol.Name}/inner");
-                return EmitNullableAlias(symbol, decl, proj);
+                var proj = typeResolver.Project(
+                    nonNull[0],
+                    $"{symbol.Name}/inner",
+                    generic.Scope);
+                return EmitNullableAlias(symbol, decl, proj, generic);
             }
 
             // Mixed union (not all-null-or-T) -> emit as union wrapper struct
             // All arms must project or throw — no object degradation
-            return EmitMixedUnionWrapper(symbol, decl, un);
+            return EmitMixedUnionWrapper(symbol, decl, un, generic);
         }
 
         // Simple reference or keyword alias
         // Throws on failure — fail closed
-        var simpleProj = typeResolver.Project(typeNode, symbol.Name);
-        return EmitSimpleAlias(symbol, decl, simpleProj);
+        var simpleProj = typeResolver.Project(typeNode, symbol.Name, generic.Scope);
+        return EmitSimpleAlias(symbol, decl, simpleProj, generic);
     }
 
     private static bool IsInterfaceType(string csharpType)
@@ -77,7 +94,11 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             && !simpleType.StartsWith("IAsyncEnumerable", StringComparison.Ordinal);
     }
 
-    private string EmitSimpleAlias(SymbolModel symbol, DeclarationModel decl, TypeProjection proj)
+    private string EmitSimpleAlias(
+        SymbolModel symbol,
+        DeclarationModel decl,
+        TypeProjection proj,
+        GenericDeclaration generic)
     {
         var w = new CSharpWriter();
         w.AppendLine("#nullable enable");
@@ -89,29 +110,38 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         w.XmlDoc(docText, deprecated);
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         var innerType = proj.CSharpType;
-        var isIface = IsInterfaceType(innerType);
+        var isIface = IsInterfaceType(innerType) || proj.Identity.IsTypeParameter;
         w.AppendLine($"// Typedef alias: {symbol.Name} = {innerType}");
-        w.Block($"public readonly struct {csName}", () =>
+        foreach (var defaultNote in generic.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        var declaredName = $"{csName}{generic.TypeParameterList}";
+        w.Block(
+            $"public readonly struct {declaredName}{generic.ConstraintSuffix}",
+            () =>
         {
             w.AppendLine($"public {innerType} Value {{ get; }}");
             w.AppendLine($"public {csName}({innerType} value) => Value = value;");
             if (!isIface)
             {
-                w.AppendLine($"public static implicit operator {innerType}({csName} a) => a.Value;");
-                w.AppendLine($"public static implicit operator {csName}({innerType} v) => new(v);");
+                w.AppendLine($"public static implicit operator {innerType}({declaredName} a) => a.Value;");
+                w.AppendLine($"public static implicit operator {declaredName}({innerType} v) => new(v);");
             }
             else
             {
                 // C# does not allow implicit operators from/to interfaces
-                w.AppendLine($"public static explicit operator {innerType}({csName} a) => a.Value;");
-                w.AppendLine($"public static {csName} From({innerType} v) => new(v);");
+                w.AppendLine($"public static explicit operator {innerType}({declaredName} a) => a.Value;");
+                w.AppendLine($"public static {declaredName} From({innerType} v) => new(v);");
             }
             w.AppendLine("public override string ToString() => $\"{Value}\";");
         });
         return w.ToString();
     }
 
-    private string EmitNullableAlias(SymbolModel symbol, DeclarationModel decl, TypeProjection proj)
+    private string EmitNullableAlias(
+        SymbolModel symbol,
+        DeclarationModel decl,
+        TypeProjection proj,
+        GenericDeclaration generic)
     {
         var w = new CSharpWriter();
         w.AppendLine("#nullable enable");
@@ -123,23 +153,28 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         w.XmlDoc(docText, deprecated);
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         var innerType = proj.CSharpType;
-        var isIface = IsInterfaceType(innerType);
+        var isIface = IsInterfaceType(innerType) || proj.Identity.IsTypeParameter;
         w.AppendLine($"// Nullable typedef alias: {symbol.Name} = {innerType}?");
-        w.Block($"public readonly struct {csName}", () =>
+        foreach (var defaultNote in generic.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        var declaredName = $"{csName}{generic.TypeParameterList}";
+        w.Block(
+            $"public readonly struct {declaredName}{generic.ConstraintSuffix}",
+            () =>
         {
             w.AppendLine($"public {innerType}? Value {{ get; }}");
             w.AppendLine($"public bool HasValue => Value is not null;");
             w.AppendLine($"public {csName}({innerType}? value) => Value = value;");
             if (!isIface)
             {
-                w.AppendLine($"public static implicit operator {innerType}?({csName} a) => a.Value;");
-                w.AppendLine($"public static implicit operator {csName}({innerType}? v) => new(v);");
+                w.AppendLine($"public static implicit operator {innerType}?({declaredName} a) => a.Value;");
+                w.AppendLine($"public static implicit operator {declaredName}({innerType}? v) => new(v);");
             }
             else
             {
                 // C# does not allow implicit operators from/to interfaces
-                w.AppendLine($"public static explicit operator {innerType}?({csName} a) => a.Value;");
-                w.AppendLine($"public static {csName} From({innerType}? v) => new(v);");
+                w.AppendLine($"public static explicit operator {innerType}?({declaredName} a) => a.Value;");
+                w.AppendLine($"public static {declaredName} From({innerType}? v) => new(v);");
             }
             w.AppendLine("public override string ToString() => Value?.ToString() ?? \"(null)\";");
         });
@@ -147,12 +182,15 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
     }
 
     private string EmitMixedUnionWrapper(
-        SymbolModel symbol, DeclarationModel decl, UnionTypeNode un)
+        SymbolModel symbol,
+        DeclarationModel decl,
+        UnionTypeNode un,
+        GenericDeclaration generic)
     {
         // All arms must project successfully — throws with provenance on any failure.
         // No object fallback arms are permitted.
         var memberTypes = un.Types.Select((t, i) =>
-            typeResolver.Project(t, $"{symbol.Name}[{i}]")
+            typeResolver.Project(t, $"{symbol.Name}[{i}]", generic.Scope)
         ).ToList();
 
         var w = new CSharpWriter();
@@ -164,9 +202,14 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         var deprecated = decl.Documentation?.Deprecated ?? false;
         w.XmlDoc(docText, deprecated);
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
+        var declaredName = $"{csName}{generic.TypeParameterList}";
 
         w.AppendLine($"// Mixed union wrapper: {symbol.Name} = {string.Join(" | ", memberTypes.Select(t => t.CSharpType))}");
-        w.Block($"public readonly struct {csName}", () =>
+        foreach (var defaultNote in generic.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        w.Block(
+            $"public readonly struct {declaredName}{generic.ConstraintSuffix}",
+            () =>
         {
             w.AppendLine("private readonly object? _value;");
             w.AppendLine($"private {csName}(object? value) => _value = value;");
@@ -187,11 +230,11 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
                 if (isIface)
                 {
                     // C# does not allow implicit operators from/to interfaces; use factory methods.
-                    w.AppendLine($"public static {csName} From{safeName}({t} v) => new(v);");
+                    w.AppendLine($"public static {declaredName} From{safeName}({t} v) => new(v);");
                 }
                 else
                 {
-                    w.AppendLine($"public static implicit operator {csName}({t} v) => new(v);");
+                    w.AppendLine($"public static implicit operator {declaredName}({t} v) => new(v);");
                 }
                 w.AppendLine($"public {t}? As{safeName}() => _value is {t} x ? x : default;");
                 w.AppendLine($"public bool Is{safeName} => _value is {t};");

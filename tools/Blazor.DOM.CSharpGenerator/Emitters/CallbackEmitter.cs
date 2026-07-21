@@ -45,6 +45,10 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
         {
             return EmitCore(symbol).Source;
         }
+        catch (GenericDeferralException)
+        {
+            throw;
+        }
         catch (CallbackEmitException exception)
         {
             throw new TypeProjectionException(
@@ -69,6 +73,10 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                 DeclarationOutcomes = outcomes.DeclarationOutcomes,
                 OverloadOutcomes = outcomes.OverloadOutcomes,
             };
+        }
+        catch (GenericDeferralException)
+        {
+            throw;
         }
         catch (CallbackEmitException exception)
         {
@@ -116,6 +124,9 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
             sourceMembers);
         var memberOutcomes = new List<MemberOutcome>();
         var overloadOutcomes = new List<OverloadOutcome>();
+        var generic = typeResolver.CreateGenericDeclaration(
+            symbol,
+            symbol.Name);
 
         foreach (var objectMember in sourceMembers
             .Where(member => member.CallbackObjectForm))
@@ -156,11 +167,21 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
         }
 
         var primary = directOverloads[0];
+        if (primary.TypeParameters.Count > 0)
+        {
+            throw new GenericDeferralException(
+                $"Callback signature at '{primary.Provenance}' declares its own " +
+                "generic parameters; a C# delegate cannot preserve generic Invoke arity.",
+                primary.Provenance,
+                "generic-callback-signature");
+        }
         string returnType;
         string parameterList;
         try
         {
-            (returnType, parameterList, var outcome) = ProjectSignature(primary);
+            (returnType, parameterList, var outcome) = ProjectSignature(
+                primary,
+                generic.Scope);
             overloadOutcomes.Add(outcome);
             if (primary.SourceMember is not null)
                 memberOutcomes.Add(CreateMemberOutcome(
@@ -250,9 +271,13 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
         writer.XmlDoc(GetDocText(symbol), IsDeprecated(symbol));
         if (symbol.Semantic.SecureContext)
             writer.AppendLine("// Requires secure context (HTTPS).");
+        foreach (var defaultNote in generic.DefaultNotes)
+            writer.AppendLine($"// TypeScript generic default: {defaultNote}.");
 
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
-        writer.AppendLine($"public delegate {returnType} {csName}({parameterList});");
+        writer.AppendLine(
+            $"public delegate {returnType} {csName}{generic.TypeParameterList}(" +
+            $"{parameterList}){generic.ConstraintSuffix};");
         return new CallbackEmitResult(
             writer.ToString(),
             memberOutcomes,
@@ -265,7 +290,8 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                 && source.Kind is "callSignature" or "constructSignature");
 
     private (string ReturnType, string Parameters, OverloadOutcome Outcome) ProjectSignature(
-        SourceOverloadShape source)
+        SourceOverloadShape source,
+        GenericScope declarationScope)
     {
         string returnType;
         try
@@ -274,7 +300,12 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                 ? "void"
                 : typeResolver.Project(
                     source.ReturnType,
-                    $"{source.Provenance}/return").RenderedType;
+                    $"{source.Provenance}/return",
+                    declarationScope).RenderedType;
+        }
+        catch (GenericDeferralException)
+        {
+            throw;
         }
         catch (TypeProjectionException exception)
         {
@@ -304,7 +335,10 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                 $"{source.Provenance}/parameter[{parameter.Ordinal}]/{parameter.Name}";
             try
             {
-                var projection = typeResolver.Project(parameter.Type, provenance);
+                var projection = typeResolver.Project(
+                    parameter.Type,
+                    provenance,
+                    declarationScope);
                 var csType = projection.RenderedType;
                 var csName = Naming.ToCSharpParameterName(parameter.Name);
                 if (parameter.Rest)
@@ -313,6 +347,16 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                         ? csType[..^2]
                         : csType;
                     parts.Add($"params {elementType}[] {csName}");
+                }
+                else if (parameter.Optional)
+                {
+                    var optionalProjection = projection with
+                    {
+                        IsNullable = projection.IsNullable
+                            || projection.Identity.Kind == ClrTypeKind.Reference,
+                    };
+                    parts.Add(
+                        $"{optionalProjection.RenderedType} {csName} = default");
                 }
                 else
                 {
@@ -325,6 +369,10 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                     MemberOutcomeStatus.Projected,
                     null,
                     "projected"));
+            }
+            catch (GenericDeferralException)
+            {
+                throw;
             }
             catch (TypeProjectionException exception)
             {

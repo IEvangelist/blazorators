@@ -1,5 +1,5 @@
 // Type resolver: maps TypeScript type nodes to C# type strings.
-// Hard-errors on unsupported projections (unions/intersections/generics/
+// Hard-errors on unsupported projections (unions/intersections/advanced generics/
 // conditional/mapped/template) unless they fall into well-defined safe patterns.
 // `object` is allowed ONLY for TypeScript `any`, `unknown`, and `object`.
 
@@ -30,7 +30,10 @@ public enum ClrTypeKind
 public sealed record ClrTypeIdentity(
     string CanonicalName,
     ClrTypeKind Kind,
-    bool IsAwaitable = false);
+    bool IsAwaitable = false,
+    int GenericArity = 0,
+    IReadOnlyList<ClrTypeIdentity>? TypeArguments = null,
+    bool IsTypeParameter = false);
 
 public sealed record TypeProjection(
     string CSharpType,
@@ -158,11 +161,102 @@ public sealed class TypeResolver
             classification is "interface" or "mixin");
     }
 
+    public int GetGenericArity(string symbolName)
+    {
+        if (!_symbolIndex.TryGetValue(symbolName, out var symbol))
+            throw new TypeProjectionException(
+                $"Unresolved type symbol '{symbolName}'.",
+                $"{symbolName}/symbol-resolution");
+        return GetSymbolTypeParameters(symbol, $"{symbolName}/typeParameters").Count;
+    }
+
+    public GenericDeclaration CreateGenericDeclaration(
+        IReadOnlyList<TypeParameterModel> parameters,
+        string provenance,
+        GenericScope? parent = null,
+        string canonicalPrefix = "!")
+    {
+        var scope = GenericScope.Create(
+            parameters,
+            provenance,
+            parent,
+            canonicalPrefix);
+        var clauses = new List<string>();
+        var canonical = new List<string>();
+        var defaults = new List<string>();
+        foreach (var binding in scope.Parameters)
+        {
+            var constraint = ProjectConstraint(binding, scope, provenance);
+            if (constraint is not null)
+            {
+                clauses.Add($"where {binding.CSharpName} : {constraint.Value.Rendered}");
+                canonical.Add(
+                    $"{binding.CanonicalIdentity}:{constraint.Value.Canonical}");
+            }
+            else
+            {
+                canonical.Add($"{binding.CanonicalIdentity}:*");
+            }
+
+            if (binding.Model.Default is not null)
+            {
+                TypeProjection projectedDefault;
+                try
+                {
+                    projectedDefault = Project(
+                        binding.Model.Default,
+                        $"{provenance}/typeParameter[{binding.Model.Ordinal}]/default",
+                        scope);
+                }
+                catch (GenericDeferralException)
+                {
+                    throw;
+                }
+                catch (TypeProjectionException exception)
+                {
+                    throw new GenericDeferralException(
+                        $"Generic default for '{binding.SourceName}' at '{provenance}' " +
+                        $"cannot be represented faithfully in C#: {exception.Message}",
+                        exception.Provenance,
+                        "generic-defaults");
+                }
+                defaults.Add(
+                    $"{binding.SourceName} = {projectedDefault.RenderedType}");
+            }
+        }
+
+        var list = scope.Parameters.Count == 0
+            ? ""
+            : $"<{string.Join(", ", scope.Parameters.Select(
+                parameter => parameter.CSharpName))}>";
+        return new GenericDeclaration(
+            scope,
+            list,
+            clauses,
+            string.Join(";", canonical),
+            defaults);
+    }
+
+    public GenericDeclaration CreateGenericDeclaration(
+        SymbolModel symbol,
+        string provenance,
+        GenericScope? parent = null,
+        string canonicalPrefix = "!")
+        => CreateGenericDeclaration(
+            GetSymbolTypeParameters(symbol, provenance),
+            provenance,
+            parent,
+            canonicalPrefix);
+
     /// <summary>
     /// Projects a TypeScript type node to C#. Throws <see cref="TypeProjectionException"/>
     /// for unsupported projections. Never returns <c>object</c> for supported types.
     /// </summary>
-    public TypeProjection Project(TypeNode? typeNode, string provenance, int depth = 0)
+    public TypeProjection Project(
+        TypeNode? typeNode,
+        string provenance,
+        GenericScope? scope = null,
+        int depth = 0)
     {
         if (typeNode is null)
             return VoidType();
@@ -174,16 +268,21 @@ public sealed class TypeResolver
         var projection = typeNode switch
         {
             KeywordTypeNode kw => ProjectKeyword(kw, provenance),
-            ReferenceTypeNode rf => ProjectReference(rf, provenance, depth),
+            ReferenceTypeNode rf => ProjectReference(rf, provenance, scope, depth),
             LiteralTypeNode lit => ProjectLiteral(lit, provenance),
-            UnionTypeNode un => ProjectUnion(un, provenance, depth),
-            ArrayTypeNode arr => ProjectArray(arr, provenance, depth),
-            FunctionTypeNode fn => ProjectFunction(fn, provenance, depth),
-            ParenthesizedTypeNode pt => Project(pt.InnerType, provenance, depth),
-            HeritageReferenceTypeNode hr => ProjectHeritageReference(hr, provenance, depth),
+            UnionTypeNode un => ProjectUnion(un, provenance, scope, depth),
+            ArrayTypeNode arr => ProjectArray(arr, provenance, scope, depth),
+            FunctionTypeNode fn => ProjectFunction(fn, provenance, scope, depth),
+            ParenthesizedTypeNode pt => Project(pt.InnerType, provenance, scope, depth),
+            HeritageReferenceTypeNode hr => ProjectHeritageReference(
+                hr,
+                provenance,
+                scope,
+                depth),
             IntersectionTypeNode intersection => ProjectIntersection(
                 intersection,
                 provenance,
+                scope,
                 depth),
             TypeLiteralTypeNode => Fail(typeNode, provenance,
                 "type literal (anonymous object type) is not supported for C# projection"),
@@ -202,6 +301,7 @@ public sealed class TypeResolver
             _ => Fail(typeNode, provenance,
                 $"unhandled TypeNode subtype '{typeNode.GetType().Name}'"),
         };
+        ValidateJsonGenericTransport(typeNode, provenance);
         return projection with { Transport = typeNode.Transport ?? projection.Transport };
     }
 
@@ -226,9 +326,24 @@ public sealed class TypeResolver
             "Add it to KeywordMap if it has a safe C# equivalent.", provenance);
     }
 
-    private TypeProjection ProjectReference(ReferenceTypeNode rf, string provenance, int depth)
+    private TypeProjection ProjectReference(
+        ReferenceTypeNode rf,
+        string provenance,
+        GenericScope? scope,
+        int depth)
     {
         var name = rf.Name;
+
+        if (scope?.TryResolve(name, rf.ResolvedSymbol, out var parameter) == true)
+        {
+            if (rf.TypeArguments.Count != 0)
+            {
+                throw new TypeProjectionException(
+                    $"Type parameter '{name}' at '{provenance}' cannot receive type arguments.",
+                    provenance);
+            }
+            return parameter.Substitution ?? TypeParameter(parameter);
+        }
 
         // GL numeric aliases -> primitives (safe: no object degradation)
         if (GlTypeAliases.TryGetValue(name, out var glType))
@@ -253,9 +368,15 @@ public sealed class TypeResolver
         }
 
         // Promise<T> -> ValueTask<T>
-        if (name == "Promise" && rf.TypeArguments.Count == 1)
+        if (name == "Promise")
         {
-            var inner = Project(rf.TypeArguments[0], $"{provenance}/Promise<T>", depth + 1);
+            if (rf.TypeArguments.Count != 1)
+                throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
+            var inner = Project(
+                rf.TypeArguments[0],
+                $"{provenance}/Promise<T>",
+                scope,
+                depth + 1);
             var promiseType = inner.Identity.Kind == ClrTypeKind.Void
                 ? "ValueTask"
                 : $"ValueTask<{inner.RenderedType}>";
@@ -266,7 +387,10 @@ public sealed class TypeResolver
                 promiseType,
                 providerNote: "Promise<T>→ValueTask<T>",
                 canonicalType: canonicalType,
-                isAwaitable: true);
+                isAwaitable: true,
+                typeArguments: inner.Identity.Kind == ClrTypeKind.Void
+                    ? []
+                    : [inner.Identity]);
         }
 
         // ReadableStream/WritableStream/TransformStream are live DOM proxy objects —
@@ -276,29 +400,63 @@ public sealed class TypeResolver
 
         // ArrayBuffer-like binary
         if (name is "ArrayBuffer" or "SharedArrayBuffer")
+        {
+            if (rf.TypeArguments.Count != 0)
+                throw ArityError(name, 0, rf.TypeArguments.Count, provenance);
             return ReferenceType("byte[]", true, $"mapped-from-{name}");
+        }
 
         // Typed array views
         if (name is "Uint8Array" or "Uint8ClampedArray")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("byte[]", true, $"mapped-from-{name}");
+        }
         if (name is "Int8Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("sbyte[]", true, $"mapped-from-{name}");
+        }
         if (name is "Uint16Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("ushort[]", true, $"mapped-from-{name}");
+        }
         if (name is "Int16Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("short[]", true, $"mapped-from-{name}");
+        }
         if (name is "Uint32Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("uint[]", true, $"mapped-from-{name}");
+        }
         if (name is "Int32Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("int[]", true, $"mapped-from-{name}");
+        }
         if (name is "Float32Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("float[]", true, $"mapped-from-{name}");
+        }
         if (name is "Float64Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("double[]", true, $"mapped-from-{name}");
+        }
         if (name is "BigInt64Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("long[]", true, $"mapped-from-{name}");
+        }
         if (name is "BigUint64Array")
+        {
+            ValidateOptionalBufferArgument(rf, provenance);
             return ReferenceType("ulong[]", true, $"mapped-from-{name}");
+        }
         if (name is "DataView")
             return ValueType("System.Memory<byte>", providerNote: "DataView");
 
@@ -307,26 +465,79 @@ public sealed class TypeResolver
         {
             if (rf.TypeArguments.Count == 1)
             {
-                var elem = Project(rf.TypeArguments[0], $"{provenance}/Array<T>", depth + 1);
+                var elem = Project(
+                    rf.TypeArguments[0],
+                    $"{provenance}/Array<T>",
+                    scope,
+                    depth + 1);
                 return ReferenceType(
                     $"{elem.RenderedType}[]",
                     isCollection: true,
-                    canonicalType: $"{elem.CanonicalType}[]");
+                    canonicalType: $"{elem.CanonicalType}[]",
+                    typeArguments: [elem.Identity]);
             }
             throw new TypeProjectionException(
                 $"Unparameterized '{name}' at '{provenance}' cannot be projected to C#. " +
                 "Provide an explicit type argument or add a symbol override.", provenance);
         }
 
-        if (name is "Iterable" or "IterableIterator")
+        if (name is
+            "IteratorObject" or
+            "AsyncIteratorObject" or
+            "Iterator" or
+            "AsyncIterator")
+        {
+            if (rf.TypeArguments.Count is not (1 or 3))
+            {
+                throw new TypeProjectionException(
+                    $"{name} at '{provenance}' requires one element argument or " +
+                    "the complete three-argument iterator form.",
+                    provenance);
+            }
+            if (rf.TypeArguments.Count == 3
+                && (!IsDefaultIteratorReturn(rf.TypeArguments[1])
+                    || !IsUnknownLike(rf.TypeArguments[2])))
+            {
+                throw new GenericDeferralException(
+                    $"{name} at '{provenance}' has non-standard return/next " +
+                    "arguments that cannot be represented by the CLR enumerable contract.",
+                    provenance,
+                    "advanced-iterator-contracts");
+            }
+            var item = Project(
+                rf.TypeArguments[0],
+                $"{provenance}/{name}<T>",
+                scope,
+                depth + 1);
+            var clrName = name is "AsyncIteratorObject" or "AsyncIterator"
+                ? "IAsyncEnumerable"
+                : "IEnumerable";
+            return ReferenceType(
+                $"{clrName}<{item.RenderedType}>",
+                isCollection: true,
+                canonicalType: $"{clrName}<{item.CanonicalType}>",
+                typeArguments: [item.Identity]);
+        }
+
+        if (name is
+            "Iterable" or
+            "IterableIterator" or
+            "ArrayIterator" or
+            "MapIterator" or
+            "SetIterator")
         {
             if (rf.TypeArguments.Count == 1)
             {
-                var elem = Project(rf.TypeArguments[0], $"{provenance}/Iterable<T>", depth + 1);
+                var elem = Project(
+                    rf.TypeArguments[0],
+                    $"{provenance}/{name}<T>",
+                    scope,
+                    depth + 1);
                 return ReferenceType(
                     $"IEnumerable<{elem.RenderedType}>",
                     isCollection: true,
-                    canonicalType: $"IEnumerable<{elem.CanonicalType}>");
+                    canonicalType: $"IEnumerable<{elem.CanonicalType}>",
+                    typeArguments: [elem.Identity]);
             }
             throw new TypeProjectionException(
                 $"Unparameterized '{name}' at '{provenance}' cannot be projected to C#. " +
@@ -337,24 +548,94 @@ public sealed class TypeResolver
         {
             if (rf.TypeArguments.Count == 1)
             {
-                var elem = Project(rf.TypeArguments[0], $"{provenance}/AsyncIterable<T>", depth + 1);
+                var elem = Project(
+                    rf.TypeArguments[0],
+                    $"{provenance}/AsyncIterable<T>",
+                    scope,
+                    depth + 1);
                 return ReferenceType(
                     $"IAsyncEnumerable<{elem.RenderedType}>",
                     isCollection: true,
-                    canonicalType: $"IAsyncEnumerable<{elem.CanonicalType}>");
+                    canonicalType: $"IAsyncEnumerable<{elem.CanonicalType}>",
+                    typeArguments: [elem.Identity]);
             }
             throw new TypeProjectionException(
                 $"Unparameterized '{name}' at '{provenance}' cannot be projected to C#. " +
                 "Provide an explicit type argument.", provenance);
         }
 
-        if (name == "Record" && rf.TypeArguments.Count == 2)
+        if (name == "Record")
         {
-            var key = Project(rf.TypeArguments[0], $"{provenance}/Record<K>", depth + 1);
-            var val = Project(rf.TypeArguments[1], $"{provenance}/Record<V>", depth + 1);
+            if (rf.TypeArguments.Count != 2)
+                throw ArityError(name, 2, rf.TypeArguments.Count, provenance);
+            var key = Project(
+                rf.TypeArguments[0],
+                $"{provenance}/Record<K>",
+                scope,
+                depth + 1);
+            var val = Project(
+                rf.TypeArguments[1],
+                $"{provenance}/Record<V>",
+                scope,
+                depth + 1);
             return ReferenceType(
                 $"IReadOnlyDictionary<{key.RenderedType},{val.RenderedType}>",
-                canonicalType: $"IReadOnlyDictionary<{key.CanonicalType},{val.CanonicalType}>");
+                canonicalType: $"IReadOnlyDictionary<{key.CanonicalType},{val.CanonicalType}>",
+                typeArguments: [key.Identity, val.Identity]);
+        }
+
+        if (name is "Map" or "ReadonlyMap")
+            return ProjectDictionaryContainer(rf, provenance, scope, depth, name);
+
+        if (name is "Set" or "ReadonlySet")
+            return ProjectSetContainer(rf, provenance, scope, depth, name);
+
+        if (name is "WeakMap" or "WeakSet")
+        {
+            throw new GenericDeferralException(
+                $"{name} at '{provenance}' has weak-key lifetime semantics with no " +
+                "faithful existing CLR projection.",
+                provenance,
+                "standard-library-weak-collections");
+        }
+
+        if (name == "PromiseLike")
+        {
+            if (rf.TypeArguments.Count != 1)
+                throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
+            var inner = Project(
+                rf.TypeArguments[0],
+                $"{provenance}/PromiseLike<T>",
+                scope,
+                depth + 1);
+            var promiseLikeType = inner.Identity.Kind == ClrTypeKind.Void
+                ? "ValueTask"
+                : $"ValueTask<{inner.RenderedType}>";
+            var promiseLikeCanonical = inner.Identity.Kind == ClrTypeKind.Void
+                ? "ValueTask"
+                : $"ValueTask<{inner.CanonicalType}>";
+            return ValueType(
+                promiseLikeType,
+                providerNote: "PromiseLike<T>→ValueTask<T>",
+                canonicalType: promiseLikeCanonical,
+                isAwaitable: true,
+                typeArguments: inner.Identity.Kind == ClrTypeKind.Void
+                    ? []
+                    : [inner.Identity]);
+        }
+
+        if (name == "Readonly")
+        {
+            if (rf.TypeArguments.Count != 1)
+                throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
+            return Project(
+                rf.TypeArguments[0],
+                $"{provenance}/Readonly<T>",
+                scope,
+                depth + 1) with
+            {
+                ProviderNote = "Readonly<T> preserves the projected CLR type",
+            };
         }
 
         // EventHandler -> not projected (deferred to events phase)
@@ -374,6 +655,18 @@ public sealed class TypeResolver
             if (sym is null
                 && !string.Equals(resolvedName, name, StringComparison.Ordinal))
             {
+                if (resolvedName.EndsWith(
+                        $".{name}",
+                        StringComparison.Ordinal)
+                    && name.Length > 0
+                    && char.IsUpper(name[0])
+                    && scope?.ContainsSourceName(name) == true)
+                {
+                    throw new TypeProjectionException(
+                        $"Type-parameter reference '{resolvedName}' at '{provenance}' " +
+                        "is outside the active lexical generic scope.",
+                        provenance);
+                }
                 throw new TypeProjectionException(
                     $"Resolved type reference '{resolvedName}' (written as '{name}') at " +
                     $"'{provenance}' is not in the TypeScript symbol index.",
@@ -390,18 +683,45 @@ public sealed class TypeResolver
                 _generatedNamespace,
                 sym.Name,
                 classification is "interface" or "mixin");
-            // Warn on unsupported generics
-            if (rf.TypeArguments.Count > 0)
-            {
-                // Only allow if the symbol has type parameters (we don't emit generics yet)
-                throw new TypeProjectionException(
-                    $"Generic reference '{name}<...>' at '{provenance}' uses type arguments " +
-                    "but generic C# emission is deferred. Add an explicit override or emit non-generic projection.",
-                    provenance);
-            }
+            var typeParameters = GetSymbolTypeParameters(
+                sym,
+                $"{sym.Name}/typeParameters");
+            var arguments = ProjectTypeArguments(
+                rf.TypeArguments,
+                typeParameters,
+                provenance,
+                scope,
+                depth);
+            if (arguments.Count > 0)
+                csharpName += $"<{string.Join(", ", arguments.Select(
+                    argument => argument.RenderedType))}>";
+            var canonicalName = arguments.Count == 0
+                ? csharpName
+                : $"{Naming.ToCSharpTypeReference(
+                    _generatedNamespace,
+                    sym.Name,
+                    classification is "interface" or "mixin")}<" +
+                  $"{string.Join(",", arguments.Select(
+                      argument => argument.CanonicalType))}>";
             return classification is "enum" or "typedef"
-                ? ValueType(csharpName)
-                : ReferenceType(csharpName);
+                ? ValueType(
+                    csharpName,
+                    canonicalType: canonicalName,
+                    typeArguments: arguments.Select(argument => argument.Identity).ToList())
+                : ReferenceType(
+                    csharpName,
+                    canonicalType: canonicalName,
+                    typeArguments: arguments.Select(argument => argument.Identity).ToList());
+        }
+
+        if (!string.IsNullOrWhiteSpace(rf.ResolvedSymbol)
+            && rf.ResolvedSymbol.Contains('.', StringComparison.Ordinal)
+            && char.IsUpper(rf.Name.FirstOrDefault()))
+        {
+            throw new TypeProjectionException(
+                $"Type-parameter reference '{rf.ResolvedSymbol}' at '{provenance}' " +
+                "is outside the active lexical generic scope.",
+                provenance);
         }
 
         throw new TypeProjectionException(
@@ -428,7 +748,11 @@ public sealed class TypeResolver
         };
     }
 
-    private TypeProjection ProjectUnion(UnionTypeNode un, string provenance, int depth)
+    private TypeProjection ProjectUnion(
+        UnionTypeNode un,
+        string provenance,
+        GenericScope? scope,
+        int depth)
     {
         var types = un.Types;
 
@@ -449,7 +773,11 @@ public sealed class TypeResolver
 
         if (nonNull.Count < types.Count && nonNull.Count == 1)
         {
-            var inner = Project(nonNull[0], $"{provenance}/nullable", depth + 1);
+            var inner = Project(
+                nonNull[0],
+                $"{provenance}/nullable",
+                scope,
+                depth + 1);
             return inner with { IsNullable = true };
         }
 
@@ -460,7 +788,11 @@ public sealed class TypeResolver
         // Pattern 3: T | null | undefined where T is nullable-safe -> T?
         if (nonNull.Count == 1)
         {
-            var inner = Project(nonNull[0], $"{provenance}/nullable", depth + 1);
+            var inner = Project(
+                nonNull[0],
+                $"{provenance}/nullable",
+                scope,
+                depth + 1);
             return inner with { IsNullable = true };
         }
 
@@ -489,18 +821,28 @@ public sealed class TypeResolver
             provenance);
     }
 
-    private TypeProjection ProjectArray(ArrayTypeNode arr, string provenance, int depth)
+    private TypeProjection ProjectArray(
+        ArrayTypeNode arr,
+        string provenance,
+        GenericScope? scope,
+        int depth)
     {
-        var elem = Project(arr.ElementType, $"{provenance}[]", depth + 1);
+        var elem = Project(
+            arr.ElementType,
+            $"{provenance}[]",
+            scope,
+            depth + 1);
         return ReferenceType(
             $"{elem.RenderedType}[]",
             isCollection: true,
-            canonicalType: $"{elem.CanonicalType}[]");
+            canonicalType: $"{elem.CanonicalType}[]",
+            typeArguments: [elem.Identity]);
     }
 
     private TypeProjection ProjectIntersection(
         IntersectionTypeNode intersection,
         string provenance,
+        GenericScope? scope,
         int depth)
     {
         if (intersection.Types.Count == 2)
@@ -529,6 +871,7 @@ public sealed class TypeResolver
                 return Project(
                     windowReference,
                     $"{provenance}/WindowProxy",
+                    scope,
                     depth + 1) with
                 {
                     ProviderNote = "Window & typeof globalThis→WindowProxy",
@@ -542,15 +885,35 @@ public sealed class TypeResolver
             "intersection types are not supported for C# projection");
     }
 
-    private TypeProjection ProjectFunction(FunctionTypeNode fn, string provenance, int depth)
+    private TypeProjection ProjectFunction(
+        FunctionTypeNode fn,
+        string provenance,
+        GenericScope? scope,
+        int depth)
     {
+        if (fn.TypeParameters.Count > 0)
+        {
+            throw new GenericDeferralException(
+                $"Generic function type at '{provenance}' requires a named delegate " +
+                "because System.Func/System.Action cannot preserve generic Invoke arity.",
+                provenance,
+                "generic-callback-signature");
+        }
         // Function types project to Action<>/Func<> delegates.
         // Skip TypeScript's synthetic `this` parameter — it has no C# equivalent.
-        var ret = Project(fn.ReturnType, $"{provenance}/return", depth + 1);
+        var ret = Project(
+            fn.ReturnType,
+            $"{provenance}/return",
+            scope,
+            depth + 1);
         var paramTypes = fn.Parameters
             .Where(p => p.Name != "this")
             .Select((p, i) =>
-                Project(p.Type, $"{provenance}/param[{i}]", depth + 1))
+                Project(
+                    p.Type,
+                    $"{provenance}/param[{i}]",
+                    scope,
+                    depth + 1))
             .ToList();
 
         if (ret.Identity.Kind == ClrTypeKind.Void)
@@ -576,31 +939,380 @@ public sealed class TypeResolver
     }
 
     private TypeProjection ProjectHeritageReference(
-        HeritageReferenceTypeNode hr, string provenance, int depth)
+        HeritageReferenceTypeNode hr,
+        string provenance,
+        GenericScope? scope,
+        int depth)
     {
-        // Heritage references used in extends/implements clauses.
-        // Note: the InterfaceEmitter adds the 'I' prefix itself for heritage clauses;
-        // this method is used for type references, not heritage clause building.
         var name = hr.ResolvedSymbol ?? hr.Expression;
-        if (hr.TypeArguments.Count > 0)
-            throw new TypeProjectionException(
-                $"Generic heritage reference '{name}<...>' at '{provenance}' is not supported.",
-                provenance);
+        return ProjectReference(
+            new ReferenceTypeNode(
+                hr.Expression,
+                name,
+                hr.TypeArguments)
+            {
+                CheckerType = hr.CheckerType,
+                Transport = hr.Transport,
+            },
+            provenance,
+            scope,
+            depth);
+    }
 
-        if (_symbolIndex.TryGetValue(name, out var sym))
+    private (string Rendered, string Canonical)? ProjectConstraint(
+        GenericParameterBinding binding,
+        GenericScope scope,
+        string provenance)
+    {
+        if (binding.Model.Constraint is null)
+            return null;
+        var constraintProvenance =
+            $"{provenance}/typeParameter[{binding.Model.Ordinal}]/constraint";
+        if (binding.Model.Constraint is OperatorTypeNode
+            or IndexedAccessTypeNode
+            or IntersectionTypeNode
+            or UnionTypeNode
+            or TypeLiteralTypeNode
+            or TemplateLiteralTypeNode
+            or QueryTypeNode)
         {
-            var classification = EffectiveClassificationPolicy.Classify(sym, _overrides).Name;
-            var csharpName = Naming.ToCSharpTypeReference(
-                _generatedNamespace,
-                sym.Name,
-                classification is "interface" or "mixin");
-            return classification is "enum" or "typedef"
-                ? ValueType(csharpName)
-                : ReferenceType(csharpName);
+            throw new GenericDeferralException(
+                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
+                $"uses unsupported TypeScript shape " +
+                $"'{binding.Model.Constraint.Kind}' and cannot be weakened.",
+                constraintProvenance,
+                "advanced-generic-constraints");
         }
 
-        throw new TypeProjectionException(
-            $"Unresolved heritage reference '{name}' at '{provenance}'.", provenance);
+        var constraintNode = binding.Model.Constraint is ParenthesizedTypeNode parenthesized
+            ? parenthesized.InnerType
+            : binding.Model.Constraint;
+        if (constraintNode is KeywordTypeNode)
+        {
+            throw new GenericDeferralException(
+                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
+                "uses a TypeScript primitive/keyword constraint that has no faithful " +
+                "C# where-clause equivalent.",
+                constraintProvenance,
+                "advanced-generic-constraints");
+        }
+        if (constraintNode is ReferenceTypeNode reference
+            && scope.TryResolve(
+                reference.Name,
+                reference.ResolvedSymbol,
+                out _) == false)
+        {
+            var target = reference.ResolvedSymbol ?? reference.Name;
+            if (!IsInterfaceOrMixin(target) && !IsDictionarySymbol(target))
+            {
+                throw new GenericDeferralException(
+                    $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
+                    $"targets '{target}', which is not a generated reference/base " +
+                    "contract and cannot be used as a faithful C# constraint.",
+                    constraintProvenance,
+                    "advanced-generic-constraints");
+            }
+        }
+
+        TypeProjection projection;
+        try
+        {
+            projection = Project(
+                binding.Model.Constraint,
+                constraintProvenance,
+                scope);
+        }
+        catch (GenericDeferralException)
+        {
+            throw;
+        }
+        catch (TypeProjectionException exception)
+        {
+            throw new GenericDeferralException(
+                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
+                $"cannot be represented faithfully in C#: {exception.Message}",
+                exception.Provenance,
+                "advanced-generic-constraints");
+        }
+
+        if (projection.Identity.IsTypeParameter)
+            return (projection.RenderedType, projection.CanonicalType);
+        if (projection.Identity.Kind != ClrTypeKind.Reference)
+        {
+            throw new GenericDeferralException(
+                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
+                $"projects to non-reference type '{projection.RenderedType}', which " +
+                "is not a faithful C# base/interface constraint.",
+                constraintProvenance,
+                "advanced-generic-constraints");
+        }
+        return (projection.RenderedType, projection.CanonicalType);
+    }
+
+    private IReadOnlyList<TypeProjection> ProjectTypeArguments(
+        IReadOnlyList<TypeNode> supplied,
+        IReadOnlyList<TypeParameterModel> parameters,
+        string provenance,
+        GenericScope? callerScope,
+        int depth)
+    {
+        var required = parameters.Count(parameter => parameter.Default is null);
+        if (supplied.Count < required || supplied.Count > parameters.Count)
+        {
+            throw new TypeProjectionException(
+                $"Generic reference at '{provenance}' supplies {supplied.Count} type " +
+                $"argument(s), but target arity is {parameters.Count} with {required} " +
+                "required argument(s).",
+                provenance);
+        }
+        if (parameters.Count == 0)
+        {
+            if (supplied.Count != 0)
+                throw ArityError("target", 0, supplied.Count, provenance);
+            return [];
+        }
+
+        var projected = supplied.Select((argument, index) => Project(
+            argument,
+            $"{provenance}/typeArgument[{index}]",
+            callerScope,
+            depth + 1)).ToList();
+        var targetScope = GenericScope.Create(
+            parameters,
+            $"{provenance}/target",
+            callerScope,
+            canonicalPrefix: "^");
+        while (projected.Count < parameters.Count)
+        {
+            var parameter = parameters[projected.Count];
+            if (parameter.Default is null)
+            {
+                throw new TypeProjectionException(
+                    $"Missing required type argument {projected.Count} at '{provenance}'.",
+                    provenance);
+            }
+            var substitutions = projected
+                .Concat(Enumerable.Repeat<TypeProjection>(
+                    TypeParameter(targetScope.Parameters[projected.Count]),
+                    parameters.Count - projected.Count))
+                .Take(parameters.Count)
+                .ToList();
+            var defaultScope = targetScope.WithSubstitutions(substitutions);
+            try
+            {
+                projected.Add(Project(
+                    parameter.Default,
+                    $"{provenance}/defaultTypeArgument[{projected.Count}]",
+                    defaultScope,
+                    depth + 1));
+            }
+            catch (TypeProjectionException exception)
+            {
+                throw new GenericDeferralException(
+                    $"Omitted default type argument '{parameter.Name}' at " +
+                    $"'{provenance}' cannot be represented faithfully: " +
+                    exception.Message,
+                    exception.Provenance,
+                    "generic-defaults");
+            }
+        }
+        return projected;
+    }
+
+    private static IReadOnlyList<TypeParameterModel> GetSymbolTypeParameters(
+        SymbolModel symbol,
+        string provenance)
+    {
+        var declarations = symbol.Declarations
+            .Where(declaration => declaration.Kind is "interface" or "typeAlias")
+            .ToList();
+        var parameterLists = declarations
+            .Where(declaration => declaration.TypeParameters.Count > 0)
+            .Select(declaration => declaration.TypeParameters
+                .OrderBy(parameter => parameter.Ordinal)
+                .ToList())
+            .ToList();
+        if (parameterLists.Count == 0)
+            return [];
+
+        var canonical = parameterLists[0];
+        foreach (var list in parameterLists.Skip(1))
+        {
+            if (list.Count != canonical.Count
+                || list.Where((parameter, index) =>
+                        parameter.Name != canonical[index].Name
+                        || TypeFingerprint(parameter.Constraint)
+                            != TypeFingerprint(canonical[index].Constraint)
+                        || TypeFingerprint(parameter.Default)
+                            != TypeFingerprint(canonical[index].Default))
+                    .Any())
+            {
+                throw new TypeProjectionException(
+                    $"Merged declarations for '{symbol.Name}' have incompatible " +
+                    "generic parameter order or arity.",
+                    provenance);
+            }
+        }
+        if (declarations.Any(declaration =>
+                declaration.TypeParameters.Count == 0))
+        {
+            throw new TypeProjectionException(
+                $"Merged declarations for '{symbol.Name}' mix generic and " +
+                "non-generic declaration shapes.",
+                provenance);
+        }
+        return canonical;
+    }
+
+    private static string TypeFingerprint(TypeNode? type)
+        => type switch
+        {
+            null => "-",
+            KeywordTypeNode keyword =>
+                $"keyword:{keyword.Name}:{keyword.CheckerType}",
+            ReferenceTypeNode reference =>
+                $"reference:{reference.ResolvedSymbol ?? reference.Name}<" +
+                $"{string.Join(",", reference.TypeArguments.Select(TypeFingerprint))}>",
+            HeritageReferenceTypeNode heritage =>
+                $"heritage:{heritage.ResolvedSymbol ?? heritage.Expression}<" +
+                $"{string.Join(",", heritage.TypeArguments.Select(TypeFingerprint))}>",
+            UnionTypeNode union =>
+                $"union({string.Join("|", union.Types.Select(TypeFingerprint))})",
+            IntersectionTypeNode intersection =>
+                $"intersection({string.Join("&", intersection.Types.Select(TypeFingerprint))})",
+            ArrayTypeNode array => $"array({TypeFingerprint(array.ElementType)})",
+            TupleTypeNode tuple =>
+                $"tuple({string.Join(",", tuple.Elements.Select(TypeFingerprint))})",
+            LiteralTypeNode literal =>
+                $"literal:{literal.LiteralKind}:{literal.Text}",
+            ParenthesizedTypeNode parenthesized =>
+                $"parenthesized({TypeFingerprint(parenthesized.InnerType)})",
+            OperatorTypeNode operation =>
+                $"operator:{operation.Operator}({TypeFingerprint(operation.OperandType)})",
+            IndexedAccessTypeNode indexed =>
+                $"indexed({TypeFingerprint(indexed.ObjectType)}," +
+                $"{TypeFingerprint(indexed.IndexType)})",
+            _ => $"{type.Kind}:{type.CheckerType}",
+        };
+
+    private TypeProjection ProjectDictionaryContainer(
+        ReferenceTypeNode reference,
+        string provenance,
+        GenericScope? scope,
+        int depth,
+        string name)
+    {
+        if (reference.TypeArguments.Count != 2)
+            throw ArityError(name, 2, reference.TypeArguments.Count, provenance);
+        var key = Project(
+            reference.TypeArguments[0],
+            $"{provenance}/{name}<K>",
+            scope,
+            depth + 1);
+        var value = Project(
+            reference.TypeArguments[1],
+            $"{provenance}/{name}<V>",
+            scope,
+            depth + 1);
+        return ReferenceType(
+            $"IReadOnlyDictionary<{key.RenderedType}, {value.RenderedType}>",
+            isCollection: true,
+            canonicalType:
+                $"IReadOnlyDictionary<{key.CanonicalType},{value.CanonicalType}>",
+            typeArguments: [key.Identity, value.Identity]);
+    }
+
+    private TypeProjection ProjectSetContainer(
+        ReferenceTypeNode reference,
+        string provenance,
+        GenericScope? scope,
+        int depth,
+        string name)
+    {
+        if (reference.TypeArguments.Count != 1)
+            throw ArityError(name, 1, reference.TypeArguments.Count, provenance);
+        var item = Project(
+            reference.TypeArguments[0],
+            $"{provenance}/{name}<T>",
+            scope,
+            depth + 1);
+        return ReferenceType(
+            $"IReadOnlySet<{item.RenderedType}>",
+            isCollection: true,
+            canonicalType: $"IReadOnlySet<{item.CanonicalType}>",
+            typeArguments: [item.Identity]);
+    }
+
+    private static TypeProjectionException ArityError(
+        string name,
+        int expected,
+        int actual,
+        string provenance)
+        => new(
+            $"Generic type '{name}' at '{provenance}' requires exactly {expected} " +
+            $"type argument(s), but received {actual}.",
+            provenance);
+
+    private static void ValidateOptionalBufferArgument(
+        ReferenceTypeNode reference,
+        string provenance)
+    {
+        if (reference.TypeArguments.Count > 1)
+            throw ArityError(
+                reference.Name,
+                1,
+                reference.TypeArguments.Count,
+                provenance);
+        if (reference.TypeArguments.Count == 1
+            && reference.TypeArguments[0] is not ReferenceTypeNode
+            {
+                Name: "ArrayBuffer" or "ArrayBufferLike" or "SharedArrayBuffer",
+            })
+        {
+            throw new TypeProjectionException(
+                $"Typed array '{reference.Name}' at '{provenance}' has unsupported " +
+                "backing-buffer type argument.",
+                provenance);
+        }
+    }
+
+    private static bool IsDefaultIteratorReturn(TypeNode type)
+        => type is ReferenceTypeNode
+            {
+                Name: "BuiltinIteratorReturn",
+            }
+            || IsUnknownLike(type);
+
+    private static bool IsUnknownLike(TypeNode type)
+        => type is KeywordTypeNode
+            {
+                Name: "UnknownKeyword" or "AnyKeyword" or "unknown" or "any",
+            };
+
+    private static void ValidateJsonGenericTransport(
+        TypeNode typeNode,
+        string provenance)
+    {
+        if (typeNode.Transport?.Kind != "json-value"
+            || typeNode is not ReferenceTypeNode reference
+            || reference.TypeArguments.Count == 0)
+        {
+            return;
+        }
+
+        var invalid = reference.TypeArguments
+            .Select((argument, index) => (argument, index))
+            .FirstOrDefault(item =>
+                item.argument.Transport?.Kind != "json-value");
+        if (invalid.argument is not null)
+        {
+            throw new TypeProjectionException(
+                $"Generic JSON projection '{reference.Name}' at '{provenance}' " +
+                $"cannot prove JSON compatibility recursively: type argument " +
+                $"{invalid.index} has transport " +
+                $"'{invalid.argument.Transport?.Kind ?? "(missing)"}'.",
+                $"{provenance}/typeArgument[{invalid.index}]/transport");
+        }
     }
 
     private static TypeProjection Fail(TypeNode node, string provenance, string reason)
@@ -630,7 +1342,8 @@ public sealed class TypeResolver
         bool isCollection = false,
         string providerNote = "",
         string? canonicalType = null,
-        bool isAwaitable = false)
+        bool isAwaitable = false,
+        IReadOnlyList<ClrTypeIdentity>? typeArguments = null)
         => new(
             csharpType,
             false,
@@ -638,20 +1351,38 @@ public sealed class TypeResolver
             new ClrTypeIdentity(
                 canonicalType ?? csharpType,
                 ClrTypeKind.Value,
-                isAwaitable),
+                isAwaitable,
+                typeArguments?.Count ?? 0,
+                typeArguments),
             providerNote);
 
     private static TypeProjection ReferenceType(
         string csharpType,
         bool isCollection = false,
         string providerNote = "",
-        string? canonicalType = null)
+        string? canonicalType = null,
+        IReadOnlyList<ClrTypeIdentity>? typeArguments = null)
         => new(
             csharpType,
             false,
             isCollection,
-            new ClrTypeIdentity(canonicalType ?? csharpType, ClrTypeKind.Reference),
+            new ClrTypeIdentity(
+                canonicalType ?? csharpType,
+                ClrTypeKind.Reference,
+                GenericArity: typeArguments?.Count ?? 0,
+                TypeArguments: typeArguments),
             providerNote);
+
+    private static TypeProjection TypeParameter(GenericParameterBinding parameter)
+        => new(
+            parameter.CSharpName,
+            false,
+            false,
+            new ClrTypeIdentity(
+                parameter.CanonicalIdentity,
+                ClrTypeKind.Reference,
+                IsTypeParameter: true),
+            $"type-parameter:{parameter.SourceName}");
 
     private static TypeProjection VoidType()
         => new("void", false, false, new ClrTypeIdentity("void", ClrTypeKind.Void));

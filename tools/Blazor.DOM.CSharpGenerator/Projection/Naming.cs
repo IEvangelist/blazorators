@@ -141,6 +141,13 @@ public static class Naming
         return EscapeKeyword(camel);
     }
 
+    public static string ToCSharpTypeParameterName(string typeScriptName)
+    {
+        if (string.IsNullOrWhiteSpace(typeScriptName))
+            return "_";
+        return ToCSharpTypeName(typeScriptName);
+    }
+
     /// <summary>
     /// Converts a string-literal enum value to a valid C# enum member name.
     /// E.g. "audio/mpeg" -> "AudioMpeg", "end-of-line" -> "EndOfLine", "2d" -> "_2D".
@@ -200,7 +207,10 @@ public static class Naming
         if (name.Length == 0) return name;
 
         // Already starts uppercase and no separators -> likely already PascalCase
-        if (char.IsUpper(name[0]) && !name.Contains('_') && !name.Contains('-'))
+        if (char.IsUpper(name[0])
+            && !name.Contains('_')
+            && !name.Contains('-')
+            && !name.Contains('.'))
             return name;
 
         var sb = new StringBuilder(name.Length);

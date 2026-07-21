@@ -5,7 +5,7 @@
 // - Methods -> C# method signatures (bool|options params expand to three overloads)
 // - Event-subscription generic overloads (addEventListener/removeEventListener<K extends keyof EventMap>):
 //   deferred to the event-subscription phase with an honest DEFERRED comment.
-// - Other generic methods: fail with provenance (require generic-emission phase approval).
+// - Other generic methods: preserve lexical parameters, constraints, and CLR arity.
 // - Index signatures and call signatures: deferred with comment.
 // FAIL-CLOSED: A symbol is only written when ALL in-scope members project successfully OR
 // are legitimately deferred to a named phase. Any unhandled projection failure throws.
@@ -57,6 +57,7 @@ public sealed class InterfaceEmitter(
         string Rendered,
         string CanonicalKey,
         string ReturnType,
+        string CanonicalConstraints,
         int DeclarationOrdinal,
         int OptionalParamCount = 0);
     private sealed record MethodBuildResult(
@@ -90,6 +91,10 @@ public sealed class InterfaceEmitter(
         {
             throw CompleteFailure(symbol, ex.Message, ex.Provenance, ex.PartialOutcomes);
         }
+        catch (GenericDeferralException)
+        {
+            throw;
+        }
         catch (MemberOutcomeReconciliationException ex)
         {
             throw CompleteFailure(symbol, ex.Message, ex.Provenance, ex.PartialOutcomes);
@@ -122,10 +127,21 @@ public sealed class InterfaceEmitter(
                 $"InterfaceEmitter: '{symbol.Name}' is an event map and should be deferred, not emitted.");
 
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
+        var generic = typeResolver.CreateGenericDeclaration(
+            symbol,
+            symbol.Name);
         string baseClause;
         try
         {
-            baseClause = BuildBaseClause(allDecls, typeResolver, symbol.Name);
+            baseClause = BuildBaseClause(
+                allDecls,
+                typeResolver,
+                symbol.Name,
+                generic.Scope);
+        }
+        catch (GenericDeferralException)
+        {
+            throw;
         }
         catch (TypeProjectionException ex)
         {
@@ -180,13 +196,28 @@ public sealed class InterfaceEmitter(
                     canonical.Member,
                     symbol.Name,
                     allDecls,
-                    canonical.DeclarationOrdinal);
+                    canonical.DeclarationOrdinal,
+                    generic.Scope);
 
                 memberOutcomes.AddRange(outcomes);
 
                 var propKey = $"prop:{canonical.Member.Name!.Text}";
                 if (output is not null && emittedPropertyKeys.Add(propKey))
                     propertyOutputs.Add(output);
+            }
+            catch (GenericDeferralException exception)
+            {
+                memberOutcomes.AddRange(group.Select(accessor => new MemberOutcome(
+                    accessor.Member.Ordinal,
+                    accessor.Member.Name?.Text ?? "",
+                    accessor.Member.Kind,
+                    MemberOutcomeStatus.Deferred,
+                    exception.Phase,
+                    exception.Message,
+                    accessor.DeclarationOrdinal)));
+                propertyOutputs.Add(
+                    $"// DEFERRED ({exception.Phase}): " +
+                    $"{canonical.Member.Name?.Text} — {exception.Message}");
             }
             catch (TypeProjectionException ex)
             {
@@ -214,7 +245,8 @@ public sealed class InterfaceEmitter(
                     var build = BuildMethod(
                         methodRef.Member,
                         symbol.Name,
-                        methodRef.DeclarationOrdinal);
+                        methodRef.DeclarationOrdinal,
+                        generic.Scope);
                     var outcomes = build.Outcomes.ToList();
 
                     if (build.DeferredOutput is not null
@@ -235,6 +267,17 @@ public sealed class InterfaceEmitter(
                                     $"Method '{symbol.Name}.{methodName}' in decl[{methodRef.DeclarationOrdinal}] collides with decl[{existing.DeclarationOrdinal}] " +
                                     $"for canonical signature '{sig.CanonicalKey}' but has incompatible return types '{existing.ReturnType}' and '{sig.ReturnType}'.",
                                     $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/{methodName}/method[{methodRef.Member.Ordinal}]/return");
+                            }
+                            if (!string.Equals(
+                                    existing.CanonicalConstraints,
+                                    sig.CanonicalConstraints,
+                                    StringComparison.Ordinal))
+                            {
+                                var methodName = methodRef.Member.Name?.Text ?? "";
+                                throw new TypeProjectionException(
+                                    $"Method '{symbol.Name}.{methodName}' in decl[{methodRef.DeclarationOrdinal}] collides with decl[{existing.DeclarationOrdinal}] " +
+                                    $"for canonical signature '{sig.CanonicalKey}' but has incompatible generic constraints.",
+                                    $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/{methodName}/constraints");
                             }
 
                             if (sig.OptionalParamCount > existing.OptionalParamCount
@@ -262,6 +305,20 @@ public sealed class InterfaceEmitter(
                     }
 
                     memberOutcomes.AddRange(outcomes);
+                }
+                catch (GenericDeferralException exception)
+                {
+                    memberOutcomes.Add(new MemberOutcome(
+                        methodRef.Member.Ordinal,
+                        methodRef.Member.Name?.Text ?? "",
+                        methodRef.Member.Kind,
+                        MemberOutcomeStatus.Deferred,
+                        exception.Phase,
+                        exception.Message,
+                        methodRef.DeclarationOrdinal));
+                    methodOutputs.Add(
+                        $"// DEFERRED ({exception.Phase}): " +
+                        $"{methodRef.Member.Name?.Text} — {exception.Message}");
                 }
                 catch (TypeProjectionException ex)
                 {
@@ -331,10 +388,13 @@ public sealed class InterfaceEmitter(
             w.AppendLine("// Requires secure context (HTTPS).");
         if (symbol.Semantic.Transferable)
             w.AppendLine("// Transferable (supports postMessage transfer).");
+        foreach (var defaultNote in generic.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
 
+        var typeName = $"I{csName}{generic.TypeParameterList}";
         var header = string.IsNullOrEmpty(baseClause)
-            ? $"public partial interface I{csName}"
-            : $"public partial interface I{csName} : {baseClause}";
+            ? $"public partial interface {typeName}{generic.ConstraintSuffix}"
+            : $"public partial interface {typeName} : {baseClause}{generic.ConstraintSuffix}";
 
         w.Block(header, () =>
         {
@@ -381,7 +441,8 @@ public sealed class InterfaceEmitter(
         MemberModel member,
         string symbolName,
         IReadOnlyList<DeclarationModel> allDecls,
-        int declOrdinal)
+        int declOrdinal,
+        GenericScope declarationScope)
     {
         var memberName = member.Name?.Text;
         if (memberName is null)
@@ -439,7 +500,8 @@ public sealed class InterfaceEmitter(
                 {
                     projection = typeResolver.Project(
                         propertyRef.Member.Type,
-                        $"{symbolName}/decl[{propertyRef.DeclarationOrdinal}]/{memberName}/property");
+                        $"{symbolName}/decl[{propertyRef.DeclarationOrdinal}]/{memberName}/property",
+                        declarationScope);
                 }
                 catch (TypeProjectionException ex) when (ex.Message.Contains("deferred to the events phase", StringComparison.Ordinal))
                 {
@@ -540,7 +602,8 @@ public sealed class InterfaceEmitter(
             {
                 projection = typeResolver.Project(
                     getterRef.Member.ReturnType,
-                    $"{symbolName}/decl[{getterRef.DeclarationOrdinal}]/{memberName}/getter");
+                    $"{symbolName}/decl[{getterRef.DeclarationOrdinal}]/{memberName}/getter",
+                    declarationScope);
             }
             catch (TypeProjectionException ex) when (ex.Message.Contains("deferred to the events phase", StringComparison.Ordinal))
             {
@@ -633,7 +696,8 @@ public sealed class InterfaceEmitter(
             var setterParam = setterRef.Member.Parameters[0];
             var setterProjection = typeResolver.Project(
                 setterParam.Type,
-                $"{symbolName}/decl[{setterRef.DeclarationOrdinal}]/{memberName}/setter/{setterParam.Name}");
+                $"{symbolName}/decl[{setterRef.DeclarationOrdinal}]/{memberName}/setter/{setterParam.Name}",
+                declarationScope);
             var effectiveSetterProjection = setterProjection with
             {
                 IsNullable = setterParam.Optional || setterProjection.IsNullable
@@ -667,7 +731,11 @@ public sealed class InterfaceEmitter(
         return (w2.ToString().TrimEnd(), outcomes);
     }
 
-    private MethodBuildResult BuildMethod(MemberModel method, string symbolName, int declOrdinal)
+    private MethodBuildResult BuildMethod(
+        MemberModel method,
+        string symbolName,
+        int declOrdinal,
+        GenericScope declarationScope)
     {
         var memberName = method.Name?.Text;
         if (memberName is null)
@@ -675,35 +743,54 @@ public sealed class InterfaceEmitter(
 
         var provenance = $"{symbolName}/decl[{declOrdinal}]/{memberName}";
 
-        if (method.TypeParameters.Count > 0)
+        if (method.TypeParameters.Count > 0 && IsEventSubscriptionOverload(method))
         {
             var typeParamNames = string.Join(", ", method.TypeParameters.Select(tp => tp.Name));
-
-            if (IsEventSubscriptionOverload(method))
-            {
-                return new MethodBuildResult(
-                    [],
-                    [
-                        new MemberOutcome(
-                            method.Ordinal,
-                            memberName,
-                            method.Kind,
-                            MemberOutcomeStatus.Deferred,
-                            "event-subscription",
-                            "Event-map-keyed generic overload deferred to event-subscription phase.",
-                            declOrdinal)
-                    ],
-                    $"// DEFERRED (event-subscription): {memberName}<{typeParamNames}> — deferred to typed event subscription phase.");
-            }
-
-            throw new TypeProjectionException(
-                $"Generic method '{symbolName}.{memberName}<{typeParamNames}>' requires the generic-emission phase. " +
-                "This is not an event-subscription overload (must be named addEventListener/removeEventListener " +
-                "with all type parameters constrained by keyof <EventMapType>).",
-                provenance);
+            return new MethodBuildResult(
+                [],
+                [
+                    new MemberOutcome(
+                        method.Ordinal,
+                        memberName,
+                        method.Kind,
+                        MemberOutcomeStatus.Deferred,
+                        "event-subscription",
+                        "Event-map-keyed generic overload deferred to event-subscription phase.",
+                        declOrdinal)
+                ],
+                $"// DEFERRED (event-subscription): {memberName}<{typeParamNames}> — deferred to typed event subscription phase.");
         }
 
-        var returnProj = typeResolver.Project(method.ReturnType, $"{provenance}/return");
+        GenericDeclaration methodGeneric;
+        try
+        {
+            methodGeneric = typeResolver.CreateGenericDeclaration(
+                method.TypeParameters,
+                provenance,
+                declarationScope,
+                canonicalPrefix: "!!");
+        }
+        catch (GenericDeferralException exception)
+        {
+            return new MethodBuildResult(
+                [],
+                [
+                    new MemberOutcome(
+                        method.Ordinal,
+                        memberName,
+                        method.Kind,
+                        MemberOutcomeStatus.Deferred,
+                        exception.Phase,
+                        exception.Message,
+                        declOrdinal)
+                ],
+                $"// DEFERRED ({exception.Phase}): {memberName} — {exception.Message}");
+        }
+
+        var returnProj = typeResolver.Project(
+            method.ReturnType,
+            $"{provenance}/return",
+            methodGeneric.Scope);
         var (docText, deprecated) = MergeGlobalDocumentation(
             symbolName,
             memberName,
@@ -718,7 +805,8 @@ public sealed class InterfaceEmitter(
             symbolName,
             memberName,
             method.Parameters,
-            returnProj);
+            returnProj,
+            methodGeneric.Scope);
         var optionalParamCount = 0;
 
         for (var pi = 0; pi < paramList.Count; pi++)
@@ -739,7 +827,8 @@ public sealed class InterfaceEmitter(
                 docText,
                 deprecated,
                 provenance,
-                declOrdinal);
+                declOrdinal,
+                methodGeneric);
             var boolOverload = BuildMethodSignature(
                 emittedName,
                 csReturn,
@@ -753,7 +842,8 @@ public sealed class InterfaceEmitter(
                 null,
                 false,
                 provenance,
-                declOrdinal);
+                declOrdinal,
+                methodGeneric);
             var optOverload = BuildMethodSignature(
                 emittedName,
                 csReturn,
@@ -767,7 +857,8 @@ public sealed class InterfaceEmitter(
                 null,
                 false,
                 provenance,
-                declOrdinal);
+                declOrdinal,
+                methodGeneric);
 
             return new MethodBuildResult(
                 [noOptionsOverload, boolOverload, optOverload],
@@ -787,7 +878,10 @@ public sealed class InterfaceEmitter(
         var canonicalParamTypes = new List<string>();
         foreach (var p in paramList)
         {
-            var pProj = typeResolver.Project(p.Type, $"{provenance}/{p.Name}");
+            var pProj = typeResolver.Project(
+                p.Type,
+                $"{provenance}/{p.Name}",
+                methodGeneric.Scope);
             var pType = FormatParameterType(pProj);
             var pName = Naming.ToCSharpParameterName(p.Name);
 
@@ -818,13 +912,19 @@ public sealed class InterfaceEmitter(
 
         var w = new CSharpWriter();
         w.XmlDoc(docText, deprecated);
-        w.AppendLine($"{csReturn} {emittedName}({string.Join(", ", parts)});");
+        w.AppendLine(
+            $"{csReturn} {emittedName}{methodGeneric.TypeParameterList}(" +
+            $"{string.Join(", ", parts)}){methodGeneric.ConstraintSuffix};");
 
         return new MethodBuildResult(
             [new MethodSig(
                 w.ToString().TrimEnd(),
-                CanonicalMethodKey(emittedName, canonicalParamTypes),
+                CanonicalMethodKey(
+                    emittedName,
+                    methodGeneric.Scope.Parameters.Count,
+                    canonicalParamTypes),
                 returnProj.CanonicalType,
+                methodGeneric.CanonicalConstraints,
                 declOrdinal,
                 optionalParamCount)],
             [
@@ -852,7 +952,8 @@ public sealed class InterfaceEmitter(
         string? docText,
         bool deprecated,
         string provenance,
-        int declOrdinal)
+        int declOrdinal,
+        GenericDeclaration methodGeneric)
     {
         var parts = new List<string>();
         var canonicalParamTypes = new List<string>();
@@ -871,7 +972,10 @@ public sealed class InterfaceEmitter(
             }
 
             var p = paramList[i];
-            var pProj = typeResolver.Project(p.Type, $"{provenance}/{p.Name}");
+            var pProj = typeResolver.Project(
+                p.Type,
+                $"{provenance}/{p.Name}",
+                methodGeneric.Scope);
             var pType = FormatParameterType(pProj);
             var pName = Naming.ToCSharpParameterName(p.Name);
 
@@ -903,12 +1007,18 @@ public sealed class InterfaceEmitter(
         var w = new CSharpWriter();
         if (docText is not null)
             w.XmlDoc(docText, deprecated);
-        w.AppendLine($"{csReturn} {emittedName}({string.Join(", ", parts)});");
+        w.AppendLine(
+            $"{csReturn} {emittedName}{methodGeneric.TypeParameterList}(" +
+            $"{string.Join(", ", parts)}){methodGeneric.ConstraintSuffix};");
 
         return new MethodSig(
             w.ToString().TrimEnd(),
-            CanonicalMethodKey(emittedName, canonicalParamTypes),
+            CanonicalMethodKey(
+                emittedName,
+                methodGeneric.Scope.Parameters.Count,
+                canonicalParamTypes),
             canonicalReturnType,
+            methodGeneric.CanonicalConstraints,
             declOrdinal,
             optionalParamCount);
     }
@@ -916,7 +1026,8 @@ public sealed class InterfaceEmitter(
     private static string BuildBaseClause(
         IReadOnlyList<DeclarationModel> allDecls,
         TypeResolver typeResolver,
-        string symbolName)
+        string symbolName,
+        GenericScope declarationScope)
     {
         var seenBases = new HashSet<string>(StringComparer.Ordinal);
         var bases = new List<string>();
@@ -943,16 +1054,24 @@ public sealed class InterfaceEmitter(
                             $"{symbolName}/extends");
                     }
 
-                    if (hrt.TypeArguments.Count > 0)
-                    {
-                        throw new TypeProjectionException(
-                            $"Interface '{symbolName}' decl[{decl.Ordinal}] extends generic type '{hrt.Expression}<...>'. " +
-                            "Generic heritage requires the generic-heritage phase.",
-                            $"{symbolName}/extends/{hrt.Expression}");
-                    }
-
                     var resolvedBaseName = hrt.ResolvedSymbol ?? hrt.Expression;
-                    if (!typeResolver.IsKnownSymbol(resolvedBaseName))
+                    if (!typeResolver.IsKnownSymbol(resolvedBaseName)
+                        && resolvedBaseName is not
+                            "ReadonlyMap" and
+                            not "Map" and
+                            not "ReadonlySet" and
+                            not "Set" and
+                            not "Iterable" and
+                            not "IterableIterator" and
+                            not "ArrayIterator" and
+                            not "Iterator" and
+                            not "IteratorObject" and
+                            not "MapIterator" and
+                            not "SetIterator" and
+                            not "AsyncIterable" and
+                            not "AsyncIterableIterator" and
+                            not "AsyncIterator" and
+                            not "AsyncIteratorObject")
                     {
                         throw new TypeProjectionException(
                             $"Interface '{symbolName}' decl[{decl.Ordinal}] extends unknown symbol '{resolvedBaseName}'. " +
@@ -960,7 +1079,8 @@ public sealed class InterfaceEmitter(
                             $"{symbolName}/extends/{resolvedBaseName}");
                     }
 
-                    if (!typeResolver.IsInterfaceOrMixin(resolvedBaseName))
+                    if (typeResolver.IsKnownSymbol(resolvedBaseName)
+                        && !typeResolver.IsInterfaceOrMixin(resolvedBaseName))
                     {
                         throw new TypeProjectionException(
                             $"Interface '{symbolName}' decl[{decl.Ordinal}] extends '{resolvedBaseName}' which has classification " +
@@ -969,7 +1089,18 @@ public sealed class InterfaceEmitter(
                             $"{symbolName}/extends/{resolvedBaseName}");
                     }
 
-                    var csBase = typeResolver.GetCSharpTypeReference(resolvedBaseName);
+                    var projection = typeResolver.Project(
+                        hrt,
+                        $"{symbolName}/decl[{decl.Ordinal}]/extends/{resolvedBaseName}",
+                        declarationScope);
+                    if (projection.Identity.Kind != ClrTypeKind.Reference)
+                    {
+                        throw new TypeProjectionException(
+                            $"Interface '{symbolName}' decl[{decl.Ordinal}] extends " +
+                            $"non-reference projection '{projection.RenderedType}'.",
+                            $"{symbolName}/extends/{resolvedBaseName}");
+                    }
+                    var csBase = projection.RenderedType;
                     if (seenBases.Add(csBase))
                         bases.Add(csBase);
                 }
@@ -981,8 +1112,9 @@ public sealed class InterfaceEmitter(
 
     private static string CanonicalMethodKey(
         string csName,
+        int arity,
         IReadOnlyList<string> canonicalParamTypes)
-        => $"{csName}({string.Join(",", canonicalParamTypes)})";
+        => $"{csName}`{arity}({string.Join(",", canonicalParamTypes)})";
 
     private static string ApplyPropertyNullability(
         TypeProjection projection,
@@ -993,7 +1125,8 @@ public sealed class InterfaceEmitter(
         string ownerSymbol,
         string memberName,
         IReadOnlyList<ParameterModel> ownerParameters,
-        TypeProjection ownerReturn)
+        TypeProjection ownerReturn,
+        GenericScope scope)
     {
         var merged = ownerParameters
             .OrderBy(parameter => parameter.Ordinal)
@@ -1018,7 +1151,8 @@ public sealed class InterfaceEmitter(
             {
                 var aliasReturn = typeResolver.Project(
                     declaration.ReturnType,
-                    $"{alias.Symbol.Name}/decl[{declaration.Ordinal}]/globalFunction/return");
+                    $"{alias.Symbol.Name}/decl[{declaration.Ordinal}]/globalFunction/return",
+                    scope);
                 if (!string.Equals(
                         ownerReturn.CanonicalType,
                         aliasReturn.CanonicalType,
@@ -1038,11 +1172,13 @@ public sealed class InterfaceEmitter(
                     }
                     var ownerProjection = typeResolver.Project(
                         merged[index].Type,
-                        $"{ownerSymbol}/{memberName}/parameter[{index}]");
+                        $"{ownerSymbol}/{memberName}/parameter[{index}]",
+                        scope);
                     var aliasProjection = typeResolver.Project(
                         aliasParameters[index].Type,
                         $"{alias.Symbol.Name}/decl[{declaration.Ordinal}]/" +
-                        $"globalFunction/parameter[{aliasParameters[index].Ordinal}]");
+                        $"globalFunction/parameter[{aliasParameters[index].Ordinal}]",
+                        scope);
                     if (!string.Equals(
                             ownerProjection.CanonicalType,
                             aliasProjection.CanonicalType,

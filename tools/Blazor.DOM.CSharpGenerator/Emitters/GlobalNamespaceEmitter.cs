@@ -276,17 +276,17 @@ internal sealed class GlobalNamespaceEmitter(
                             AddMemberOutcome(
                                 source,
                                 MemberOutcomeStatus.Deferred,
-                                FactoryPhase,
+                                callable.Phase,
                                 callable.Reason);
                             AddOverloadOutcome(
                                 overload,
                                 MemberOutcomeStatus.Deferred,
-                                FactoryPhase,
+                                callable.Phase,
                                 callable.Reason,
                                 SetParameterStatus(
                                     callable.ParameterOutcomes,
                                     MemberOutcomeStatus.Deferred,
-                                    FactoryPhase,
+                                    callable.Phase,
                                     callable.Reason));
                             break;
                         }
@@ -311,6 +311,21 @@ internal sealed class GlobalNamespaceEmitter(
                                         $"Factory callable '{callableName}' collides for " +
                                         $"canonical signature '{signature.CanonicalKey}' " +
                                         "with an incompatible return type.");
+                                    return null;
+                                }
+                                if (!string.Equals(
+                                        existingSignature.Signature.CanonicalConstraints,
+                                        signature.CanonicalConstraints,
+                                        StringComparison.Ordinal))
+                                {
+                                    FailFactoryCollision(
+                                        route,
+                                        source,
+                                        sourceMembers,
+                                        sourceOverloads.Values,
+                                        $"Factory callable '{callableName}' collides for " +
+                                        $"canonical signature '{signature.CanonicalKey}' " +
+                                        "with incompatible generic constraints.");
                                     return null;
                                 }
 
@@ -406,14 +421,24 @@ internal sealed class GlobalNamespaceEmitter(
             Naming.ToOutputSubdirectory("Factories", route.Symbol.Name));
         builder.AddFile(path);
 
-        var deferred = builder.MemberOutcomesFor(route.Declaration.Ordinal)
-            .Any(outcome => outcome.Status == MemberOutcomeStatus.Deferred);
+        var deferredOutcomes = builder.MemberOutcomesFor(route.Declaration.Ordinal)
+            .Where(outcome => outcome.Status == MemberOutcomeStatus.Deferred)
+            .ToList();
+        var deferred = deferredOutcomes.Count > 0;
+        var deferredPhases = deferredOutcomes
+            .Select(outcome => outcome.Phase)
+            .Where(phase => !string.IsNullOrWhiteSpace(phase))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        var deferredPhase = deferredPhases.Count == 1
+            ? deferredPhases[0]
+            : FactoryPhase;
         AddDeclarationOutcome(
             route,
             deferred
                 ? MemberOutcomeStatus.Deferred
                 : MemberOutcomeStatus.Projected,
-            deferred ? FactoryPhase : null,
+            deferred ? deferredPhase : null,
             deferred
                 ? "Logical factory contract emitted; unsupported members remain " +
                   "deferred to factory-constructor."
@@ -1552,6 +1577,7 @@ internal sealed class GlobalNamespaceEmitter(
                 new ContractEntry(
                     property.Rendered,
                     property.CanonicalType,
+                    "",
                     property.Mutable,
                     OptionalParameterCount: 0));
             _order.Add(property.CanonicalKey);
@@ -1580,6 +1606,16 @@ internal sealed class GlobalNamespaceEmitter(
                             "has incompatible return types.";
                         return false;
                     }
+                    if (!string.Equals(
+                            existing.CanonicalConstraints,
+                            signature.CanonicalConstraints,
+                            StringComparison.Ordinal))
+                    {
+                        collisionReason =
+                            $"Callable collision for '{signature.CanonicalKey}' " +
+                            "has incompatible generic constraints.";
+                        return false;
+                    }
                     if (signature.OptionalParameterCount
                         > existing.OptionalParameterCount)
                     {
@@ -1598,6 +1634,7 @@ internal sealed class GlobalNamespaceEmitter(
                     new ContractEntry(
                         signature.Rendered,
                         signature.CanonicalReturnType,
+                        signature.CanonicalConstraints,
                         Mutable: false,
                         signature.OptionalParameterCount));
                 _order.Add(key);
@@ -1611,6 +1648,7 @@ internal sealed class GlobalNamespaceEmitter(
         private sealed record ContractEntry(
             string Rendered,
             string CanonicalType,
+            string CanonicalConstraints,
             bool Mutable,
             int OptionalParameterCount);
     }
