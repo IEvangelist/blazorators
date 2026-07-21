@@ -21,6 +21,12 @@ public enum DomTransportKind
     /// <summary>A Web IDL transferable value. Transferability does not imply JSON compatibility.</summary>
     Transferable,
 
+    /// <summary>The CLR result type selects live-reference or structured-clone transport.</summary>
+    Inferred,
+
+    /// <summary>An arbitrary value crossing an API-defined structured-clone boundary.</summary>
+    StructuredClone,
+
     /// <summary>A shape whose transport cannot be selected safely without an explicit escape hatch.</summary>
     Unsupported,
 }

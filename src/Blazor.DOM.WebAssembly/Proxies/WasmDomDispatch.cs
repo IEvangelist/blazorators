@@ -25,6 +25,7 @@ public static class WasmDomDispatch
         string name,
         DomTransportDescriptor transport)
     {
+        transport = DomDispatch.ResolveTransport<TResult>(transport);
         DomDispatch.Validate(proxy, name, transport);
         var runtime = RequireSyncRuntime(proxy);
         var reference = RequireSyncReference(proxy);
@@ -37,7 +38,11 @@ public static class WasmDomDispatch
         }
 
         DomDispatch.RequireJsonLike(transport);
-        return runtime.GetProperty<TResult>(reference, name);
+        return runtime.GetProperty<TResult>(
+            reference,
+            name,
+            allowStructuredClone:
+                transport.Kind == DomTransportKind.StructuredClone);
     }
 
     /// <summary>Writes a property synchronously.</summary>
@@ -61,6 +66,7 @@ public static class WasmDomDispatch
         object?[]? arguments,
         DomTransportDescriptor transport)
     {
+        transport = DomDispatch.ResolveTransport<TResult>(transport);
         DomDispatch.Validate(proxy, name, transport);
         var runtime = RequireSyncRuntime(proxy);
         var reference = RequireSyncReference(proxy);
@@ -73,7 +79,12 @@ public static class WasmDomDispatch
         }
 
         DomDispatch.RequireJsonLike(transport);
-        return runtime.InvokeMethod<TResult>(reference, name, arguments);
+        return runtime.InvokeMethod<TResult>(
+            reference,
+            name,
+            arguments,
+            allowStructuredClone:
+                transport.Kind == DomTransportKind.StructuredClone);
     }
 
     /// <summary>Invokes a non-Promise void method synchronously.</summary>

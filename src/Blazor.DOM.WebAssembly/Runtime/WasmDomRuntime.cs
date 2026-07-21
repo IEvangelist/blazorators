@@ -139,8 +139,11 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
             DomArguments.Prepare(args));
 
     /// <inheritdoc />
-    public TValue GetProperty<TValue>(IJSInProcessObjectReference reference, string name) =>
-        GetJsonProperty<TValue>(reference, name);
+    public TValue GetProperty<TValue>(
+        IJSInProcessObjectReference reference,
+        string name,
+        bool allowStructuredClone = false) =>
+        GetJsonProperty<TValue>(reference, name, allowStructuredClone);
 
     /// <inheritdoc />
     public IJSInProcessObjectReference GetPropertyRef(
@@ -161,9 +164,12 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public TResult InvokeMethod<TResult>(
-        IJSInProcessObjectReference reference, string name, object?[]? args)
+        IJSInProcessObjectReference reference,
+        string name,
+        object?[]? args,
+        bool allowStructuredClone = false)
     {
-        DomTransportValidator.ValidateJsonResult<TResult>();
+        DomTransportValidator.ValidateJsonResult<TResult>(allowStructuredClone);
         return GetSyncModule().Invoke<TResult>(
             "invokeMethod",
             reference,
@@ -219,9 +225,10 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     private TValue GetJsonProperty<TValue>(
         IJSInProcessObjectReference reference,
-        string name)
+        string name,
+        bool allowStructuredClone = false)
     {
-        DomTransportValidator.ValidateJsonResult<TValue>();
+        DomTransportValidator.ValidateJsonResult<TValue>(allowStructuredClone);
         return GetSyncModule().Invoke<TValue>("getProperty", reference, name);
     }
 
@@ -237,9 +244,12 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public async ValueTask<TValue> GetPropertyAsync<TValue>(
-        IJSObjectReference reference, string name, CancellationToken cancellationToken = default)
+        IJSObjectReference reference,
+        string name,
+        CancellationToken cancellationToken = default,
+        bool allowStructuredClone = false)
     {
-        DomTransportValidator.ValidateJsonResult<TValue>();
+        DomTransportValidator.ValidateJsonResult<TValue>(allowStructuredClone);
         var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TValue>(
             "getProperty", cancellationToken, [reference, name]).ConfigureAwait(false);
@@ -295,9 +305,13 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public async ValueTask<TResult> InvokeMethodAsync<TResult>(
-        IJSObjectReference reference, string name, object?[]? args, CancellationToken cancellationToken = default)
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        CancellationToken cancellationToken = default,
+        bool allowStructuredClone = false)
     {
-        DomTransportValidator.ValidateJsonResult<TResult>();
+        DomTransportValidator.ValidateJsonResult<TResult>(allowStructuredClone);
         var preparedArgs = DomArguments.Prepare(args);
         var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TResult>(

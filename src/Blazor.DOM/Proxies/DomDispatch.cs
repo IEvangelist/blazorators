@@ -40,6 +40,7 @@ public static class DomDispatch
         DomTransportDescriptor transport,
         CancellationToken cancellationToken = default)
     {
+        transport = ResolveTransport<TResult>(transport);
         Validate(proxy, name, transport);
         if (IsProxyContract<TResult>())
         {
@@ -55,7 +56,9 @@ public static class DomDispatch
         return await proxy.DispatchRuntime.GetPropertyAsync<TResult>(
             proxy.Reference,
             name,
-            cancellationToken).ConfigureAwait(false);
+            cancellationToken,
+            allowStructuredClone:
+                transport.Kind == DomTransportKind.StructuredClone).ConfigureAwait(false);
     }
 
     /// <summary>Writes a Server/async property.</summary>
@@ -82,6 +85,7 @@ public static class DomDispatch
         DomTransportDescriptor transport,
         CancellationToken cancellationToken = default)
     {
+        transport = ResolveTransport<TResult>(transport);
         Validate(proxy, name, transport);
         if (IsProxyContract<TResult>())
         {
@@ -99,7 +103,9 @@ public static class DomDispatch
             proxy.Reference,
             name,
             arguments,
-            cancellationToken).ConfigureAwait(false);
+            cancellationToken,
+            allowStructuredClone:
+                transport.Kind == DomTransportKind.StructuredClone).ConfigureAwait(false);
     }
 
     /// <summary>Invokes a Server/async void method.</summary>
@@ -199,6 +205,7 @@ public static class DomDispatch
     {
         if (transport.Kind is not (
             DomTransportKind.JsonValue
+            or DomTransportKind.StructuredClone
             or DomTransportKind.Binary
             or DomTransportKind.JsStream
             or DomTransportKind.Transferable))
@@ -207,5 +214,25 @@ public static class DomDispatch
                 $"TypeScript value '{transport.SourceType}' requires " +
                 $"{transport.Kind} transport but the CLR result is not a DOM proxy.");
         }
+    }
+
+    internal static DomTransportDescriptor ResolveTransport<TResult>(
+        DomTransportDescriptor transport)
+    {
+        if (transport.Kind != DomTransportKind.Inferred)
+            return transport;
+        if (IsProxyContract<TResult>())
+        {
+            return DomTransportDescriptor.JsReference(
+                transport.SourceType,
+                transport.Nullable);
+        }
+        return typeof(TResult) == typeof(object)
+            ? DomTransportDescriptor.StructuredCloneValue(
+                transport.SourceType,
+                transport.Nullable)
+            : DomTransportDescriptor.JsonValue(
+                transport.SourceType,
+                transport.Nullable);
     }
 }

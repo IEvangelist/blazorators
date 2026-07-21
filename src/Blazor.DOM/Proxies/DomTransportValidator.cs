@@ -56,9 +56,12 @@ internal static class DomTransportValidator
         PropertyNameCaseInsensitive = true,
     };
 
-    public static void ValidateJsonResult<TValue>()
+    public static void ValidateJsonResult<TValue>(
+        bool allowStructuredClone = false)
     {
         var type = typeof(TValue);
+        if (allowStructuredClone && type == typeof(object))
+            return;
         if (!IsJsonType(type, new HashSet<Type>()))
         {
             throw UnsupportedJson(type, "result");
