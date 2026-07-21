@@ -4,47 +4,61 @@ using Microsoft.Playwright;
 
 namespace Blazor.ExampleConsumer.EndToEndTests;
 
-public sealed class BlazoratorsSiteFixture : IAsyncLifetime
-{
-    const string BaseUrlEnvironmentVariable = "BLAZORATORS_E2E_BASE_URL";
-    const string DefaultLocalUrl = "http://127.0.0.1:5127";
+public sealed class BlazoratorsSiteFixture()
+    : BlazorSiteFixture(
+        "BLAZORATORS_E2E_BASE_URL",
+        "http://127.0.0.1:5127",
+        "Blazor.ExampleConsumer");
 
+public sealed class BlazorServerSiteFixture()
+    : BlazorSiteFixture(
+        "BLAZORATORS_SERVER_E2E_BASE_URL",
+        "http://127.0.0.1:5128",
+        "BlazorServer.ExampleConsumer");
+
+public abstract class BlazorSiteFixture(
+    string baseUrlEnvironmentVariable,
+    string defaultLocalUrl,
+    string projectName) : IAsyncLifetime
+{
     Process? _server;
 
     public string BaseUrl { get; private set; } = "";
 
     public async Task InitializeAsync()
     {
-        var configuredUrl = Environment.GetEnvironmentVariable(BaseUrlEnvironmentVariable);
+        var configuredUrl = Environment.GetEnvironmentVariable(baseUrlEnvironmentVariable);
         if (!string.IsNullOrWhiteSpace(configuredUrl))
         {
             BaseUrl = NormalizeBaseUrl(configuredUrl);
-            await WaitForSiteAsync(BaseUrl);
+            await WaitForSiteAsync(BaseUrl, null, projectName);
             return;
         }
 
-        BaseUrl = DefaultLocalUrl;
+        BaseUrl = defaultLocalUrl;
 
         var repoRoot = FindRepositoryRoot();
-        var projectPath = Path.Combine(repoRoot, "samples", "Blazor.ExampleConsumer", "Blazor.ExampleConsumer.csproj");
+        var projectPath = Path.Combine(repoRoot, "samples", projectName, $"{projectName}.csproj");
 
-        _server = Process.Start(new ProcessStartInfo
+        var startInfo = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"run --no-build --no-restore --project \"{projectPath}\" --framework net10.0 --no-launch-profile --urls {BaseUrl}",
+            Arguments = $"run --no-build --no-restore --configuration Release --project \"{projectPath}\" --framework net10.0 --no-launch-profile --urls {BaseUrl}",
             WorkingDirectory = repoRoot,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             CreateNoWindow = true
-        });
+        };
+        startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
+        _server = Process.Start(startInfo);
 
         if (_server is null)
         {
-            throw new InvalidOperationException("Unable to start the Blazor example app for end-to-end tests.");
+            throw new InvalidOperationException($"Unable to start {projectName} for end-to-end tests.");
         }
 
-        await WaitForSiteAsync(BaseUrl);
+        await WaitForSiteAsync(BaseUrl, _server, projectName);
     }
 
     public async Task DisposeAsync()
@@ -85,7 +99,7 @@ public sealed class BlazoratorsSiteFixture : IAsyncLifetime
         throw new DirectoryNotFoundException("Could not locate the repository root containing blazorators.sln.");
     }
 
-    static async Task WaitForSiteAsync(string baseUrl)
+    static async Task WaitForSiteAsync(string baseUrl, Process? server, string projectName)
     {
         using var client = new HttpClient();
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
@@ -93,6 +107,14 @@ public sealed class BlazoratorsSiteFixture : IAsyncLifetime
 
         while (!timeout.IsCancellationRequested)
         {
+            if (server is { HasExited: true })
+            {
+                var output = await server.StandardOutput.ReadToEndAsync();
+                var error = await server.StandardError.ReadToEndAsync();
+                throw new InvalidOperationException(
+                    $"{projectName} exited before becoming available.{Environment.NewLine}{output}{error}");
+            }
+
             try
             {
                 using var response = await client.GetAsync(baseUrl, timeout.Token);

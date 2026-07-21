@@ -15,6 +15,7 @@ builder.Services.AddLocalStorageServices();
 builder.Services.AddSessionStorageServices();
 builder.Services.AddGeolocationServices();
 builder.Services.AddSpeechSynthesisServices();
+builder.Services.AddBlazorDOMWebAssembly();
 
 // Custom library bits...
 builder.Services.AddSpeechRecognitionServices();
