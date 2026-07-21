@@ -561,13 +561,15 @@ public sealed class GenericEmitterTests
                 new ReferenceTypeNode("T", "Either.T", []),
                 new ReferenceTypeNode("U", "Either.U", []),
             ]));
-        var unionError = Assert.Throws<GenericDeferralException>(() =>
-            new AliasEmitter(
-                new TypeResolver([either]),
-                "1.0.0",
-                "Blazor.DOM").Emit(either));
-        Assert.Equal("typed-union", unionError.Phase);
-        Assert.Equal("Either/typeAlias", unionError.Provenance);
+        var unionSource = new AliasEmitter(
+            new TypeResolver([either]),
+            "1.0.0",
+            "Blazor.DOM").Emit(either);
+        Assert.Contains("public readonly struct Either<T, U>", unionSource);
+        Assert.Contains("FromT(T value)", unionSource);
+        Assert.Contains("FromU(U value)", unionSource);
+        Assert.DoesNotContain("implicit operator", unionSource);
+        Assert.DoesNotContain("AsObject", unionSource);
     }
 
     [Fact]
