@@ -150,6 +150,12 @@ jobs:
         dotnet build ./tests/Blazor.DOM.TypedEvents.CompilationTests/Blazor.DOM.TypedEvents.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
         dotnet build ./tests/Blazor.DOM.TypedEvents.CompilationTests/Blazor.DOM.TypedEvents.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
 
+    - name: Build remaining DOM profile compilation tests with warnings as errors
+      run: |
+        for project in NonEventDeferrals ResolvedFailures SupplementalBrowserApis; do
+          dotnet build "./tests/Blazor.DOM.${project}.CompilationTests/Blazor.DOM.${project}.CompilationTests.csproj" --configuration Release --warnaserror
+        done
+
     - name: Build end-to-end tests
       run: |
         dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release
