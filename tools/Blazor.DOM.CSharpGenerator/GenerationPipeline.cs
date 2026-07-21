@@ -24,7 +24,8 @@ public sealed class GenerationPipeline
         string outputDirectory,
         IReadOnlyDictionary<string, EmitterOverrideEntry>? overrides = null,
         bool verboseFailures = false,
-        bool emitHosts = false)
+        bool emitHosts = false,
+        HostPackageOptions? hostPackageOptions = null)
     {
         _ = verboseFailures;
         overrides ??= new Dictionary<string, EmitterOverrideEntry>(
@@ -97,7 +98,8 @@ public sealed class GenerationPipeline
                 overrides,
                 resolver,
                 routingPlan,
-                interfaceEmitter);
+                interfaceEmitter,
+                hostPackageOptions);
         }
 
         foreach (var synthesized in resolver.SynthesizedTypes)

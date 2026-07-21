@@ -7,6 +7,7 @@
 using Blazor.DOM.CSharpGenerator.Accounting;
 using Blazor.DOM.CSharpGenerator.IR;
 using Blazor.DOM.CSharpGenerator.Output;
+using Blazor.DOM.CSharpGenerator.Hosts;
 using System.Text.Json;
 
 namespace Blazor.DOM.CSharpGenerator.Profiles;
@@ -46,6 +47,19 @@ public static class ProfilePipeline
             .OrderBy(n => n, StringComparer.Ordinal)
             .ToList();
 
+        HostPackageOptions? hostOptions = null;
+        if (profile.EntryPoints is not null)
+        {
+            ValidatePackageClosure(profile, sourceIndex, closure, externalRefs);
+            hostOptions = new HostPackageOptions(new HostCapabilityMetadata(
+                profile.Name,
+                profile.Description,
+                profile.Features,
+                profile.SecureContext,
+                profile.RequiresUserActivation,
+                profile.EntryPoints));
+        }
+
         var filteredIr = new IrBundle(
             ir.Manifest,
             includedSymbols,
@@ -69,7 +83,12 @@ public static class ProfilePipeline
         {
             // ── Pass 1 ──────────────────────────────────────────────────────
             result = GenerationPipeline.Run(
-                filteredIr, stagingPass1, overrides, verboseFailures: false);
+                filteredIr,
+                stagingPass1,
+                overrides,
+                verboseFailures: false,
+                emitHosts: hostOptions is not null,
+                hostPackageOptions: hostOptions);
 
             coverage = BuildCoverage(
                 profile, closure, includedSymbols, externalRefs, result,
@@ -85,7 +104,12 @@ public static class ProfilePipeline
 
             // ── Pass 2 (byte-identity verification) ─────────────────────────
             var result2 = GenerationPipeline.Run(
-                filteredIr, stagingPass2, overrides, verboseFailures: false);
+                filteredIr,
+                stagingPass2,
+                overrides,
+                verboseFailures: false,
+                emitHosts: hostOptions is not null,
+                hostPackageOptions: hostOptions);
 
             var coverage2 = BuildCoverage(
                 profile, closure, includedSymbols, externalRefs, result2,
@@ -214,6 +238,55 @@ public static class ProfilePipeline
                 })
                 .ToList(),
         };
+    }
+
+    private static void ValidatePackageClosure(
+        ProfileDefinition profile,
+        IReadOnlyDictionary<string, SymbolModel> sourceIndex,
+        IReadOnlySet<string> closure,
+        IReadOnlyList<string> externalReferences)
+    {
+        var missingRoots = profile.RootSymbols
+            .Where(root => !sourceIndex.ContainsKey(root))
+            .ToList();
+        if (missingRoots.Count > 0)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' has missing root symbol(s): " +
+                string.Join(", ", missingRoots));
+        }
+
+        var ambiguousRoots = profile.RootSymbols
+            .Where(root => string.Equals(
+                sourceIndex[root].Semantic.Status,
+                "ambiguous",
+                StringComparison.Ordinal))
+            .ToList();
+        if (ambiguousRoots.Count > 0)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' has ambiguous root symbol(s): " +
+                string.Join(", ", ambiguousRoots));
+        }
+
+        var leakedReferences = externalReferences
+            .Where(reference => reference is not "Promise")
+            .ToList();
+        if (leakedReferences.Count > 0)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' closure leaks unresolved " +
+                $"reference(s): {string.Join(", ", leakedReferences)}");
+        }
+
+        foreach (var entryPoint in profile.EntryPoints!)
+        {
+            if (!closure.Contains(entryPoint.Symbol))
+            {
+                throw new InvalidDataException(
+                    $"Entry point '{entryPoint.Name}' is outside the resolved closure.");
+            }
+        }
     }
 
     private static string SerializeCoverage(ProfileCoverageReport report)

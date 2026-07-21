@@ -190,6 +190,39 @@ public sealed class ProfileSystemTests
     }
 
     [Fact]
+    public void Load_PackageProfileWithInvalidEntryPointPath_IsRejected()
+    {
+        var dir = CreateTempDir();
+        try
+        {
+            var json = """
+                {
+                    "name": "Invalid",
+                    "description": "Invalid entry point",
+                    "rootSymbols": ["Root"],
+                    "secureContext": false,
+                    "requiresUserActivation": false,
+                    "features": [],
+                    "outputNamespace": "Blazor.DOM",
+                    "outputSubdirectory": "Profiles/Invalid",
+                    "entryPoints": [
+                        {
+                            "name": "Root",
+                            "symbol": "Root",
+                            "javaScriptPath": "navigator[\"root\"]"
+                        }
+                    ]
+                }
+                """;
+            var path = Path.Combine(dir, "invalid.profile.json");
+            File.WriteAllText(path, json);
+
+            Assert.Throws<InvalidDataException>(() => ProfileLoader.Load(path));
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
     public void LoadAll_LoadsAllProfileJsonFiles()
     {
         var dir = CreateTempDir();
