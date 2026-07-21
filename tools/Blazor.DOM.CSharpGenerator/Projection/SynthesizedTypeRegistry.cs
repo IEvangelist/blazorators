@@ -88,6 +88,27 @@ internal sealed class SynthesizedTypeRegistry(
             name => EmitStringDomain(name, ordered));
     }
 
+    public string RegisterTypeScriptError()
+    {
+        const string identity = "Standard:TypeScript.Error";
+        if (_byIdentity.TryGetValue(identity, out var existing))
+            return QualifiedStandard(existing.Name);
+
+        const string name = "ITypeScriptError";
+        const string fingerprint =
+            "typescript/lib/lib.es5.d.ts:Error{name:string;message:string;stack?:string}";
+        _byIdentity.Add(
+            identity,
+            new SynthesizedTypeDefinition(
+                name,
+                "Standard",
+                "typescript/lib/lib.es5.d.ts/Error",
+                fingerprint,
+                Path.Combine("StandardTypes", $"{name}.g.cs"),
+                EmitTypeScriptError(name)));
+        return QualifiedStandard(name);
+    }
+
     public string RegisterUnion(
         string provenance,
         NormalizedUnion normalized,
@@ -175,6 +196,44 @@ internal sealed class SynthesizedTypeRegistry(
 
     private string Qualified(string name)
         => $"global::{generatedNamespace}.AdvancedTypes.{name}";
+
+    private string QualifiedStandard(string name)
+        => $"global::{generatedNamespace}.StandardTypes.{name}";
+
+    private string EmitTypeScriptError(string name)
+    {
+        var writer = Header();
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.StandardTypes;");
+        writer.AppendLine();
+        writer.Block($"public partial interface {name}", () =>
+        {
+            EmitStandardErrorProperty(writer, "name", "string", "Name", nullable: false);
+            writer.AppendLine();
+            EmitStandardErrorProperty(writer, "message", "string", "Message", nullable: false);
+            writer.AppendLine();
+            EmitStandardErrorProperty(writer, "stack", "string?", "Stack", nullable: true);
+        });
+        return writer.ToString();
+    }
+
+    private static void EmitStandardErrorProperty(
+        CSharpWriter writer,
+        string sourceName,
+        string type,
+        string memberName,
+        bool nullable)
+    {
+        writer.AppendLine(
+            "[global::Microsoft.JSInterop.DomAccessor(" +
+            $"\"{sourceName}\", " +
+            "global::Microsoft.JSInterop.DomAccessorOperation.Get, " +
+            "global::Microsoft.JSInterop.DomTransportKind.JsonValue, " +
+            $"\"{(nullable ? "string | undefined" : "string")}\", " +
+            $"Nullable = {nullable.ToString().ToLowerInvariant()}, " +
+            "Streamable = false, StructuredClone = true)]");
+        writer.AppendLine($"{type} {memberName} {{ get; }}");
+    }
 
     private string EmitRecord(
         string name,
