@@ -13,6 +13,8 @@ public sealed class OutputWriter
     private readonly string _outputDirectory;
     private readonly List<GeneratedFile> _written = [];
     private readonly HashSet<string> _paths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _sources =
+        new(StringComparer.Ordinal);
 
     public IReadOnlyList<GeneratedFile> WrittenFiles => _written;
 
@@ -47,8 +49,12 @@ public sealed class OutputWriter
         File.WriteAllBytes(fullPath, bytes);
 
         _written.Add(new GeneratedFile(relPath, csharpTypeName, sha256, bytes.Length));
+        _sources.Add(relPath, normalized);
         return relPath;
     }
+
+    public bool TryGetSource(string relativePath, out string source) =>
+        _sources.TryGetValue(relativePath, out source!);
 
     /// <summary>
     /// Writes the emitter manifest (accounting report) as JSON.

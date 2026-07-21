@@ -6,6 +6,19 @@ namespace Microsoft.JSInterop;
 /// <summary>In-process dispatch primitives used by generated WebAssembly interfaces.</summary>
 public static class WasmDomDispatch
 {
+    /// <summary>Constructs and wraps an owned DOM proxy synchronously.</summary>
+    public static TResult Construct<TResult>(
+        IDomDispatchProxy owner,
+        string constructorPath,
+        object?[]? arguments)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentException.ThrowIfNullOrWhiteSpace(constructorPath);
+        return (TResult)owner.DispatchFactory.Create(
+            typeof(TResult),
+            RequireSyncRuntime(owner).ConstructRef(constructorPath, arguments));
+    }
+
     /// <summary>Reads a property synchronously.</summary>
     public static TResult GetProperty<TResult>(
         IDomDispatchProxy proxy,

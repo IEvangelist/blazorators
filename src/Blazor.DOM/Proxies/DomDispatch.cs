@@ -17,6 +17,22 @@ public static class DomDispatch
             : DomTransportDescriptor.JsonValue(sourceType);
     }
 
+    /// <summary>Constructs and wraps an owned DOM proxy asynchronously.</summary>
+    public static async ValueTask<TResult> ConstructAsync<TResult>(
+        IDomDispatchProxy owner,
+        string constructorPath,
+        object?[]? arguments,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentException.ThrowIfNullOrWhiteSpace(constructorPath);
+        var reference = await owner.DispatchRuntime.ConstructAsync(
+            constructorPath,
+            arguments,
+            cancellationToken).ConfigureAwait(false);
+        return CreateProxy<TResult>(owner, reference);
+    }
+
     /// <summary>Reads a Server/async property using reviewed transport metadata.</summary>
     public static async ValueTask<TResult> GetPropertyAsync<TResult>(
         IDomDispatchProxy proxy,

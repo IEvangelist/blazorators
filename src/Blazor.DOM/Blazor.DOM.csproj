@@ -61,6 +61,7 @@
     <Compile Include="..\..\data\Blazor.DOM.Generated\EventMaps\**\*.cs" />
     <Compile Include="..\..\data\Blazor.DOM.Generated\Typedefs\**\*.cs" />
     <Compile Include="..\..\data\Blazor.DOM.Generated\Server\Interfaces\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Server\Factories\**\*.cs" />
     <Compile Include="..\..\data\Blazor.DOM.Generated\Server\GeneratedDomHost.g.cs" />
     <None Include="..\..\data\Blazor.DOM.Generated\Server\host-manifest.json"
           Pack="true"
