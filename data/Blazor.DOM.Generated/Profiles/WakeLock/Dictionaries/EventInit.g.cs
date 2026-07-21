@@ -11,12 +11,4 @@ namespace Blazor.DOM;
 
 public record EventInit
 {
-    [JsonPropertyName("bubbles")]
-    public bool? Bubbles { get; init; }
-
-    [JsonPropertyName("cancelable")]
-    public bool? Cancelable { get; init; }
-
-    [JsonPropertyName("composed")]
-    public bool? Composed { get; init; }
 }

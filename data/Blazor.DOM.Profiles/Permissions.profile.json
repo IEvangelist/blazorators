@@ -8,6 +8,19 @@
   "features": ["permissions"],
   "outputNamespace": "Blazor.DOM",
   "outputSubdirectory": "Profiles/Permissions",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Permissions": ["query"],
+    "PermissionStatus": [
+      "name",
+      "state",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"],
+    "PermissionStatusEventMap": ["*"]
+  },
   "entryPoints": [
     {
       "name": "Permissions",

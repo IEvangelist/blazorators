@@ -24,16 +24,6 @@ public partial interface IPermissionStatus : IEventTarget, global::Microsoft.JSI
     global::System.Threading.Tasks.ValueTask<string> GetNameAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<string>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "name", global::Microsoft.JSInterop.DomTransportDescriptor.JsonValue("string", nullable: false), cancellationToken);
 
     /// <summary>
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/PermissionStatus/change_event)
-/// </summary>
-    [global::Microsoft.JSInterop.DomAccessor("onchange", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: PermissionStatus, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: PermissionStatus, ev: Event) => any) | null' is unsupported: TypeScript '(this: PermissionStatus, ev: Event) => any' has an ambiguous function shape.")]
-    global::System.Threading.Tasks.ValueTask<Func<IEvent, object>?> GetOnchangeAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<Func<IEvent, object>?>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "onchange", global::Microsoft.JSInterop.DomTransportDescriptor.Unsupported("((this: PermissionStatus, ev: Event) => any) | null", "Union '((this: PermissionStatus, ev: Event) => any) | null' is unsupported: TypeScript '(this: PermissionStatus, ev: Event) => any' has an ambiguous function shape.", nullable: true), cancellationToken);
-
-
-    [global::Microsoft.JSInterop.DomAccessor("onchange", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: PermissionStatus, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: PermissionStatus, ev: Event) => any) | null' is unsupported: TypeScript '(this: PermissionStatus, ev: Event) => any' has an ambiguous function shape.")]
-    global::System.Threading.Tasks.ValueTask SetOnchangeAsync(Func<IEvent, object>? value, global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.SetPropertyAsync((global::Microsoft.JSInterop.IDomDispatchProxy)this, "onchange", value, cancellationToken);
-
-    /// <summary>
 /// The **`state`** read-only property of the This property returns one of `'granted'`, `'denied'`, or `'prompt'`.
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/PermissionStatus/state)

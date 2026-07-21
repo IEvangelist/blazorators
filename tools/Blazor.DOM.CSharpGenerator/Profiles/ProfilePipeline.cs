@@ -89,6 +89,8 @@ public static class ProfilePipeline
                 verboseFailures: false,
                 emitHosts: hostOptions is not null,
                 hostPackageOptions: hostOptions);
+            if (hostOptions is not null)
+                ValidateSupportedTransports(profile, stagingPass1);
 
             coverage = BuildCoverage(
                 profile, closure, includedSymbols, externalRefs, result,
@@ -110,6 +112,8 @@ public static class ProfilePipeline
                 verboseFailures: false,
                 emitHosts: hostOptions is not null,
                 hostPackageOptions: hostOptions);
+            if (hostOptions is not null)
+                ValidateSupportedTransports(profile, stagingPass2);
 
             var coverage2 = BuildCoverage(
                 profile, closure, includedSymbols, externalRefs, result2,
@@ -286,6 +290,35 @@ public static class ProfilePipeline
                 throw new InvalidDataException(
                     $"Entry point '{entryPoint.Name}' is outside the resolved closure.");
             }
+        }
+    }
+
+    private static void ValidateSupportedTransports(
+        ProfileDefinition profile,
+        string outputDirectory)
+    {
+        var unsupportedFiles = new[] { "Server", "WebAssembly" }
+            .SelectMany(hostDirectory =>
+            {
+                var path = Path.Combine(outputDirectory, hostDirectory);
+                return Directory.Exists(path)
+                    ? Directory.EnumerateFiles(
+                        path,
+                        "*.cs",
+                        SearchOption.AllDirectories)
+                    : Array.Empty<string>();
+            })
+            .Where(path => File.ReadAllText(path).Contains(
+                "DomTransportKind.Unsupported",
+                StringComparison.Ordinal))
+            .Select(path => Path.GetRelativePath(outputDirectory, path))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+        if (unsupportedFiles.Count > 0)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' emits unsupported transport in: " +
+                string.Join(", ", unsupportedFiles));
         }
     }
 

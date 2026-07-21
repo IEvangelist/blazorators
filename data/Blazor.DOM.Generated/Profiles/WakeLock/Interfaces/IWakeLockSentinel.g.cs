@@ -18,13 +18,6 @@ namespace Blazor.DOM;
 public partial interface IWakeLockSentinel : IEventTarget, global::Microsoft.JSInterop.IDomEventTargetProxy
 {
     /// <summary>
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/release_event)
-/// </summary>
-[global::Microsoft.JSInterop.DomAccessor("onrelease", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: WakeLockSentinel, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.")]
-[global::Microsoft.JSInterop.DomAccessor("onrelease", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: WakeLockSentinel, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.")]
-Func<IEvent, object>? Onrelease { get; set; }
-
-    /// <summary>
 /// The **`released`** read-only property of the WakeLockSentinel interface returns a boolean that indicates whether a WakeLockSentinel has been released.
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/released)

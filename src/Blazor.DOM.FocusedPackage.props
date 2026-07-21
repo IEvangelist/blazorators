@@ -1,0 +1,69 @@
+<Project>
+  <ItemGroup Label="Generated focused DOM contracts">
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\AdvancedTypes\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Callbacks\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Dictionaries\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Enums\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\EventMaps\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\Typedefs\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\Interfaces\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\Factories\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\GeneratedDomHost.g.cs" />
+    <None Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\$(DomProfileHost)\host-manifest.json"
+          Pack="true"
+          PackagePath="build\$(PackageId).host-manifest.json" />
+    <None Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\host-parity.json"
+          Pack="true"
+          PackagePath="build\$(PackageId).host-parity.json" />
+    <None Include="..\..\data\Blazor.DOM.Generated\Profiles\$(DomProfileName)\profile-coverage.json"
+          Pack="true"
+          PackagePath="build\$(PackageId).profile-coverage.json" />
+  </ItemGroup>
+
+  <ItemGroup Label="Shared DOM runtime sources">
+    <Compile Include="..\Blazor.DOM\Abstractions\**\*.cs"
+             LinkBase="SharedRuntime\Abstractions" />
+    <Compile Include="..\Blazor.DOM\Exceptions\**\*.cs"
+             LinkBase="SharedRuntime\Exceptions" />
+    <Compile Include="..\Blazor.DOM\Proxies\**\*.cs"
+             LinkBase="SharedRuntime\Proxies" />
+    <Compile Include="..\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
+             Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
+    <Content Include="..\Blazor.DOM\wwwroot\blazorators.dom.js"
+             Link="wwwroot\blazorators.dom.js"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DomProfileHost)' == 'Server'" Label="Server runtime sources">
+    <Compile Include="..\Blazor.DOM\Browser\ServerBrowser.cs"
+             Link="SharedRuntime\Browser\ServerBrowser.cs" />
+    <Compile Include="..\Blazor.DOM\Runtime\ServerDomRuntime.cs"
+             Link="SharedRuntime\Runtime\ServerDomRuntime.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DomProfileHost)' == 'WebAssembly'" Label="WebAssembly runtime sources">
+    <Compile Include="..\Blazor.DOM.WebAssembly\Abstractions\**\*.cs"
+             LinkBase="SharedRuntime\WebAssembly\Abstractions" />
+    <Compile Include="..\Blazor.DOM.WebAssembly\Browser\**\*.cs"
+             LinkBase="SharedRuntime\WebAssembly\Browser" />
+    <Compile Include="..\Blazor.DOM.WebAssembly\Proxies\**\*.cs"
+             LinkBase="SharedRuntime\WebAssembly\Proxies" />
+    <Compile Include="..\Blazor.DOM.WebAssembly\Runtime\**\*.cs"
+             LinkBase="SharedRuntime\WebAssembly\Runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.JSInterop" />
+    <Using Include="System.Collections.Concurrent" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DomProfileHost)' == 'Server'">
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DomProfileHost)' == 'WebAssembly'">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+</Project>

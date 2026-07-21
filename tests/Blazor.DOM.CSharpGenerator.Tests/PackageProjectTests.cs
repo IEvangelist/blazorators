@@ -69,6 +69,69 @@ public sealed class PackageProjectTests
                 StringComparison.Ordinal) == true);
     }
 
+    [Theory]
+    [InlineData("Blazor.WakeLock", "WakeLock", "Server")]
+    [InlineData("Blazor.WakeLock.WebAssembly", "WakeLock", "WebAssembly")]
+    [InlineData("Blazor.Permissions", "Permissions", "Server")]
+    [InlineData("Blazor.Permissions.WebAssembly", "Permissions", "WebAssembly")]
+    public void FocusedPackage_UsesGeneratedProfileAssets(
+        string projectName,
+        string profileName,
+        string host)
+    {
+        var root = FindRepositoryRoot();
+        var project = XDocument.Load(
+            Path.Combine(root, "src", projectName, $"{projectName}.csproj"));
+        var import = project.Descendants("Import")
+            .Single(element => element.Attribute("Project")?.Value.Contains(
+                "Blazor.DOM.FocusedPackage.props",
+                StringComparison.Ordinal) == true);
+
+        Assert.NotNull(import);
+        Assert.Equal(
+            profileName,
+            project.Descendants("DomProfileName").Single().Value);
+        Assert.Equal(
+            host,
+            project.Descendants("DomProfileHost").Single().Value);
+
+        var profile = Path.Combine(
+            root,
+            "data",
+            "Blazor.DOM.Generated",
+            "Profiles",
+            profileName);
+        Assert.True(File.Exists(Path.Combine(
+            profile,
+            host,
+            "host-manifest.json")));
+        Assert.True(File.Exists(Path.Combine(profile, "host-parity.json")));
+        Assert.True(File.Exists(Path.Combine(profile, "profile-coverage.json")));
+    }
+
+    [Fact]
+    public void ExistingPermissionsWebAssemblyPackage_PreservesLegacyAnalyzerSurface()
+    {
+        var root = FindRepositoryRoot();
+        var project = XDocument.Load(Path.Combine(
+            root,
+            "src",
+            "Blazor.Permissions.WebAssembly",
+            "Blazor.Permissions.WebAssembly.csproj"));
+
+        Assert.Contains(
+            project.Descendants("ProjectReference"),
+            reference => string.Equals(
+                reference.Attribute("OutputItemType")?.Value,
+                "Analyzer",
+                StringComparison.Ordinal));
+        Assert.True(File.Exists(Path.Combine(
+            root,
+            "src",
+            "Blazor.Permissions.WebAssembly",
+            "IPermissionsService.cs")));
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = AppContext.BaseDirectory;

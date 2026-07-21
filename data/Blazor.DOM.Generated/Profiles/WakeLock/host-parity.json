@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "serverOperationCount": 73,
-  "webAssemblyOperationCount": 73,
+  "serverOperationCount": 24,
+  "webAssemblyOperationCount": 24,
   "unexplainedDeltas": [],
   "exact": true
 }
