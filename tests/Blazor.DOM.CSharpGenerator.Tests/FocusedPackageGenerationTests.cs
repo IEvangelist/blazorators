@@ -90,6 +90,10 @@ public sealed class FocusedPackageGenerationTests
                 "RequiresSecureContext = true",
                 serverSource,
                 StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "DomBrowserArrayProxy",
+                serverSource,
+                StringComparison.Ordinal);
 
             var wasmSource = File.ReadAllText(Path.Combine(
                 generated,
