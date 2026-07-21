@@ -55,6 +55,11 @@ public sealed class GenerationPipeline
             GeneratorVersion,
             GeneratedNamespace,
             routingPlan);
+        var eventMapEmitter = new EventMapEmitter(
+            resolver,
+            GeneratorVersion,
+            GeneratedNamespace,
+            ir.TypescriptSymbols);
 
         var primaryEmissions = new Dictionary<string, PrimarySymbolEmission>(
             StringComparer.Ordinal);
@@ -70,6 +75,7 @@ public sealed class GenerationPipeline
                     aliasEmitter,
                     callbackEmitter,
                     interfaceEmitter,
+                    eventMapEmitter,
                     overrides));
         }
 
@@ -131,6 +137,7 @@ public sealed class GenerationPipeline
         AliasEmitter aliasEmitter,
         CallbackEmitter callbackEmitter,
         InterfaceEmitter interfaceEmitter,
+        EventMapEmitter eventMapEmitter,
         IReadOnlyDictionary<string, EmitterOverrideEntry> overrides)
     {
         if (symbol.Semantic.Status == "ambiguous"
@@ -161,12 +168,7 @@ public sealed class GenerationPipeline
         if (primaryDeclarations.Any(route =>
             route.Declaration.EventMap.IsEventMap))
         {
-            return new PrimarySymbolEmission(
-                SymbolEmissionDisposition.Deferred,
-                Phase: "event-subscription",
-                Reason:
-                    "Event map interface is deferred to the typed event " +
-                    "subscription emission phase.");
+            return EmitEventMap(symbol, writer, eventMapEmitter);
         }
 
         if (symbol.Semantic.ExposedOnWorker
@@ -206,6 +208,35 @@ public sealed class GenerationPipeline
                     $"'{symbol.Name}'.",
                 ExceptionType: "DeclarationRoutingException"),
         };
+    }
+
+    private static PrimarySymbolEmission EmitEventMap(
+        SymbolModel symbol,
+        OutputWriter writer,
+        EventMapEmitter emitter)
+    {
+        try
+        {
+            var result = emitter.Emit(symbol);
+            var path = writer.Write(
+                Naming.ToCSharpSimpleTypeName(symbol.Name),
+                result.Source,
+                Naming.ToOutputSubdirectory("EventMaps", symbol.Name));
+            return new PrimarySymbolEmission(
+                SymbolEmissionDisposition.Projected,
+                path,
+                MemberOutcomes: result.MemberOutcomes,
+                DeclarationOutcomes: result.DeclarationOutcomes,
+                OverloadOutcomes: result.OverloadOutcomes);
+        }
+        catch (Exception exception)
+        {
+            return CompletePrimaryFailure(
+                symbol,
+                exception,
+                new HashSet<string>(["interface"], StringComparer.Ordinal),
+                $"{symbol.Name}/event-map-emitter");
+        }
     }
 
     private static PrimarySymbolEmission EmitEnum(
