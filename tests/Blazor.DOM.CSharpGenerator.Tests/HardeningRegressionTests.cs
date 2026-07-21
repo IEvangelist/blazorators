@@ -947,8 +947,8 @@ public sealed class HardeningRegressionTests
         Assert.Contains("void AddEventListener(string type, object listener, bool capture);", result.Source);
         // 3. options required (no default = no '= null')
         Assert.Contains("EventListenerOptions? options", result.Source);
-        Assert.DoesNotContain("= null", result.Source); // no default args — all required
-        Assert.DoesNotContain("= false", result.Source); // no default args — all required
+        Assert.DoesNotContain("EventListenerOptions? options =", result.Source);
+        Assert.DoesNotContain("bool capture =", result.Source);
     }
 
     // ── D2: Mutable properties — Readonly=false PropertySignature → { get; set; } ──

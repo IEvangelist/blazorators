@@ -78,6 +78,16 @@ public partial interface IWindow
 
     global::Blazor.DOM.IBlobEventFactory BlobEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBlobEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BlobEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BlobEvent"));
 
+    global::Blazor.DOM.IBluetoothAdvertisingEventFactory BluetoothAdvertisingEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBluetoothAdvertisingEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothAdvertisingEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothAdvertisingEvent"));
+
+    global::Blazor.DOM.IBluetoothDataFilterFactory BluetoothDataFilterConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBluetoothDataFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothDataFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothDataFilter"));
+
+    global::Blazor.DOM.IBluetoothLEScanFilterFactory BluetoothLEScanFilterConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBluetoothLEScanFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothLEScanFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothLEScanFilter"));
+
+    global::Blazor.DOM.IBluetoothManufacturerDataFilterFactory BluetoothManufacturerDataFilterConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBluetoothManufacturerDataFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothManufacturerDataFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothManufacturerDataFilter"));
+
+    global::Blazor.DOM.IBluetoothServiceDataFilterFactory BluetoothServiceDataFilterConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBluetoothServiceDataFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothServiceDataFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothServiceDataFilter"));
+
     global::Blazor.DOM.IBroadcastChannelFactory BroadcastChannelConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IBroadcastChannelFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BroadcastChannel", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BroadcastChannel"));
 
     global::Blazor.DOM.IByteLengthQueuingStrategyFactory ByteLengthQueuingStrategyConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IByteLengthQueuingStrategyFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ByteLengthQueuingStrategy", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ByteLengthQueuingStrategy"));
@@ -368,6 +378,16 @@ public partial interface IWindow
 
     global::Blazor.DOM.IFragmentDirectiveFactory FragmentDirectiveConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IFragmentDirectiveFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "FragmentDirective", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("FragmentDirective"));
 
+    global::Blazor.DOM.IGPUInternalErrorFactory GPUInternalErrorConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGPUInternalErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUInternalError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUInternalError"));
+
+    global::Blazor.DOM.IGPUOutOfMemoryErrorFactory GPUOutOfMemoryErrorConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGPUOutOfMemoryErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUOutOfMemoryError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUOutOfMemoryError"));
+
+    global::Blazor.DOM.IGPUPipelineErrorFactory GPUPipelineErrorConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGPUPipelineErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUPipelineError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUPipelineError"));
+
+    global::Blazor.DOM.IGPUUncapturedErrorEventFactory GPUUncapturedErrorEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGPUUncapturedErrorEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUUncapturedErrorEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUUncapturedErrorEvent"));
+
+    global::Blazor.DOM.IGPUValidationErrorFactory GPUValidationErrorConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGPUValidationErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUValidationError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUValidationError"));
+
     global::Blazor.DOM.IGainNodeFactory GainNodeConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGainNodeFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GainNode", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GainNode"));
 
     global::Blazor.DOM.IGamepadButtonFactory GamepadButtonConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGamepadButtonFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GamepadButton", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GamepadButton"));
@@ -385,6 +405,10 @@ public partial interface IWindow
     global::Blazor.DOM.IGeolocationPositionFactory GeolocationPositionConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGeolocationPositionFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GeolocationPosition", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GeolocationPosition"));
 
     global::Blazor.DOM.IGeolocationPositionErrorFactory GeolocationPositionErrorConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IGeolocationPositionErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GeolocationPositionError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GeolocationPositionError"));
+
+    global::Blazor.DOM.IHIDConnectionEventFactory HIDConnectionEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IHIDConnectionEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "HIDConnectionEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HIDConnectionEvent"));
+
+    global::Blazor.DOM.IHIDInputReportEventFactory HIDInputReportEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IHIDInputReportEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "HIDInputReportEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HIDInputReportEvent"));
 
     global::Blazor.DOM.IHTMLAllCollectionFactory HTMLAllCollectionConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IHTMLAllCollectionFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "HTMLAllCollection", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HTMLAllCollection"));
 
@@ -790,6 +814,12 @@ public partial interface IWindow
 
     global::Blazor.DOM.IPopStateEventFactory PopStateEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IPopStateEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PopStateEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PopStateEvent"));
 
+    global::Blazor.DOM.IPresentationConnectionAvailableEventFactory PresentationConnectionAvailableEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IPresentationConnectionAvailableEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PresentationConnectionAvailableEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PresentationConnectionAvailableEvent"));
+
+    global::Blazor.DOM.IPresentationConnectionCloseEventFactory PresentationConnectionCloseEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IPresentationConnectionCloseEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PresentationConnectionCloseEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PresentationConnectionCloseEvent"));
+
+    global::Blazor.DOM.IPresentationRequestFactory PresentationRequestConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IPresentationRequestFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PresentationRequest", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PresentationRequest"));
+
     global::Blazor.DOM.IProcessingInstructionFactory ProcessingInstructionConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IProcessingInstructionFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ProcessingInstruction", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ProcessingInstruction"));
 
     global::Blazor.DOM.IProgressEventFactory ProgressEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IProgressEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ProgressEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ProgressEvent"));
@@ -1182,6 +1212,28 @@ public partial interface IWindow
 
     global::Blazor.DOM.IURLSearchParamsFactory URLSearchParamsConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IURLSearchParamsFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "URLSearchParams", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("URLSearchParams"));
 
+    global::Blazor.DOM.IUSBAlternateInterfaceFactory USBAlternateInterfaceConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBAlternateInterfaceFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBAlternateInterface", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBAlternateInterface"));
+
+    global::Blazor.DOM.IUSBConfigurationFactory USBConfigurationConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBConfigurationFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBConfiguration", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBConfiguration"));
+
+    global::Blazor.DOM.IUSBConnectionEventFactory USBConnectionEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBConnectionEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBConnectionEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBConnectionEvent"));
+
+    global::Blazor.DOM.IUSBEndpointFactory USBEndpointConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBEndpointFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBEndpoint", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBEndpoint"));
+
+    global::Blazor.DOM.IUSBInTransferResultFactory USBInTransferResultConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBInTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBInTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBInTransferResult"));
+
+    global::Blazor.DOM.IUSBInterfaceFactory USBInterfaceConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBInterfaceFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBInterface", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBInterface"));
+
+    global::Blazor.DOM.IUSBIsochronousInTransferPacketFactory USBIsochronousInTransferPacketConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBIsochronousInTransferPacketFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousInTransferPacket", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousInTransferPacket"));
+
+    global::Blazor.DOM.IUSBIsochronousInTransferResultFactory USBIsochronousInTransferResultConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBIsochronousInTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousInTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousInTransferResult"));
+
+    global::Blazor.DOM.IUSBIsochronousOutTransferPacketFactory USBIsochronousOutTransferPacketConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBIsochronousOutTransferPacketFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousOutTransferPacket", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousOutTransferPacket"));
+
+    global::Blazor.DOM.IUSBIsochronousOutTransferResultFactory USBIsochronousOutTransferResultConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBIsochronousOutTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousOutTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousOutTransferResult"));
+
+    global::Blazor.DOM.IUSBOutTransferResultFactory USBOutTransferResultConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUSBOutTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBOutTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBOutTransferResult"));
+
     global::Blazor.DOM.IUserActivationFactory UserActivationConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IUserActivationFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "UserActivation", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("UserActivation"));
 
     global::Blazor.DOM.IVTTCueFactory VTTCueConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IVTTCueFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "VTTCue", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("VTTCue"));
@@ -1189,6 +1241,8 @@ public partial interface IWindow
     global::Blazor.DOM.IVTTRegionFactory VTTRegionConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IVTTRegionFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "VTTRegion", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("VTTRegion"));
 
     global::Blazor.DOM.IValidityStateFactory ValidityStateConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IValidityStateFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ValidityState", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ValidityState"));
+
+    global::Blazor.DOM.IValueEventFactory ValueEventConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IValueEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ValueEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ValueEvent"));
 
     global::Blazor.DOM.IVideoColorSpaceFactory VideoColorSpaceConstructor => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<global::Blazor.DOM.IVideoColorSpaceFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "VideoColorSpace", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("VideoColorSpace"));
 

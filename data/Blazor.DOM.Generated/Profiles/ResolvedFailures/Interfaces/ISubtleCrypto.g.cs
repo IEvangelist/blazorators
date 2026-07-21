@@ -21,12 +21,15 @@ public partial interface ISubtleCrypto : global::Microsoft.JSInterop.IDomProxy
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:exportKey`0<>(StringLiteral:\"jwk\":optional=False:rest=False,CryptoKey<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_5694ca1bfd,ICryptoKey]->ValueTask<JsonWebKey>@transport:json-value:False:False:True:Promise<JsonWebKey>", "exportKey", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<JsonWebKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<JsonWebKey> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_5694ca1bfd format, ICryptoKey key);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:exportKey`0<>(Exclude<KeyFormat<>,StringLiteral:\"jwk\">:optional=False:rest=False,CryptoKey<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_2ae44cd65a,ICryptoKey]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "exportKey", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<byte[]> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_2ae44cd65a format, ICryptoKey key);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:exportKey`0<>(KeyFormat<>:optional=False:rest=False,CryptoKey<>:optional=False:rest=False)[clr:KeyFormat,ICryptoKey]->ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef>@transport:unsupported:False:False:False:Promise<ArrayBuffer | JsonWebKey>", "exportKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<ArrayBuffer | JsonWebKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'ArrayBuffer | JsonWebKey' has incompatible transports: binary, json-value.")]
+[global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef> ExportKeyAsync(KeyFormat format, ICryptoKey key);
 }

@@ -13,7 +13,7 @@ public partial interface IWebGLRenderingContextBase : global::Microsoft.JSIntero
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/canvas)
 /// </summary>
 [global::Microsoft.JSInterop.DomAccessor("canvas", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "OffscreenCanvas | HTMLCanvasElement", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'OffscreenCanvas | HTMLCanvasElement' has incompatible transports: js-reference, transferable.")]
-global::Blazor.DOM.AdvancedTypes.ImageBitmapRenderingContextUnionShape_b90c3a7581 Canvas { get; }
+global::Blazor.DOM.AdvancedTypes.GPUCanvasContextUnionShape_b90c3a7581 Canvas { get; }
 
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/drawingBufferColorSpace)

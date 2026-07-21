@@ -14,9 +14,11 @@ public partial interface IPresentationRequest : IEventTarget, global::Microsoft.
 [global::Microsoft.JSInterop.DomAccessor("onconnectionavailable", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: PresentationRequest, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: PresentationRequest, ev: Event) => any) | null' is unsupported: TypeScript '(this: PresentationRequest, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Onconnectionavailable { get; set; }
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("start")]
+    [global::Microsoft.JSInterop.DomOperation("js:start`0<>()[clr:]->ValueTask<IPresentationConnection>@transport:js-reference:False:False:False:Promise<PresentationConnection>", "start", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<PresentationConnection>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("start")]
 ValueTask<IPresentationConnection> StartAsync();
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("reconnect")]
+    [global::Microsoft.JSInterop.DomOperation("js:reconnect`0<>(StringKeyword:optional=False:rest=False)[clr:string]->ValueTask<IPresentationConnection>@transport:js-reference:False:False:False:Promise<PresentationConnection>", "reconnect", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<PresentationConnection>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("reconnect")]
 ValueTask<IPresentationConnection> ReconnectAsync(string presentationId);
 }

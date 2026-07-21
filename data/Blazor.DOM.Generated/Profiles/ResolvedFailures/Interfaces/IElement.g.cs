@@ -19,7 +19,9 @@ public partial interface IElement : INode, IARIAMixin, IAnimatable, IChildNode, 
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/getElementsByTagNameNS)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getElementsByTagNameNS`0<>(StringLiteral:\"http://www.w3.org/1999/xhtml\":optional=False:rest=False,StringKeyword:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.ElementStringShape_ff809a7942,string]->IHTMLCollectionOf<IHTMLElement>@transport:unsupported:False:False:False:HTMLCollectionOf<HTMLElement>", "getElementsByTagNameNS", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "HTMLCollectionOf<HTMLElement>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'HTMLCollectionOf' has no reviewed DOM transport classification.")]
 IHTMLCollectionOf<IHTMLElement> GetElementsByTagNameNS(global::Blazor.DOM.AdvancedTypes.ElementStringShape_ff809a7942 namespaceURI, string localName);
 
-    IHTMLCollectionOf<ISVGElement> GetElementsByTagNameNS(global::Blazor.DOM.AdvancedTypes.ElementStringShape_a36e95c5d7 namespaceURI, string localName);
+    [global::Microsoft.JSInterop.DomOperation("js:getElementsByTagNameNS`0<>(StringLiteral:\"http://www.w3.org/2000/svg\":optional=False:rest=False,StringKeyword:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.ElementStringShape_a36e95c5d7,string]->IHTMLCollectionOf<ISVGElement>@transport:unsupported:False:False:False:HTMLCollectionOf<SVGElement>", "getElementsByTagNameNS", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "HTMLCollectionOf<SVGElement>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'HTMLCollectionOf' has no reviewed DOM transport classification.")]
+IHTMLCollectionOf<ISVGElement> GetElementsByTagNameNS(global::Blazor.DOM.AdvancedTypes.ElementStringShape_a36e95c5d7 namespaceURI, string localName);
 }

@@ -27,14 +27,19 @@ ICSSNumericValue GetIndexedValueByNumber(double index);
 [global::Microsoft.JSInterop.DomIndexAccessor(global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomIndexKeyKind.Number, "number", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Streamable = false, StructuredClone = false)]
 void SetIndexedValueByNumber(double index, ICSSNumericValue value);
 
-    void ForEach(Action<ICSSNumericValue, double, ICSSNumericArray> callbackfn, object? thisArg = default);
+    [global::Microsoft.JSInterop.DomOperation("js:forEach`0<>(function:(value: CSSNumericValue, key: number, parent: CSSNumericArray) => void:optional=False:rest=False,AnyKeyword:optional=True:rest=False)[clr:Action<ICSSNumericValue, double, ICSSNumericArray>,object]->void@transport:json-value:False:False:True:void", "forEach", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void ForEach(Action<ICSSNumericValue, double, ICSSNumericArray> callbackfn, object? thisArg = default);
 
-    [global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.Iterator)]
+    [global::Microsoft.JSInterop.DomOperation("js:Symbol.iterator`0<>()[clr:]->global::Microsoft.JSInterop.IBrowserIterableIterator<ICSSNumericValue>@transport:js-reference:False:False:False:ArrayIterator<CSSNumericValue>", "Symbol.iterator", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ArrayIterator<CSSNumericValue>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.Iterator)]
 global::Microsoft.JSInterop.IBrowserIterableIterator<ICSSNumericValue> SymbolIterator();
 
-    global::Microsoft.JSInterop.IBrowserIterableIterator<global::Blazor.DOM.AdvancedTypes.CSSNumericArrayReferenceTupleShape_1e54033eb6> Entries();
+    [global::Microsoft.JSInterop.DomOperation("js:entries`0<>()[clr:]->global::Microsoft.JSInterop.IBrowserIterableIterator<global::Blazor.DOM.AdvancedTypes.CSSNumericArrayReferenceTupleShape_1e54033eb6>@transport:js-reference:False:False:False:ArrayIterator<[number, CSSNumericValue]>", "entries", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ArrayIterator<[number, CSSNumericValue]>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
+global::Microsoft.JSInterop.IBrowserIterableIterator<global::Blazor.DOM.AdvancedTypes.CSSNumericArrayReferenceTupleShape_1e54033eb6> Entries();
 
-    global::Microsoft.JSInterop.IBrowserIterableIterator<double> Keys();
+    [global::Microsoft.JSInterop.DomOperation("js:keys`0<>()[clr:]->global::Microsoft.JSInterop.IBrowserIterableIterator<double>@transport:js-reference:False:False:False:ArrayIterator<number>", "keys", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ArrayIterator<number>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
+global::Microsoft.JSInterop.IBrowserIterableIterator<double> Keys();
 
-    global::Microsoft.JSInterop.IBrowserIterableIterator<ICSSNumericValue> Values();
+    [global::Microsoft.JSInterop.DomOperation("js:values`0<>()[clr:]->global::Microsoft.JSInterop.IBrowserIterableIterator<ICSSNumericValue>@transport:js-reference:False:False:False:ArrayIterator<CSSNumericValue>", "values", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ArrayIterator<CSSNumericValue>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
+global::Microsoft.JSInterop.IBrowserIterableIterator<ICSSNumericValue> Values();
 }

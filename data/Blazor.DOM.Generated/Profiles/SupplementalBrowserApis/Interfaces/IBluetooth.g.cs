@@ -14,9 +14,11 @@ public partial interface IBluetooth : IEventTarget, IBluetoothDeviceEventHandler
 [global::Microsoft.JSInterop.DomAccessor("onavailabilitychanged", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: Bluetooth, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: Bluetooth, ev: Event) => any) | null' is unsupported: TypeScript '(this: Bluetooth, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Onavailabilitychanged { get; set; }
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("requestDevice")]
+    [global::Microsoft.JSInterop.DomOperation("js:requestDevice`0<>(RequestDeviceOptions<>:optional=True:rest=False)[clr:RequestDeviceOptions]->ValueTask<IBluetoothDevice>@transport:js-reference:False:False:False:Promise<BluetoothDevice>", "requestDevice", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<BluetoothDevice>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("requestDevice")]
 ValueTask<IBluetoothDevice> RequestDeviceAsync(RequestDeviceOptions? options = default);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("requestLEScan")]
+    [global::Microsoft.JSInterop.DomOperation("js:requestLEScan`0<>(BluetoothLEScanOptions<>:optional=True:rest=False)[clr:BluetoothLEScanOptions]->ValueTask<IBluetoothLEScan>@transport:js-reference:False:False:False:Promise<BluetoothLEScan>", "requestLEScan", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<BluetoothLEScan>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("requestLEScan")]
 ValueTask<IBluetoothLEScan> RequestLEScanAsync(BluetoothLEScanOptions? options = default);
 }

@@ -15,6 +15,7 @@ public partial interface IGPUQueue : IGPUObjectBase, global::Microsoft.JSInterop
 /// Submitted command buffers cannot be used again.
 /// `commandBuffers`:
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:submit`0<>(Iterable<GPUCommandBuffer<>>:optional=False:rest=False)[clr:global::Microsoft.JSInterop.IBrowserIterable<IGPUCommandBuffer>]->global::Microsoft.JSInterop.BrowserUndefined@transport:none", "submit", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "global::Microsoft.JSInterop.BrowserUndefined", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Source IR does not provide reviewed transport metadata.")]
 global::Microsoft.JSInterop.BrowserUndefined Submit(global::Microsoft.JSInterop.IBrowserIterable<IGPUCommandBuffer> commandBuffers);
 
     /// <summary>
@@ -24,11 +25,13 @@ global::Microsoft.JSInterop.BrowserUndefined Submit(global::Microsoft.JSInterop.
 /// {@link GPUBuffer#mapAsync} calls made prior to that call,
 /// on {@link GPUBuffer}s last used exclusively on that queue.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:onSubmittedWorkDone`0<>()[clr:]->ValueTask<global::Microsoft.JSInterop.BrowserUndefined>@transport:json-value:True:False:True:Promise<undefined>", "onSubmittedWorkDone", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<undefined>", Nullable = true, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("onSubmittedWorkDone")]
 ValueTask<global::Microsoft.JSInterop.BrowserUndefined> OnSubmittedWorkDoneAsync();
 
     /// <summary>
 /// Issues a write operation of the provided data into a {@link GPUBuffer}.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:writeBuffer`0<>(GPUBuffer<>:optional=False:rest=False,GPUSize64<>:optional=False:rest=False,GPUAllowSharedBufferSource<>:optional=False:rest=False,GPUSize64<>:optional=True:rest=False,GPUSize64<>:optional=True:rest=False)[clr:IGPUBuffer,double,GPUAllowSharedBufferSource,double,double]->global::Microsoft.JSInterop.BrowserUndefined@transport:none", "writeBuffer", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "global::Microsoft.JSInterop.BrowserUndefined", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Source IR does not provide reviewed transport metadata.")]
 global::Microsoft.JSInterop.BrowserUndefined WriteBuffer(IGPUBuffer buffer, double bufferOffset, GPUAllowSharedBufferSource data, double dataOffset = default, double size = default);
 }

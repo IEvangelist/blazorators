@@ -28,6 +28,7 @@ ISubtleCrypto Subtle { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/getRandomValues)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getRandomValues`1<!!0:global::Blazor.DOM.AdvancedTypes.CryptoConstraintShape_0aa9b2870a>(T<>:optional=False:rest=False)[clr:!!0]->!!0@transport:unsupported:False:False:False:T", "getRandomValues", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "T", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'T' has no reviewed DOM transport classification.")]
 T GetRandomValues<T>(T array) where T : global::Blazor.DOM.AdvancedTypes.CryptoConstraintShape_0aa9b2870a;
 
     /// <summary>
@@ -36,5 +37,6 @@ T GetRandomValues<T>(T array) where T : global::Blazor.DOM.AdvancedTypes.CryptoC
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/randomUUID)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:randomUUID`0<>()[clr:]->global::Blazor.DOM.AdvancedTypes.CryptoStringPatternShape_530b41d974@transport:json-value:False:False:True:`${string}-${string}-${string}-${string}-${string}`", "randomUUID", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "`${string}-${string}-${string}-${string}-${string}`", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 global::Blazor.DOM.AdvancedTypes.CryptoStringPatternShape_530b41d974 RandomUUID();
 }

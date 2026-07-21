@@ -77,7 +77,11 @@ public static class EffectiveClassificationPolicy
     private static string? ClassifyUnmatchedDeclaration(SymbolModel symbol)
     {
         if (symbol.Declarations.Any(d => d.Kind == "interface"))
-            return "interface";
+        {
+            return IsJsonValueInterfaceExtension(symbol)
+                ? "dictionary"
+                : "interface";
+        }
         if (symbol.Declarations.Any(d => d.Kind == "typeAlias"))
             return "typedef";
         if (symbol.Declarations.Any(d => d.Kind == "globalFunction"))
@@ -88,5 +92,31 @@ public static class EffectiveClassificationPolicy
             return "namespace";
 
         return null;
+    }
+
+    private static bool IsJsonValueInterfaceExtension(SymbolModel symbol)
+    {
+        var declarations = symbol.Declarations
+            .Where(declaration => declaration.Kind == "interface")
+            .ToList();
+        if (declarations.Count == 0
+            || declarations.Count != symbol.Declarations.Count
+            || declarations.SelectMany(declaration => declaration.Heritage)
+                .Any(heritage => heritage.Token != "extends"))
+        {
+            return false;
+        }
+
+        var heritageTypes = declarations
+            .SelectMany(declaration => declaration.Heritage)
+            .SelectMany(heritage => heritage.Types)
+            .ToList();
+        return heritageTypes.Count > 0
+            && heritageTypes.All(type => type.Transport?.Kind == "json-value")
+            && declarations.SelectMany(declaration => declaration.Members)
+                .All(member =>
+                    (member.Kind is "property" or "getter")
+                    && !member.Static
+                    && member.Type?.Transport?.Kind == "json-value");
     }
 }

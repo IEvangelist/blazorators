@@ -19,6 +19,7 @@ public partial interface ICSSNumericValue : ICSSStyleValue, global::Microsoft.JS
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/add)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:add`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->ICSSNumericValue@transport:js-reference:False:False:False:CSSNumericValue", "add", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSNumericValue Add(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] values);
 
     /// <summary>
@@ -26,6 +27,7 @@ ICSSNumericValue Add(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/div)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:div`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->ICSSNumericValue@transport:js-reference:False:False:False:CSSNumericValue", "div", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSNumericValue Div(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] values);
 
     /// <summary>
@@ -33,6 +35,7 @@ ICSSNumericValue Div(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/equals)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:equals`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->bool@transport:json-value:False:False:True:boolean", "equals", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 bool Equals(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] @value);
 
     /// <summary>
@@ -40,6 +43,7 @@ bool Equals(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] @va
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/max)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:max`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->ICSSNumericValue@transport:js-reference:False:False:False:CSSNumericValue", "max", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSNumericValue Max(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] values);
 
     /// <summary>
@@ -47,6 +51,7 @@ ICSSNumericValue Max(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/min)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:min`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->ICSSNumericValue@transport:js-reference:False:False:False:CSSNumericValue", "min", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSNumericValue Min(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] values);
 
     /// <summary>
@@ -54,6 +59,7 @@ ICSSNumericValue Min(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/mul)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:mul`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->ICSSNumericValue@transport:js-reference:False:False:False:CSSNumericValue", "mul", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSNumericValue Mul(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] values);
 
     /// <summary>
@@ -61,6 +67,7 @@ ICSSNumericValue Mul(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/sub)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:sub`0<>(CSSNumberish<>[]:optional=False:rest=True)[clr:global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>]->ICSSNumericValue@transport:js-reference:False:False:False:CSSNumericValue", "sub", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSNumericValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSNumericValue Sub(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberish>[] values);
 
     /// <summary>
@@ -68,6 +75,7 @@ ICSSNumericValue Sub(params global::Microsoft.JSInterop.IBrowserArray<CSSNumberi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/to)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:to`0<>(StringKeyword:optional=False:rest=False)[clr:string]->ICSSUnitValue@transport:js-reference:False:False:False:CSSUnitValue", "to", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSUnitValue", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSUnitValue To(string unit);
 
     /// <summary>
@@ -75,6 +83,7 @@ ICSSUnitValue To(string unit);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/toSum)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:toSum`0<>(StringKeyword[]:optional=False:rest=True)[clr:string[]]->ICSSMathSum@transport:js-reference:False:False:False:CSSMathSum", "toSum", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CSSMathSum", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 ICSSMathSum ToSum(params string[] units);
 
     /// <summary>
@@ -82,5 +91,6 @@ ICSSMathSum ToSum(params string[] units);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/type)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:type`0<>()[clr:]->CSSNumericType@transport:json-value:False:False:True:CSSNumericType", "type", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "CSSNumericType", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 CSSNumericType Type();
 }

@@ -21,6 +21,7 @@ public partial interface ISubtleCrypto : global::Microsoft.JSInterop.IDomProxy
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:decrypt`0<>(union(AlgorithmIdentifier<>|RsaOaepParams<>|AesCtrParams<>|AesCbcParams<>|AesGcmParams<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548,ICryptoKey,BufferSource]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "decrypt", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("decrypt")]
 ValueTask<byte[]> DecryptAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548 algorithm, ICryptoKey key, BufferSource data);
 
@@ -29,6 +30,7 @@ ValueTask<byte[]> DecryptAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnio
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:deriveBits`0<>(union(AlgorithmIdentifier<>|EcdhKeyDeriveParams<>|HkdfParams<>|Pbkdf2Params<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,union(NumberKeyword|NullKeyword:null):optional=True:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_d61c9f0250,ICryptoKey,double?]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "deriveBits", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("deriveBits")]
 ValueTask<byte[]> DeriveBitsAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_d61c9f0250 algorithm, ICryptoKey baseKey, double? length = default);
 
@@ -37,6 +39,7 @@ ValueTask<byte[]> DeriveBitsAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoU
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:deriveKey`0<>(union(AlgorithmIdentifier<>|EcdhKeyDeriveParams<>|HkdfParams<>|Pbkdf2Params<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|AesDerivedKeyParams<>|HmacImportParams<>|HkdfParams<>|Pbkdf2Params<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,KeyUsage<>[]:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_d61c9f0250,ICryptoKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_7d455a3ac9,bool,KeyUsage[]]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "deriveKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("deriveKey")]
 ValueTask<ICryptoKey> DeriveKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_d61c9f0250 algorithm, ICryptoKey baseKey, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_7d455a3ac9 derivedKeyType, bool extractable, KeyUsage[] keyUsages);
 
@@ -45,6 +48,7 @@ ValueTask<ICryptoKey> DeriveKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryp
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:digest`0<>(AlgorithmIdentifier<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False)[clr:AlgorithmIdentifier,BufferSource]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "digest", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("digest")]
 ValueTask<byte[]> DigestAsync(AlgorithmIdentifier algorithm, BufferSource data);
 
@@ -53,6 +57,7 @@ ValueTask<byte[]> DigestAsync(AlgorithmIdentifier algorithm, BufferSource data);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:encrypt`0<>(union(AlgorithmIdentifier<>|RsaOaepParams<>|AesCtrParams<>|AesCbcParams<>|AesGcmParams<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548,ICryptoKey,BufferSource]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "encrypt", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("encrypt")]
 ValueTask<byte[]> EncryptAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548 algorithm, ICryptoKey key, BufferSource data);
 
@@ -61,13 +66,16 @@ ValueTask<byte[]> EncryptAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnio
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:exportKey`0<>(StringLiteral:\"jwk\":optional=False:rest=False,CryptoKey<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_5694ca1bfd,ICryptoKey]->ValueTask<JsonWebKey>@transport:json-value:False:False:True:Promise<JsonWebKey>", "exportKey", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<JsonWebKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<JsonWebKey> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_5694ca1bfd format, ICryptoKey key);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:exportKey`0<>(Exclude<KeyFormat<>,StringLiteral:\"jwk\">:optional=False:rest=False,CryptoKey<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_2ae44cd65a,ICryptoKey]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "exportKey", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<byte[]> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_2ae44cd65a format, ICryptoKey key);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:exportKey`0<>(KeyFormat<>:optional=False:rest=False,CryptoKey<>:optional=False:rest=False)[clr:KeyFormat,ICryptoKey]->ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef>@transport:unsupported:False:False:False:Promise<ArrayBuffer | JsonWebKey>", "exportKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<ArrayBuffer | JsonWebKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'ArrayBuffer | JsonWebKey' has incompatible transports: binary, json-value.")]
+[global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef> ExportKeyAsync(KeyFormat format, ICryptoKey key);
 
     /// <summary>
@@ -75,16 +83,20 @@ ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef> Ex
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:generateKey`0<>(union(StringLiteral:\"Ed25519\"|typeLiteral:{ name: \"Ed25519\"; }):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,ReadonlyArray<union(StringLiteral:\"sign\"|StringLiteral:\"verify\")>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_177e3e8f21,bool,global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_6cc4ae812b[]]->ValueTask<CryptoKeyPair>@transport:unsupported:False:False:False:Promise<CryptoKeyPair>", "generateKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<CryptoKeyPair>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Web IDL dictionary 'CryptoKeyPair' is not a reviewed JSON-only shape: 'privateKey' uses js-reference; 'publicKey' uses js-reference.")]
 [global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
 ValueTask<CryptoKeyPair> GenerateKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_177e3e8f21 algorithm, bool extractable, global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_6cc4ae812b[] keyUsages);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:generateKey`0<>(union(RsaHashedKeyGenParams<>|EcKeyGenParams<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,ReadonlyArray<KeyUsage<>>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_8c6995f1f8,bool,KeyUsage[]]->ValueTask<CryptoKeyPair>@transport:unsupported:False:False:False:Promise<CryptoKeyPair>", "generateKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<CryptoKeyPair>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Web IDL dictionary 'CryptoKeyPair' is not a reviewed JSON-only shape: 'privateKey' uses js-reference; 'publicKey' uses js-reference.")]
+[global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
 ValueTask<CryptoKeyPair> GenerateKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_8c6995f1f8 algorithm, bool extractable, KeyUsage[] keyUsages);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:generateKey`0<>(union(AesKeyGenParams<>|HmacKeyGenParams<>|Pbkdf2Params<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,ReadonlyArray<KeyUsage<>>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_ad23b0d10c,bool,KeyUsage[]]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "generateKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
 ValueTask<ICryptoKey> GenerateKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_ad23b0d10c algorithm, bool extractable, KeyUsage[] keyUsages);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:generateKey`0<>(AlgorithmIdentifier<>:optional=False:rest=False,BooleanKeyword:optional=False:rest=False,KeyUsage<>[]:optional=False:rest=False)[clr:AlgorithmIdentifier,bool,KeyUsage[]]->ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c2c0fc37f4>@transport:unsupported:False:False:False:Promise<CryptoKeyPair | CryptoKey>", "generateKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<CryptoKeyPair | CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'CryptoKeyPair | CryptoKey' is unsupported: Web IDL dictionary 'CryptoKeyPair' is not a reviewed JSON-only shape: 'privateKey' uses js-reference; 'publicKey' uses js-reference.")]
+[global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
 ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c2c0fc37f4> GenerateKeyAsync(AlgorithmIdentifier algorithm, bool extractable, KeyUsage[] keyUsages);
 
     /// <summary>
@@ -92,10 +104,12 @@ ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c2c0fc37f4> Ge
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:importKey`0<>(StringLiteral:\"jwk\":optional=False:rest=False,JsonWebKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaHashedImportParams<>|EcKeyImportParams<>|HmacImportParams<>|AesKeyAlgorithm<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,ReadonlyArray<KeyUsage<>>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_53ef9f3246,JsonWebKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a,bool,KeyUsage[]]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "importKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("importKey")]
 ValueTask<ICryptoKey> ImportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_53ef9f3246 format, JsonWebKey keyData, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a algorithm, bool extractable, KeyUsage[] keyUsages);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("importKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:importKey`0<>(Exclude<KeyFormat<>,StringLiteral:\"jwk\">:optional=False:rest=False,BufferSource<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaHashedImportParams<>|EcKeyImportParams<>|HmacImportParams<>|AesKeyAlgorithm<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,KeyUsage<>[]:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_fa4b2ca2b3,BufferSource,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a,bool,KeyUsage[]]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "importKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("importKey")]
 ValueTask<ICryptoKey> ImportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_fa4b2ca2b3 format, BufferSource keyData, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a algorithm, bool extractable, KeyUsage[] keyUsages);
 
     /// <summary>
@@ -103,6 +117,7 @@ ValueTask<ICryptoKey> ImportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryp
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:sign`0<>(union(AlgorithmIdentifier<>|RsaPssParams<>|EcdsaParams<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_ba9ffd5a88,ICryptoKey,BufferSource]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "sign", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("sign")]
 ValueTask<byte[]> SignAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_ba9ffd5a88 algorithm, ICryptoKey key, BufferSource data);
 
@@ -111,6 +126,7 @@ ValueTask<byte[]> SignAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionSh
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:unwrapKey`0<>(KeyFormat<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False,CryptoKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaOaepParams<>|AesCtrParams<>|AesCbcParams<>|AesGcmParams<>):optional=False:rest=False,union(AlgorithmIdentifier<>|RsaHashedImportParams<>|EcKeyImportParams<>|HmacImportParams<>|AesKeyAlgorithm<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,KeyUsage<>[]:optional=False:rest=False)[clr:KeyFormat,BufferSource,ICryptoKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a,bool,KeyUsage[]]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "unwrapKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("unwrapKey")]
 ValueTask<ICryptoKey> UnwrapKeyAsync(KeyFormat format, BufferSource wrappedKey, ICryptoKey unwrappingKey, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548 unwrapAlgorithm, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a unwrappedKeyAlgorithm, bool extractable, KeyUsage[] keyUsages);
 
@@ -119,6 +135,7 @@ ValueTask<ICryptoKey> UnwrapKeyAsync(KeyFormat format, BufferSource wrappedKey, 
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:verify`0<>(union(AlgorithmIdentifier<>|RsaPssParams<>|EcdsaParams<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_ba9ffd5a88,ICryptoKey,BufferSource,BufferSource]->ValueTask<bool>@transport:json-value:False:False:True:Promise<boolean>", "verify", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<boolean>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("verify")]
 ValueTask<bool> VerifyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_ba9ffd5a88 algorithm, ICryptoKey key, BufferSource signature, BufferSource data);
 
@@ -127,6 +144,7 @@ ValueTask<bool> VerifyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionSh
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:wrapKey`0<>(KeyFormat<>:optional=False:rest=False,CryptoKey<>:optional=False:rest=False,CryptoKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaOaepParams<>|AesCtrParams<>|AesCbcParams<>|AesGcmParams<>):optional=False:rest=False)[clr:KeyFormat,ICryptoKey,ICryptoKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548]->ValueTask<byte[]>@transport:binary:False:True:True:Promise<ArrayBuffer>", "wrapKey", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<ArrayBuffer>", Nullable = false, Promise = true, Streamable = true, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("wrapKey")]
 ValueTask<byte[]> WrapKeyAsync(KeyFormat format, ICryptoKey key, ICryptoKey wrappingKey, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548 wrapAlgorithm);
 
@@ -135,6 +153,7 @@ ValueTask<byte[]> WrapKeyAsync(KeyFormat format, ICryptoKey key, ICryptoKey wrap
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:deriveKey`0<>(union(AlgorithmIdentifier<>|EcdhKeyDeriveParams<>|HkdfParams<>|Pbkdf2Params<>):optional=False:rest=False,CryptoKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|AesDerivedKeyParams<>|HmacImportParams<>|HkdfParams<>|Pbkdf2Params<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,Iterable<KeyUsage<>>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_d61c9f0250,ICryptoKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_7d455a3ac9,bool,global::Microsoft.JSInterop.IBrowserIterable<KeyUsage>]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "deriveKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("deriveKey")]
 ValueTask<ICryptoKey> DeriveKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_d61c9f0250 algorithm, ICryptoKey baseKey, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_7d455a3ac9 derivedKeyType, bool extractable, global::Microsoft.JSInterop.IBrowserIterable<KeyUsage> keyUsages);
 
@@ -143,10 +162,12 @@ ValueTask<ICryptoKey> DeriveKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryp
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:generateKey`0<>(union(StringLiteral:\"Ed25519\"|typeLiteral:{ name: \"Ed25519\"; }):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,ReadonlyArray<union(StringLiteral:\"sign\"|StringLiteral:\"verify\")>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_565f672ed1,bool,global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_8261a424d3[]]->ValueTask<CryptoKeyPair>@transport:unsupported:False:False:False:Promise<CryptoKeyPair>", "generateKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<CryptoKeyPair>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Web IDL dictionary 'CryptoKeyPair' is not a reviewed JSON-only shape: 'privateKey' uses js-reference; 'publicKey' uses js-reference.")]
 [global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
 ValueTask<CryptoKeyPair> GenerateKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_565f672ed1 algorithm, bool extractable, global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_8261a424d3[] keyUsages);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:generateKey`0<>(AlgorithmIdentifier<>:optional=False:rest=False,BooleanKeyword:optional=False:rest=False,Iterable<KeyUsage<>>:optional=False:rest=False)[clr:AlgorithmIdentifier,bool,global::Microsoft.JSInterop.IBrowserIterable<KeyUsage>]->ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c2c0fc37f4>@transport:unsupported:False:False:False:Promise<CryptoKeyPair | CryptoKey>", "generateKey", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<CryptoKeyPair | CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'CryptoKeyPair | CryptoKey' is unsupported: Web IDL dictionary 'CryptoKeyPair' is not a reviewed JSON-only shape: 'privateKey' uses js-reference; 'publicKey' uses js-reference.")]
+[global::Microsoft.JSInterop.DomJavaScriptName("generateKey")]
 ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c2c0fc37f4> GenerateKeyAsync(AlgorithmIdentifier algorithm, bool extractable, global::Microsoft.JSInterop.IBrowserIterable<KeyUsage> keyUsages);
 
     /// <summary>
@@ -154,10 +175,12 @@ ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c2c0fc37f4> Ge
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:importKey`0<>(StringLiteral:\"jwk\":optional=False:rest=False,JsonWebKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaHashedImportParams<>|EcKeyImportParams<>|HmacImportParams<>|AesKeyAlgorithm<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,ReadonlyArray<KeyUsage<>>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_3b561c80fc,JsonWebKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a,bool,KeyUsage[]]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "importKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("importKey")]
 ValueTask<ICryptoKey> ImportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_3b561c80fc format, JsonWebKey keyData, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a algorithm, bool extractable, KeyUsage[] keyUsages);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("importKey")]
+    [global::Microsoft.JSInterop.DomOperation("js:importKey`0<>(Exclude<KeyFormat<>,StringLiteral:\"jwk\">:optional=False:rest=False,BufferSource<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaHashedImportParams<>|EcKeyImportParams<>|HmacImportParams<>|AesKeyAlgorithm<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,Iterable<KeyUsage<>>:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_7141917cff,BufferSource,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a,bool,global::Microsoft.JSInterop.IBrowserIterable<KeyUsage>]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "importKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("importKey")]
 ValueTask<ICryptoKey> ImportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_7141917cff format, BufferSource keyData, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a algorithm, bool extractable, global::Microsoft.JSInterop.IBrowserIterable<KeyUsage> keyUsages);
 
     /// <summary>
@@ -165,6 +188,7 @@ ValueTask<ICryptoKey> ImportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryp
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:unwrapKey`0<>(KeyFormat<>:optional=False:rest=False,BufferSource<>:optional=False:rest=False,CryptoKey<>:optional=False:rest=False,union(AlgorithmIdentifier<>|RsaOaepParams<>|AesCtrParams<>|AesCbcParams<>|AesGcmParams<>):optional=False:rest=False,union(AlgorithmIdentifier<>|RsaHashedImportParams<>|EcKeyImportParams<>|HmacImportParams<>|AesKeyAlgorithm<>):optional=False:rest=False,BooleanKeyword:optional=False:rest=False,Iterable<KeyUsage<>>:optional=False:rest=False)[clr:KeyFormat,BufferSource,ICryptoKey,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548,global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a,bool,global::Microsoft.JSInterop.IBrowserIterable<KeyUsage>]->ValueTask<ICryptoKey>@transport:js-reference:False:False:True:Promise<CryptoKey>", "unwrapKey", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<CryptoKey>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("unwrapKey")]
 ValueTask<ICryptoKey> UnwrapKeyAsync(KeyFormat format, BufferSource wrappedKey, ICryptoKey unwrappingKey, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_c6e8785548 unwrapAlgorithm, global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_b485a87b8a unwrappedKeyAlgorithm, bool extractable, global::Microsoft.JSInterop.IBrowserIterable<KeyUsage> keyUsages);
 }

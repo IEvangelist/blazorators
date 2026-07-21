@@ -21,6 +21,7 @@ public partial interface ILockManager : global::Microsoft.JSInterop.IDomProxy
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager/query)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:query`0<>()[clr:]->ValueTask<LockManagerSnapshot>@transport:json-value:False:False:True:Promise<LockManagerSnapshot>", "query", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<LockManagerSnapshot>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("query")]
 ValueTask<LockManagerSnapshot> QueryAsync();
 
@@ -29,9 +30,11 @@ ValueTask<LockManagerSnapshot> QueryAsync();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager/request)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:request`1<!!0:*>(StringKeyword:optional=False:rest=False,LockGrantedCallback<T<>>:optional=False:rest=False)[clr:string,LockGrantedCallback<!!0>]->ValueTask<!!0>@transport:unsupported:False:False:False:Promise<T>", "request", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<T>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'T' has no reviewed DOM transport classification.")]
 [global::Microsoft.JSInterop.DomJavaScriptName("request")]
 ValueTask<T> RequestAsync<T>(string name, LockGrantedCallback<T> callback);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("request")]
+    [global::Microsoft.JSInterop.DomOperation("js:request`1<!!0:*>(StringKeyword:optional=False:rest=False,LockOptions<>:optional=False:rest=False,LockGrantedCallback<T<>>:optional=False:rest=False)[clr:string,LockOptions,LockGrantedCallback<!!0>]->ValueTask<!!0>@transport:unsupported:False:False:False:Promise<T>", "request", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "Promise<T>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'T' has no reviewed DOM transport classification.")]
+[global::Microsoft.JSInterop.DomJavaScriptName("request")]
 ValueTask<T> RequestAsync<T>(string name, LockOptions options, LockGrantedCallback<T> callback);
 }

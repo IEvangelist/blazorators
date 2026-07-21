@@ -19,7 +19,9 @@ public partial interface IDocument : INode, IDocumentOrShadowRoot, IFontFaceSour
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/createElementNS)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:createElementNS`0<>(StringLiteral:\"http://www.w3.org/1999/xhtml\":optional=False:rest=False,StringKeyword:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.DocumentStringShape_3ba364cf6c,string]->IHTMLElement@transport:js-reference:False:False:False:HTMLElement", "createElementNS", global::Microsoft.JSInterop.DomTransportKind.JsReference, "HTMLElement", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 IHTMLElement CreateElementNS(global::Blazor.DOM.AdvancedTypes.DocumentStringShape_3ba364cf6c namespaceURI, string qualifiedName);
 
-    ISVGElement CreateElementNS(global::Blazor.DOM.AdvancedTypes.DocumentStringShape_5e37aa9c9f namespaceURI, string qualifiedName);
+    [global::Microsoft.JSInterop.DomOperation("js:createElementNS`0<>(StringLiteral:\"http://www.w3.org/2000/svg\":optional=False:rest=False,StringKeyword:optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.DocumentStringShape_5e37aa9c9f,string]->ISVGElement@transport:js-reference:False:False:False:SVGElement", "createElementNS", global::Microsoft.JSInterop.DomTransportKind.JsReference, "SVGElement", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
+ISVGElement CreateElementNS(global::Blazor.DOM.AdvancedTypes.DocumentStringShape_5e37aa9c9f namespaceURI, string qualifiedName);
 }

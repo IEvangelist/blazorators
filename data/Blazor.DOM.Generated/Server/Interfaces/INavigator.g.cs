@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator)
 /// </summary>
-public partial interface INavigator : INavigatorAutomationInformation, INavigatorBadge, INavigatorConcurrentHardware, INavigatorContentUtils, INavigatorCookies, INavigatorID, INavigatorLanguage, INavigatorLocks, INavigatorOnLine, INavigatorPlugins, INavigatorStorage, global::Microsoft.JSInterop.IDomDispatchProxy
+public partial interface INavigator : INavigatorAutomationInformation, INavigatorBadge, INavigatorConcurrentHardware, INavigatorContentUtils, INavigatorCookies, INavigatorID, INavigatorLanguage, INavigatorLocks, INavigatorOnLine, INavigatorPlugins, INavigatorStorage, INavigatorGPU, global::Microsoft.JSInterop.IDomDispatchProxy
 {
     /// <summary>
 /// The **`clipboard`** read-only property of the Navigator interface returns a Clipboard object used to read and write the clipboard's contents.
@@ -117,6 +117,21 @@ public partial interface INavigator : INavigatorAutomationInformation, INavigato
 /// </summary>
     [global::Microsoft.JSInterop.DomAccessor("wakeLock", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "WakeLock", Nullable = false, Streamable = false, StructuredClone = false)]
     global::System.Threading.Tasks.ValueTask<IWakeLock> GetWakeLockAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<IWakeLock>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "wakeLock", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("WakeLock", nullable: false, streamable: false, structuredClone: false), cancellationToken);
+
+    [global::Microsoft.JSInterop.DomAccessor("presentation", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Presentation", Nullable = false, Streamable = false, StructuredClone = false)]
+    global::System.Threading.Tasks.ValueTask<IPresentation> GetPresentationAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<IPresentation>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "presentation", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("Presentation", nullable: false, streamable: false, structuredClone: false), cancellationToken);
+
+    [global::Microsoft.JSInterop.DomAccessor("serial", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Serial", Nullable = false, Streamable = false, StructuredClone = false)]
+    global::System.Threading.Tasks.ValueTask<ISerial> GetSerialAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<ISerial>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "serial", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("Serial", nullable: false, streamable: false, structuredClone: false), cancellationToken);
+
+    [global::Microsoft.JSInterop.DomAccessor("bluetooth", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Bluetooth", Nullable = false, Streamable = false, StructuredClone = false)]
+    global::System.Threading.Tasks.ValueTask<IBluetooth> GetBluetoothAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<IBluetooth>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "bluetooth", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("Bluetooth", nullable: false, streamable: false, structuredClone: false), cancellationToken);
+
+    [global::Microsoft.JSInterop.DomAccessor("hid", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "HID", Nullable = false, Streamable = false, StructuredClone = false)]
+    global::System.Threading.Tasks.ValueTask<IHID> GetHidAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<IHID>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "hid", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HID", nullable: false, streamable: false, structuredClone: false), cancellationToken);
+
+    [global::Microsoft.JSInterop.DomAccessor("usb", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "USB", Nullable = false, Streamable = false, StructuredClone = false)]
+    global::System.Threading.Tasks.ValueTask<IUSB> GetUsbAsync(global::System.Threading.CancellationToken cancellationToken = default) => global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<IUSB>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "usb", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USB", nullable: false, streamable: false, structuredClone: false), cancellationToken);
 
     /// <summary>
 /// The **`canShare()`** method of the Navigator interface returns `true` if the equivalent call to navigator.share() would succeed.

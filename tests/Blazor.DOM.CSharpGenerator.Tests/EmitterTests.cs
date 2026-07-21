@@ -3,10 +3,26 @@
 using Blazor.DOM.CSharpGenerator.Accounting;
 using Blazor.DOM.CSharpGenerator.Emitters;
 using Blazor.DOM.CSharpGenerator.IR;
+using Blazor.DOM.CSharpGenerator.Output;
 using Blazor.DOM.CSharpGenerator.Projection;
 using Xunit;
 
 namespace Blazor.DOM.CSharpGenerator.Tests;
+
+public sealed class CSharpWriterTests
+{
+    [Fact]
+    public void XmlDoc_DecodesHtmlEntitiesAndEscapesXmlText()
+    {
+        var writer = new CSharpWriter();
+
+        writer.XmlDoc("size &ge; 1 & value < limit &times; 2");
+
+        Assert.Contains(
+            "size \u2265 1 &amp; value &lt; limit \u00d7 2",
+            writer.ToString());
+    }
+}
 
 public sealed class DictionaryEmitterTests
 {

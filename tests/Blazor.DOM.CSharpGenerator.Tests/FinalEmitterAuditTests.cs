@@ -62,6 +62,104 @@ public sealed class FinalEmitterAuditTests
     }
 
     [Fact]
+    public void EffectiveClassification_UnmatchedJsonValueExtension_IsDictionary()
+    {
+        var jsonTransport = new TransportModel(
+            "json-value",
+            false,
+            "JsonOptions",
+            false,
+            true,
+            null);
+        var baseSymbol = MakeInterfaceSymbol(
+            "JsonOptions",
+            [],
+            classification: "dictionary");
+        var absenceMember = MakeProperty(
+            0,
+            "legacy",
+            new KeywordTypeNode("UndefinedKeyword")
+            {
+                CheckerType = "undefined",
+                Transport = jsonTransport with { SourceType = "undefined", Nullable = true },
+            }) with
+        {
+            Optional = true,
+        };
+        var derived = MakeInterfaceSymbol(
+            "JsonOptionsStrict",
+            [absenceMember],
+            status: "unmatched",
+            classification: null,
+            heritage:
+            [
+                new HeritageClauseModel(
+                    "extends",
+                    [
+                        new HeritageReferenceTypeNode("JsonOptions", "JsonOptions", [])
+                        {
+                            CheckerType = "JsonOptions",
+                            Transport = jsonTransport,
+                        },
+                    ])
+            ]) with
+        {
+            Ordinal = 1,
+            Supplemental = true,
+        };
+        var symbols = new[] { baseSymbol, derived };
+        var classification = EffectiveClassificationPolicy.Classify(derived);
+        var resolver = new TypeResolver(symbols);
+
+        Assert.Equal("dictionary", classification.Name);
+        Assert.Equal(EffectiveClassificationSource.DeclarationShape, classification.Source);
+        Assert.True(resolver.IsDictionarySymbol("JsonOptionsStrict"));
+        var reference = resolver.Project(
+            new ReferenceTypeNode("JsonOptionsStrict", "JsonOptionsStrict", [])
+            {
+                CheckerType = "JsonOptionsStrict",
+                Transport = new TransportModel(
+                    "unsupported",
+                    false,
+                    "JsonOptionsStrict",
+                    false,
+                    false,
+                    "Unmatched TypeScript interface."),
+            },
+            "fixture/reference");
+        Assert.Equal("JsonOptionsStrict", reference.CSharpType);
+        Assert.Equal("json-value", reference.Transport?.Kind);
+
+        var output = CreateTempDirectory();
+        try
+        {
+            var result = GenerationPipeline.Run(
+                new IrBundle(CreateDummyManifest(), symbols, []),
+                output);
+
+            Assert.Empty(result.Errors);
+            Assert.Equal(2, result.Manifest.Accounting.ProjectedClean);
+            Assert.Equal(0, result.Manifest.Accounting.DeferredMembers);
+            var generated = File.ReadAllText(Path.Combine(
+                output,
+                "Dictionaries",
+                "JsonOptionsStrict.g.cs"));
+            Assert.Contains(
+                "public record JsonOptionsStrict : JsonOptions",
+                generated);
+            Assert.DoesNotContain("Legacy", generated);
+            Assert.False(File.Exists(Path.Combine(
+                output,
+                "Interfaces",
+                "IJsonOptionsStrict.g.cs")));
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
+    }
+
+    [Fact]
     public void EffectiveClassification_ReviewedOverride_IsSharedAndDictionaryShapeDoesNotBecomeInterface()
     {
         var ambiguous = MakeInterfaceSymbol(

@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator)
 /// </summary>
-public partial interface INavigator : INavigatorAutomationInformation, INavigatorBadge, INavigatorConcurrentHardware, INavigatorContentUtils, INavigatorCookies, INavigatorID, INavigatorLanguage, INavigatorLocks, INavigatorOnLine, INavigatorPlugins, INavigatorStorage, global::Microsoft.JSInterop.IDomDispatchProxy
+public partial interface INavigator : INavigatorAutomationInformation, INavigatorBadge, INavigatorConcurrentHardware, INavigatorContentUtils, INavigatorCookies, INavigatorID, INavigatorLanguage, INavigatorLocks, INavigatorOnLine, INavigatorPlugins, INavigatorStorage, INavigatorGPU, global::Microsoft.JSInterop.IDomDispatchProxy
 {
     /// <summary>
 /// The **`clipboard`** read-only property of the Navigator interface returns a Clipboard object used to read and write the clipboard's contents.
@@ -155,6 +155,36 @@ public partial interface INavigator : INavigatorAutomationInformation, INavigato
     IWakeLock WakeLock
     {
         get => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<IWakeLock>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "wakeLock", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("WakeLock", nullable: false, streamable: false, structuredClone: false));
+    }
+
+    [global::Microsoft.JSInterop.DomAccessor("presentation", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Presentation", Nullable = false, Streamable = false, StructuredClone = false)]
+    IPresentation Presentation
+    {
+        get => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<IPresentation>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "presentation", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("Presentation", nullable: false, streamable: false, structuredClone: false));
+    }
+
+    [global::Microsoft.JSInterop.DomAccessor("serial", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Serial", Nullable = false, Streamable = false, StructuredClone = false)]
+    ISerial Serial
+    {
+        get => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<ISerial>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "serial", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("Serial", nullable: false, streamable: false, structuredClone: false));
+    }
+
+    [global::Microsoft.JSInterop.DomAccessor("bluetooth", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Bluetooth", Nullable = false, Streamable = false, StructuredClone = false)]
+    IBluetooth Bluetooth
+    {
+        get => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<IBluetooth>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "bluetooth", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("Bluetooth", nullable: false, streamable: false, structuredClone: false));
+    }
+
+    [global::Microsoft.JSInterop.DomAccessor("hid", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "HID", Nullable = false, Streamable = false, StructuredClone = false)]
+    IHID Hid
+    {
+        get => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<IHID>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "hid", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HID", nullable: false, streamable: false, structuredClone: false));
+    }
+
+    [global::Microsoft.JSInterop.DomAccessor("usb", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "USB", Nullable = false, Streamable = false, StructuredClone = false)]
+    IUSB Usb
+    {
+        get => global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<IUSB>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "usb", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USB", nullable: false, streamable: false, structuredClone: false));
     }
 
     /// <summary>

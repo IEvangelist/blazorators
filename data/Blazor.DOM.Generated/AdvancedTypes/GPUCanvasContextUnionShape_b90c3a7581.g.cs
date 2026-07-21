@@ -13,7 +13,7 @@ namespace Blazor.DOM.AdvancedTypes;
 
 // TypeScript union: HTMLCanvasElement | OffscreenCanvas
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct ImageBitmapRenderingContextUnionShape_b90c3a7581 : IEquatable<ImageBitmapRenderingContextUnionShape_b90c3a7581>, IDomUnionValue
+public readonly struct GPUCanvasContextUnionShape_b90c3a7581 : IEquatable<GPUCanvasContextUnionShape_b90c3a7581>, IDomUnionValue
 {
     public enum ArmKind : byte
     {
@@ -34,9 +34,9 @@ public readonly struct ImageBitmapRenderingContextUnionShape_b90c3a7581 : IEquat
         ArmKind.UnclassifiedReference => DomTransportDescriptor.JsReference("unclassified union reference"),
         _ => DomTransportDescriptor.Unsupported("uninitialized union", "A default union value has no selected arm."),
     };
-    private ImageBitmapRenderingContextUnionShape_b90c3a7581(ArmKind kind, object? value) => (Kind, _value) = (kind, value);
+    private GPUCanvasContextUnionShape_b90c3a7581(ArmKind kind, object? value) => (Kind, _value) = (kind, value);
 
-    public static ImageBitmapRenderingContextUnionShape_b90c3a7581 FromHTMLCanvasElement(IHTMLCanvasElement value) => new(ArmKind.HTMLCanvasElement, value);
+    public static GPUCanvasContextUnionShape_b90c3a7581 FromHTMLCanvasElement(IHTMLCanvasElement value) => new(ArmKind.HTMLCanvasElement, value);
     public bool IsHTMLCanvasElement => Kind == ArmKind.HTMLCanvasElement;
     public IHTMLCanvasElement GetHTMLCanvasElement() => Kind == ArmKind.HTMLCanvasElement ? (IHTMLCanvasElement)_value! : throw new InvalidOperationException($"The union contains '{Kind}', not 'HTMLCanvasElement'.");
     public bool TryGetHTMLCanvasElement([MaybeNullWhen(false)] out IHTMLCanvasElement value)
@@ -50,7 +50,7 @@ public readonly struct ImageBitmapRenderingContextUnionShape_b90c3a7581 : IEquat
         return false;
     }
 
-    public static ImageBitmapRenderingContextUnionShape_b90c3a7581 FromOffscreenCanvas(IOffscreenCanvas value) => new(ArmKind.OffscreenCanvas, value);
+    public static GPUCanvasContextUnionShape_b90c3a7581 FromOffscreenCanvas(IOffscreenCanvas value) => new(ArmKind.OffscreenCanvas, value);
     public bool IsOffscreenCanvas => Kind == ArmKind.OffscreenCanvas;
     public IOffscreenCanvas GetOffscreenCanvas() => Kind == ArmKind.OffscreenCanvas ? (IOffscreenCanvas)_value! : throw new InvalidOperationException($"The union contains '{Kind}', not 'OffscreenCanvas'.");
     public bool TryGetOffscreenCanvas([MaybeNullWhen(false)] out IOffscreenCanvas value)
@@ -64,17 +64,17 @@ public readonly struct ImageBitmapRenderingContextUnionShape_b90c3a7581 : IEquat
         return false;
     }
 
-    public static ImageBitmapRenderingContextUnionShape_b90c3a7581 FromUnclassifiedReference(DomUnclassifiedReference value) => new(ArmKind.UnclassifiedReference, value ?? throw new ArgumentNullException(nameof(value)));
+    public static GPUCanvasContextUnionShape_b90c3a7581 FromUnclassifiedReference(DomUnclassifiedReference value) => new(ArmKind.UnclassifiedReference, value ?? throw new ArgumentNullException(nameof(value)));
     public bool IsUnclassifiedReference => Kind == ArmKind.UnclassifiedReference;
     public DomUnclassifiedReference GetUnclassifiedReference() => IsUnclassifiedReference ? (DomUnclassifiedReference)_value! : throw new InvalidOperationException("The union contains a classified arm.");
     public IHTMLCanvasElement TakeUnclassifiedAsHTMLCanvasElement(Func<IJSObjectReference, IHTMLCanvasElement> candidateFactory) => GetUnclassifiedReference().TakeAs(candidateFactory);
     public IOffscreenCanvas TakeUnclassifiedAsOffscreenCanvas(Func<IJSObjectReference, IOffscreenCanvas> candidateFactory) => GetUnclassifiedReference().TakeAs(candidateFactory);
 
-    public bool Equals(ImageBitmapRenderingContextUnionShape_b90c3a7581 other) => Kind == other.Kind && EqualityComparer<object?>.Default.Equals(_value, other._value);
-    public override bool Equals(object? obj) => obj is ImageBitmapRenderingContextUnionShape_b90c3a7581 other && Equals(other);
+    public bool Equals(GPUCanvasContextUnionShape_b90c3a7581 other) => Kind == other.Kind && EqualityComparer<object?>.Default.Equals(_value, other._value);
+    public override bool Equals(object? obj) => obj is GPUCanvasContextUnionShape_b90c3a7581 other && Equals(other);
     public override int GetHashCode() => HashCode.Combine(Kind, _value);
-    public static bool operator ==(ImageBitmapRenderingContextUnionShape_b90c3a7581 left, ImageBitmapRenderingContextUnionShape_b90c3a7581 right) => left.Equals(right);
-    public static bool operator !=(ImageBitmapRenderingContextUnionShape_b90c3a7581 left, ImageBitmapRenderingContextUnionShape_b90c3a7581 right) => !left.Equals(right);
+    public static bool operator ==(GPUCanvasContextUnionShape_b90c3a7581 left, GPUCanvasContextUnionShape_b90c3a7581 right) => left.Equals(right);
+    public static bool operator !=(GPUCanvasContextUnionShape_b90c3a7581 left, GPUCanvasContextUnionShape_b90c3a7581 right) => !left.Equals(right);
     public override string ToString() => Kind switch
     {
         ArmKind.Uninitialized => "(uninitialized)",

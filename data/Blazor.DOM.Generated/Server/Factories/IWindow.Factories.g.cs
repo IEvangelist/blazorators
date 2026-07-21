@@ -113,6 +113,21 @@ public partial interface IWindow
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBlobEventFactory> GetBlobEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBlobEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BlobEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BlobEvent"), cancellationToken);
 
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBluetoothAdvertisingEventFactory> GetBluetoothAdvertisingEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBluetoothAdvertisingEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothAdvertisingEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothAdvertisingEvent"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBluetoothDataFilterFactory> GetBluetoothDataFilterConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBluetoothDataFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothDataFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothDataFilter"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBluetoothLEScanFilterFactory> GetBluetoothLEScanFilterConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBluetoothLEScanFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothLEScanFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothLEScanFilter"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBluetoothManufacturerDataFilterFactory> GetBluetoothManufacturerDataFilterConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBluetoothManufacturerDataFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothManufacturerDataFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothManufacturerDataFilter"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBluetoothServiceDataFilterFactory> GetBluetoothServiceDataFilterConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBluetoothServiceDataFilterFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BluetoothServiceDataFilter", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BluetoothServiceDataFilter"), cancellationToken);
+
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IBroadcastChannelFactory> GetBroadcastChannelConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IBroadcastChannelFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "BroadcastChannel", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("BroadcastChannel"), cancellationToken);
 
@@ -548,6 +563,21 @@ public partial interface IWindow
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IFragmentDirectiveFactory> GetFragmentDirectiveConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IFragmentDirectiveFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "FragmentDirective", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("FragmentDirective"), cancellationToken);
 
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGPUInternalErrorFactory> GetGPUInternalErrorConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGPUInternalErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUInternalError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUInternalError"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGPUOutOfMemoryErrorFactory> GetGPUOutOfMemoryErrorConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGPUOutOfMemoryErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUOutOfMemoryError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUOutOfMemoryError"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGPUPipelineErrorFactory> GetGPUPipelineErrorConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGPUPipelineErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUPipelineError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUPipelineError"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGPUUncapturedErrorEventFactory> GetGPUUncapturedErrorEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGPUUncapturedErrorEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUUncapturedErrorEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUUncapturedErrorEvent"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGPUValidationErrorFactory> GetGPUValidationErrorConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGPUValidationErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GPUValidationError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUValidationError"), cancellationToken);
+
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGainNodeFactory> GetGainNodeConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGainNodeFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GainNode", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GainNode"), cancellationToken);
 
@@ -574,6 +604,12 @@ public partial interface IWindow
 
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IGeolocationPositionErrorFactory> GetGeolocationPositionErrorConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IGeolocationPositionErrorFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "GeolocationPositionError", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GeolocationPositionError"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IHIDConnectionEventFactory> GetHIDConnectionEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IHIDConnectionEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "HIDConnectionEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HIDConnectionEvent"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IHIDInputReportEventFactory> GetHIDInputReportEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IHIDInputReportEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "HIDInputReportEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HIDInputReportEvent"), cancellationToken);
 
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IHTMLAllCollectionFactory> GetHTMLAllCollectionConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IHTMLAllCollectionFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "HTMLAllCollection", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("HTMLAllCollection"), cancellationToken);
@@ -1181,6 +1217,15 @@ public partial interface IWindow
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IPopStateEventFactory> GetPopStateEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IPopStateEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PopStateEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PopStateEvent"), cancellationToken);
 
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IPresentationConnectionAvailableEventFactory> GetPresentationConnectionAvailableEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IPresentationConnectionAvailableEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PresentationConnectionAvailableEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PresentationConnectionAvailableEvent"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IPresentationConnectionCloseEventFactory> GetPresentationConnectionCloseEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IPresentationConnectionCloseEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PresentationConnectionCloseEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PresentationConnectionCloseEvent"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IPresentationRequestFactory> GetPresentationRequestConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IPresentationRequestFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "PresentationRequest", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("PresentationRequest"), cancellationToken);
+
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IProcessingInstructionFactory> GetProcessingInstructionConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IProcessingInstructionFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ProcessingInstruction", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ProcessingInstruction"), cancellationToken);
 
@@ -1769,6 +1814,39 @@ public partial interface IWindow
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IURLSearchParamsFactory> GetURLSearchParamsConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IURLSearchParamsFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "URLSearchParams", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("URLSearchParams"), cancellationToken);
 
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBAlternateInterfaceFactory> GetUSBAlternateInterfaceConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBAlternateInterfaceFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBAlternateInterface", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBAlternateInterface"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBConfigurationFactory> GetUSBConfigurationConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBConfigurationFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBConfiguration", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBConfiguration"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBConnectionEventFactory> GetUSBConnectionEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBConnectionEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBConnectionEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBConnectionEvent"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBEndpointFactory> GetUSBEndpointConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBEndpointFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBEndpoint", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBEndpoint"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBInTransferResultFactory> GetUSBInTransferResultConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBInTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBInTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBInTransferResult"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBInterfaceFactory> GetUSBInterfaceConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBInterfaceFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBInterface", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBInterface"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBIsochronousInTransferPacketFactory> GetUSBIsochronousInTransferPacketConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBIsochronousInTransferPacketFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousInTransferPacket", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousInTransferPacket"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBIsochronousInTransferResultFactory> GetUSBIsochronousInTransferResultConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBIsochronousInTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousInTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousInTransferResult"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBIsochronousOutTransferPacketFactory> GetUSBIsochronousOutTransferPacketConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBIsochronousOutTransferPacketFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousOutTransferPacket", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousOutTransferPacket"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBIsochronousOutTransferResultFactory> GetUSBIsochronousOutTransferResultConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBIsochronousOutTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBIsochronousOutTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBIsochronousOutTransferResult"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUSBOutTransferResultFactory> GetUSBOutTransferResultConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUSBOutTransferResultFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "USBOutTransferResult", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("USBOutTransferResult"), cancellationToken);
+
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IUserActivationFactory> GetUserActivationConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IUserActivationFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "UserActivation", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("UserActivation"), cancellationToken);
 
@@ -1780,6 +1858,9 @@ public partial interface IWindow
 
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IValidityStateFactory> GetValidityStateConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IValidityStateFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ValidityState", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ValidityState"), cancellationToken);
+
+    global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IValueEventFactory> GetValueEventConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
+        global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IValueEventFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "ValueEvent", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("ValueEvent"), cancellationToken);
 
     global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IVideoColorSpaceFactory> GetVideoColorSpaceConstructorAsync(global::System.Threading.CancellationToken cancellationToken = default) =>
         global::Microsoft.JSInterop.DomDispatch.GetPropertyAsync<global::Blazor.DOM.IVideoColorSpaceFactory>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "VideoColorSpace", global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("VideoColorSpace"), cancellationToken);

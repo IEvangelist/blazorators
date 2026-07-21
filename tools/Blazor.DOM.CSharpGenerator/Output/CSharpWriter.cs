@@ -82,12 +82,21 @@ public sealed class CSharpWriter
                 if (trimmed.Length == 0)
                     AppendLine("///");
                 else
-                    AppendLine($"/// {trimmed.Replace("<", "&lt;").Replace(">", "&gt;")}");
+                    AppendLine($"/// {EscapeXmlDoc(trimmed)}");
             }
             AppendLine("/// </summary>");
         }
         if (deprecated)
             AppendLine("[Obsolete]");
+    }
+
+    private static string EscapeXmlDoc(string text)
+    {
+        var decoded = System.Net.WebUtility.HtmlDecode(text);
+        return decoded
+            .Replace("&", "&amp;", StringComparison.Ordinal)
+            .Replace("<", "&lt;", StringComparison.Ordinal)
+            .Replace(">", "&gt;", StringComparison.Ordinal);
     }
 
     public override string ToString() => _sb.ToString();

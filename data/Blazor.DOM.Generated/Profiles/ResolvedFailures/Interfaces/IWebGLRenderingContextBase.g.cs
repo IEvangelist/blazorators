@@ -12,7 +12,9 @@ public partial interface IWebGLRenderingContextBase : global::Microsoft.JSIntero
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getExtension)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getExtension`0<>(StringLiteral:\"ANGLE_instanced_arrays\":optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.WebGLRenderingContextBaseStringShape_9e416f179d]->IANGLE_instanced_arrays@transport:js-reference:True:False:False:ANGLE_instanced_arrays | null", "getExtension", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ANGLE_instanced_arrays | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
 IANGLE_instanced_arrays? GetExtension(global::Blazor.DOM.AdvancedTypes.WebGLRenderingContextBaseStringShape_9e416f179d extensionName);
 
-    IEXT_blend_minmax? GetExtension(global::Blazor.DOM.AdvancedTypes.WebGLRenderingContextBaseStringShape_8c113ebc35 extensionName);
+    [global::Microsoft.JSInterop.DomOperation("js:getExtension`0<>(StringLiteral:\"EXT_blend_minmax\":optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.WebGLRenderingContextBaseStringShape_8c113ebc35]->IEXT_blend_minmax@transport:js-reference:True:False:False:EXT_blend_minmax | null", "getExtension", global::Microsoft.JSInterop.DomTransportKind.JsReference, "EXT_blend_minmax | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
+IEXT_blend_minmax? GetExtension(global::Blazor.DOM.AdvancedTypes.WebGLRenderingContextBaseStringShape_8c113ebc35 extensionName);
 }
