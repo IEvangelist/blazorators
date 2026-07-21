@@ -584,7 +584,8 @@ public sealed class TypeResolver
             "statically-reduced-indexed-access" or
             "readonly-operator" or
             "readonly-array" or
-            "resolved-import-type"
+            "resolved-import-type" or
+            "Promise<T>→ValueTask<T>"
             || projection.ProviderNote.StartsWith(
                 "browser-",
                 StringComparison.Ordinal)
@@ -802,7 +803,8 @@ public sealed class TypeResolver
                 isAwaitable: true,
                 typeArguments: inner.Identity.Kind == ClrTypeKind.Void
                     ? []
-                    : [inner.Identity]);
+                    : [inner.Identity],
+                transport: inner.Transport);
         }
 
         // ReadableStream/WritableStream/TransformStream are live DOM proxy objects —
