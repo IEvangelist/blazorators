@@ -4,7 +4,7 @@ JavaScript reference proxy runtime for exhaustive Blazor DOM bindings — WebAss
 
 ## Overview
 
-`Blazor.DOM.WebAssembly` extends the shared `Blazor.DOM` abstractions with an in-process runtime suitable for **Blazor WebAssembly**.  Non-Promise DOM operations expose synchronous C# paths via `IDomSyncRuntime`; Promise-returning operations remain asynchronous.
+`Blazor.DOM.WebAssembly` is the mutually exclusive in-process package for **Blazor WebAssembly**. It contains the shared value/runtime corpus directly rather than depending on `Blazor.DOM`. Non-Promise DOM operations are synchronous; Promise and lifecycle operations remain cancellable and asynchronous.
 
 ## Key services
 
@@ -40,7 +40,7 @@ builder.Services.AddBlazorDOMWebAssembly();
 
 ## Notes
 
-- Do **not** use this package together with `Blazor.DOM` (Server) in the same application.
+- Do **not** reference this package together with `Blazor.DOM`; both intentionally provide the same generated namespaces with different host signatures.
 - Call at least one async DOM method before using synchronous dispatch to ensure the JS module is loaded.
 - `WasmDomProxyBase` extends `DomProxyBase` with `SyncRuntime` and `InProcessReference` accessors.
 - Transport classification and ownership match `Blazor.DOM`: interfaces use explicit synchronous/asynchronous live-reference paths, nullable interface results use the typed async reference-result APIs, callback references are borrowed unless promoted, and Blob/ArrayBuffer/typed-array bytes use bounded `IJSStreamReference` reads with cancellation and async disposal. Empty values use an owned zero-length stream without an invalid JS stream reference.

@@ -30,6 +30,7 @@ public sealed partial class HostContractTransformer(DomHostKind host)
         string? contractType = null;
         string? genericParameters = null;
         string? constraints = null;
+        IReadOnlyList<string> structuralBases = [];
         var inInterface = false;
 
         foreach (var line in lines)
@@ -48,8 +49,15 @@ public sealed partial class HostContractTransformer(DomHostKind host)
 
                 contractType = header.Groups["contract"].Value;
                 genericParameters = header.Groups["generic"].Value;
-                constraints = header.Groups["constraints"].Value;
+                constraints = "";
                 var bases = header.Groups["bases"].Value;
+                var parsedBases = SplitTopLevel(bases);
+                structuralBases = parsedBases
+                    .Where(IsStructuralBase)
+                    .ToList();
+                bases = string.Join(
+                    ", ",
+                    parsedBases.Where(baseType => !IsStructuralBase(baseType)));
                 bases = ProxyBaseRegex().Replace(
                     bases,
                     "global::Microsoft.JSInterop.IDomDispatchProxy");
@@ -76,6 +84,11 @@ public sealed partial class HostContractTransformer(DomHostKind host)
             {
                 output.AddRange(pending);
                 pending.Clear();
+                EmitStructuralMembers(
+                    symbol,
+                    structuralBases,
+                    output,
+                    operations);
                 output.Add(line);
                 inInterface = false;
                 continue;
@@ -461,6 +474,388 @@ public sealed partial class HostContractTransformer(DomHostKind host)
             metadata.Promise,
             signature));
     }
+
+    private void EmitStructuralMembers(
+        SymbolModel symbol,
+        IReadOnlyList<string> bases,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        foreach (var baseType in bases)
+        {
+            if (baseType.Contains("IReadOnlyBrowserMap<", StringComparison.Ordinal)
+                || baseType.Contains("IBrowserMap<", StringComparison.Ordinal))
+            {
+                var arguments = GenericArguments(baseType);
+                EmitMapMembers(
+                    symbol,
+                    arguments[0],
+                    arguments[1],
+                    baseType.Contains(".IBrowserMap<", StringComparison.Ordinal),
+                    output,
+                    operations);
+            }
+            else if (baseType.Contains("IBrowserSet<", StringComparison.Ordinal))
+            {
+                EmitSetMembers(
+                    symbol,
+                    GenericArguments(baseType)[0],
+                    output,
+                    operations);
+            }
+            else if (baseType.Contains("IBrowserAsyncIterator<", StringComparison.Ordinal))
+            {
+                EmitIteratorMember(
+                    symbol,
+                    GenericArguments(baseType),
+                    asynchronous: true,
+                    output,
+                    operations);
+            }
+            else if (baseType.Contains("IBrowserIterator<", StringComparison.Ordinal))
+            {
+                EmitIteratorMember(
+                    symbol,
+                    GenericArguments(baseType),
+                    asynchronous: false,
+                    output,
+                    operations);
+            }
+            else if (baseType.EndsWith(
+                ".ITypeScriptError",
+                StringComparison.Ordinal))
+            {
+                EmitErrorMembers(symbol, output, operations);
+            }
+        }
+    }
+
+    private void EmitMapMembers(
+        SymbolModel symbol,
+        string keyType,
+        string valueType,
+        bool mutable,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        EmitStructuralGet(
+            symbol,
+            "size",
+            "Size",
+            "int",
+            [],
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "has",
+            "Has",
+            "bool",
+            [$"{keyType} key"],
+            ["key"],
+            promise: false,
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "get",
+            "Get",
+            valueType,
+            [$"{keyType} key"],
+            ["key"],
+            promise: false,
+            output,
+            operations);
+        if (!mutable)
+            return;
+        EmitStructuralMethod(
+            symbol,
+            "set",
+            "Set",
+            "void",
+            [$"{keyType} key", $"{valueType} value"],
+            ["key", "value"],
+            promise: false,
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "delete",
+            "Delete",
+            "bool",
+            [$"{keyType} key"],
+            ["key"],
+            promise: false,
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "clear",
+            "Clear",
+            "void",
+            [],
+            [],
+            promise: false,
+            output,
+            operations);
+    }
+
+    private void EmitSetMembers(
+        SymbolModel symbol,
+        string valueType,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        EmitStructuralGet(
+            symbol,
+            "size",
+            "Size",
+            "int",
+            [],
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "has",
+            "Has",
+            "bool",
+            [$"{valueType} value"],
+            ["value"],
+            promise: false,
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "add",
+            "Add",
+            "void",
+            [$"{valueType} value"],
+            ["value"],
+            promise: false,
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "delete",
+            "Delete",
+            "bool",
+            [$"{valueType} value"],
+            ["value"],
+            promise: false,
+            output,
+            operations);
+        EmitStructuralMethod(
+            symbol,
+            "clear",
+            "Clear",
+            "void",
+            [],
+            [],
+            promise: false,
+            output,
+            operations);
+    }
+
+    private void EmitIteratorMember(
+        SymbolModel symbol,
+        IReadOnlyList<string> arguments,
+        bool asynchronous,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        var result =
+            $"global::Microsoft.JSInterop.BrowserIteratorResult<" +
+            $"{arguments[0]}, {arguments[1]}>";
+        EmitStructuralMethod(
+            symbol,
+            "next",
+            "Next",
+            result,
+            [$"{arguments[2]} value"],
+            ["value"],
+            promise: asynchronous,
+            output,
+            operations);
+    }
+
+    private void EmitErrorMembers(
+        SymbolModel symbol,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        foreach (var (javaScriptName, csharpName) in new[]
+        {
+            ("name", "Name"),
+            ("message", "Message"),
+            ("stack", "Stack"),
+        })
+        {
+            if (operations.Any(operation =>
+                string.Equals(
+                    operation.JavaScriptName,
+                    javaScriptName,
+                    StringComparison.Ordinal)))
+            {
+                continue;
+            }
+            EmitStructuralGet(
+                symbol,
+                javaScriptName,
+                csharpName,
+                "string?",
+                [],
+                output,
+                operations);
+        }
+    }
+
+    private void EmitStructuralGet(
+        SymbolModel symbol,
+        string javaScriptName,
+        string csharpName,
+        string resultType,
+        IReadOnlyList<string> parameters,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        output.Add("");
+        string signature;
+        if (host == DomHostKind.Server)
+        {
+            signature =
+                $"global::System.Threading.Tasks.ValueTask<{resultType}> " +
+                $"Get{csharpName}Async(global::System.Threading.CancellationToken " +
+                "cancellationToken = default)";
+            output.Add(
+                $"    {signature} => global::Microsoft.JSInterop.DomDispatch." +
+                $"GetPropertyAsync<{resultType}>({DispatchCast}, " +
+                $"\"{javaScriptName}\", global::Microsoft.JSInterop.DomDispatch." +
+                $"InferTransport<{resultType}>(\"{javaScriptName}\"), cancellationToken);");
+        }
+        else
+        {
+            signature = $"{resultType} {csharpName} {{ get; }}";
+            output.Add(
+                $"    {resultType} {csharpName} => " +
+                $"global::Microsoft.JSInterop.WasmDomDispatch.GetProperty<{resultType}>(" +
+                $"{DispatchCast}, \"{javaScriptName}\", " +
+                $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
+                $"\"{javaScriptName}\"));");
+        }
+        AddStructuralOperation(
+            symbol,
+            javaScriptName,
+            "property-get",
+            signature,
+            promise: false,
+            operations);
+    }
+
+    private void EmitStructuralMethod(
+        SymbolModel symbol,
+        string javaScriptName,
+        string csharpName,
+        string resultType,
+        IReadOnlyList<string> parameters,
+        IReadOnlyList<string> argumentNames,
+        bool promise,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        output.Add("");
+        var arguments = argumentNames.Count == 0
+            ? "null"
+            : $"[{string.Join(", ", argumentNames)}]";
+        var asyncDispatch = host == DomHostKind.Server || promise;
+        string signature;
+        if (asyncDispatch)
+        {
+            var methodName = EnsureAsync(csharpName);
+            var hostParameters = AddCancellation(parameters, out var cancellationName);
+            var returnType = resultType == "void"
+                ? "global::System.Threading.Tasks.ValueTask"
+                : $"global::System.Threading.Tasks.ValueTask<{resultType}>";
+            signature = BuildMethodSignature(
+                returnType,
+                methodName,
+                "",
+                hostParameters,
+                "");
+            var invocation = resultType == "void"
+                ? $"global::Microsoft.JSInterop.DomDispatch.InvokeVoidAsync(" +
+                    $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
+                    $"{cancellationName})"
+                : $"global::Microsoft.JSInterop.DomDispatch.InvokeAsync<{resultType}>(" +
+                    $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
+                    $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
+                    $"\"{javaScriptName}\"), {cancellationName})";
+            output.Add($"    {signature} => {invocation};");
+        }
+        else
+        {
+            signature =
+                $"{resultType} {csharpName}({string.Join(", ", parameters)})";
+            var invocation = resultType == "void"
+                ? $"global::Microsoft.JSInterop.WasmDomDispatch.InvokeVoid(" +
+                    $"{DispatchCast}, \"{javaScriptName}\", {arguments})"
+                : $"global::Microsoft.JSInterop.WasmDomDispatch.Invoke<{resultType}>(" +
+                    $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
+                    $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
+                    $"\"{javaScriptName}\"))";
+            output.Add($"    {signature} => {invocation};");
+        }
+        AddStructuralOperation(
+            symbol,
+            javaScriptName,
+            "method",
+            signature,
+            promise,
+            operations);
+    }
+
+    private static void AddStructuralOperation(
+        SymbolModel symbol,
+        string javaScriptName,
+        string kind,
+        string signature,
+        bool promise,
+        List<HostApiOperation> operations) =>
+        operations.Add(new HostApiOperation(
+            $"{symbol.Name}/structural:{javaScriptName}",
+            symbol.Name,
+            kind,
+            javaScriptName,
+            promise,
+            signature));
+
+    private static IReadOnlyList<string> GenericArguments(string type)
+    {
+        var open = type.IndexOf('<');
+        return SplitTopLevel(type[(open + 1)..^1]);
+    }
+
+    private static bool IsStructuralBase(string baseType) =>
+        baseType.Contains(
+            "global::Microsoft.JSInterop.IReadOnlyBrowserMap<",
+            StringComparison.Ordinal)
+        || baseType.Contains(
+            "global::Microsoft.JSInterop.IBrowserMap<",
+            StringComparison.Ordinal)
+        || baseType.Contains(
+            "global::Microsoft.JSInterop.IBrowserSet<",
+            StringComparison.Ordinal)
+        || baseType.Contains(
+            "global::Microsoft.JSInterop.IBrowserIterator<",
+            StringComparison.Ordinal)
+        || baseType.Contains(
+            "global::Microsoft.JSInterop.IBrowserAsyncIterator<",
+            StringComparison.Ordinal)
+        || baseType.EndsWith(
+            "global::Blazor.DOM.StandardTypes.ITypeScriptError",
+            StringComparison.Ordinal)
+        || baseType.StartsWith(
+            "IQueuingStrategyContract<",
+            StringComparison.Ordinal);
 
     private static bool IsMemberDeclaration(string line) =>
         PropertyRegex().IsMatch(line)

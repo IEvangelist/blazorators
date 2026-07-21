@@ -8,14 +8,15 @@ namespace Microsoft.JSInterop;
 /// Uses <see cref="IJSRuntime"/> for the async module import (which returns
 /// an <see cref="IJSInProcessObjectReference"/> on WASM) and exposes
 /// synchronous dispatch paths once the module has been initialised.
-/// The module is imported using the same single-flight mechanism as
-/// <see cref="ServerDomRuntime"/>: concurrent callers share the in-progress
+/// The module is imported using the same single-flight mechanism as the Server
+/// runtime: concurrent callers share the in-progress
 /// import, failed or cancelled attempts are cleared for retry, and caller
 /// cancellation never poisons the shared task.
 /// </summary>
 internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 {
-    internal const string ModulePath = "./_content/Blazor.DOM/blazorators.dom.js";
+    internal const string ModulePath =
+        "./_content/Blazor.DOM.WebAssembly/blazorators.dom.js";
 
     private readonly IJSRuntime _jsRuntime;
     private readonly SemaphoreSlim _importLock = new(1, 1);

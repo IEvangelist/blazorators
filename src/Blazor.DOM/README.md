@@ -4,13 +4,13 @@ JavaScript reference proxy runtime for exhaustive Blazor DOM bindings — Server
 
 ## Overview
 
-`Blazor.DOM` provides the low-level runtime infrastructure that generated DOM proxy types build on top of.  It targets **Blazor Server** and any hosting model where JavaScript interop is inherently asynchronous.
+`Blazor.DOM` provides the exhaustive generated Server/hosting-neutral DOM API and its runtime. It targets **Blazor Server** and hosting models where JavaScript interop is inherently asynchronous. Non-Promise members are cancellable `ValueTask` methods; Promise members are awaited through the same async surface.
 
 ## Key services
 
 | Service | Description |
 |---|---|
-| `IBrowser` | Entry point for common browser globals (`window`, `document`, `navigator`, arbitrary path). |
+| `IBrowser` | Single DI root for typed `window`, `document`, `navigator`, and authoritative global paths. Injection is prerender-safe; the first operation performs JS interop. |
 | `IDomRuntime` | Core async dispatch — validated JSON, typed references/callbacks, bounded streams, constructor/index access, and event subscriptions. |
 | `IDomProxyFactory` | Typed proxy registry — maps `IJSObjectReference` handles to generated C# proxy instances without reflection. |
 
@@ -29,9 +29,8 @@ builder.Services.AddBlazorDOM();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        var docRef = await Browser.GetDocumentAsync();
-        // Pass docRef to IDomProxyFactory.Create<HtmlDocument>(docRef)
-        // when generated proxy types are available.
+        var document = await Browser.GetDocumentProxyAsync();
+        var title = await document.GetTitleAsync();
     }
 }
 ```
@@ -56,6 +55,6 @@ Blob, ArrayBuffer, and typed-array bytes use `DotNet.createJSStreamReference(...
 
 ## Notes
 
-- Do **not** use this package together with `Blazor.DOM.WebAssembly` in the same application.
-- Do **not** inject or use `IBrowser`/`IDomRuntime` during Blazor prerendering; the first JS call will throw `DomJSException` with a helpful message.
+- Do **not** reference this package together with `Blazor.DOM.WebAssembly`; both intentionally provide the same generated namespaces with host-specific signatures.
+- `IBrowser` may be injected during prerendering. Defer its first operation until interactive rendering; an attempted prerender operation throws `DomJSException` with a clear message.
 - Browser E2E acceptance for callback-created object/stream references belongs in the combined generated-DOM fixture once those contracts are integrated.

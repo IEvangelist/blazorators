@@ -34,7 +34,9 @@
     <IncludeSymbols>false</IncludeSymbols>
     <IncludeSource>false</IncludeSource>
     <RootNamespace>Blazor.DOM</RootNamespace>
-    <NoWarn>NU5125;NU5039;</NoWarn>
+    <!-- Generated lib.dom inheritance intentionally preserves obsolete bases and
+         TypeScript redeclarations that C# reports as member hiding. -->
+    <NoWarn>NU5125;NU5039;CS0108;CS0612;CS8766;</NoWarn>
     <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
     <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -49,6 +51,23 @@
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup Label="Generated DOM contracts">
+    <Compile Include="..\..\data\Blazor.DOM.Generated\AdvancedTypes\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Callbacks\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Dictionaries\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Enums\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\EventMaps\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Typedefs\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Server\Interfaces\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Server\GeneratedDomHost.g.cs" />
+    <None Include="..\..\data\Blazor.DOM.Generated\Server\host-manifest.json"
+          Pack="true"
+          PackagePath="build\Blazor.DOM.host-manifest.json" />
+    <None Include="..\..\data\Blazor.DOM.Generated\host-parity.json"
+          Pack="true"
+          PackagePath="build\Blazor.DOM.host-parity.json" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(ImplicitUsings)' == 'enable' or '$(ImplicitUsings)' == 'true'">
