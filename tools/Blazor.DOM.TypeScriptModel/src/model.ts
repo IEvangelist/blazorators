@@ -20,6 +20,10 @@ export function buildDomModel(inputs: InputSet): DomModel {
     inputs.typescriptFiles.map((file) => ({
       path: file.path,
       label: file.label,
+      ...(file.text === undefined ? {} : { text: file.text }),
+      ...(file.supplemental === undefined
+        ? {}
+        : { supplemental: file.supplemental }),
     })),
   );
   const webIdl = extractWebIdlModel(inputs.webIdlFiles);
@@ -91,7 +95,7 @@ export function buildDomModel(inputs: InputSet): DomModel {
         inputs: inputs.typescriptFiles.map((file) => ({
           name: file.label,
           sha256: file.sha256,
-        })),
+        })).filter((_, index) => !inputs.typescriptFiles[index]!.supplemental),
       },
       webref: {
         package: "@webref/idl",
@@ -108,6 +112,7 @@ export function buildDomModel(inputs: InputSet): DomModel {
         version: inputs.webidl2Version,
         license: "W3C",
       },
+      supplementalTypeScript: inputs.supplementalSources,
       overrides: {
         input: inputs.overridesPath,
         sha256: inputs.overridesSha256,
@@ -511,7 +516,14 @@ function isCompatible(symbol: SymbolModel, candidate: WebIdlCandidate): boolean 
   switch (classification) {
     case "interface":
     case "mixin":
-      return declarationKinds.has("interface");
+      return declarationKinds.has("interface") ||
+        (
+          declarationKinds.has("typeAlias") &&
+          candidate.symbol.declarations.some((declaration) =>
+            declaration.members.length === 1 &&
+            declaration.members.every((member) => member.kind === "setlike")
+          )
+        );
     case "dictionary":
       return (
         declarationKinds.has("interface") ||

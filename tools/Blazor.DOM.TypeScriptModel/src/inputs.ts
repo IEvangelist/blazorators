@@ -4,6 +4,13 @@ import { createRequire } from "node:module";
 import { listAll } from "@webref/idl";
 import { InputSet } from "./schema.js";
 import { compareOrdinal, normalizeLf, sha256 } from "./stable-json.js";
+import {
+  filterWebGpuWindowSource,
+  generateWebIdlSupplement,
+  SupplementalBuildResult,
+  WebIdlSupplementalSource,
+  webIdlWindowNamespaces,
+} from "./supplemental.js";
 
 const require = createRequire(import.meta.url);
 
@@ -34,16 +41,26 @@ export async function loadPinnedInputs(toolRoot: string): Promise<InputSet> {
         return { name, text, sha256: sha256(text) };
       }),
   );
+  const supplemental = await loadSupplementalInputs(
+    toolRoot,
+    webref.version,
+    webIdlFiles,
+  );
+  const allTypeScriptFiles = [
+    ...typescriptFiles,
+    ...supplemental.inputs,
+  ];
   const overridesFile = path.join(toolRoot, "overrides.json");
   const overridesText = normalizeLf(await readFile(overridesFile, "utf8"));
   const overrideCount = validateOverrides(overridesText);
 
   return {
     typescriptVersion: typescript.version,
-    typescriptFiles,
+    typescriptFiles: allTypeScriptFiles,
     typescriptAggregateSha256: sha256(
       typescriptFiles.map((file) => `${file.label}\0${file.sha256}\n`).join(""),
     ),
+    supplementalSources: supplemental.provenance,
     webrefVersion: webref.version,
     webIdlFiles,
     webIdlAggregateSha256: sha256(
@@ -53,6 +70,120 @@ export async function loadPinnedInputs(toolRoot: string): Promise<InputSet> {
     overridesPath: "tools/Blazor.DOM.TypeScriptModel/overrides.json",
     overridesSha256: sha256(overridesText),
     overrideCount,
+  };
+}
+
+const webIdlSupplementalSources: ReadonlyArray<
+  Omit<WebIdlSupplementalSource, "text" | "sha256">
+> = [
+  {
+    family: "Presentation API",
+    specification: "presentation-api",
+    sourceUrl: "https://www.w3.org/TR/presentation-api/",
+  },
+  {
+    family: "Web Serial",
+    specification: "serial",
+    sourceUrl: "https://wicg.github.io/serial/",
+  },
+  {
+    family: "Web Bluetooth",
+    specification: "web-bluetooth",
+    sourceUrl: "https://webbluetoothcg.github.io/web-bluetooth/",
+  },
+  {
+    family: "Web Bluetooth",
+    specification: "web-bluetooth-scanning",
+    sourceUrl: "https://webbluetoothcg.github.io/web-bluetooth/scanning.html",
+  },
+  {
+    family: "WebHID",
+    specification: "webhid",
+    sourceUrl: "https://wicg.github.io/webhid/",
+  },
+  {
+    family: "WebUSB",
+    specification: "webusb",
+    sourceUrl: "https://wicg.github.io/webusb/",
+  },
+];
+
+async function loadSupplementalInputs(
+  toolRoot: string,
+  webrefVersion: string,
+  webIdlFiles: InputSet["webIdlFiles"],
+): Promise<SupplementalBuildResult> {
+  const filesByName = new Map(webIdlFiles.map((file) => [file.name, file]));
+  const generated = webIdlSupplementalSources.map((source) => {
+    const file = filesByName.get(source.specification);
+    if (file === undefined) {
+      throw new Error(
+        `Pinned @webref/idl is missing '${source.specification}.idl'.`,
+      );
+    }
+    return generateWebIdlSupplement(
+      { ...source, text: file.text, sha256: file.sha256 },
+      webrefVersion,
+      path.join(toolRoot, ".virtual", `${source.specification}.d.ts`),
+      sha256,
+    );
+  });
+
+  const webgpuDirectory = path.join(
+    toolRoot,
+    "node_modules",
+    "@webgpu",
+    "types",
+  );
+  const webgpu = await packageInfoFromDirectory(webgpuDirectory, "@webgpu/types");
+  if (webgpu.license !== "BSD-3-Clause") {
+    throw new Error(
+      `Unexpected @webgpu/types license '${webgpu.license ?? "(missing)"}'.`,
+    );
+  }
+  const webgpuPath = path.join(webgpuDirectory, "dist", "index.d.ts");
+  const webgpuSource = normalizeLf(await readFile(webgpuPath, "utf8"));
+  const webgpuIdl = filesByName.get("webgpu");
+  if (webgpuIdl === undefined) {
+    throw new Error("Pinned @webref/idl is missing 'webgpu.idl'.");
+  }
+  const webgpuText = filterWebGpuWindowSource(
+    webgpuSource,
+    webIdlWindowNamespaces(webgpuIdl.text),
+  );
+  const webgpuSourceHash = sha256(webgpuSource);
+  const webgpuOutputHash = sha256(webgpuText);
+  const webgpuLabel = "supplemental/@webgpu/types/dist/index.window.d.ts";
+
+  return {
+    inputs: [
+      ...generated.map((item) => item.input),
+      {
+        path: path.join(toolRoot, ".virtual", "webgpu.window.d.ts"),
+        label: webgpuLabel,
+        text: webgpuText,
+        sha256: webgpuOutputHash,
+        supplemental: true,
+      },
+    ],
+    provenance: [
+      ...generated.map((item) => item.provenance),
+      {
+        family: "WebGPU",
+        sourceKind: "package-declaration",
+        package: "@webgpu/types",
+        version: webgpu.version,
+        license: webgpu.license,
+        sourceUrl: "https://github.com/gpuweb/types",
+        inputs: [{
+          name: "@webgpu/types/dist/index.d.ts",
+          sha256: webgpuSourceHash,
+        }],
+        output: { name: webgpuLabel, sha256: webgpuOutputHash },
+        generationMethod:
+          "Exact package declaration filtered to Window exposure; Web IDL namespaces are normalized from interface/value pairs and finite Required/Omit mapped heritage is flattened without widening.",
+      },
+    ],
   };
 }
 
@@ -73,10 +204,12 @@ async function packageInfo(packageName: string): Promise<{ version: string }> {
       ) {
         return { version: value.version };
       }
+
     } catch (error: unknown) {
       if (!isFileNotFound(error)) {
         throw error;
       }
+
     }
 
     const parent = path.dirname(directory);
@@ -85,6 +218,27 @@ async function packageInfo(packageName: string): Promise<{ version: string }> {
     }
     directory = parent;
   }
+}
+
+async function packageInfoFromDirectory(
+  directory: string,
+  packageName: string,
+): Promise<{ version: string; license: string }> {
+  const text = await readFile(path.join(directory, "package.json"), "utf8");
+  const value: unknown = JSON.parse(text);
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    !("name" in value) ||
+    value.name !== packageName ||
+    !("version" in value) ||
+    typeof value.version !== "string" ||
+    !("license" in value) ||
+    typeof value.license !== "string"
+  ) {
+    throw new Error(`Malformed package metadata for '${packageName}'.`);
+  }
+  return { version: value.version, license: value.license };
 }
 
 function validateOverrides(text: string): number {

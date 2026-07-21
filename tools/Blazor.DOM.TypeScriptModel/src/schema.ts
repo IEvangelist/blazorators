@@ -19,6 +19,8 @@ export interface TransportModel {
 
 export interface SourceLocation {
   source: string;
+  sourceOrdinal: number;
+  supplemental: boolean;
   start: { line: number; column: number; offset: number };
   end: { line: number; column: number; offset: number };
 }
@@ -77,6 +79,7 @@ export interface PropertyNameModel {
 
 export interface DeclarationModel {
   ordinal: number;
+  supplemental: boolean;
   kind: string;
   name: string;
   modifiers: string[];
@@ -141,7 +144,20 @@ export interface SymbolModel {
   symbolFlags: number;
   declarations: DeclarationModel[];
   isDeclarationMerged: boolean;
+  supplemental: boolean;
   semantic: SemanticModel;
+}
+
+export interface SupplementalSourceProvenance {
+  family: string;
+  sourceKind: "webref-idl-generated" | "package-declaration";
+  package: string;
+  version: string;
+  license: string;
+  sourceUrl: string;
+  inputs: ProvenanceFile[];
+  output: ProvenanceFile;
+  generationMethod: string;
 }
 
 export interface WebIdlExtendedAttributeModel {
@@ -304,6 +320,7 @@ export interface DomModel {
       version: string;
       license: "W3C";
     };
+    supplementalTypeScript: SupplementalSourceProvenance[];
     overrides: { input: string; sha256: string; appliedCount: number };
   };
   symbols: SymbolModel[];
@@ -332,8 +349,15 @@ export interface CoverageModel {
 
 export interface InputSet {
   typescriptVersion: string;
-  typescriptFiles: Array<{ path: string; label: string; sha256: string }>;
+  typescriptFiles: Array<{
+    path: string;
+    label: string;
+    sha256: string;
+    text?: string;
+    supplemental?: boolean;
+  }>;
   typescriptAggregateSha256: string;
+  supplementalSources: SupplementalSourceProvenance[];
   webrefVersion: string;
   webIdlFiles: Array<{ name: string; text: string; sha256: string }>;
   webIdlAggregateSha256: string;

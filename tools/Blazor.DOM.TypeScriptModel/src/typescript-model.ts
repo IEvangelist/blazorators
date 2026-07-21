@@ -28,12 +28,15 @@ interface TypeScriptExtraction {
 interface TypeScriptInputFile {
   path: string;
   label: string;
+  text?: string;
+  supplemental?: boolean;
 }
 
 interface ExtractionSource {
   sourceFile: ts.SourceFile;
   label: string;
   ordinal: number;
+  supplemental: boolean;
 }
 
 const keywordTypeKindNames = new Map<ts.SyntaxKind, string>([
@@ -72,16 +75,46 @@ export function extractTypeScriptModel(
     path.dirname(ts.getDefaultLibFilePath(options)),
     "lib.esnext.d.ts",
   );
+  const virtualFiles = new Map(
+    files
+      .filter((file) => file.text !== undefined)
+      .map((file) => [path.resolve(file.path), file.text!] as const),
+  );
+  const host = ts.createCompilerHost(options, true);
+  const defaultFileExists = host.fileExists.bind(host);
+  const defaultReadFile = host.readFile.bind(host);
+  const defaultGetSourceFile = host.getSourceFile.bind(host);
+  host.fileExists = (fileName) =>
+    virtualFiles.has(path.resolve(fileName)) || defaultFileExists(fileName);
+  host.readFile = (fileName) =>
+    virtualFiles.get(path.resolve(fileName)) ?? defaultReadFile(fileName);
+  host.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
+    const text = virtualFiles.get(path.resolve(fileName));
+    return text === undefined
+      ? defaultGetSourceFile(
+        fileName,
+        languageVersion,
+        onError,
+        shouldCreateNewSourceFile,
+      )
+      : ts.createSourceFile(fileName, text, languageVersion, true, ts.ScriptKind.TS);
+  };
   const program = ts.createProgram({
     rootNames: [standardLibraryPath, ...files.map((file) => file.path)],
     options,
+    host,
   });
   const sources = files.map<ExtractionSource>((file, ordinal) => {
     const sourceFile = program.getSourceFile(file.path);
     if (sourceFile === undefined) {
       throw new Error(`TypeScript did not load '${file.path}'.`);
     }
-    return { sourceFile, label: file.label, ordinal };
+    return {
+      sourceFile,
+      label: file.label,
+      ordinal,
+      supplemental: file.supplemental ?? false,
+    };
   });
 
   const diagnostics = ts.getPreEmitDiagnostics(program);
@@ -100,7 +133,7 @@ class TypeScriptExtractor {
   readonly #typeExpressionKinds: Record<string, number> = {};
   readonly #sourceMetadata = new Map<
     ts.SourceFile,
-    { label: string; ordinal: number }
+    { label: string; ordinal: number; supplemental: boolean }
   >();
   readonly #sourceOrdinals = new Map<string, number>();
   #declarationCount = 0;
@@ -115,6 +148,7 @@ class TypeScriptExtractor {
       this.#sourceMetadata.set(source.sourceFile, {
         label: source.label,
         ordinal: source.ordinal,
+        supplemental: source.supplemental,
       });
       this.#sourceOrdinals.set(source.label, source.ordinal);
     }
@@ -145,6 +179,9 @@ class TypeScriptExtractor {
             ordinal: declarationOrdinal,
           })),
         isDeclarationMerged: symbol.declarations.length > 1,
+        supplemental: symbol.declarations.every((declaration) =>
+          declaration.supplemental
+        ),
         semantic: {
           status: "unmatched",
           webIdlName: null,
@@ -271,11 +308,16 @@ class TypeScriptExtractor {
       this.member(member, ordinal)
     );
     const eventKeys = declaration.members
+      .filter((member) => member.kind === "property")
       .map((member) => member.name)
-      .filter((name): name is PropertyNameModel => name?.kind === "string")
-      .map((name) => name.text);
+      .filter((name): name is PropertyNameModel =>
+        name?.kind === "string" || name?.kind === "identifier"
+      )
+      .map((name) => name.text)
+      .filter((name, index, values) => values.indexOf(name) === index);
     const directMembersAreEventProperties = declaration.members.every((member) =>
-      member.kind === "property" && member.name?.kind === "string"
+      member.kind === "property" &&
+      (member.name?.kind === "string" || member.name?.kind === "identifier")
     );
     const inheritsEventMap = declaration.heritage.some((clause) =>
       clause.types.some((type) => {
@@ -338,6 +380,7 @@ class TypeScriptExtractor {
     increment(this.#declarationKinds, kind);
     return {
       ordinal: 0,
+      supplemental: this.location(node).supplemental,
       kind,
       name,
       modifiers: this.modifiers(node),
@@ -688,6 +731,8 @@ class TypeScriptExtractor {
     const end = sourceFile.getLineAndCharacterOfPosition(endOffset);
     return {
       source: metadata.label,
+      sourceOrdinal: metadata.ordinal,
+      supplemental: metadata.supplemental,
       start: {
         line: start.line + 1,
         column: start.character + 1,

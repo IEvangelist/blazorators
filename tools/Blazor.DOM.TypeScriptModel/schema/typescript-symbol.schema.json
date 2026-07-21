@@ -10,6 +10,7 @@
     "symbolFlags",
     "declarations",
     "isDeclarationMerged",
+    "supplemental",
     "semantic"
   ],
   "properties": {
@@ -31,6 +32,9 @@
       }
     },
     "isDeclarationMerged": {
+      "type": "boolean"
+    },
+    "supplemental": {
       "type": "boolean"
     },
     "semantic": {
@@ -87,12 +91,20 @@
       "additionalProperties": false,
       "required": [
         "source",
+        "sourceOrdinal",
+        "supplemental",
         "start",
         "end"
       ],
       "properties": {
         "source": {
           "$ref": "#/$defs/nonEmptyString"
+        },
+        "sourceOrdinal": {
+          "$ref": "#/$defs/ordinal"
+        },
+        "supplemental": {
+          "type": "boolean"
         },
         "start": {
           "$ref": "#/$defs/position"
@@ -1158,6 +1170,7 @@
       "additionalProperties": false,
       "required": [
         "ordinal",
+        "supplemental",
         "kind",
         "name",
         "modifiers",
@@ -1177,6 +1190,9 @@
       "properties": {
         "ordinal": {
           "$ref": "#/$defs/ordinal"
+        },
+        "supplemental": {
+          "type": "boolean"
         },
         "kind": {
           "enum": [

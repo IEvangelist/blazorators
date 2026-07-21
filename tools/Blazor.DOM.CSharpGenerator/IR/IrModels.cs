@@ -60,7 +60,9 @@ public sealed record ManifestProvenanceModel(
     [property: JsonPropertyName("typescript")] TypescriptProvenanceModel Typescript,
     [property: JsonPropertyName("webref")] ProvenanceEntryModel Webref,
     [property: JsonPropertyName("webidl2")] ProvenanceEntryModel Webidl2,
-    [property: JsonPropertyName("overrides")] OverridesProvenanceModel Overrides
+    [property: JsonPropertyName("overrides")] OverridesProvenanceModel Overrides,
+    [property: JsonPropertyName("supplementalTypeScript")]
+        IReadOnlyList<SupplementalSourceProvenanceModel>? SupplementalTypeScript = null
 );
 
 public sealed record ProvenanceEntryModel(
@@ -88,6 +90,18 @@ public sealed record OverridesProvenanceModel(
     [property: JsonPropertyName("appliedCount")] int AppliedCount
 );
 
+public sealed record SupplementalSourceProvenanceModel(
+    [property: JsonPropertyName("family")] string Family,
+    [property: JsonPropertyName("sourceKind")] string SourceKind,
+    [property: JsonPropertyName("package")] string Package,
+    [property: JsonPropertyName("version")] string Version,
+    [property: JsonPropertyName("license")] string License,
+    [property: JsonPropertyName("sourceUrl")] string SourceUrl,
+    [property: JsonPropertyName("inputs")] IReadOnlyList<ProvenanceInputModel> Inputs,
+    [property: JsonPropertyName("output")] ProvenanceInputModel Output,
+    [property: JsonPropertyName("generationMethod")] string GenerationMethod
+);
+
 // ─── TypeScript Symbol ──────────────────────────────────────────────────────────
 
 public sealed record SymbolModel(
@@ -96,7 +110,8 @@ public sealed record SymbolModel(
     [property: JsonPropertyName("symbolFlags")] int SymbolFlags,
     [property: JsonPropertyName("declarations")] IReadOnlyList<DeclarationModel> Declarations,
     [property: JsonPropertyName("isDeclarationMerged")] bool IsDeclarationMerged,
-    [property: JsonPropertyName("semantic")] SemanticModel Semantic
+    [property: JsonPropertyName("semantic")] SemanticModel Semantic,
+    [property: JsonPropertyName("supplemental")] bool Supplemental = false
 );
 
 public sealed record DeclarationModel(
@@ -115,7 +130,8 @@ public sealed record DeclarationModel(
     [property: JsonPropertyName("variableKind")] string? VariableKind,
     [property: JsonPropertyName("constructorObject")] bool ConstructorObject,
     [property: JsonPropertyName("eventMap")] EventMapModel EventMap,
-    [property: JsonPropertyName("namespaceMembers")] IReadOnlyList<string> NamespaceMembers
+    [property: JsonPropertyName("namespaceMembers")] IReadOnlyList<string> NamespaceMembers,
+    [property: JsonPropertyName("supplemental")] bool Supplemental = false
 );
 
 public sealed record TypeParameterModel(
@@ -185,7 +201,9 @@ public sealed record DocTagModel(
 public sealed record LocationModel(
     [property: JsonPropertyName("source")] string Source,
     [property: JsonPropertyName("start")] PositionModel Start,
-    [property: JsonPropertyName("end")] PositionModel End
+    [property: JsonPropertyName("end")] PositionModel End,
+    [property: JsonPropertyName("sourceOrdinal")] int SourceOrdinal = 0,
+    [property: JsonPropertyName("supplemental")] bool Supplemental = false
 );
 
 public sealed record PositionModel(
