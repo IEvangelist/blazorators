@@ -1324,6 +1324,56 @@ public sealed class TypeResolver
                 canonicalType: enumType);
         }
 
+        if (normalized.Arms.Count > 0
+            && normalized.Arms.All(arm => arm.Type is LiteralTypeNode
+            {
+                LiteralKind: "NumericLiteral" or "PrefixUnaryExpression",
+            })
+            && normalized.Arms
+                .Select(arm => (LiteralTypeNode)arm.Type)
+                .All(literal => double.TryParse(
+                    literal.Text,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out _)))
+        {
+            var values = normalized.Arms
+                .Select(arm => double.Parse(
+                    ((LiteralTypeNode)arm.Type).Text,
+                    System.Globalization.CultureInfo.InvariantCulture))
+                .ToList();
+            var numericType = _synthesizedTypes.RegisterNumericDomain(
+                provenance,
+                values);
+            return ValueType(
+                numericType,
+                providerNote: "finite-numeric-literal-union",
+                canonicalType: numericType);
+        }
+
+        if (normalized.Arms.Count > 0
+            && normalized.Arms.All(arm =>
+                arm.Type is QueryTypeNode
+                && double.TryParse(
+                    arm.Type.CheckerType,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out _)))
+        {
+            var values = normalized.Arms
+                .Select(arm => double.Parse(
+                    arm.Type.CheckerType!,
+                    System.Globalization.CultureInfo.InvariantCulture))
+                .ToList();
+            var numericType = _synthesizedTypes.RegisterNumericDomain(
+                provenance,
+                values);
+            return ValueType(
+                numericType,
+                providerNote: "finite-numeric-query-union",
+                canonicalType: numericType);
+        }
+
         var arms = Emitters.UnionWrapperEmitter.ProjectArms(
             normalized,
             arm => Project(
