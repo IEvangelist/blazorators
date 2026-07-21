@@ -75,7 +75,8 @@ public static class ProfilePipeline
                 profile.Features,
                 profile.SecureContext,
                 profile.RequiresUserActivation,
-                profile.EntryPoints));
+                profile.EntryPoints,
+                profile.Permissions));
         }
 
         var filteredIr = new IrBundle(

@@ -26,7 +26,9 @@ public sealed record ProfileDefinition(
     [property: JsonPropertyName("entryPoints")]
         IReadOnlyList<HostEntryPoint>? EntryPoints = null,
     [property: JsonPropertyName("transportOverrides")]
-        IReadOnlyList<ProfileTransportOverride>? TransportOverrides = null
+        IReadOnlyList<ProfileTransportOverride>? TransportOverrides = null,
+    [property: JsonPropertyName("permissions")]
+        IReadOnlyList<string>? Permissions = null
 );
 
 public sealed record ProfileTransportOverride(

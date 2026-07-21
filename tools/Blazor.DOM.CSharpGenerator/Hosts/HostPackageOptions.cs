@@ -11,7 +11,8 @@ public sealed record HostCapabilityMetadata(
     IReadOnlyList<string> Features,
     bool SecureContext,
     bool RequiresUserActivation,
-    IReadOnlyList<HostEntryPoint> EntryPoints);
+    IReadOnlyList<HostEntryPoint> EntryPoints,
+    IReadOnlyList<string>? Permissions = null);
 
 public sealed record HostPackageOptions(
     HostCapabilityMetadata Capability,
