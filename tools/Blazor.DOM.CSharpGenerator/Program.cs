@@ -227,6 +227,12 @@ try
                             $"{acc.GenerationFailed} generation failures, " +
                             $"{profileResult.PipelineResult.Errors.Count} errors, " +
                             $"byteIdentityVerified={profileResult.Coverage.ByteIdentityVerified}.");
+                        foreach (var error in profileResult.PipelineResult.Errors.Take(20))
+                        {
+                            Console.Error.WriteLine(
+                                $"    [{error.ExceptionType}] {error.SymbolName}: " +
+                                $"{error.Message.Split('\n')[0]}");
+                        }
                         profileFailures++;
                     }
                     else

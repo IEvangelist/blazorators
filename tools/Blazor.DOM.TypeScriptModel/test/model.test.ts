@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, before, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { loadPinnedInputs } from "../src/inputs.js";
 import { buildDomModel } from "../src/model.js";
 import {
   hashJsonLines,
@@ -13,6 +14,10 @@ import {
 } from "../src/output.js";
 import { InputSet, SymbolModel, WebIdlSymbolModel } from "../src/schema.js";
 import { normalizeLf, stableJson, sha256 } from "../src/stable-json.js";
+import {
+  filterWebGpuWindowSource,
+  generateWebIdlSupplement,
+} from "../src/supplemental.js";
 import { extractTypeScriptModel } from "../src/typescript-model.js";
 import { extractWebIdlModel } from "../src/webidl-model.js";
 import { assertValid, loadArtifactValidators } from "../src/validation.js";
@@ -319,6 +324,145 @@ test("classifies Web IDL and preserves exposure metadata", () => {
   assert.equal(result.coverage.argumentCount, 6);
 });
 
+test("strict supplemental conversion preserves IDL constructs and fails closed", () => {
+  const supplementalIdl = `
+[Exposed=Window, SecureContext]
+interface SupplementalFixture : EventTarget {
+  constructor(DOMString name, optional sequence<unsigned long> values = []);
+  Promise<DOMString> run(optional BufferSource input);
+  attribute EventHandler onchange;
+  readonly maplike<DOMString, long>;
+};
+dictionary SupplementalOptions {
+  required DOMString name;
+  boolean enabled = false;
+};
+enum SupplementalMode { "one", "two" };
+callback SupplementalCallback = Promise<DOMString> (SupplementalOptions options);
+namespace SupplementalConstants {
+  readonly attribute unsigned long VALUE;
+};
+`;
+  const generated = generateWebIdlSupplement(
+    {
+      family: "Fixture",
+      specification: "fixture",
+      sourceUrl: "https://example.test/fixture/",
+      text: supplementalIdl,
+      sha256: sha256(supplementalIdl),
+    },
+    "fixture",
+    path.join(directory, "fixture.supplemental.d.ts"),
+    sha256,
+  );
+  assert.match(generated.input.text, /interface SupplementalFixture extends EventTarget/);
+  assert.match(generated.input.text, /new\(name: string, values\?: Array<number>\)/);
+  assert.match(generated.input.text, /run\(input\?: BufferSource\): Promise<string>/);
+  assert.match(generated.input.text, /\[Symbol\.iterator\]\(\): MapIterator/);
+  assert.match(generated.input.text, /type SupplementalCallback = \(options: SupplementalOptions\) => Promise<string>/);
+  assert.match(generated.input.text, /declare namespace SupplementalConstants/);
+  assert.equal(generated.provenance.sourceKind, "webref-idl-generated");
+  assert.equal(generated.provenance.output.sha256, sha256(generated.input.text));
+
+  const unsupported = `
+[Exposed=Window] interface UnsupportedFixture {
+  readonly setlike<DOMString>;
+};
+`;
+  assert.throws(
+    () =>
+      generateWebIdlSupplement(
+        {
+          family: "Unsupported",
+          specification: "unsupported",
+          sourceUrl: "https://example.test/unsupported/",
+          text: unsupported,
+          sha256: sha256(unsupported),
+        },
+        "fixture",
+        path.join(directory, "unsupported.d.ts"),
+        sha256,
+      ),
+    /Unsupported Web IDL member 'setlike'/,
+  );
+});
+
+test("WebGPU filtering keeps Window shapes and normalizes semantic namespaces", () => {
+  const source = `
+interface Config {
+  retained?: string;
+  omitted?: number;
+}
+interface ConfigOut extends Required<Omit<Config, "omitted">> {
+  own?: boolean;
+}
+interface Navigator extends NavigatorGPU {}
+interface WorkerNavigator extends NavigatorGPU {}
+interface GPUFlags {
+  readonly READ: number;
+}
+declare var GPUFlags: GPUFlags;
+`;
+  const filtered = filterWebGpuWindowSource(source, new Set(["GPUFlags"]));
+  assert.doesNotMatch(filtered, /WorkerNavigator/);
+  assert.match(filtered, /interface Navigator extends NavigatorGPU/);
+  assert.match(filtered, /interface ConfigOut \{\s+retained: string;/);
+  assert.match(filtered, /own\?: boolean/);
+  assert.doesNotMatch(
+    /interface ConfigOut \{(?<body>[\s\S]*?)\}/.exec(filtered)?.groups?.body ?? "",
+    /omitted/,
+  );
+  assert.match(filtered, /declare namespace GPUFlags \{\s+const READ: number;/);
+  assert.doesNotMatch(filtered, /declare var GPUFlags/);
+});
+
+test("pinned supplemental closure is Window-scoped and provenance-complete", async () => {
+  const toolRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+  const inputs = await loadPinnedInputs(toolRoot);
+  const model = buildDomModel(inputs);
+  const expected = [
+    "Bluetooth",
+    "USB",
+    "HID",
+    "Serial",
+    "Presentation",
+    "GPU",
+  ];
+  for (const name of expected) {
+    const item = symbol(model.symbols, name);
+    assert.equal(item.supplemental, true, name);
+    assert.equal(item.semantic.exposedOnWindow, true, name);
+  }
+  const navigator = symbol(model.symbols, "Navigator");
+  assert.equal(navigator.supplemental, false);
+  assert.ok(navigator.declarations.some((item) => item.supplemental));
+  assert.equal(
+    model.symbols.some((item) => item.name === "WorkerNavigator"),
+    false,
+  );
+  assert.equal(inputs.supplementalSources.length, 7);
+  assert.deepEqual(
+    inputs.supplementalSources.map((item) => item.family),
+    [
+      "Presentation API",
+      "Web Serial",
+      "Web Bluetooth",
+      "Web Bluetooth",
+      "WebHID",
+      "WebUSB",
+      "WebGPU",
+    ],
+  );
+  assert.ok(
+    model.symbols
+      .flatMap((item) => item.declarations)
+      .every((item) =>
+        item.location.sourceOrdinal >= 0 &&
+        item.supplemental === item.location.supplemental
+      ),
+  );
+});
+
 test("regeneration is byte-identical and reconciliation is explicit", async () => {
   const inputs: InputSet = {
     typescriptVersion: "fixture",
@@ -338,6 +482,7 @@ test("regeneration is byte-identical and reconciliation is explicit", async () =
       `fixture.d.ts\0${sha256(declarations)}\n` +
       `fixture.iterable.d.ts\0${sha256(iterableDeclarations)}\n`,
     ),
+    supplementalSources: [],
     webrefVersion: "fixture",
     webIdlFiles: [{ name: "fixture", text: idl, sha256: sha256(idl) }],
     webIdlAggregateSha256: sha256(`fixture\0${sha256(idl)}\n`),
@@ -484,6 +629,7 @@ enum Mode { "one", "two" };
     typescriptAggregateSha256: sha256(
       `transport.d.ts\0${sha256(transportDeclarations)}\n`,
     ),
+    supplementalSources: [],
     webrefVersion: "fixture",
     webIdlFiles: [{
       name: "transport",

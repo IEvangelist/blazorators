@@ -65,6 +65,9 @@ public sealed class IrLoaderTests : IDisposable
 
         Assert.Single(bundle.TypescriptSymbols);
         Assert.Equal("AlignSetting", bundle.TypescriptSymbols[0].Name);
+        Assert.True(bundle.TypescriptSymbols[0].Supplemental);
+        Assert.True(bundle.TypescriptSymbols[0].Declarations[0].Supplemental);
+        Assert.Equal(3, bundle.TypescriptSymbols[0].Declarations[0].Location.SourceOrdinal);
         var aliasType = Assert.IsType<UnionTypeNode>(
             bundle.TypescriptSymbols[0].Declarations[0].Type);
         Assert.Equal("json-value", aliasType.Transport?.Kind);
@@ -78,8 +81,8 @@ public sealed class IrLoaderTests : IDisposable
     {
         var escaped = name.Replace("\"", "\\\"");
         return
-            "{\"ordinal\":0,\"name\":\"" + escaped + "\",\"symbolFlags\":524288," +
-            "\"declarations\":[{\"ordinal\":0,\"kind\":\"" + declKind + "\",\"name\":\"" + escaped + "\"," +
+            "{\"ordinal\":0,\"name\":\"" + escaped + "\",\"symbolFlags\":524288,\"supplemental\":true," +
+            "\"declarations\":[{\"ordinal\":0,\"supplemental\":true,\"kind\":\"" + declKind + "\",\"name\":\"" + escaped + "\"," +
             "\"modifiers\":[],\"typeParameters\":[],\"heritage\":[],\"members\":[]," +
             "\"type\":{\"syntaxKind\":\"UnionType\",\"checkerType\":\"" + escaped + "\",\"kind\":\"union\"," +
             "\"transport\":{\"kind\":\"json-value\",\"nullable\":false,\"sourceType\":\"" + escaped + "\"," +
@@ -90,7 +93,7 @@ public sealed class IrLoaderTests : IDisposable
             "\"literalKind\":\"StringLiteral\",\"text\":\"\\\"center\\\"\"}]}," +
             "\"parameters\":[],\"returnType\":null," +
             "\"documentation\":{\"text\":\"\",\"tags\":[],\"deprecated\":false}," +
-            "\"location\":{\"source\":\"lib.dom.d.ts\",\"start\":{\"line\":1,\"column\":1,\"offset\":0}," +
+            "\"location\":{\"source\":\"lib.dom.d.ts\",\"sourceOrdinal\":3,\"supplemental\":true,\"start\":{\"line\":1,\"column\":1,\"offset\":0}," +
             "\"end\":{\"line\":1,\"column\":10,\"offset\":9}}," +
             "\"variableKind\":null,\"constructorObject\":false," +
             "\"eventMap\":{\"isEventMap\":false,\"keys\":[]},\"namespaceMembers\":[]}]," +

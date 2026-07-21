@@ -375,6 +375,57 @@
         }
       }
     },
+    "supplementalSourceProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family",
+        "sourceKind",
+        "package",
+        "version",
+        "license",
+        "sourceUrl",
+        "inputs",
+        "output",
+        "generationMethod"
+      ],
+      "properties": {
+        "family": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sourceKind": {
+          "enum": [
+            "webref-idl-generated",
+            "package-declaration"
+          ]
+        },
+        "package": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "license": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sourceUrl": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/provenanceFile"
+          }
+        },
+        "output": {
+          "$ref": "#/$defs/provenanceFile"
+        },
+        "generationMethod": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
     "provenance": {
       "type": "object",
       "additionalProperties": false,
@@ -383,6 +434,7 @@
         "typescript",
         "webref",
         "webidl2",
+        "supplementalTypeScript",
         "overrides"
       ],
       "properties": {
@@ -397,6 +449,13 @@
         },
         "webidl2": {
           "$ref": "#/$defs/webidl2Provenance"
+        },
+        "supplementalTypeScript": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/supplementalSourceProvenance"
+          }
         },
         "overrides": {
           "$ref": "#/$defs/overrideProvenance"
