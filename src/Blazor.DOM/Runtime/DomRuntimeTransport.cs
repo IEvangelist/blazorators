@@ -10,6 +10,7 @@ internal static class DomRuntimeTransport
         IJSObjectReference target,
         string type,
         DotNetObjectReference<DomCallbackHandler> handlerReference,
+        DomEventListenerOptions? options,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(module);
@@ -33,6 +34,7 @@ internal static class DomRuntimeTransport
                     "HandleEvent",
                     registrationHandlerReference,
                     "ReceiveRegistration",
+                    options?.ToInteropValue(),
                 ]).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
             return registrationHandler.TakeRegistration();

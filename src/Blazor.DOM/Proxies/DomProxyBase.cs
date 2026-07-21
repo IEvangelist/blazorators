@@ -50,6 +50,19 @@ public abstract class DomProxyBase : IDomEventTargetProxy
             options,
             cancellationToken);
 
+    /// <inheritdoc />
+    public ValueTask<DomEventSubscription> SubscribeValueAsync<TValue>(
+        DomEventDescriptor<TValue> descriptor,
+        Func<TValue, Task> callback,
+        DomEventListenerOptions? options = null,
+        CancellationToken cancellationToken = default) =>
+        Runtime.SubscribeValueAsync(
+            Reference,
+            descriptor,
+            callback,
+            options,
+            cancellationToken);
+
     /// <summary>
     /// Disposes the underlying JS reference.  Idempotent; safe to call
     /// multiple times or concurrently.

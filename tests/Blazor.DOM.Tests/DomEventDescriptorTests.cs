@@ -20,5 +20,21 @@ public sealed class DomEventDescriptorTests
         Assert.Single(descriptor.Provenance);
     }
 
+    [Fact]
+    public void Value_preserves_nullable_json_transport()
+    {
+        var descriptor = DomEventDescriptor<int?>.Value(
+            "count",
+            "ExampleEventMap",
+            "number | null",
+            nullable: true,
+            deprecated: false,
+            "ExampleEventMap/decl[0]/member[2]/count");
+
+        Assert.Equal(DomTransportKind.JsonValue, descriptor.Transport.Kind);
+        Assert.True(descriptor.Transport.Nullable);
+        Assert.Equal("count", descriptor.Name);
+    }
+
     private sealed class TestEvent;
 }

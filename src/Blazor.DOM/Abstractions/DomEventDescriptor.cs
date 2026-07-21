@@ -62,4 +62,19 @@ public sealed class DomEventDescriptor<TEvent>
             DomTransportDescriptor.JsReference(sourceType),
             deprecated,
             provenance);
+
+    /// <summary>Creates a descriptor for a proven JSON event payload.</summary>
+    public static DomEventDescriptor<TEvent> Value(
+        string name,
+        string eventMap,
+        string sourceType,
+        bool nullable,
+        bool deprecated,
+        params string[] provenance) =>
+        new(
+            name,
+            eventMap,
+            DomTransportDescriptor.JsonValue(sourceType, nullable),
+            deprecated,
+            provenance);
 }

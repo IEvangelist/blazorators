@@ -1125,6 +1125,52 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Value_descriptor_uses_typed_json_callback_and_existing_listener_registry(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        DomCallbackHandler? handler = null;
+        host.Module.InvocationHandlers["addDotNetEventListener"] =
+            async (args, _) =>
+            {
+                handler = Assert.IsType<
+                    DotNetObjectReference<DomCallbackHandler>>(args![2]).Value;
+                var registrationHandler = Assert.IsType<
+                    DotNetObjectReference<DomEventIdRegistrationHandler>>(args[4]);
+                await registrationHandler.Value.ReceiveRegistrationAsync(77);
+                return null;
+            };
+        var descriptor = DomEventDescriptor<int?>.Value(
+            "count",
+            "FixtureEventMap",
+            "number | null",
+            nullable: true,
+            deprecated: false,
+            "FixtureEventMap/decl[0]/member[0]/count");
+        int? received = null;
+
+        var subscription = await host.Runtime.SubscribeValueAsync(
+            new FakeJSObjectReference(),
+            descriptor,
+            value =>
+            {
+                received = value;
+                return Task.CompletedTask;
+            },
+            options: true);
+        await Assert.IsType<DomCallbackHandler>(handler).HandleEventAsync("42");
+        await subscription.DisposeAsync();
+
+        Assert.Equal(42, received);
+        Assert.Contains(
+            host.Module.Invocations,
+            invocation => invocation.Identifier == "removeDotNetEventListener"
+                && Equals(invocation.Args![0], 77));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Typed_event_registration_failure_closes_handler_and_late_reference(bool wasm)
     {
         var host = CreateHost(wasm);
