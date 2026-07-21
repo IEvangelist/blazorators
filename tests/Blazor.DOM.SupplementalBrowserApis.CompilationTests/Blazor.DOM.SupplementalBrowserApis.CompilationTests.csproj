@@ -8,6 +8,7 @@
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <DomGenerationProfile>SupplementalBrowserApis</DomGenerationProfile>
+    <DomIncludeSupplemental>true</DomIncludeSupplemental>
   </PropertyGroup>
 
   <ItemGroup>
