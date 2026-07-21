@@ -44,10 +44,19 @@ public static class OutputPromotion
         "Globals",
         "Interfaces",
         "Namespaces",
+        "Server",
+        "Shared",
         "Typedefs",
+        "WebAssembly",
     ];
 
-    private const string ExhaustiveManifest = "emitter-manifest.json";
+    private static readonly IReadOnlySet<string> ExhaustiveOwnedFiles =
+        new HashSet<string>(
+        [
+            "emitter-manifest.json",
+            "host-parity.json",
+        ],
+        StringComparer.Ordinal);
 
     public static void PromoteExhaustive(
         string stagingDirectory,
@@ -72,7 +81,7 @@ public static class OutputPromotion
     public static bool IsExhaustiveOwnedPath(string relativePath)
     {
         var normalized = relativePath.Replace('\\', '/');
-        if (string.Equals(normalized, ExhaustiveManifest, StringComparison.Ordinal))
+        if (ExhaustiveOwnedFiles.Contains(normalized))
             return true;
 
         var separator = normalized.IndexOf('/');
@@ -305,9 +314,12 @@ public static class OutputPromotion
                 DeleteDirectoryWithRetry(path);
         }
 
-        var manifest = Path.Combine(directory, ExhaustiveManifest);
-        if (File.Exists(manifest))
-            File.Delete(manifest);
+        foreach (var ownedFile in ExhaustiveOwnedFiles)
+        {
+            var path = Path.Combine(directory, ownedFile);
+            if (File.Exists(path))
+                File.Delete(path);
+        }
     }
 
     private static void VerifyPromotion(

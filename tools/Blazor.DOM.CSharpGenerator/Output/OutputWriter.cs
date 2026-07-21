@@ -12,13 +12,15 @@ public sealed class OutputWriter
 {
     private readonly string _outputDirectory;
     private readonly List<GeneratedFile> _written = [];
+    private readonly HashSet<string> _paths = new(StringComparer.OrdinalIgnoreCase);
 
     public IReadOnlyList<GeneratedFile> WrittenFiles => _written;
 
     public OutputWriter(string outputDirectory)
     {
-        _outputDirectory = outputDirectory;
-        Directory.CreateDirectory(outputDirectory);
+        _outputDirectory = Path.TrimEndingDirectorySeparator(
+            Path.GetFullPath(outputDirectory));
+        Directory.CreateDirectory(_outputDirectory);
     }
 
     /// <summary>
@@ -27,20 +29,23 @@ public sealed class OutputWriter
     /// </summary>
     public string Write(string csharpTypeName, string source, string subdirectory = "")
     {
+        ValidateFileStem(csharpTypeName);
+        var relativeDirectory = ValidateRelativePath(subdirectory, nameof(subdirectory));
         var dir = string.IsNullOrEmpty(subdirectory)
             ? _outputDirectory
-            : Path.Combine(_outputDirectory, subdirectory);
+            : ResolveOwnedPath(relativeDirectory);
         Directory.CreateDirectory(dir);
 
         var fileName = $"{csharpTypeName}.g.cs";
         var fullPath = Path.Combine(dir, fileName);
+        var relPath = Path.GetRelativePath(_outputDirectory, fullPath);
+        ReservePath(relPath);
         var normalized = NormalizeLineEndings(source);
         var bytes = Encoding.UTF8.GetBytes(normalized);
         var sha256 = ComputeSha256Hex(bytes);
 
         File.WriteAllBytes(fullPath, bytes);
 
-        var relPath = Path.GetRelativePath(_outputDirectory, fullPath);
         _written.Add(new GeneratedFile(relPath, csharpTypeName, sha256, bytes.Length));
         return relPath;
     }
@@ -51,7 +56,10 @@ public sealed class OutputWriter
     /// </summary>
     public void WriteManifest(object manifest, string fileName = "emitter-manifest.json")
     {
-        var path = Path.Combine(_outputDirectory, fileName);
+        var relativePath = ValidateRelativePath(fileName, nameof(fileName));
+        var path = ResolveOwnedPath(relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        ReservePath(relativePath);
         var json = JsonSerializer.Serialize(manifest, new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -62,6 +70,64 @@ public sealed class OutputWriter
         var sha256 = ComputeSha256Hex(bytes);
         var relPath = Path.GetRelativePath(_outputDirectory, path);
         _written.Add(new GeneratedFile(relPath, Path.GetFileNameWithoutExtension(fileName), sha256, bytes.Length));
+    }
+
+    private string ResolveOwnedPath(string relativePath)
+    {
+        var path = Path.GetFullPath(Path.Combine(_outputDirectory, relativePath));
+        var prefix = _outputDirectory + Path.DirectorySeparatorChar;
+        if (!path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                $"Generated path '{relativePath}' escapes output root '{_outputDirectory}'.");
+        }
+
+        return path;
+    }
+
+    private void ReservePath(string relativePath)
+    {
+        if (!_paths.Add(relativePath))
+        {
+            throw new InvalidOperationException(
+                $"Generated output path collision: '{relativePath}'.");
+        }
+    }
+
+    private static void ValidateFileStem(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)
+            || value is "." or ".."
+            || value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+            || value.Contains(Path.DirectorySeparatorChar)
+            || value.Contains(Path.AltDirectorySeparatorChar))
+        {
+            throw new ArgumentException(
+                $"Generated C# type name '{value}' is not a valid file stem.",
+                nameof(value));
+        }
+    }
+
+    private static string ValidateRelativePath(string value, string parameterName)
+    {
+        if (Path.IsPathRooted(value))
+        {
+            throw new ArgumentException(
+                $"Generated path '{value}' must be relative.",
+                parameterName);
+        }
+
+        var segments = value.Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Any(segment => segment is "." or ".."))
+        {
+            throw new ArgumentException(
+                $"Generated path '{value}' contains a traversal segment.",
+                parameterName);
+        }
+
+        return Path.Combine(segments);
     }
 
     // LF-normalised for byte-stable output across platforms.
