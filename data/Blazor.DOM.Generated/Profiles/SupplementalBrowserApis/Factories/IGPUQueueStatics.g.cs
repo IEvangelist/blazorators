@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUSupportedLimitsFactory
+public partial interface IGPUQueueStatics
 {
-    IGPUSupportedLimits Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUQueue Prototype { get; set; }
 }

@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IBluetoothDeviceFactory
+public partial interface IGPUDeviceStatics
 {
-    IBluetoothDevice Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUDevice Prototype { get; set; }
 }

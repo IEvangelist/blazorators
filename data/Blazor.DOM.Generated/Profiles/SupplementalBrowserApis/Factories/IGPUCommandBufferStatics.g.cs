@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface ISerialPortFactory
+public partial interface IGPUCommandBufferStatics
 {
-    ISerialPort Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUCommandBuffer Prototype { get; set; }
 }

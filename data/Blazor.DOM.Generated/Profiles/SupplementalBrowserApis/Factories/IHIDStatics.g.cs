@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IPresentationReceiverFactory
+public partial interface IHIDStatics
 {
-    IPresentationReceiver Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IHID Prototype { get; set; }
 }

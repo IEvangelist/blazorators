@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IBluetoothLEScanFactory
+public partial interface IGPUStatics
 {
-    IBluetoothLEScan Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPU Prototype { get; set; }
 }

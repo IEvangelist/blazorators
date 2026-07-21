@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUAdapterFactory
+public partial interface IGPUAdapterStatics
 {
     IGPUAdapter Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
 }

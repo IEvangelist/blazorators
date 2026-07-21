@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUTextureFactory
+public partial interface ISerialStatics
 {
-    IGPUTexture Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    ISerial Prototype { get; set; }
 }

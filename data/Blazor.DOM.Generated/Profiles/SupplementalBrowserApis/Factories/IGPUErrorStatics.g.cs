@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface ISerialFactory
+public partial interface IGPUErrorStatics
 {
-    ISerial Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUError Prototype { get; set; }
 }

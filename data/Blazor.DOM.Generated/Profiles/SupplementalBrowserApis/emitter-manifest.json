@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generatorVersion": "1.0.0",
   "sourceManifest": {
-    "typescriptSymbolsSha256": "a32344da18a6fe899dd5f81a25849bc7b27a323ee7e136f459d9d524b97b1e0e",
+    "typescriptSymbolsSha256": "1b118d7db3d79c7c2e6ede8faefabaacb44122b1cd5bece68e3b15c398443b2d",
     "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
   },
   "accounting": {
@@ -149,20 +149,20 @@
     "failedSymbols": [],
     "deferredMemberEntries": [],
     "failedMemberEntries": [],
-    "totalMembers": 190,
-    "projectedMembers": 190,
+    "totalMembers": 163,
+    "projectedMembers": 163,
     "deferredMembers": 0,
     "failedMembers": 0,
-    "expectedMembers": 190,
+    "expectedMembers": 163,
     "memberReconciliationValid": true,
     "failedSymbolMemberOutcomes": [],
     "notAttemptedAfterFailureMembers": 0,
     "sourceDeclarations": 189,
     "accountedSourceDeclarations": 189,
-    "sourceMembers": 190,
-    "accountedSourceMembers": 190,
-    "sourceOverloads": 93,
-    "accountedSourceOverloads": 93,
+    "sourceMembers": 163,
+    "accountedSourceMembers": 163,
+    "sourceOverloads": 66,
+    "accountedSourceOverloads": 66,
     "sourceParameters": 78,
     "accountedSourceParameters": 78,
     "declarationReconciliationValid": true,
@@ -247,7 +247,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Bluetooth/decl[2]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:30:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:29:1"
       },
       {
         "symbolName": "Bluetooth",
@@ -257,7 +257,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Bluetooth/decl[3]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:33:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:32:1"
       },
       {
         "symbolName": "Bluetooth",
@@ -267,7 +267,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Bluetooth/decl[4]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:36:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:35:1"
       },
       {
         "symbolName": "Bluetooth",
@@ -287,7 +287,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothDevice/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:98:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:96:1"
       },
       {
         "symbolName": "BluetoothDevice",
@@ -297,7 +297,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "BluetoothDevice/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:107:13"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:105:13"
       },
       {
         "symbolName": "BluetoothDevice",
@@ -307,7 +307,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothDevice/decl[2]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:113:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:110:1"
       },
       {
         "symbolName": "BluetoothDevice",
@@ -317,7 +317,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothDevice/decl[3]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:116:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:113:1"
       },
       {
         "symbolName": "BluetoothDevice",
@@ -327,7 +327,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothDevice/decl[4]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:119:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:116:1"
       },
       {
         "symbolName": "BluetoothDeviceEventHandlers",
@@ -337,7 +337,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothDeviceEventHandlers/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:122:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:119:1"
       },
       {
         "symbolName": "BluetoothLEScan",
@@ -367,7 +367,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothLEScanFilterInit/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:128:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:125:1"
       },
       {
         "symbolName": "BluetoothLEScanOptions",
@@ -377,7 +377,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothLEScanOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:52:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:51:1"
       },
       {
         "symbolName": "BluetoothLEScanPermissionDescriptor",
@@ -387,7 +387,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothLEScanPermissionDescriptor/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:59:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:58:1"
       },
       {
         "symbolName": "BluetoothManufacturerDataMap",
@@ -397,7 +397,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:142:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:139:1"
       },
       {
         "symbolName": "BluetoothManufacturerDataMap",
@@ -407,7 +407,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "BluetoothManufacturerDataMap/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:153:13"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:150:13"
       },
       {
         "symbolName": "BluetoothPermissionDescriptor",
@@ -417,7 +417,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothPermissionDescriptor/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:159:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:155:1"
       },
       {
         "symbolName": "BluetoothRemoteGATTCharacteristic",
@@ -427,7 +427,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:183:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:178:1"
       },
       {
         "symbolName": "BluetoothRemoteGATTCharacteristic",
@@ -437,7 +437,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:198:13"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:193:13"
       },
       {
         "symbolName": "BluetoothRemoteGATTCharacteristic",
@@ -447,7 +447,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[2]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:204:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:198:1"
       },
       {
         "symbolName": "BluetoothRemoteGATTServer",
@@ -457,7 +457,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothRemoteGATTServer/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:221:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:214:1"
       },
       {
         "symbolName": "BluetoothRemoteGATTServer",
@@ -467,7 +467,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "BluetoothRemoteGATTServer/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:230:13"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:223:13"
       },
       {
         "symbolName": "BluetoothServiceUUID",
@@ -477,7 +477,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "BluetoothServiceUUID/decl[0]/typeAlias",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:280:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:270:1"
       },
       {
         "symbolName": "BufferSource",
@@ -497,7 +497,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "CharacteristicEventHandlers/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:296:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:285:1"
       },
       {
         "symbolName": "Event",
@@ -607,7 +607,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPU/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2129:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2128:13"
       },
       {
         "symbolName": "GPUAdapter",
@@ -617,7 +617,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUAdapter/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2134:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2132:1"
       },
       {
         "symbolName": "GPUAdapter",
@@ -627,7 +627,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUAdapter/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2170:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2167:13"
       },
       {
         "symbolName": "GPUAdapterInfo",
@@ -637,7 +637,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUAdapterInfo/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2175:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2171:1"
       },
       {
         "symbolName": "GPUAdapterInfo",
@@ -647,7 +647,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUAdapterInfo/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2225:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2220:13"
       },
       {
         "symbolName": "GPUAllowSharedBufferSource",
@@ -667,7 +667,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUBuffer/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2252:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2242:1"
       },
       {
         "symbolName": "GPUBuffer",
@@ -677,7 +677,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUBuffer/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2303:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2292:13"
       },
       {
         "symbolName": "GPUBufferDescriptor",
@@ -697,7 +697,7 @@
         "phase": null,
         "reason": "Namespace container emitted as a logical namespace contract reachable from IWindow.",
         "provenance": "GPUBufferUsage/decl[0]/namespace",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3358:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3300:1"
       },
       {
         "symbolName": "GPUBufferUsage.COPY_DST",
@@ -707,7 +707,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.COPY_DST/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3362:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3304:9"
       },
       {
         "symbolName": "GPUBufferUsage.COPY_SRC",
@@ -717,7 +717,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.COPY_SRC/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3361:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3303:9"
       },
       {
         "symbolName": "GPUBufferUsage.INDEX",
@@ -727,7 +727,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.INDEX/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3363:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3305:9"
       },
       {
         "symbolName": "GPUBufferUsage.INDIRECT",
@@ -737,7 +737,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.INDIRECT/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3367:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3309:9"
       },
       {
         "symbolName": "GPUBufferUsage.MAP_READ",
@@ -747,7 +747,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.MAP_READ/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3359:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3301:9"
       },
       {
         "symbolName": "GPUBufferUsage.MAP_WRITE",
@@ -757,7 +757,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.MAP_WRITE/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3360:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3302:9"
       },
       {
         "symbolName": "GPUBufferUsage.QUERY_RESOLVE",
@@ -767,7 +767,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.QUERY_RESOLVE/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3368:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3310:9"
       },
       {
         "symbolName": "GPUBufferUsage.STORAGE",
@@ -777,7 +777,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.STORAGE/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3366:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3308:9"
       },
       {
         "symbolName": "GPUBufferUsage.UNIFORM",
@@ -787,7 +787,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.UNIFORM/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3365:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3307:9"
       },
       {
         "symbolName": "GPUBufferUsage.VERTEX",
@@ -797,7 +797,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUBufferUsage\u0027.",
         "provenance": "GPUBufferUsage.VERTEX/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3364:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3306:9"
       },
       {
         "symbolName": "GPUCanvasConfiguration",
@@ -827,7 +827,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUCanvasContext/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2308:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2296:1"
       },
       {
         "symbolName": "GPUCanvasContext",
@@ -837,7 +837,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUCanvasContext/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2348:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2335:13"
       },
       {
         "symbolName": "GPUCommandBuffer",
@@ -847,7 +847,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUCommandBuffer/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2353:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2339:1"
       },
       {
         "symbolName": "GPUCommandBuffer",
@@ -857,7 +857,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUCommandBuffer/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2359:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2344:13"
       },
       {
         "symbolName": "GPUDevice",
@@ -877,7 +877,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUDevice/decl[1]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2616:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2590:1"
       },
       {
         "symbolName": "GPUDevice",
@@ -887,7 +887,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUDevice/decl[2]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2798:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2771:13"
       },
       {
         "symbolName": "GPUDeviceDescriptor",
@@ -907,7 +907,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUDeviceLostInfo/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2803:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2775:1"
       },
       {
         "symbolName": "GPUDeviceLostInfo",
@@ -917,7 +917,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUDeviceLostInfo/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2810:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2781:13"
       },
       {
         "symbolName": "GPUError",
@@ -937,7 +937,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUError/decl[1]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2815:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2785:1"
       },
       {
         "symbolName": "GPUError",
@@ -947,7 +947,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUError/decl[2]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2834:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2803:13"
       },
       {
         "symbolName": "GPUFlagsConstant",
@@ -967,7 +967,7 @@
         "phase": null,
         "reason": "Namespace container emitted as a logical namespace contract reachable from IWindow.",
         "provenance": "GPUMapMode/decl[0]/namespace",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3377:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3319:1"
       },
       {
         "symbolName": "GPUMapMode.READ",
@@ -977,7 +977,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUMapMode\u0027.",
         "provenance": "GPUMapMode.READ/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3378:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3320:9"
       },
       {
         "symbolName": "GPUMapMode.WRITE",
@@ -987,7 +987,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUMapMode\u0027.",
         "provenance": "GPUMapMode.WRITE/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3379:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3321:9"
       },
       {
         "symbolName": "GPUMapModeFlags",
@@ -1027,7 +1027,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUQueue/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2935:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2897:1"
       },
       {
         "symbolName": "GPUQueue",
@@ -1037,7 +1037,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUQueue/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3006:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2967:13"
       },
       {
         "symbolName": "GPURequestAdapterOptions",
@@ -1057,7 +1057,7 @@
         "phase": null,
         "reason": "Namespace container emitted as a logical namespace contract reachable from IWindow.",
         "provenance": "GPUShaderStage/decl[0]/namespace",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3381:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3323:1"
       },
       {
         "symbolName": "GPUShaderStage.COMPUTE",
@@ -1067,7 +1067,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUShaderStage\u0027.",
         "provenance": "GPUShaderStage.COMPUTE/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3384:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3326:9"
       },
       {
         "symbolName": "GPUShaderStage.FRAGMENT",
@@ -1077,7 +1077,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUShaderStage\u0027.",
         "provenance": "GPUShaderStage.FRAGMENT/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3383:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3325:9"
       },
       {
         "symbolName": "GPUShaderStage.VERTEX",
@@ -1087,7 +1087,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUShaderStage\u0027.",
         "provenance": "GPUShaderStage.VERTEX/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3382:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3324:9"
       },
       {
         "symbolName": "GPUSize64",
@@ -1117,7 +1117,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUSupportedFeatures/decl[0]/typeAlias",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3175:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3123:1"
       },
       {
         "symbolName": "GPUSupportedLimits",
@@ -1127,7 +1127,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUSupportedLimits/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3178:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3126:1"
       },
       {
         "symbolName": "GPUSupportedLimits",
@@ -1137,7 +1137,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUSupportedLimits/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3235:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3182:13"
       },
       {
         "symbolName": "GPUTexture",
@@ -1147,7 +1147,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUTexture/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3240:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3186:1"
       },
       {
         "symbolName": "GPUTexture",
@@ -1157,7 +1157,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUTexture/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3305:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3250:13"
       },
       {
         "symbolName": "GPUTextureUsage",
@@ -1167,7 +1167,7 @@
         "phase": null,
         "reason": "Namespace container emitted as a logical namespace contract reachable from IWindow.",
         "provenance": "GPUTextureUsage/decl[0]/namespace",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3386:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3328:1"
       },
       {
         "symbolName": "GPUTextureUsage.COPY_DST",
@@ -1177,7 +1177,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUTextureUsage\u0027.",
         "provenance": "GPUTextureUsage.COPY_DST/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3388:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3330:9"
       },
       {
         "symbolName": "GPUTextureUsage.COPY_SRC",
@@ -1187,7 +1187,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUTextureUsage\u0027.",
         "provenance": "GPUTextureUsage.COPY_SRC/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3387:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3329:9"
       },
       {
         "symbolName": "GPUTextureUsage.RENDER_ATTACHMENT",
@@ -1197,7 +1197,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUTextureUsage\u0027.",
         "provenance": "GPUTextureUsage.RENDER_ATTACHMENT/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3391:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3333:9"
       },
       {
         "symbolName": "GPUTextureUsage.STORAGE_BINDING",
@@ -1207,7 +1207,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUTextureUsage\u0027.",
         "provenance": "GPUTextureUsage.STORAGE_BINDING/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3390:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3332:9"
       },
       {
         "symbolName": "GPUTextureUsage.TEXTURE_BINDING",
@@ -1217,7 +1217,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUTextureUsage\u0027.",
         "provenance": "GPUTextureUsage.TEXTURE_BINDING/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3389:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3331:9"
       },
       {
         "symbolName": "GPUTextureUsage.TRANSIENT_ATTACHMENT",
@@ -1227,7 +1227,7 @@
         "phase": null,
         "reason": "Emitted in namespace contract \u0027GPUTextureUsage\u0027.",
         "provenance": "GPUTextureUsage.TRANSIENT_ATTACHMENT/decl[0]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3392:9"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3334:9"
       },
       {
         "symbolName": "GPUUncapturedErrorEvent",
@@ -1237,7 +1237,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "GPUUncapturedErrorEvent/decl[0]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3321:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3263:1"
       },
       {
         "symbolName": "GPUUncapturedErrorEvent",
@@ -1247,7 +1247,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "GPUUncapturedErrorEvent/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3332:13"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3274:13"
       },
       {
         "symbolName": "GPUUncapturedErrorEventInit",
@@ -1287,7 +1287,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "HIDDevice/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:47:1"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:46:1"
       },
       {
         "symbolName": "HIDDevice",
@@ -1297,7 +1297,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "HIDDevice/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:62:13"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:61:13"
       },
       {
         "symbolName": "HIDDeviceRequestOptions",
@@ -1307,7 +1307,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "HIDDeviceRequestOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:76:1"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:74:1"
       },
       {
         "symbolName": "HIDInputReportEvent",
@@ -1317,7 +1317,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "HIDInputReportEvent/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:82:1"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:80:1"
       },
       {
         "symbolName": "HIDInputReportEvent",
@@ -1327,7 +1327,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "HIDInputReportEvent/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:88:13"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:86:13"
       },
       {
         "symbolName": "HIDInputReportEventInit",
@@ -1337,7 +1337,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "HIDInputReportEventInit/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:94:1"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:92:1"
       },
       {
         "symbolName": "Navigator",
@@ -1397,7 +1397,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Navigator/decl[5]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:301:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:290:1"
       },
       {
         "symbolName": "Navigator",
@@ -1407,7 +1407,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Navigator/decl[6]/interface",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:142:1"
+        "sourceLocation": "supplemental/webref/webhid.d.ts:140:1"
       },
       {
         "symbolName": "Navigator",
@@ -1427,7 +1427,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Navigator/decl[8]/interface",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3356:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3298:1"
       },
       {
         "symbolName": "NavigatorAutomationInformation",
@@ -1587,7 +1587,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Presentation/decl[2]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:22:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:21:1"
       },
       {
         "symbolName": "Presentation",
@@ -1597,7 +1597,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "Presentation/decl[3]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:27:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:26:1"
       },
       {
         "symbolName": "PresentationConnection",
@@ -1607,7 +1607,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "PresentationConnection/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:43:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:41:1"
       },
       {
         "symbolName": "PresentationConnection",
@@ -1617,7 +1617,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "PresentationConnection/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:60:13"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:58:13"
       },
       {
         "symbolName": "PresentationConnectionAvailableEvent",
@@ -1627,7 +1627,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "PresentationConnectionAvailableEvent/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:66:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:63:1"
       },
       {
         "symbolName": "PresentationConnectionAvailableEvent",
@@ -1637,7 +1637,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "PresentationConnectionAvailableEvent/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:70:13"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:67:13"
       },
       {
         "symbolName": "PresentationConnectionAvailableEventInit",
@@ -1647,7 +1647,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "PresentationConnectionAvailableEventInit/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:76:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:73:1"
       },
       {
         "symbolName": "PresentationConnectionState",
@@ -1657,7 +1657,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "PresentationConnectionState/decl[0]/typeAlias",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:112:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:108:1"
       },
       {
         "symbolName": "PresentationReceiver",
@@ -1667,7 +1667,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "PresentationReceiver/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:115:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:111:1"
       },
       {
         "symbolName": "PresentationReceiver",
@@ -1677,7 +1677,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "PresentationReceiver/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:119:13"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:115:13"
       },
       {
         "symbolName": "PresentationRequest",
@@ -1687,7 +1687,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "PresentationRequest/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:125:1"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:120:1"
       },
       {
         "symbolName": "PresentationRequest",
@@ -1697,7 +1697,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "PresentationRequest/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:132:13"
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:127:13"
       },
       {
         "symbolName": "QueuingStrategy",
@@ -1747,7 +1747,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "RequestDeviceOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:306:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:295:1"
       },
       {
         "symbolName": "Serial",
@@ -1777,7 +1777,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "SerialInputSignals/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/serial.d.ts:32:1"
+        "sourceLocation": "supplemental/webref/serial.d.ts:31:1"
       },
       {
         "symbolName": "SerialOptions",
@@ -1787,7 +1787,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "SerialOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/serial.d.ts:40:1"
+        "sourceLocation": "supplemental/webref/serial.d.ts:39:1"
       },
       {
         "symbolName": "SerialPort",
@@ -1797,7 +1797,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "SerialPort/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/serial.d.ts:57:1"
+        "sourceLocation": "supplemental/webref/serial.d.ts:56:1"
       },
       {
         "symbolName": "SerialPort",
@@ -1807,7 +1807,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "SerialPort/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/serial.d.ts:71:13"
+        "sourceLocation": "supplemental/webref/serial.d.ts:70:13"
       },
       {
         "symbolName": "SerialPortRequestOptions",
@@ -1817,7 +1817,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "SerialPortRequestOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/serial.d.ts:91:1"
+        "sourceLocation": "supplemental/webref/serial.d.ts:89:1"
       },
       {
         "symbolName": "ServiceEventHandlers",
@@ -1827,7 +1827,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "ServiceEventHandlers/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:315:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:304:1"
       },
       {
         "symbolName": "USB",
@@ -1857,7 +1857,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBConfiguration/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:55:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:54:1"
       },
       {
         "symbolName": "USBConfiguration",
@@ -1867,7 +1867,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "USBConfiguration/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:61:13"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:60:13"
       },
       {
         "symbolName": "USBDevice",
@@ -1877,7 +1877,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBDevice/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:91:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:90:1"
       },
       {
         "symbolName": "USBDevice",
@@ -1887,7 +1887,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "USBDevice/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:126:13"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:125:13"
       },
       {
         "symbolName": "USBDeviceFilter",
@@ -1897,7 +1897,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBDeviceFilter/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:132:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:130:1"
       },
       {
         "symbolName": "USBDeviceRequestOptions",
@@ -1907,7 +1907,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBDeviceRequestOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:142:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:140:1"
       },
       {
         "symbolName": "USBInTransferResult",
@@ -1917,7 +1917,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBInTransferResult/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:167:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:165:1"
       },
       {
         "symbolName": "USBInTransferResult",
@@ -1927,7 +1927,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "USBInTransferResult/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:172:13"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:170:13"
       },
       {
         "symbolName": "USBOutTransferResult",
@@ -1937,7 +1937,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBOutTransferResult/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:234:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:232:1"
       },
       {
         "symbolName": "USBOutTransferResult",
@@ -1947,7 +1947,7 @@
         "phase": null,
         "reason": "Logical factory contract emitted.",
         "provenance": "USBOutTransferResult/decl[1]/globalVariable",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:239:13"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:237:13"
       },
       {
         "symbolName": "USBPermissionDescriptor",
@@ -1957,7 +1957,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBPermissionDescriptor/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:245:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:243:1"
       },
       {
         "symbolName": "USBTransferStatus",
@@ -1967,7 +1967,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "USBTransferStatus/decl[0]/typeAlias",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:272:1"
+        "sourceLocation": "supplemental/webref/webusb.d.ts:269:1"
       },
       {
         "symbolName": "UnderlyingByteSource",
@@ -2017,7 +2017,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "WGSLLanguageFeatures/decl[0]/typeAlias",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3353:1"
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3295:1"
       },
       {
         "symbolName": "WatchAdvertisementsOptions",
@@ -2027,7 +2027,7 @@
         "phase": null,
         "reason": "emitted",
         "provenance": "WatchAdvertisementsOptions/decl[0]/interface",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:340:1"
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:329:1"
       },
       {
         "symbolName": "WritableStream",
@@ -2128,19 +2128,6 @@
       },
       {
         "symbolName": "Bluetooth",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "Bluetooth/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:26:3",
-        "qualifiedKey": "Bluetooth/decl[1]/typeLiteral/member[1]"
-      },
-      {
-        "symbolName": "Bluetooth",
         "declarationOrdinal": 5,
         "memberOrdinal": 0,
         "memberName": "requestLEScan",
@@ -2162,7 +2149,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027gatt\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "BluetoothDevice/decl[0]/member[2]/property/gatt",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:101:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:99:3",
         "qualifiedKey": "BluetoothDevice/decl[0]/member[2]"
       },
       {
@@ -2175,7 +2162,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothDevice/decl[0]/member[4]/method/watchAdvertisements",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:103:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:101:3",
         "qualifiedKey": "BluetoothDevice/decl[0]/member[4]"
       },
       {
@@ -2188,21 +2175,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "BluetoothDevice/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:108:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:106:3",
         "qualifiedKey": "BluetoothDevice/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "BluetoothDevice",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "BluetoothDevice/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:109:3",
-        "qualifiedKey": "BluetoothDevice/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "BluetoothLEScan",
@@ -2218,19 +2192,6 @@
         "qualifiedKey": "BluetoothLEScan/decl[1]/typeLiteral/member[0]"
       },
       {
-        "symbolName": "BluetoothLEScan",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "BluetoothLEScan/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:34:3",
-        "qualifiedKey": "BluetoothLEScan/decl[1]/typeLiteral/member[1]"
-      },
-      {
         "symbolName": "BluetoothLEScanPermissionDescriptor",
         "declarationOrdinal": 0,
         "memberOrdinal": 0,
@@ -2240,7 +2201,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothLEScanPermissionDescriptor/decl[0]/member[0]/property/filters",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:60:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:59:3",
         "qualifiedKey": "BluetoothLEScanPermissionDescriptor/decl[0]/member[0]"
       },
       {
@@ -2253,7 +2214,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothLEScanPermissionDescriptor/decl[0]/member[1]/property/keepRepeatedDevices",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:61:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:60:3",
         "qualifiedKey": "BluetoothLEScanPermissionDescriptor/decl[0]/member[1]"
       },
       {
@@ -2266,7 +2227,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothLEScanPermissionDescriptor/decl[0]/member[2]/property/acceptAllAdvertisements",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:62:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:61:3",
         "qualifiedKey": "BluetoothLEScanPermissionDescriptor/decl[0]/member[2]"
       },
       {
@@ -2279,7 +2240,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027size\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[0]/property/size",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:143:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:140:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[0]"
       },
       {
@@ -2292,7 +2253,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[1]/method/entries",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:144:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:141:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[1]"
       },
       {
@@ -2305,7 +2266,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[2]/method/forEach",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:145:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:142:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[2]"
       },
       {
@@ -2318,7 +2279,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[3]/method/get",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:146:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:143:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[3]"
       },
       {
@@ -2331,7 +2292,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[4]/method/has",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:147:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:144:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[4]"
       },
       {
@@ -2344,7 +2305,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[5]/method/keys",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:148:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:145:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[5]"
       },
       {
@@ -2357,7 +2318,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[6]/method/values",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:149:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:146:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[6]"
       },
       {
@@ -2370,7 +2331,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[7]/method/Symbol.iterator",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:150:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:147:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[7]"
       },
       {
@@ -2383,21 +2344,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "BluetoothManufacturerDataMap/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:154:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:151:3",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "BluetoothManufacturerDataMap",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "BluetoothManufacturerDataMap/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:155:3",
-        "qualifiedKey": "BluetoothManufacturerDataMap/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "BluetoothPermissionDescriptor",
@@ -2409,7 +2357,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothPermissionDescriptor/decl[0]/member[0]/property/deviceId",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:160:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:156:3",
         "qualifiedKey": "BluetoothPermissionDescriptor/decl[0]/member[0]"
       },
       {
@@ -2422,7 +2370,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothPermissionDescriptor/decl[0]/member[1]/property/filters",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:161:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:157:3",
         "qualifiedKey": "BluetoothPermissionDescriptor/decl[0]/member[1]"
       },
       {
@@ -2435,7 +2383,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothPermissionDescriptor/decl[0]/member[2]/property/optionalServices",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:162:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:158:3",
         "qualifiedKey": "BluetoothPermissionDescriptor/decl[0]/member[2]"
       },
       {
@@ -2448,7 +2396,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothPermissionDescriptor/decl[0]/member[3]/property/optionalManufacturerData",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:163:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:159:3",
         "qualifiedKey": "BluetoothPermissionDescriptor/decl[0]/member[3]"
       },
       {
@@ -2461,7 +2409,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothPermissionDescriptor/decl[0]/member[4]/property/acceptAllDevices",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:164:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:160:3",
         "qualifiedKey": "BluetoothPermissionDescriptor/decl[0]/member[4]"
       },
       {
@@ -2474,7 +2422,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027value\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[3]/property/value",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:187:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:182:3",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[3]"
       },
       {
@@ -2487,7 +2435,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[6]/method/readValue",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:190:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:185:3",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[6]"
       },
       {
@@ -2500,7 +2448,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[8]/method/writeValueWithResponse",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:192:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:187:3",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[8]"
       },
       {
@@ -2513,7 +2461,7 @@
         "phase": null,
         "reason": "",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[10]/method/startNotifications",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:194:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:189:3",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[10]"
       },
       {
@@ -2526,21 +2474,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:199:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:194:3",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "BluetoothRemoteGATTCharacteristic",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "BluetoothRemoteGATTCharacteristic/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:200:3",
-        "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "BluetoothRemoteGATTServer",
@@ -2552,21 +2487,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "BluetoothRemoteGATTServer/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:231:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:224:3",
         "qualifiedKey": "BluetoothRemoteGATTServer/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "BluetoothRemoteGATTServer",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "BluetoothRemoteGATTServer/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:232:3",
-        "qualifiedKey": "BluetoothRemoteGATTServer/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "Event",
@@ -2721,21 +2643,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPU/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2130:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2129:3",
         "qualifiedKey": "GPU/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPU",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPU/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2131:3",
-        "qualifiedKey": "GPU/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUAdapter",
@@ -2747,7 +2656,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027features\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUAdapter/decl[0]/member[1]/property/features",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2140:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2138:3",
         "qualifiedKey": "GPUAdapter/decl[0]/member[1]"
       },
       {
@@ -2760,7 +2669,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027limits\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUAdapter/decl[0]/member[2]/property/limits",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2144:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2142:3",
         "qualifiedKey": "GPUAdapter/decl[0]/member[2]"
       },
       {
@@ -2773,7 +2682,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027info\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUAdapter/decl[0]/member[3]/property/info",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2158:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2156:3",
         "qualifiedKey": "GPUAdapter/decl[0]/member[3]"
       },
       {
@@ -2786,7 +2695,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUAdapter/decl[0]/member[4]/method/requestDevice",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2165:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2163:3",
         "qualifiedKey": "GPUAdapter/decl[0]/member[4]"
       },
       {
@@ -2799,21 +2708,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUAdapter/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2171:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2168:3",
         "qualifiedKey": "GPUAdapter/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUAdapter",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUAdapter/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2172:3",
-        "qualifiedKey": "GPUAdapter/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUAdapterInfo",
@@ -2825,21 +2721,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUAdapterInfo/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2226:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2221:3",
         "qualifiedKey": "GPUAdapterInfo/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUAdapterInfo",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUAdapterInfo/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2227:3",
-        "qualifiedKey": "GPUAdapterInfo/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUBuffer",
@@ -2851,7 +2734,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027size\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUBuffer/decl[0]/member[1]/property/size",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2256:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2246:3",
         "qualifiedKey": "GPUBuffer/decl[0]/member[1]"
       },
       {
@@ -2864,7 +2747,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027usage\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUBuffer/decl[0]/member[2]/property/usage",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2257:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2247:3",
         "qualifiedKey": "GPUBuffer/decl[0]/member[2]"
       },
       {
@@ -2877,7 +2760,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUBuffer/decl[0]/member[4]/method/mapAsync",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2275:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2265:3",
         "qualifiedKey": "GPUBuffer/decl[0]/member[4]"
       },
       {
@@ -2890,7 +2773,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUBuffer/decl[0]/member[5]/method/getMappedRange",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2285:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2275:3",
         "qualifiedKey": "GPUBuffer/decl[0]/member[5]"
       },
       {
@@ -2903,21 +2786,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUBuffer/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2304:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2293:3",
         "qualifiedKey": "GPUBuffer/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUBuffer",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUBuffer/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2305:3",
-        "qualifiedKey": "GPUBuffer/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUCanvasContext",
@@ -2929,7 +2799,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUCanvasContext/decl[0]/member[2]/method/configure",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2323:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2311:3",
         "qualifiedKey": "GPUCanvasContext/decl[0]/member[2]"
       },
       {
@@ -2942,7 +2812,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUCanvasContext/decl[0]/member[4]/method/getConfiguration",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2337:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2325:3",
         "qualifiedKey": "GPUCanvasContext/decl[0]/member[4]"
       },
       {
@@ -2955,7 +2825,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUCanvasContext/decl[0]/member[5]/method/getCurrentTexture",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2345:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2333:3",
         "qualifiedKey": "GPUCanvasContext/decl[0]/member[5]"
       },
       {
@@ -2968,21 +2838,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUCanvasContext/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2349:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2336:3",
         "qualifiedKey": "GPUCanvasContext/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUCanvasContext",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUCanvasContext/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2350:3",
-        "qualifiedKey": "GPUCanvasContext/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUCommandBuffer",
@@ -2994,21 +2851,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUCommandBuffer/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2360:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2345:3",
         "qualifiedKey": "GPUCommandBuffer/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUCommandBuffer",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUCommandBuffer/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2361:3",
-        "qualifiedKey": "GPUCommandBuffer/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUDevice",
@@ -3072,7 +2916,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027features\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUDevice/decl[1]/member[1]/property/features",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2625:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2599:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[1]"
       },
       {
@@ -3085,7 +2929,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027limits\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUDevice/decl[1]/member[2]/property/limits",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2630:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2604:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[2]"
       },
       {
@@ -3098,7 +2942,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027queue\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUDevice/decl[1]/member[4]/property/queue",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2641:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2615:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[4]"
       },
       {
@@ -3111,7 +2955,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUDevice/decl[1]/member[6]/method/createBuffer",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2655:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2629:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[6]"
       },
       {
@@ -3124,7 +2968,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027lost\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "GPUDevice/decl[1]/member[21]/property/lost",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2773:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2747:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[21]"
       },
       {
@@ -3137,7 +2981,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUDevice/decl[1]/member[23]/method/popErrorScope",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2786:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2760:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[23]"
       },
       {
@@ -3150,7 +2994,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027onuncapturederror\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "GPUDevice/decl[1]/member[24]/property/onuncapturederror",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2790:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2764:3",
         "qualifiedKey": "GPUDevice/decl[1]/member[24]"
       },
       {
@@ -3163,21 +3007,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUDevice/decl[2]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2799:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2772:3",
         "qualifiedKey": "GPUDevice/decl[2]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUDevice",
-        "declarationOrdinal": 2,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUDevice/decl[2]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2800:3",
-        "qualifiedKey": "GPUDevice/decl[2]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUDeviceLostInfo",
@@ -3189,21 +3020,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUDeviceLostInfo/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2811:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2782:3",
         "qualifiedKey": "GPUDeviceLostInfo/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUDeviceLostInfo",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUDeviceLostInfo/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2812:3",
-        "qualifiedKey": "GPUDeviceLostInfo/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUError",
@@ -3215,21 +3033,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUError/decl[2]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2835:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2804:3",
         "qualifiedKey": "GPUError/decl[2]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUError",
-        "declarationOrdinal": 2,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUError/decl[2]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2836:3",
-        "qualifiedKey": "GPUError/decl[2]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUQueue",
@@ -3241,7 +3046,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUQueue/decl[0]/member[1]/method/submit",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2944:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2906:3",
         "qualifiedKey": "GPUQueue/decl[0]/member[1]"
       },
       {
@@ -3254,7 +3059,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUQueue/decl[0]/member[2]/method/onSubmittedWorkDone",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2954:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2916:3",
         "qualifiedKey": "GPUQueue/decl[0]/member[2]"
       },
       {
@@ -3267,7 +3072,7 @@
         "phase": null,
         "reason": "",
         "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2965:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2927:3",
         "qualifiedKey": "GPUQueue/decl[0]/member[3]"
       },
       {
@@ -3280,21 +3085,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUQueue/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3007:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2968:3",
         "qualifiedKey": "GPUQueue/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUQueue",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUQueue/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3008:3",
-        "qualifiedKey": "GPUQueue/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUSupportedLimits",
@@ -3306,21 +3098,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUSupportedLimits/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3236:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3183:3",
         "qualifiedKey": "GPUSupportedLimits/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUSupportedLimits",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUSupportedLimits/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3237:3",
-        "qualifiedKey": "GPUSupportedLimits/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUTexture",
@@ -3332,21 +3111,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUTexture/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3306:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3251:3",
         "qualifiedKey": "GPUTexture/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "GPUTexture",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "GPUTexture/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3307:3",
-        "qualifiedKey": "GPUTexture/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "GPUUncapturedErrorEvent",
@@ -3358,7 +3124,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3333:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3275:3",
         "qualifiedKey": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -3371,7 +3137,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3334:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3276:3",
         "qualifiedKey": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -3440,19 +3206,6 @@
         "qualifiedKey": "HID/decl[1]/typeLiteral/member[0]"
       },
       {
-        "symbolName": "HID",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "HID/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:17:3",
-        "qualifiedKey": "HID/decl[1]/typeLiteral/member[1]"
-      },
-      {
         "symbolName": "HIDDevice",
         "declarationOrdinal": 0,
         "memberOrdinal": 0,
@@ -3462,7 +3215,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027oninputreport\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "HIDDevice/decl[0]/member[0]/property/oninputreport",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:48:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:47:3",
         "qualifiedKey": "HIDDevice/decl[0]/member[0]"
       },
       {
@@ -3475,7 +3228,7 @@
         "phase": null,
         "reason": "",
         "provenance": "HIDDevice/decl[0]/member[6]/method/open",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:54:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:53:3",
         "qualifiedKey": "HIDDevice/decl[0]/member[6]"
       },
       {
@@ -3488,7 +3241,7 @@
         "phase": null,
         "reason": "",
         "provenance": "HIDDevice/decl[0]/member[9]/method/sendReport",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:57:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:56:3",
         "qualifiedKey": "HIDDevice/decl[0]/member[9]"
       },
       {
@@ -3501,7 +3254,7 @@
         "phase": null,
         "reason": "",
         "provenance": "HIDDevice/decl[0]/member[11]/method/receiveFeatureReport",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:59:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:58:3",
         "qualifiedKey": "HIDDevice/decl[0]/member[11]"
       },
       {
@@ -3514,21 +3267,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "HIDDevice/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:63:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:62:3",
         "qualifiedKey": "HIDDevice/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "HIDDevice",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "HIDDevice/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:64:3",
-        "qualifiedKey": "HIDDevice/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "HIDInputReportEvent",
@@ -3540,7 +3280,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027device\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "HIDInputReportEvent/decl[0]/member[0]/property/device",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:83:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:81:3",
         "qualifiedKey": "HIDInputReportEvent/decl[0]/member[0]"
       },
       {
@@ -3553,7 +3293,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027reportId\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "HIDInputReportEvent/decl[0]/member[1]/property/reportId",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:84:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:82:3",
         "qualifiedKey": "HIDInputReportEvent/decl[0]/member[1]"
       },
       {
@@ -3566,7 +3306,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027data\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "HIDInputReportEvent/decl[0]/member[2]/property/data",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:85:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:83:3",
         "qualifiedKey": "HIDInputReportEvent/decl[0]/member[2]"
       },
       {
@@ -3579,7 +3319,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "HIDInputReportEvent/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:89:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:87:3",
         "qualifiedKey": "HIDInputReportEvent/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -3592,7 +3332,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "HIDInputReportEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:90:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:88:3",
         "qualifiedKey": "HIDInputReportEvent/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -3657,7 +3397,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027bluetooth\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Navigator/decl[5]/member[0]/property/bluetooth",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:302:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:291:3",
         "qualifiedKey": "Navigator/decl[5]/member[0]"
       },
       {
@@ -3670,7 +3410,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027hid\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Navigator/decl[6]/member[0]/property/hid",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:143:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:141:3",
         "qualifiedKey": "Navigator/decl[6]/member[0]"
       },
       {
@@ -3714,19 +3454,6 @@
       },
       {
         "symbolName": "Presentation",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "Presentation/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:18:3",
-        "qualifiedKey": "Presentation/decl[1]/typeLiteral/member[1]"
-      },
-      {
-        "symbolName": "Presentation",
         "declarationOrdinal": 2,
         "memberOrdinal": 0,
         "memberName": "defaultRequest",
@@ -3735,7 +3462,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027defaultRequest\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "Presentation/decl[2]/member[0]/property/defaultRequest",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:23:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:22:3",
         "qualifiedKey": "Presentation/decl[2]/member[0]"
       },
       {
@@ -3748,7 +3475,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027receiver\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "Presentation/decl[3]/member[0]/property/receiver",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:28:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:27:3",
         "qualifiedKey": "Presentation/decl[3]/member[0]"
       },
       {
@@ -3761,7 +3488,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027state\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "PresentationConnection/decl[0]/member[2]/property/state",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:46:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:44:3",
         "qualifiedKey": "PresentationConnection/decl[0]/member[2]"
       },
       {
@@ -3774,7 +3501,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027onmessage\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "PresentationConnection/decl[0]/member[9]/property/onmessage",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:53:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:51:3",
         "qualifiedKey": "PresentationConnection/decl[0]/member[9]"
       },
       {
@@ -3787,7 +3514,7 @@
         "phase": null,
         "reason": "",
         "provenance": "PresentationConnection/decl[0]/member[10]/method/send",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:54:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:52:3",
         "qualifiedKey": "PresentationConnection/decl[0]/member[10]"
       },
       {
@@ -3800,7 +3527,7 @@
         "phase": null,
         "reason": "",
         "provenance": "PresentationConnection/decl[0]/member[11]/method/send",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:55:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:53:3",
         "qualifiedKey": "PresentationConnection/decl[0]/member[11]"
       },
       {
@@ -3813,7 +3540,7 @@
         "phase": null,
         "reason": "",
         "provenance": "PresentationConnection/decl[0]/member[12]/method/send",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:56:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:54:3",
         "qualifiedKey": "PresentationConnection/decl[0]/member[12]"
       },
       {
@@ -3826,7 +3553,7 @@
         "phase": null,
         "reason": "Deduplicated from declaration ordinal 0.",
         "provenance": "PresentationConnection/decl[0]/member[13]/method/send",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:57:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:55:3",
         "qualifiedKey": "PresentationConnection/decl[0]/member[13]"
       },
       {
@@ -3839,21 +3566,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationConnection/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:61:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:59:3",
         "qualifiedKey": "PresentationConnection/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "PresentationConnection",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "PresentationConnection/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:62:3",
-        "qualifiedKey": "PresentationConnection/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "PresentationConnectionAvailableEvent",
@@ -3865,7 +3579,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027connection\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "PresentationConnectionAvailableEvent/decl[0]/member[0]/property/connection",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:67:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:64:3",
         "qualifiedKey": "PresentationConnectionAvailableEvent/decl[0]/member[0]"
       },
       {
@@ -3878,7 +3592,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:71:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:68:3",
         "qualifiedKey": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -3891,7 +3605,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:72:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:69:3",
         "qualifiedKey": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -3904,21 +3618,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationReceiver/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:120:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:116:3",
         "qualifiedKey": "PresentationReceiver/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "PresentationReceiver",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "PresentationReceiver/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:121:3",
-        "qualifiedKey": "PresentationReceiver/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "PresentationRequest",
@@ -3930,7 +3631,7 @@
         "phase": null,
         "reason": "",
         "provenance": "PresentationRequest/decl[0]/member[0]/method/start",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:126:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:121:3",
         "qualifiedKey": "PresentationRequest/decl[0]/member[0]"
       },
       {
@@ -3943,7 +3644,7 @@
         "phase": null,
         "reason": "",
         "provenance": "PresentationRequest/decl[0]/member[1]/method/reconnect",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:127:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:122:3",
         "qualifiedKey": "PresentationRequest/decl[0]/member[1]"
       },
       {
@@ -3956,7 +3657,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027onconnectionavailable\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "PresentationRequest/decl[0]/member[3]/property/onconnectionavailable",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:129:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:124:3",
         "qualifiedKey": "PresentationRequest/decl[0]/member[3]"
       },
       {
@@ -3969,7 +3670,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationRequest/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:133:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:128:3",
         "qualifiedKey": "PresentationRequest/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -3982,7 +3683,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationRequest/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:134:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:129:3",
         "qualifiedKey": "PresentationRequest/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -3995,7 +3696,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "PresentationRequest/decl[1]/typeLiteral/member[2]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:135:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:130:3",
         "qualifiedKey": "PresentationRequest/decl[1]/typeLiteral/member[2]"
       },
       {
@@ -4116,19 +3817,6 @@
         "qualifiedKey": "Serial/decl[1]/typeLiteral/member[0]"
       },
       {
-        "symbolName": "Serial",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "Serial/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/serial.d.ts:28:3",
-        "qualifiedKey": "Serial/decl[1]/typeLiteral/member[1]"
-      },
-      {
         "symbolName": "SerialPort",
         "declarationOrdinal": 0,
         "memberOrdinal": 0,
@@ -4138,7 +3826,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027onconnect\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "SerialPort/decl[0]/member[0]/property/onconnect",
-        "sourceLocation": "supplemental/webref/serial.d.ts:58:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:57:3",
         "qualifiedKey": "SerialPort/decl[0]/member[0]"
       },
       {
@@ -4151,7 +3839,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027ondisconnect\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
         "provenance": "SerialPort/decl[0]/member[1]/property/ondisconnect",
-        "sourceLocation": "supplemental/webref/serial.d.ts:59:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:58:3",
         "qualifiedKey": "SerialPort/decl[0]/member[1]"
       },
       {
@@ -4164,7 +3852,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027readable\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "SerialPort/decl[0]/member[3]/property/readable",
-        "sourceLocation": "supplemental/webref/serial.d.ts:61:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:60:3",
         "qualifiedKey": "SerialPort/decl[0]/member[3]"
       },
       {
@@ -4177,7 +3865,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027writable\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "SerialPort/decl[0]/member[4]/property/writable",
-        "sourceLocation": "supplemental/webref/serial.d.ts:62:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:61:3",
         "qualifiedKey": "SerialPort/decl[0]/member[4]"
       },
       {
@@ -4190,7 +3878,7 @@
         "phase": null,
         "reason": "",
         "provenance": "SerialPort/decl[0]/member[6]/method/open",
-        "sourceLocation": "supplemental/webref/serial.d.ts:64:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:63:3",
         "qualifiedKey": "SerialPort/decl[0]/member[6]"
       },
       {
@@ -4203,7 +3891,7 @@
         "phase": null,
         "reason": "",
         "provenance": "SerialPort/decl[0]/member[8]/method/getSignals",
-        "sourceLocation": "supplemental/webref/serial.d.ts:66:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:65:3",
         "qualifiedKey": "SerialPort/decl[0]/member[8]"
       },
       {
@@ -4216,21 +3904,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "SerialPort/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/serial.d.ts:72:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:71:3",
         "qualifiedKey": "SerialPort/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "SerialPort",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "SerialPort/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/serial.d.ts:73:3",
-        "qualifiedKey": "SerialPort/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "USB",
@@ -4298,19 +3973,6 @@
         "qualifiedKey": "USB/decl[1]/typeLiteral/member[0]"
       },
       {
-        "symbolName": "USB",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "USB/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:29:3",
-        "qualifiedKey": "USB/decl[1]/typeLiteral/member[1]"
-      },
-      {
         "symbolName": "USBConfiguration",
         "declarationOrdinal": 1,
         "memberOrdinal": 0,
@@ -4320,7 +3982,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBConfiguration/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:62:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:61:3",
         "qualifiedKey": "USBConfiguration/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -4333,7 +3995,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBConfiguration/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:63:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:62:3",
         "qualifiedKey": "USBConfiguration/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -4346,7 +4008,7 @@
         "phase": null,
         "reason": "Reconciled into canonical \u0027configurations\u0027 get accessor from 1 getter source(s) and 0 setter source(s).",
         "provenance": "USBDevice/decl[0]/member[15]/property/configurations",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:107:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:106:3",
         "qualifiedKey": "USBDevice/decl[0]/member[15]"
       },
       {
@@ -4359,7 +4021,7 @@
         "phase": null,
         "reason": "",
         "provenance": "USBDevice/decl[0]/member[17]/method/open",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:109:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:108:3",
         "qualifiedKey": "USBDevice/decl[0]/member[17]"
       },
       {
@@ -4372,7 +4034,7 @@
         "phase": null,
         "reason": "",
         "provenance": "USBDevice/decl[0]/member[27]/method/transferIn",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:119:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:118:3",
         "qualifiedKey": "USBDevice/decl[0]/member[27]"
       },
       {
@@ -4385,7 +4047,7 @@
         "phase": null,
         "reason": "",
         "provenance": "USBDevice/decl[0]/member[28]/method/transferOut",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:120:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:119:3",
         "qualifiedKey": "USBDevice/decl[0]/member[28]"
       },
       {
@@ -4398,21 +4060,8 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBDevice/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:127:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:126:3",
         "qualifiedKey": "USBDevice/decl[1]/typeLiteral/member[0]"
-      },
-      {
-        "symbolName": "USBDevice",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "memberName": "constructSignature",
-        "memberKind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
-        "provenance": "USBDevice/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:128:3",
-        "qualifiedKey": "USBDevice/decl[1]/typeLiteral/member[1]"
       },
       {
         "symbolName": "USBInTransferResult",
@@ -4424,7 +4073,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBInTransferResult/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:173:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:171:3",
         "qualifiedKey": "USBInTransferResult/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -4437,7 +4086,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBInTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:174:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:172:3",
         "qualifiedKey": "USBInTransferResult/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -4450,7 +4099,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBOutTransferResult/decl[1]/typeLiteral/member[0]/property/prototype",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:240:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:238:3",
         "qualifiedKey": "USBOutTransferResult/decl[1]/typeLiteral/member[0]"
       },
       {
@@ -4463,7 +4112,7 @@
         "phase": null,
         "reason": "Emitted in the logical factory contract.",
         "provenance": "USBOutTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:241:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:239:3",
         "qualifiedKey": "USBOutTransferResult/decl[1]/typeLiteral/member[1]"
       },
       {
@@ -4476,7 +4125,7 @@
         "phase": null,
         "reason": "",
         "provenance": "USBPermissionDescriptor/decl[0]/member[0]/property/filters",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:246:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:244:3",
         "qualifiedKey": "USBPermissionDescriptor/decl[0]/member[0]"
       },
       {
@@ -4489,7 +4138,7 @@
         "phase": null,
         "reason": "",
         "provenance": "USBPermissionDescriptor/decl[0]/member[1]/property/exclusionFilters",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:247:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:245:3",
         "qualifiedKey": "USBPermissionDescriptor/decl[0]/member[1]"
       },
       {
@@ -4592,20 +4241,6 @@
       },
       {
         "symbolName": "Bluetooth",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "Bluetooth/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "Bluetooth/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:26:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "Bluetooth",
         "declarationOrdinal": 5,
         "memberOrdinal": 0,
         "name": "requestLEScan",
@@ -4639,7 +4274,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothDevice/decl[0]/member[4]/overload",
         "provenance": "BluetoothDevice/decl[0]/member[4]/method/watchAdvertisements/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:103:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:101:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -4648,37 +4283,9 @@
             "phase": null,
             "reason": "",
             "provenance": "BluetoothDevice/decl[0]/member[4]/method/watchAdvertisements/overload/parameter[0]/options",
-            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:103:23"
+            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:101:23"
           }
         ]
-      },
-      {
-        "symbolName": "BluetoothDevice",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "BluetoothDevice/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "BluetoothDevice/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:109:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "BluetoothLEScan",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "BluetoothLEScan/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "BluetoothLEScan/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth-scanning.d.ts:34:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "BluetoothManufacturerDataMap",
@@ -4691,7 +4298,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[1]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[1]/method/entries/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:144:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:141:3",
         "parameterOutcomes": []
       },
       {
@@ -4705,7 +4312,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[2]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[2]/method/forEach/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:145:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:142:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -4714,7 +4321,7 @@
             "phase": null,
             "reason": "",
             "provenance": "BluetoothManufacturerDataMap/decl[0]/member[2]/method/forEach/overload/parameter[0]/callbackfn",
-            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:145:11"
+            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:142:11"
           },
           {
             "ordinal": 1,
@@ -4723,7 +4330,7 @@
             "phase": null,
             "reason": "",
             "provenance": "BluetoothManufacturerDataMap/decl[0]/member[2]/method/forEach/overload/parameter[1]/thisArg",
-            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:145:101"
+            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:142:101"
           }
         ]
       },
@@ -4738,7 +4345,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[3]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[3]/method/get/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:146:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:143:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -4747,7 +4354,7 @@
             "phase": null,
             "reason": "",
             "provenance": "BluetoothManufacturerDataMap/decl[0]/member[3]/method/get/overload/parameter[0]/key",
-            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:146:7"
+            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:143:7"
           }
         ]
       },
@@ -4762,7 +4369,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[4]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[4]/method/has/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:147:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:144:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -4771,7 +4378,7 @@
             "phase": null,
             "reason": "",
             "provenance": "BluetoothManufacturerDataMap/decl[0]/member[4]/method/has/overload/parameter[0]/key",
-            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:147:7"
+            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:144:7"
           }
         ]
       },
@@ -4786,7 +4393,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[5]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[5]/method/keys/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:148:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:145:3",
         "parameterOutcomes": []
       },
       {
@@ -4800,7 +4407,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[6]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[6]/method/values/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:149:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:146:3",
         "parameterOutcomes": []
       },
       {
@@ -4814,21 +4421,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothManufacturerDataMap/decl[0]/member[7]/overload",
         "provenance": "BluetoothManufacturerDataMap/decl[0]/member[7]/method/Symbol.iterator/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:150:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "BluetoothManufacturerDataMap",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "BluetoothManufacturerDataMap/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "BluetoothManufacturerDataMap/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:155:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:147:3",
         "parameterOutcomes": []
       },
       {
@@ -4842,7 +4435,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[6]/overload",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[6]/method/readValue/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:190:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:185:3",
         "parameterOutcomes": []
       },
       {
@@ -4856,7 +4449,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[8]/overload",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[8]/method/writeValueWithResponse/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:192:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:187:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -4865,7 +4458,7 @@
             "phase": null,
             "reason": "",
             "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[8]/method/writeValueWithResponse/overload/parameter[0]/value",
-            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:192:26"
+            "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:187:26"
           }
         ]
       },
@@ -4880,35 +4473,7 @@
         "reason": "",
         "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[0]/member[10]/overload",
         "provenance": "BluetoothRemoteGATTCharacteristic/decl[0]/member[10]/method/startNotifications/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:194:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "BluetoothRemoteGATTCharacteristic",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "BluetoothRemoteGATTCharacteristic/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "BluetoothRemoteGATTCharacteristic/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:200:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "BluetoothRemoteGATTServer",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "BluetoothRemoteGATTServer/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "BluetoothRemoteGATTServer/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:232:3",
+        "sourceLocation": "supplemental/webref/web-bluetooth.d.ts:189:3",
         "parameterOutcomes": []
       },
       {
@@ -5007,20 +4572,6 @@
         ]
       },
       {
-        "symbolName": "GPU",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPU/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPU/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2131:3",
-        "parameterOutcomes": []
-      },
-      {
         "symbolName": "GPUAdapter",
         "declarationOrdinal": 0,
         "memberOrdinal": 4,
@@ -5031,7 +4582,7 @@
         "reason": "",
         "qualifiedKey": "GPUAdapter/decl[0]/member[4]/overload",
         "provenance": "GPUAdapter/decl[0]/member[4]/method/requestDevice/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2165:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2163:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5040,37 +4591,9 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUAdapter/decl[0]/member[4]/method/requestDevice/overload/parameter[0]/descriptor",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2166:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2164:5"
           }
         ]
-      },
-      {
-        "symbolName": "GPUAdapter",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUAdapter/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUAdapter/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2172:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUAdapterInfo",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUAdapterInfo/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUAdapterInfo/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2227:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "GPUBuffer",
@@ -5083,7 +4606,7 @@
         "reason": "",
         "qualifiedKey": "GPUBuffer/decl[0]/member[4]/overload",
         "provenance": "GPUBuffer/decl[0]/member[4]/method/mapAsync/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2275:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2265:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5092,7 +4615,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUBuffer/decl[0]/member[4]/method/mapAsync/overload/parameter[0]/mode",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2276:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2266:5"
           },
           {
             "ordinal": 1,
@@ -5101,7 +4624,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUBuffer/decl[0]/member[4]/method/mapAsync/overload/parameter[1]/offset",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2277:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2267:5"
           },
           {
             "ordinal": 2,
@@ -5110,7 +4633,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUBuffer/decl[0]/member[4]/method/mapAsync/overload/parameter[2]/size",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2278:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2268:5"
           }
         ]
       },
@@ -5125,7 +4648,7 @@
         "reason": "",
         "qualifiedKey": "GPUBuffer/decl[0]/member[5]/overload",
         "provenance": "GPUBuffer/decl[0]/member[5]/method/getMappedRange/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2285:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2275:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5134,7 +4657,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUBuffer/decl[0]/member[5]/method/getMappedRange/overload/parameter[0]/offset",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2286:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2276:5"
           },
           {
             "ordinal": 1,
@@ -5143,23 +4666,9 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUBuffer/decl[0]/member[5]/method/getMappedRange/overload/parameter[1]/size",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2287:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2277:5"
           }
         ]
-      },
-      {
-        "symbolName": "GPUBuffer",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUBuffer/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUBuffer/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2305:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "GPUCanvasContext",
@@ -5172,7 +4681,7 @@
         "reason": "",
         "qualifiedKey": "GPUCanvasContext/decl[0]/member[2]/overload",
         "provenance": "GPUCanvasContext/decl[0]/member[2]/method/configure/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2323:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2311:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5181,7 +4690,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUCanvasContext/decl[0]/member[2]/method/configure/overload/parameter[0]/configuration",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2324:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2312:5"
           }
         ]
       },
@@ -5196,7 +4705,7 @@
         "reason": "",
         "qualifiedKey": "GPUCanvasContext/decl[0]/member[4]/overload",
         "provenance": "GPUCanvasContext/decl[0]/member[4]/method/getConfiguration/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2337:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2325:3",
         "parameterOutcomes": []
       },
       {
@@ -5210,35 +4719,7 @@
         "reason": "",
         "qualifiedKey": "GPUCanvasContext/decl[0]/member[5]/overload",
         "provenance": "GPUCanvasContext/decl[0]/member[5]/method/getCurrentTexture/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2345:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUCanvasContext",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUCanvasContext/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUCanvasContext/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2350:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUCommandBuffer",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUCommandBuffer/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUCommandBuffer/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2361:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2333:3",
         "parameterOutcomes": []
       },
       {
@@ -5420,7 +4901,7 @@
         "reason": "",
         "qualifiedKey": "GPUDevice/decl[1]/member[6]/overload",
         "provenance": "GPUDevice/decl[1]/member[6]/method/createBuffer/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2655:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2629:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5429,7 +4910,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUDevice/decl[1]/member[6]/method/createBuffer/overload/parameter[0]/descriptor",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2656:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2630:5"
           }
         ]
       },
@@ -5444,49 +4925,7 @@
         "reason": "",
         "qualifiedKey": "GPUDevice/decl[1]/member[23]/overload",
         "provenance": "GPUDevice/decl[1]/member[23]/method/popErrorScope/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2786:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUDevice",
-        "declarationOrdinal": 2,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUDevice/decl[2]/typeLiteral/member[1]/overload",
-        "provenance": "GPUDevice/decl[2]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2800:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUDeviceLostInfo",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUDeviceLostInfo/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUDeviceLostInfo/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2812:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUError",
-        "declarationOrdinal": 2,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUError/decl[2]/typeLiteral/member[1]/overload",
-        "provenance": "GPUError/decl[2]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2836:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2760:3",
         "parameterOutcomes": []
       },
       {
@@ -5500,7 +4939,7 @@
         "reason": "",
         "qualifiedKey": "GPUQueue/decl[0]/member[1]/overload",
         "provenance": "GPUQueue/decl[0]/member[1]/method/submit/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2944:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2906:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5509,7 +4948,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUQueue/decl[0]/member[1]/method/submit/overload/parameter[0]/commandBuffers",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2945:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2907:5"
           }
         ]
       },
@@ -5524,7 +4963,7 @@
         "reason": "",
         "qualifiedKey": "GPUQueue/decl[0]/member[2]/overload",
         "provenance": "GPUQueue/decl[0]/member[2]/method/onSubmittedWorkDone/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2954:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2916:3",
         "parameterOutcomes": []
       },
       {
@@ -5538,7 +4977,7 @@
         "reason": "",
         "qualifiedKey": "GPUQueue/decl[0]/member[3]/overload",
         "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2965:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2927:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5547,7 +4986,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer/overload/parameter[0]/buffer",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2966:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2928:5"
           },
           {
             "ordinal": 1,
@@ -5556,7 +4995,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer/overload/parameter[1]/bufferOffset",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2967:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2929:5"
           },
           {
             "ordinal": 2,
@@ -5565,7 +5004,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer/overload/parameter[2]/data",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2968:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2930:5"
           },
           {
             "ordinal": 3,
@@ -5574,7 +5013,7 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer/overload/parameter[3]/dataOffset",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2969:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2931:5"
           },
           {
             "ordinal": 4,
@@ -5583,51 +5022,9 @@
             "phase": null,
             "reason": "",
             "provenance": "GPUQueue/decl[0]/member[3]/method/writeBuffer/overload/parameter[4]/size",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2970:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:2932:5"
           }
         ]
-      },
-      {
-        "symbolName": "GPUQueue",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUQueue/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUQueue/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3008:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUSupportedLimits",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUSupportedLimits/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUSupportedLimits/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3237:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "GPUTexture",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "GPUTexture/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "GPUTexture/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3307:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "GPUUncapturedErrorEvent",
@@ -5640,7 +5037,7 @@
         "reason": "emitted",
         "qualifiedKey": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3334:3",
+        "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3276:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5649,7 +5046,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/type",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3335:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3277:5"
           },
           {
             "ordinal": 1,
@@ -5658,7 +5055,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "GPUUncapturedErrorEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[1]/gpuUncapturedErrorEventInitDict",
-            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3336:5"
+            "sourceLocation": "supplemental/@webgpu/types/dist/index.window.d.ts:3278:5"
           }
         ]
       },
@@ -5701,20 +5098,6 @@
         ]
       },
       {
-        "symbolName": "HID",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "HID/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "HID/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:17:3",
-        "parameterOutcomes": []
-      },
-      {
         "symbolName": "HIDDevice",
         "declarationOrdinal": 0,
         "memberOrdinal": 6,
@@ -5725,7 +5108,7 @@
         "reason": "",
         "qualifiedKey": "HIDDevice/decl[0]/member[6]/overload",
         "provenance": "HIDDevice/decl[0]/member[6]/method/open/overload",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:54:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:53:3",
         "parameterOutcomes": []
       },
       {
@@ -5739,7 +5122,7 @@
         "reason": "",
         "qualifiedKey": "HIDDevice/decl[0]/member[9]/overload",
         "provenance": "HIDDevice/decl[0]/member[9]/method/sendReport/overload",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:57:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:56:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5748,7 +5131,7 @@
             "phase": null,
             "reason": "",
             "provenance": "HIDDevice/decl[0]/member[9]/method/sendReport/overload/parameter[0]/reportId",
-            "sourceLocation": "supplemental/webref/webhid.d.ts:57:14"
+            "sourceLocation": "supplemental/webref/webhid.d.ts:56:14"
           },
           {
             "ordinal": 1,
@@ -5757,7 +5140,7 @@
             "phase": null,
             "reason": "",
             "provenance": "HIDDevice/decl[0]/member[9]/method/sendReport/overload/parameter[1]/data",
-            "sourceLocation": "supplemental/webref/webhid.d.ts:57:32"
+            "sourceLocation": "supplemental/webref/webhid.d.ts:56:32"
           }
         ]
       },
@@ -5772,7 +5155,7 @@
         "reason": "",
         "qualifiedKey": "HIDDevice/decl[0]/member[11]/overload",
         "provenance": "HIDDevice/decl[0]/member[11]/method/receiveFeatureReport/overload",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:59:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:58:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5781,23 +5164,9 @@
             "phase": null,
             "reason": "",
             "provenance": "HIDDevice/decl[0]/member[11]/method/receiveFeatureReport/overload/parameter[0]/reportId",
-            "sourceLocation": "supplemental/webref/webhid.d.ts:59:24"
+            "sourceLocation": "supplemental/webref/webhid.d.ts:58:24"
           }
         ]
-      },
-      {
-        "symbolName": "HIDDevice",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "HIDDevice/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "HIDDevice/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:64:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "HIDInputReportEvent",
@@ -5810,7 +5179,7 @@
         "reason": "emitted",
         "qualifiedKey": "HIDInputReportEvent/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "HIDInputReportEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webhid.d.ts:90:3",
+        "sourceLocation": "supplemental/webref/webhid.d.ts:88:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5819,7 +5188,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "HIDInputReportEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/type",
-            "sourceLocation": "supplemental/webref/webhid.d.ts:90:7"
+            "sourceLocation": "supplemental/webref/webhid.d.ts:88:7"
           },
           {
             "ordinal": 1,
@@ -5828,7 +5197,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "HIDInputReportEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[1]/eventInitDict",
-            "sourceLocation": "supplemental/webref/webhid.d.ts:90:21"
+            "sourceLocation": "supplemental/webref/webhid.d.ts:88:21"
           }
         ]
       },
@@ -5847,20 +5216,6 @@
         "parameterOutcomes": []
       },
       {
-        "symbolName": "Presentation",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "Presentation/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "Presentation/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:18:3",
-        "parameterOutcomes": []
-      },
-      {
         "symbolName": "PresentationConnection",
         "declarationOrdinal": 0,
         "memberOrdinal": 10,
@@ -5871,7 +5226,7 @@
         "reason": "",
         "qualifiedKey": "PresentationConnection/decl[0]/member[10]/overload",
         "provenance": "PresentationConnection/decl[0]/member[10]/method/send/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:54:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:52:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5880,7 +5235,7 @@
             "phase": null,
             "reason": "",
             "provenance": "PresentationConnection/decl[0]/member[10]/method/send/overload/parameter[0]/message",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:54:8"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:52:8"
           }
         ]
       },
@@ -5895,7 +5250,7 @@
         "reason": "",
         "qualifiedKey": "PresentationConnection/decl[0]/member[11]/overload",
         "provenance": "PresentationConnection/decl[0]/member[11]/method/send/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:55:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:53:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5904,7 +5259,7 @@
             "phase": null,
             "reason": "",
             "provenance": "PresentationConnection/decl[0]/member[11]/method/send/overload/parameter[0]/data",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:55:8"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:53:8"
           }
         ]
       },
@@ -5919,7 +5274,7 @@
         "reason": "",
         "qualifiedKey": "PresentationConnection/decl[0]/member[12]/overload",
         "provenance": "PresentationConnection/decl[0]/member[12]/method/send/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:56:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:54:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5928,7 +5283,7 @@
             "phase": null,
             "reason": "",
             "provenance": "PresentationConnection/decl[0]/member[12]/method/send/overload/parameter[0]/data",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:56:8"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:54:8"
           }
         ]
       },
@@ -5943,7 +5298,7 @@
         "reason": "Deduplicated from declaration ordinal 0.",
         "qualifiedKey": "PresentationConnection/decl[0]/member[13]/overload",
         "provenance": "PresentationConnection/decl[0]/member[13]/method/send/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:57:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:55:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5952,23 +5307,9 @@
             "phase": null,
             "reason": "Deduplicated from declaration ordinal 0.",
             "provenance": "PresentationConnection/decl[0]/member[13]/method/send/overload/parameter[0]/data",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:57:8"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:55:8"
           }
         ]
-      },
-      {
-        "symbolName": "PresentationConnection",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "PresentationConnection/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "PresentationConnection/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:62:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "PresentationConnectionAvailableEvent",
@@ -5981,7 +5322,7 @@
         "reason": "emitted",
         "qualifiedKey": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:72:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:69:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -5990,7 +5331,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/type",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:72:7"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:69:7"
           },
           {
             "ordinal": 1,
@@ -5999,23 +5340,9 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "PresentationConnectionAvailableEvent/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[1]/eventInitDict",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:72:21"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:69:21"
           }
         ]
-      },
-      {
-        "symbolName": "PresentationReceiver",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "PresentationReceiver/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "PresentationReceiver/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:121:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "PresentationRequest",
@@ -6028,7 +5355,7 @@
         "reason": "",
         "qualifiedKey": "PresentationRequest/decl[0]/member[0]/overload",
         "provenance": "PresentationRequest/decl[0]/member[0]/method/start/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:126:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:121:3",
         "parameterOutcomes": []
       },
       {
@@ -6042,7 +5369,7 @@
         "reason": "",
         "qualifiedKey": "PresentationRequest/decl[0]/member[1]/overload",
         "provenance": "PresentationRequest/decl[0]/member[1]/method/reconnect/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:127:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:122:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6051,7 +5378,7 @@
             "phase": null,
             "reason": "",
             "provenance": "PresentationRequest/decl[0]/member[1]/method/reconnect/overload/parameter[0]/presentationId",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:127:13"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:122:13"
           }
         ]
       },
@@ -6066,7 +5393,7 @@
         "reason": "emitted",
         "qualifiedKey": "PresentationRequest/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "PresentationRequest/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:134:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:129:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6075,7 +5402,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "PresentationRequest/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/url",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:134:7"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:129:7"
           }
         ]
       },
@@ -6090,7 +5417,7 @@
         "reason": "emitted",
         "qualifiedKey": "PresentationRequest/decl[1]/typeLiteral/member[2]/overload",
         "provenance": "PresentationRequest/decl[1]/typeLiteral/member[2]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/presentation-api.d.ts:135:3",
+        "sourceLocation": "supplemental/webref/presentation-api.d.ts:130:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6099,7 +5426,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "PresentationRequest/decl[1]/typeLiteral/member[2]/constructSignature/(unnamed)/overload/parameter[0]/urls",
-            "sourceLocation": "supplemental/webref/presentation-api.d.ts:135:7"
+            "sourceLocation": "supplemental/webref/presentation-api.d.ts:130:7"
           }
         ]
       },
@@ -6241,20 +5568,6 @@
         ]
       },
       {
-        "symbolName": "Serial",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "Serial/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "Serial/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/serial.d.ts:28:3",
-        "parameterOutcomes": []
-      },
-      {
         "symbolName": "SerialPort",
         "declarationOrdinal": 0,
         "memberOrdinal": 6,
@@ -6265,7 +5578,7 @@
         "reason": "",
         "qualifiedKey": "SerialPort/decl[0]/member[6]/overload",
         "provenance": "SerialPort/decl[0]/member[6]/method/open/overload",
-        "sourceLocation": "supplemental/webref/serial.d.ts:64:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:63:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6274,7 +5587,7 @@
             "phase": null,
             "reason": "",
             "provenance": "SerialPort/decl[0]/member[6]/method/open/overload/parameter[0]/options",
-            "sourceLocation": "supplemental/webref/serial.d.ts:64:8"
+            "sourceLocation": "supplemental/webref/serial.d.ts:63:8"
           }
         ]
       },
@@ -6289,21 +5602,7 @@
         "reason": "",
         "qualifiedKey": "SerialPort/decl[0]/member[8]/overload",
         "provenance": "SerialPort/decl[0]/member[8]/method/getSignals/overload",
-        "sourceLocation": "supplemental/webref/serial.d.ts:66:3",
-        "parameterOutcomes": []
-      },
-      {
-        "symbolName": "SerialPort",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "SerialPort/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "SerialPort/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/serial.d.ts:73:3",
+        "sourceLocation": "supplemental/webref/serial.d.ts:65:3",
         "parameterOutcomes": []
       },
       {
@@ -6345,20 +5644,6 @@
         ]
       },
       {
-        "symbolName": "USB",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "USB/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "USB/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:29:3",
-        "parameterOutcomes": []
-      },
-      {
         "symbolName": "USBConfiguration",
         "declarationOrdinal": 1,
         "memberOrdinal": 1,
@@ -6369,7 +5654,7 @@
         "reason": "emitted",
         "qualifiedKey": "USBConfiguration/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "USBConfiguration/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:63:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:62:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6378,7 +5663,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "USBConfiguration/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/device",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:63:7"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:62:7"
           },
           {
             "ordinal": 1,
@@ -6387,7 +5672,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "USBConfiguration/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[1]/configurationValue",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:63:26"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:62:26"
           }
         ]
       },
@@ -6402,7 +5687,7 @@
         "reason": "",
         "qualifiedKey": "USBDevice/decl[0]/member[17]/overload",
         "provenance": "USBDevice/decl[0]/member[17]/method/open/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:109:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:108:3",
         "parameterOutcomes": []
       },
       {
@@ -6416,7 +5701,7 @@
         "reason": "",
         "qualifiedKey": "USBDevice/decl[0]/member[27]/overload",
         "provenance": "USBDevice/decl[0]/member[27]/method/transferIn/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:119:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:118:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6425,7 +5710,7 @@
             "phase": null,
             "reason": "",
             "provenance": "USBDevice/decl[0]/member[27]/method/transferIn/overload/parameter[0]/endpointNumber",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:119:14"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:118:14"
           },
           {
             "ordinal": 1,
@@ -6434,7 +5719,7 @@
             "phase": null,
             "reason": "",
             "provenance": "USBDevice/decl[0]/member[27]/method/transferIn/overload/parameter[1]/length",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:119:38"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:118:38"
           }
         ]
       },
@@ -6449,7 +5734,7 @@
         "reason": "",
         "qualifiedKey": "USBDevice/decl[0]/member[28]/overload",
         "provenance": "USBDevice/decl[0]/member[28]/method/transferOut/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:120:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:119:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6458,7 +5743,7 @@
             "phase": null,
             "reason": "",
             "provenance": "USBDevice/decl[0]/member[28]/method/transferOut/overload/parameter[0]/endpointNumber",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:120:15"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:119:15"
           },
           {
             "ordinal": 1,
@@ -6467,23 +5752,9 @@
             "phase": null,
             "reason": "",
             "provenance": "USBDevice/decl[0]/member[28]/method/transferOut/overload/parameter[1]/data",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:120:39"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:119:39"
           }
         ]
-      },
-      {
-        "symbolName": "USBDevice",
-        "declarationOrdinal": 1,
-        "memberOrdinal": 1,
-        "name": "constructSignature",
-        "kind": "constructSignature",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
-        "qualifiedKey": "USBDevice/decl[1]/typeLiteral/member[1]/overload",
-        "provenance": "USBDevice/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:128:3",
-        "parameterOutcomes": []
       },
       {
         "symbolName": "USBInTransferResult",
@@ -6496,7 +5767,7 @@
         "reason": "emitted",
         "qualifiedKey": "USBInTransferResult/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "USBInTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:174:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:172:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6505,7 +5776,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "USBInTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/status",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:174:7"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:172:7"
           },
           {
             "ordinal": 1,
@@ -6514,7 +5785,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "USBInTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[1]/data",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:174:34"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:172:34"
           }
         ]
       },
@@ -6529,7 +5800,7 @@
         "reason": "emitted",
         "qualifiedKey": "USBOutTransferResult/decl[1]/typeLiteral/member[1]/overload",
         "provenance": "USBOutTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
-        "sourceLocation": "supplemental/webref/webusb.d.ts:241:3",
+        "sourceLocation": "supplemental/webref/webusb.d.ts:239:3",
         "parameterOutcomes": [
           {
             "ordinal": 0,
@@ -6538,7 +5809,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "USBOutTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/status",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:241:7"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:239:7"
           },
           {
             "ordinal": 1,
@@ -6547,7 +5818,7 @@
             "phase": null,
             "reason": "emitted",
             "provenance": "USBOutTransferResult/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[1]/bytesWritten",
-            "sourceLocation": "supplemental/webref/webusb.d.ts:241:34"
+            "sourceLocation": "supplemental/webref/webusb.d.ts:239:34"
           }
         ]
       },
@@ -6615,13 +5886,6 @@
       "provenance": "ReadableStream/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/parameter[1]/strategy",
       "fingerprint": "record(highWaterMark:double:True)",
       "relativePath": "AdvancedTypes\\ReadableStreamRecordShape_86a44aa191.g.cs"
-    },
-    {
-      "name": "TypeScriptNever",
-      "kind": "Never",
-      "provenance": "typescript/never",
-      "fingerprint": "typescript:never:uninhabited",
-      "relativePath": "StandardTypes\\TypeScriptNever.g.cs"
     }
   ]
 }

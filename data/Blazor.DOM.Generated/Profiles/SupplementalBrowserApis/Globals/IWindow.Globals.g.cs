@@ -14,77 +14,77 @@ public partial interface IWindow
 {
     IBlobFactory BlobConstructor { get; }
 
-    IBluetoothFactory BluetoothConstructor { get; }
+    IBluetoothStatics BluetoothStatics { get; }
 
-    IBluetoothDeviceFactory BluetoothDeviceConstructor { get; }
+    IBluetoothDeviceStatics BluetoothDeviceStatics { get; }
 
-    IBluetoothLEScanFactory BluetoothLEScanConstructor { get; }
+    IBluetoothLEScanStatics BluetoothLEScanStatics { get; }
 
-    IBluetoothManufacturerDataMapFactory BluetoothManufacturerDataMapConstructor { get; }
+    IBluetoothManufacturerDataMapStatics BluetoothManufacturerDataMapStatics { get; }
 
-    IBluetoothRemoteGATTCharacteristicFactory BluetoothRemoteGATTCharacteristicConstructor { get; }
+    IBluetoothRemoteGATTCharacteristicStatics BluetoothRemoteGATTCharacteristicStatics { get; }
 
-    IBluetoothRemoteGATTServerFactory BluetoothRemoteGATTServerConstructor { get; }
+    IBluetoothRemoteGATTServerStatics BluetoothRemoteGATTServerStatics { get; }
 
     IEventFactory EventConstructor { get; }
 
     IEventTargetFactory EventTargetConstructor { get; }
 
-    IGPUFactory GPUConstructor { get; }
+    IGPUStatics GPUStatics { get; }
 
-    IGPUAdapterFactory GPUAdapterConstructor { get; }
+    IGPUAdapterStatics GPUAdapterStatics { get; }
 
-    IGPUAdapterInfoFactory GPUAdapterInfoConstructor { get; }
+    IGPUAdapterInfoStatics GPUAdapterInfoStatics { get; }
 
-    IGPUBufferFactory GPUBufferConstructor { get; }
+    IGPUBufferStatics GPUBufferStatics { get; }
 
-    IGPUCanvasContextFactory GPUCanvasContextConstructor { get; }
+    IGPUCanvasContextStatics GPUCanvasContextStatics { get; }
 
-    IGPUCommandBufferFactory GPUCommandBufferConstructor { get; }
+    IGPUCommandBufferStatics GPUCommandBufferStatics { get; }
 
-    IGPUDeviceFactory GPUDeviceConstructor { get; }
+    IGPUDeviceStatics GPUDeviceStatics { get; }
 
-    IGPUDeviceLostInfoFactory GPUDeviceLostInfoConstructor { get; }
+    IGPUDeviceLostInfoStatics GPUDeviceLostInfoStatics { get; }
 
-    IGPUErrorFactory GPUErrorConstructor { get; }
+    IGPUErrorStatics GPUErrorStatics { get; }
 
-    IGPUQueueFactory GPUQueueConstructor { get; }
+    IGPUQueueStatics GPUQueueStatics { get; }
 
-    IGPUSupportedLimitsFactory GPUSupportedLimitsConstructor { get; }
+    IGPUSupportedLimitsStatics GPUSupportedLimitsStatics { get; }
 
-    IGPUTextureFactory GPUTextureConstructor { get; }
+    IGPUTextureStatics GPUTextureStatics { get; }
 
     IGPUUncapturedErrorEventFactory GPUUncapturedErrorEventConstructor { get; }
 
-    IHIDFactory HIDConstructor { get; }
+    IHIDStatics HIDStatics { get; }
 
-    IHIDDeviceFactory HIDDeviceConstructor { get; }
+    IHIDDeviceStatics HIDDeviceStatics { get; }
 
     IHIDInputReportEventFactory HIDInputReportEventConstructor { get; }
 
     INavigatorFactory NavigatorConstructor { get; }
 
-    IPresentationFactory PresentationConstructor { get; }
+    IPresentationStatics PresentationStatics { get; }
 
-    IPresentationConnectionFactory PresentationConnectionConstructor { get; }
+    IPresentationConnectionStatics PresentationConnectionStatics { get; }
 
     IPresentationConnectionAvailableEventFactory PresentationConnectionAvailableEventConstructor { get; }
 
-    IPresentationReceiverFactory PresentationReceiverConstructor { get; }
+    IPresentationReceiverStatics PresentationReceiverStatics { get; }
 
     IPresentationRequestFactory PresentationRequestConstructor { get; }
 
     IReadableStreamFactory ReadableStreamConstructor { get; }
 
-    ISerialFactory SerialConstructor { get; }
+    ISerialStatics SerialStatics { get; }
 
-    ISerialPortFactory SerialPortConstructor { get; }
+    ISerialPortStatics SerialPortStatics { get; }
 
-    IUSBFactory USBConstructor { get; }
+    IUSBStatics USBStatics { get; }
 
     IUSBConfigurationFactory USBConfigurationConstructor { get; }
 
-    IUSBDeviceFactory USBDeviceConstructor { get; }
+    IUSBDeviceStatics USBDeviceStatics { get; }
 
     IUSBInTransferResultFactory USBInTransferResultConstructor { get; }
 

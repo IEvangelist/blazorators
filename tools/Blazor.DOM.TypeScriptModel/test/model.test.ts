@@ -402,6 +402,11 @@ interface GPUFlags {
   readonly READ: number;
 }
 declare var GPUFlags: GPUFlags;
+interface StaticOnly {}
+declare var StaticOnly: {
+  prototype: StaticOnly;
+  new(): never;
+};
 `;
   const filtered = filterWebGpuWindowSource(source, new Set(["GPUFlags"]));
   assert.doesNotMatch(filtered, /WorkerNavigator/);
@@ -414,6 +419,8 @@ declare var GPUFlags: GPUFlags;
   );
   assert.match(filtered, /declare namespace GPUFlags \{\s+const READ: number;/);
   assert.doesNotMatch(filtered, /declare var GPUFlags/);
+  assert.match(filtered, /declare var StaticOnly/);
+  assert.doesNotMatch(filtered, /new\(\): never/);
 });
 
 test("pinned supplemental closure is Window-scoped and provenance-complete", async () => {
@@ -433,6 +440,19 @@ test("pinned supplemental closure is Window-scoped and provenance-complete", asy
     assert.equal(item.supplemental, true, name);
     assert.equal(item.semantic.exposedOnWindow, true, name);
   }
+  for (const name of ["Bluetooth", "USB", "GPUAdapter"]) {
+    const declaration = symbol(model.symbols, name).declarations.find((item) =>
+      item.kind === "globalVariable" && item.supplemental
+    );
+    assert.ok(declaration, `${name} interface object`);
+    assert.equal(declaration.constructorObject, false, name);
+  }
+  const presentationRequestObject = symbol(model.symbols, "PresentationRequest")
+    .declarations.find((item) =>
+      item.kind === "globalVariable" && item.supplemental
+    );
+  assert.ok(presentationRequestObject);
+  assert.equal(presentationRequestObject.constructorObject, true);
   const navigator = symbol(model.symbols, "Navigator");
   assert.equal(navigator.supplemental, false);
   assert.ok(navigator.declarations.some((item) => item.supplemental));

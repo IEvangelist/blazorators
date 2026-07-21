@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IBluetoothRemoteGATTServerFactory
+public partial interface IGPUSupportedLimitsStatics
 {
-    IBluetoothRemoteGATTServer Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IGPUSupportedLimits Prototype { get; set; }
 }

@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUCanvasContextFactory
+public partial interface ISerialPortStatics
 {
-    IGPUCanvasContext Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    ISerialPort Prototype { get; set; }
 }

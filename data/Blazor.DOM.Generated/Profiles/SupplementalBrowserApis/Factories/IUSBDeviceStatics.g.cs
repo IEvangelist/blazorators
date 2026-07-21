@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IUSBFactory
+public partial interface IUSBDeviceStatics
 {
-    IUSB Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IUSBDevice Prototype { get; set; }
 }

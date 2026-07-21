@@ -14,7 +14,7 @@
       "format": "jsonl",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/typescript-symbol.schema.json",
       "records": 2173,
-      "sha256": "a32344da18a6fe899dd5f81a25849bc7b27a323ee7e136f459d9d524b97b1e0e"
+      "sha256": "1b118d7db3d79c7c2e6ede8faefabaacb44122b1cd5bece68e3b15c398443b2d"
     },
     "webIdlSymbols": {
       "path": "webidl-symbols.jsonl",
@@ -28,13 +28,13 @@
       "format": "json",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/coverage.schema.json",
       "records": 1,
-      "sha256": "12f2387ea6f95375a642ad0273c00ac4f0a2070b0b08b559f0617a45e813a947"
+      "sha256": "a5642ce9a400357b5d343e7005f4b718d75bd388a8098114ab3851b64145a22a"
     }
   },
   "counts": {
     "typescriptSymbols": 2173,
     "typescriptDeclarations": 3009,
-    "typescriptMembers": 12255,
+    "typescriptMembers": 12201,
     "webIdlSpecifications": 325,
     "webIdlSymbols": 2750,
     "webIdlMembers": 11338,
@@ -1401,7 +1401,7 @@
         ],
         "output": {
           "name": "supplemental/webref/presentation-api.d.ts",
-          "sha256": "6b823ac6b98adbac37b79423367ccf87a090b929e77837f743b2ccfc8a7605f6"
+          "sha256": "c8580b665aa9e27092d360666bfe76db620623ded58e8b0a5d95d84b99a94802"
         },
         "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
       },
@@ -1420,7 +1420,7 @@
         ],
         "output": {
           "name": "supplemental/webref/serial.d.ts",
-          "sha256": "bae662a448e0a8c5071563c831ea2e4488a9cea9b2d050ab02121e3b87969272"
+          "sha256": "9842ffd4c116023b3615d9c66a06148de636156393f41eb342e5c6d182bf304a"
         },
         "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
       },
@@ -1439,7 +1439,7 @@
         ],
         "output": {
           "name": "supplemental/webref/web-bluetooth.d.ts",
-          "sha256": "faab55e3f2c6c0305a4275435cc547fad7a6b6882e471146b7f1e5e9994665a5"
+          "sha256": "c44557cd380840aa181fcb6c60b605dc6d08cdd1620a1f10197e0cdeb8565b32"
         },
         "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
       },
@@ -1458,7 +1458,7 @@
         ],
         "output": {
           "name": "supplemental/webref/web-bluetooth-scanning.d.ts",
-          "sha256": "6939f24f1c83734054a6b77b82d5e0f76b7946b3cafe1d1dbe5f2d8c80d1897a"
+          "sha256": "cfd2ae97eb7db4865911f9801ed8a585418354d7548b507e604eee51c3d0c970"
         },
         "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
       },
@@ -1477,7 +1477,7 @@
         ],
         "output": {
           "name": "supplemental/webref/webhid.d.ts",
-          "sha256": "adfffe85c22c9cbdc8199475656e2bbc63bb5956e7378f77d194e34fa3a0eb52"
+          "sha256": "c3b9522fb11aea5639a2f771d8fb0c3645ba5c8a73dfbb8d92b815ea8df4a48a"
         },
         "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
       },
@@ -1496,7 +1496,7 @@
         ],
         "output": {
           "name": "supplemental/webref/webusb.d.ts",
-          "sha256": "cd82932a78169b37365e43ac29664e2e494f721c9b695f477e3059c9a9c81957"
+          "sha256": "551e6184a8e7fb1cb134056ef5800a76365a196a14d31ea27b470787fb37f86d"
         },
         "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
       },
@@ -1515,9 +1515,9 @@
         ],
         "output": {
           "name": "supplemental/@webgpu/types/dist/index.window.d.ts",
-          "sha256": "1e10b2f648da0ad168ec2f4036efd7464d5c84ece2d58e8b5a0e7c1383d7be38"
+          "sha256": "10be9dbde0d9804d06b4d21be172413b66a8dab5a7db4eb2ff2412add154d3d0"
         },
-        "generationMethod": "Exact package declaration filtered to Window exposure; Web IDL namespaces are normalized from interface/value pairs and finite Required/Omit mapped heritage is flattened without widening."
+        "generationMethod": "Exact package declaration filtered to Window exposure; non-WebIDL new(): never signatures are removed, Web IDL namespaces are normalized from interface/value pairs, and finite Required/Omit mapped heritage is flattened without widening."
       }
     ],
     "overrides": {

@@ -7,9 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGPUDeviceFactory
+public partial interface IPresentationReceiverStatics
 {
-    IGPUDevice Prototype { get; set; }
-
-    global::Blazor.DOM.StandardTypes.TypeScriptNever Create();
+    IPresentationReceiver Prototype { get; set; }
 }

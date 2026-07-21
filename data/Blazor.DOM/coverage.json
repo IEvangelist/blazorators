@@ -11,17 +11,17 @@
       "namespace": 7,
       "typeAlias": 375
     },
-    "memberCount": 12255,
+    "memberCount": 12201,
     "memberKinds": {
       "callSignature": 48,
-      "constructSignature": 740,
+      "constructSignature": 686,
       "getter": 30,
       "indexSignature": 43,
       "method": 3018,
       "property": 8348,
       "setter": 28
     },
-    "typeExpressionCount": 33944,
+    "typeExpressionCount": 33890,
     "typeExpressionKinds": {
       "AnyKeyword": 1119,
       "ArrayType": 261,
@@ -32,7 +32,7 @@
       "IndexedAccessType": 488,
       "IntersectionType": 6,
       "LiteralType": 4613,
-      "NeverKeyword": 55,
+      "NeverKeyword": 1,
       "NumberKeyword": 1999,
       "ObjectKeyword": 2,
       "ParenthesizedType": 472,
@@ -50,7 +50,7 @@
     },
     "mergedSymbolCount": 752,
     "eventMapCount": 80,
-    "constructorObjectCount": 734
+    "constructorObjectCount": 680
   },
   "webIdl": {
     "specificationCount": 325,
