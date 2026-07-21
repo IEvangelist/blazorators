@@ -159,6 +159,10 @@ public sealed class BuildGenerationTests
                 "Blazor.Credentials.WebAssembly",
                 "Blazor.WebCrypto",
                 "Blazor.WebCrypto.WebAssembly",
+                "Blazor.MediaDevices",
+                "Blazor.MediaDevices.WebAssembly",
+                "Blazor.Notifications",
+                "Blazor.Notifications.WebAssembly",
             ];
             foreach (var focusedPackageName in focusedPackages)
             {
