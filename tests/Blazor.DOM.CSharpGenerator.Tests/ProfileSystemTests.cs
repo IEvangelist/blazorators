@@ -214,41 +214,78 @@ public sealed class ProfileSystemTests
                             "kind": "runtime-inferred",
                             "rationale": ""
                         }
+                    ]
+                }
+                """;
+            var path = Path.Combine(dir, "invalid.profile.json");
+            File.WriteAllText(path, json);
 
-                        [Fact]
-                        public void Load_ReviewedExclusion_RequiresRationale()
+            var exception = Assert.Throws<InvalidDataException>(
+                () => ProfileLoader.Load(path));
+
+            Assert.Contains("non-empty rationale", exception.Message);
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void Load_ReviewedJsReferenceOverride_IsAccepted()
+    {
+        var dir = CreateTempDir();
+        try
+        {
+            var json = """
+                {
+                    "name": "Valid",
+                    "description": "Reviewed live iterator transport",
+                    "rootSymbols": ["Root"],
+                    "secureContext": false,
+                    "requiresUserActivation": false,
+                    "features": [],
+                    "outputNamespace": "Blazor.DOM",
+                    "outputSubdirectory": "Profiles/Valid",
+                    "transportOverrides": [
                         {
-                            var dir = CreateTempDir();
-                            try
-                            {
-                                var json = """
-                                    {
-                                        "name": "Invalid",
-                                        "description": "Invalid reviewed exclusion",
-                                        "rootSymbols": ["Root"],
-                                        "secureContext": false,
-                                        "requiresUserActivation": false,
-                                        "features": [],
-                                        "outputNamespace": "Blazor.DOM",
-                                        "outputSubdirectory": "Profiles/Invalid",
-                                        "reviewedExclusions": [
-                                            {
-                                                "symbol": "Root",
-                                                "member": "unsupported",
-                                                "rationale": ""
-                                            }
-                                        ]
-                                    }
-                                    """;
-                                var path = Path.Combine(dir, "invalid.profile.json");
-                                File.WriteAllText(path, json);
+                            "symbol": "Root",
+                            "member": "values",
+                            "kind": "js-reference",
+                            "rationale": "The result retains live JavaScript iterator identity."
+                        }
+                    ]
+                }
+                """;
+            var path = Path.Combine(dir, "valid.profile.json");
+            File.WriteAllText(path, json);
 
-                                var exception = Assert.Throws<InvalidDataException>(
-                                    () => ProfileLoader.Load(path));
+            var profile = ProfileLoader.Load(path);
 
-                                Assert.Contains("non-empty rationale", exception.Message);
-                            }
-                            finally { Directory.Delete(dir, true); }
+            var transportOverride = Assert.Single(profile.TransportOverrides!);
+            Assert.Equal("js-reference", transportOverride.Kind);
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void Load_ReviewedExclusion_RequiresRationale()
+    {
+        var dir = CreateTempDir();
+        try
+        {
+            var json = """
+                {
+                    "name": "Invalid",
+                    "description": "Invalid reviewed exclusion",
+                    "rootSymbols": ["Root"],
+                    "secureContext": false,
+                    "requiresUserActivation": false,
+                    "features": [],
+                    "outputNamespace": "Blazor.DOM",
+                    "outputSubdirectory": "Profiles/Invalid",
+                    "reviewedExclusions": [
+                        {
+                            "symbol": "Root",
+                            "member": "unsupported",
+                            "rationale": ""
                         }
                     ]
                 }

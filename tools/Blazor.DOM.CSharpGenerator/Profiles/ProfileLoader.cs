@@ -76,7 +76,7 @@ public static class ProfileLoader
                     $"'{transportOverride.Symbol}.{transportOverride.Member}' requires " +
                     "a non-empty rationale.");
             }
-            if (transportOverride.Kind is not "runtime-inferred")
+            if (transportOverride.Kind is not ("runtime-inferred" or "js-reference"))
             {
                 throw new InvalidDataException(
                     $"Package profile '{profile.Name}' transport override " +
