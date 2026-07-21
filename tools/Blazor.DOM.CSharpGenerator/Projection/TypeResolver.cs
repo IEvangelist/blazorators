@@ -1391,6 +1391,10 @@ public sealed class TypeResolver
                     string.Equals(
                         reference.ResolvedSymbol ?? reference.Name,
                         "Window",
+                        StringComparison.Ordinal)
+                    || string.Equals(
+                        reference.ResolvedSymbol ?? reference.Name,
+                        "WindowProxy",
                         StringComparison.Ordinal));
             var globalThisQuery = intersection.Types
                 .OfType<QueryTypeNode>()
@@ -1426,6 +1430,23 @@ public sealed class TypeResolver
                 "intersection-union-arms");
         }
 
+        if (intersection.Types.All(type =>
+                type is ReferenceTypeNode or QueryTypeNode or ParenthesizedTypeNode))
+        {
+            var sourceShape = intersection.CheckerType
+                ?? string.Join(
+                    " & ",
+                    intersection.Types.Select(TypeFingerprint));
+            var composite = _synthesizedTypes.RegisterIntersection(
+                $"{provenance}/intersection",
+                sourceShape);
+            return ReferenceType(
+                composite,
+                providerNote: "browser-intersection-composite",
+                canonicalType: composite,
+                transport: BrowserReferenceTransport(intersection));
+        }
+
         if (intersection.Types.All(type => type is TypeLiteralTypeNode)
             && intersection.Transport?.Kind is null or "json-value")
         {
@@ -1445,6 +1466,7 @@ public sealed class TypeResolver
                     merged.Add(member);
                     continue;
                 }
+
                 if (existing.Type is null
                     || member.Type is null
                     || TypeFingerprint(existing.Type) != TypeFingerprint(member.Type))
@@ -1973,23 +1995,66 @@ public sealed class TypeResolver
                 providerNote: "finite-template-string",
                 canonicalType: typeName);
         }
-        throw new GenericDeferralException(
-            $"Template literal at '{provenance}' is a constrained or dynamic string " +
-            "pattern and cannot be widened to string.",
+        var checkerDomain = ExtractQuotedStringDomain(template.CheckerType);
+        if (checkerDomain.Count > 1)
+        {
+            var typeName = _synthesizedTypes.RegisterStringDomain(
+                provenance,
+                checkerDomain);
+            return ValueType(
+                typeName,
+                providerNote: "checker-finite-template-string",
+                canonicalType: typeName);
+        }
+        var pattern = BuildTemplatePattern(template);
+        var patternType = _synthesizedTypes.RegisterStringPattern(
             provenance,
-            "template-literal-pattern");
+            pattern,
+            template.CheckerType ?? TypeFingerprint(template));
+        return ValueType(
+            patternType,
+            providerNote: "validated-template-string-pattern",
+            canonicalType: patternType);
     }
 
     private static bool IsUnrestrictedStringTemplate(
         TemplateLiteralTypeNode template)
         => string.Equals(template.CheckerType, "string", StringComparison.Ordinal)
-            || template.Head.Length == 0
+            || string.IsNullOrEmpty(template.Head)
                 && template.Spans.Count == 1
-                && template.Spans[0].Literal.Length == 0
+                && string.IsNullOrEmpty(template.Spans[0].Literal)
                 && template.Spans[0].Type is KeywordTypeNode
                 {
                     Name: "StringKeyword" or "string",
                 };
+
+    private static IReadOnlyList<string> ExtractQuotedStringDomain(string? checkerType)
+    {
+        if (string.IsNullOrWhiteSpace(checkerType))
+            return [];
+        return System.Text.RegularExpressions.Regex.Matches(
+                checkerType,
+                "\"(?<value>(?:\\\\.|[^\"\\\\])*)\"",
+                System.Text.RegularExpressions.RegexOptions.CultureInvariant)
+            .Select(match => System.Text.Json.JsonSerializer.Deserialize<string>(
+                $"\"{match.Groups["value"].Value}\"")!)
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static string BuildTemplatePattern(TemplateLiteralTypeNode template)
+    {
+        var builder = new System.Text.StringBuilder("^");
+        builder.Append(System.Text.RegularExpressions.Regex.Escape(template.Head ?? ""));
+        foreach (var span in template.Spans)
+        {
+            builder.Append("[\\s\\S]*");
+            builder.Append(System.Text.RegularExpressions.Regex.Escape(span.Literal ?? ""));
+        }
+        builder.Append('$');
+        return builder.ToString();
+    }
 
     private TypeProjection ProjectQuery(
         QueryTypeNode query,
@@ -2189,11 +2254,54 @@ public sealed class TypeResolver
                             canonical,
                             StringComparison.Ordinal)))
                 {
-                    throw new GenericDeferralException(
-                        $"Indexed access at '{provenance}' selects incompatible CLR value types " +
-                        $"[{string.Join(", ", projections.Select(p => p.RenderedType).Distinct())}].",
+                    var map = Project(
+                        indexed.ObjectType,
+                        $"{provenance}/map",
+                        scope,
+                        depth + 1);
+                    var key = Project(
+                        indexed.IndexType,
+                        $"{provenance}/key",
+                        scope,
+                        depth + 1);
+                    ValidateGenericArgument(
+                        "indexed-access map",
+                        map,
                         provenance,
-                        "dependent-indexed-access");
+                        0);
+                    ValidateGenericArgument(
+                        "indexed-access key",
+                        key,
+                        provenance,
+                        1);
+                    return ReferenceType(
+                        "global::Microsoft.JSInterop.ITypeScriptIndexedAccess<" +
+                        $"{map.RenderedType}, {key.RenderedType}>",
+                        providerNote: "statically-reduced-indexed-access",
+                        canonicalType:
+                            "global::Microsoft.JSInterop.ITypeScriptIndexedAccess<" +
+                            $"{map.CanonicalType},{key.CanonicalType}>",
+                        typeArguments: [map.Identity, key.Identity],
+                        transport: projections.All(projection =>
+                                projection.Identity.Kind == ClrTypeKind.Reference)
+                            ? new TransportModel(
+                                "js-reference",
+                                indexed.Transport?.Nullable == true,
+                                indexed.Transport?.SourceType
+                                    ?? indexed.CheckerType
+                                    ?? "indexed access",
+                                false,
+                                false,
+                                null)
+                            : new TransportModel(
+                                "json-value",
+                                indexed.Transport?.Nullable == true,
+                                indexed.Transport?.SourceType
+                                    ?? indexed.CheckerType
+                                    ?? "indexed access",
+                                false,
+                                true,
+                                null));
                 }
                 return projections[0] with
                 {
@@ -2609,41 +2717,58 @@ public sealed class TypeResolver
             return null;
         var constraintProvenance =
             $"{provenance}/typeParameter[{binding.Model.Ordinal}]/constraint";
-        if (binding.Model.Constraint is OperatorTypeNode
+        var constraintNode = binding.Model.Constraint is ParenthesizedTypeNode parenthesized
+            ? parenthesized.InnerType
+            : binding.Model.Constraint;
+        if (constraintNode is OperatorTypeNode
+            {
+                Operator: "keyof" or "KeyOfKeyword",
+            } keyOf)
+        {
+            var map = Project(
+                keyOf.OperandType,
+                $"{constraintProvenance}/keyof",
+                scope);
+            ValidateGenericArgument("keyof constraint", map, constraintProvenance, 0);
+            var rendered =
+                $"global::Microsoft.JSInterop.ITypeScriptKeyOf<{map.RenderedType}>";
+            var canonical =
+                $"global::Microsoft.JSInterop.ITypeScriptKeyOf<{map.CanonicalType}>";
+            return (rendered, canonical);
+        }
+
+        if (constraintNode is KeywordTypeNode
+            {
+                Name: "StringKeyword" or "string",
+            })
+        {
+            const string marker =
+                "global::Microsoft.JSInterop.ITypeScriptStringValue";
+            return (marker, marker);
+        }
+
+        if (constraintNode is OperatorTypeNode
             or IndexedAccessTypeNode
             or IntersectionTypeNode
             or UnionTypeNode
             or TypeLiteralTypeNode
             or TemplateLiteralTypeNode
-            or QueryTypeNode)
+            or QueryTypeNode
+            or KeywordTypeNode)
         {
-            throw new GenericDeferralException(
-                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
-                $"uses unsupported TypeScript shape " +
-                $"'{binding.Model.Constraint.Kind}' and cannot be weakened.",
+            var marker = _synthesizedTypes.RegisterConstraint(
                 constraintProvenance,
-                "advanced-generic-constraints");
-        }
-
-        var constraintNode = binding.Model.Constraint is ParenthesizedTypeNode parenthesized
-            ? parenthesized.InnerType
-            : binding.Model.Constraint;
-        if (constraintNode is KeywordTypeNode)
-        {
-            throw new GenericDeferralException(
-                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
-                "uses a TypeScript primitive/keyword constraint that has no faithful " +
-                "C# where-clause equivalent.",
-                constraintProvenance,
-                "advanced-generic-constraints");
+                constraintNode.CheckerType
+                    ?? TypeFingerprint(constraintNode));
+            return (marker, marker);
         }
         if (constraintNode is not ReferenceTypeNode reference)
         {
-            throw new GenericDeferralException(
-                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
-                $"uses non-nominal TypeScript shape '{constraintNode.Kind}'.",
+            var marker = _synthesizedTypes.RegisterConstraint(
                 constraintProvenance,
-                "advanced-generic-constraints");
+                constraintNode.CheckerType
+                    ?? TypeFingerprint(constraintNode));
+            return (marker, marker);
         }
         if (scope.TryResolve(
                 reference.Name,
@@ -2653,12 +2778,10 @@ public sealed class TypeResolver
             var target = reference.ResolvedSymbol ?? reference.Name;
             if (!IsInterfaceOrMixin(target))
             {
-                throw new GenericDeferralException(
-                    $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
-                    $"targets '{target}', which is not a generated reference/base " +
-                    "contract and cannot be used as a faithful C# constraint.",
+                var marker = _synthesizedTypes.RegisterConstraint(
                     constraintProvenance,
-                    "advanced-generic-constraints");
+                    reference.CheckerType ?? target);
+                return (marker, marker);
             }
         }
 

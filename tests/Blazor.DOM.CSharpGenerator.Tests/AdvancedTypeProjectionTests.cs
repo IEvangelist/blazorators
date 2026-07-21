@@ -357,7 +357,7 @@ public sealed class AdvancedTypeProjectionTests
     }
 
     [Fact]
-    public void TemplateLiteral_MapsOnlyUnrestrictedStringAndDefersPatterns()
+    public void TemplateLiteral_MapsUnrestrictedStringAndValidatesPatterns()
     {
         var resolver = new TypeResolver([]);
         var unrestricted = new TemplateLiteralTypeNode(
@@ -378,9 +378,12 @@ public sealed class AdvancedTypeProjectionTests
             CheckerType = "`section-${string}`",
             Transport = JsonTransport("`section-${string}`"),
         };
-        var error = Assert.Throws<GenericDeferralException>(
-            () => resolver.Project(constrained, "Fixture/constrained"));
-        Assert.Equal("template-literal-pattern", error.Phase);
+        var projection = resolver.Project(constrained, "Fixture/constrained");
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+        Assert.NotEqual("string", projection.RenderedType);
+        Assert.Contains("TryParse", definition.Source);
+        Assert.Contains("^section-", definition.Source);
+        Assert.Contains("JsonConverter", definition.Source);
     }
 
     [Fact]

@@ -103,6 +103,39 @@ internal sealed class SynthesizedTypeRegistry(
             name => EmitStringDomain(name, ordered));
     }
 
+    public string RegisterConstraint(string provenance, string sourceShape)
+    {
+        var fingerprint = $"constraint({sourceShape})";
+        return Register(
+            "Constraint",
+            provenance,
+            fingerprint,
+            name => EmitConstraint(name, sourceShape));
+    }
+
+    public string RegisterIntersection(string provenance, string sourceShape)
+    {
+        var fingerprint = $"intersection({sourceShape})";
+        return Register(
+            "Intersection",
+            provenance,
+            fingerprint,
+            name => EmitIntersection(name, sourceShape));
+    }
+
+    public string RegisterStringPattern(
+        string provenance,
+        string pattern,
+        string sourceShape)
+    {
+        var fingerprint = $"string-pattern({pattern}:{sourceShape})";
+        return Register(
+            "StringPattern",
+            provenance,
+            fingerprint,
+            name => EmitStringPattern(name, pattern, sourceShape));
+    }
+
     public string RegisterTypeScriptError()
     {
         const string identity = "Standard:TypeScript.Error";
@@ -418,6 +451,7 @@ internal sealed class SynthesizedTypeRegistry(
                         name,
                         "synthesized-identity-collision");
                 }
+
                 writer.AppendLine(
                     $"[EnumMember(Value = \"{EscapeString(value)}\")]");
                 writer.AppendLine("#if NET9_0_OR_GREATER");
@@ -430,6 +464,96 @@ internal sealed class SynthesizedTypeRegistry(
                     writer.AppendLine();
             }
         });
+        return writer.ToString();
+    }
+
+    private string EmitConstraint(string name, string sourceShape)
+    {
+        var writer = Header();
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
+        writer.AppendLine();
+        writer.AppendLine(
+            $"/// <summary>Constraint abstraction for <c>{EscapeXml(sourceShape)}</c>.</summary>");
+        writer.AppendLine($"public interface {name};");
+        return writer.ToString();
+    }
+
+    private string EmitIntersection(string name, string sourceShape)
+    {
+        var writer = Header();
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
+        writer.AppendLine();
+        writer.AppendLine(
+            $"/// <summary>Composite live reference preserving every arm of " +
+            $"<c>{EscapeXml(sourceShape)}</c>.</summary>");
+        writer.AppendLine(
+            $"public interface {name} : global::Microsoft.JSInterop.IDomProxy;");
+        return writer.ToString();
+    }
+
+    private string EmitStringPattern(
+        string name,
+        string pattern,
+        string sourceShape)
+    {
+        var writer = Header();
+        writer.AppendLine("using System.Text.Json;");
+        writer.AppendLine("using System.Text.Json.Serialization;");
+        writer.AppendLine("using System.Text.RegularExpressions;");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
+        writer.AppendLine();
+        writer.AppendLine($"[JsonConverter(typeof({name}JsonConverter))]");
+        writer.Block(
+            $"public readonly record struct {name} : global::Microsoft.JSInterop.ITypeScriptStringValue",
+            () =>
+            {
+                writer.AppendLine(
+                    $"private static readonly Regex Pattern = new(\"{EscapeString(pattern)}\", " +
+                    "RegexOptions.CultureInvariant | RegexOptions.NonBacktracking);");
+                writer.AppendLine("public string Value { get; }");
+                writer.AppendLine();
+                writer.Block($"public {name}(string value)", () =>
+                {
+                    writer.AppendLine("ArgumentNullException.ThrowIfNull(value);");
+                    writer.AppendLine(
+                        "if (!Pattern.IsMatch(value)) throw new ArgumentException(" +
+                        $"\"Value does not match TypeScript pattern {EscapeString(sourceShape)}.\", " +
+                        "nameof(value));");
+                    writer.AppendLine("Value = value;");
+                });
+                writer.AppendLine();
+                writer.AppendLine(
+                    $"public static {name} Parse(string value) => new(value);");
+                writer.Block(
+                    $"public static bool TryParse(string? value, out {name} result)",
+                    () =>
+                    {
+                        writer.AppendLine("if (value is not null && Pattern.IsMatch(value))");
+                        writer.OpenBrace();
+                        writer.AppendLine($"result = new {name}(value);");
+                        writer.AppendLine("return true;");
+                        writer.CloseBrace();
+                        writer.AppendLine("result = default;");
+                        writer.AppendLine("return false;");
+                    });
+                writer.AppendLine("public override string ToString() => Value;");
+            });
+        writer.AppendLine();
+        writer.Block(
+            $"internal sealed class {name}JsonConverter : JsonConverter<{name}>",
+            () =>
+            {
+                writer.AppendLine(
+                    $"public override {name} Read(ref Utf8JsonReader reader, Type typeToConvert, " +
+                    "JsonSerializerOptions options) => new(reader.GetString() ?? throw new " +
+                    "JsonException(\"Pattern value cannot be null.\"));");
+                writer.AppendLine(
+                    $"public override void Write(Utf8JsonWriter writer, {name} value, " +
+                    "JsonSerializerOptions options) => writer.WriteStringValue(value.Value);");
+            });
         return writer.ToString();
     }
 
@@ -573,6 +697,9 @@ internal sealed class SynthesizedTypeRegistry(
     private static string EscapeString(string value)
         => value.Replace("\\", "\\\\", StringComparison.Ordinal)
             .Replace("\"", "\\\"", StringComparison.Ordinal);
+
+    private static string EscapeXml(string value)
+        => System.Security.SecurityElement.Escape(value) ?? "";
 }
 
 internal static class ReadOnlyListExtensions
