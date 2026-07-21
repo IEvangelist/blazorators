@@ -230,6 +230,45 @@ export function invokeMethodReferenceCallback(
                 invocationArgs.splice(callbackArgumentIndex, 0, callback);
                 return ref[name](...invocationArgs);
             }
+
+            /**
+             * Construct an object whose persistent callback receives two live JS objects.
+             */
+            export function constructReferencePairCallback(
+                constructorPath,
+                args,
+                callbackArgumentIndex,
+                dotnetRef,
+                callbackMethodName) {
+                const ctor = _resolvePath(constructorPath);
+                const constructorArgs = [...(args ?? [])];
+                if (!Number.isInteger(callbackArgumentIndex) ||
+                    callbackArgumentIndex < 0 ||
+                    callbackArgumentIndex > constructorArgs.length) {
+                    throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
+                }
+                const callback = (first, second) => {
+                    const firstReference = DotNet.createJSObjectReference(first);
+                    const secondReference = DotNet.createJSObjectReference(second);
+                    dotnetRef.invokeMethodAsync(
+                        callbackMethodName,
+                        firstReference,
+                        secondReference)
+                        .then((accepted) => {
+                            if (accepted !== true) {
+                                _disposeJSReference(firstReference);
+                                _disposeJSReference(secondReference);
+                            }
+                        })
+                        .catch((error) => {
+                            _disposeJSReference(firstReference);
+                            _disposeJSReference(secondReference);
+                            console.error('[blazorators.dom] callback delivery failed:', error);
+                        });
+                };
+                constructorArgs.splice(callbackArgumentIndex, 0, callback);
+                return new ctor(...constructorArgs);
+            }
         } catch (error) {
             settled = true;
             reject(error);

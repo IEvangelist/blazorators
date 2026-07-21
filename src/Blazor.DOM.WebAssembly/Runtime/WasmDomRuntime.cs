@@ -550,6 +550,37 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
     }
 
     /// <inheritdoc />
+    public async ValueTask<DomCallbackConstruction>
+        ConstructReferencePairCallbackAsync<TFirst, TSecond>(
+            string ctorPath,
+            int callbackArgumentIndex,
+            object?[]? args,
+            IDomProxyFactory proxyFactory,
+            DomTransportDescriptor firstTransport,
+            DomTransportDescriptor secondTransport,
+            Func<
+                DomBorrowedReference<TFirst>,
+                DomBorrowedReference<TSecond>,
+                Task> callback,
+            CancellationToken cancellationToken = default)
+        where TFirst : class, IDomProxy
+        where TSecond : class, IDomProxy
+    {
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.ConstructReferencePairCallbackAsync(
+            module,
+            proxyFactory,
+            ctorPath,
+            callbackArgumentIndex,
+            preparedArgs,
+            firstTransport,
+            secondTransport,
+            callback,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask<TValue> GetIndexAsync<TValue>(
         IJSObjectReference reference, int index, CancellationToken cancellationToken = default)
         => await GetIndexAsync<TValue>(

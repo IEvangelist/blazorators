@@ -10,6 +10,8 @@ namespace Microsoft.JSInterop;
 /// </summary>
 public abstract class DomProxyBase : IDomDispatchProxy
 {
+    private readonly object _ownedResourcesGate = new();
+    private readonly List<IDisposable> _ownedResources = [];
     private int _disposed;
 
     /// <summary>The underlying JS object reference for this proxy.</summary>
@@ -77,6 +79,14 @@ public abstract class DomProxyBase : IDomDispatchProxy
     {
         if (Interlocked.Exchange(ref _disposed, 1) == 0)
         {
+            IDisposable[] resources;
+            lock (_ownedResourcesGate)
+            {
+                resources = [.. _ownedResources];
+                _ownedResources.Clear();
+            }
+            foreach (var resource in resources)
+                resource.Dispose();
             try
             {
                 await Reference.DisposeAsync().ConfigureAwait(false);
@@ -85,6 +95,20 @@ public abstract class DomProxyBase : IDomDispatchProxy
             {
                 // Circuit torn down — reference is already invalid.
             }
+        }
+    }
+
+    internal void AttachOwnedResource(IDisposable resource)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+        lock (_ownedResourcesGate)
+        {
+            if (Volatile.Read(ref _disposed) != 0)
+            {
+                resource.Dispose();
+                throw new ObjectDisposedException(GetType().Name);
+            }
+            _ownedResources.Add(resource);
         }
     }
 }

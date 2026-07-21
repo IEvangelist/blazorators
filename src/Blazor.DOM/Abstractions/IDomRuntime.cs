@@ -174,6 +174,26 @@ public interface IDomRuntime
         object?[]? args,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Constructs an object with a persistent callback that receives two
+    /// callback-scoped typed JavaScript references.
+    /// </summary>
+    ValueTask<DomCallbackConstruction>
+        ConstructReferencePairCallbackAsync<TFirst, TSecond>(
+            string ctorPath,
+            int callbackArgumentIndex,
+            object?[]? args,
+            IDomProxyFactory proxyFactory,
+            DomTransportDescriptor firstTransport,
+            DomTransportDescriptor secondTransport,
+            Func<
+                DomBorrowedReference<TFirst>,
+                DomBorrowedReference<TSecond>,
+                Task> callback,
+            CancellationToken cancellationToken = default)
+        where TFirst : class, IDomProxy
+        where TSecond : class, IDomProxy;
+
     // ── Index access ─────────────────────────────────────────────────────────
 
     /// <summary>Reads a reviewed JSON-valued numeric index from a JS object.</summary>
