@@ -136,6 +136,161 @@ public sealed class AdvancedTypeProjectionTests
         Assert.Contains("[EnumMember(Value = \"externref\")]", source);
     }
 
+    [Fact]
+    public void Tuple_EmitsJsonArrayConverterWithLabelsOptionalAndRest()
+    {
+        var resolver = new TypeResolver([]);
+        var tuple = new TupleTypeNode(
+        [
+            new NamedTupleMemberTypeNode(
+                "name",
+                false,
+                false,
+                Json(String())),
+            new NamedTupleMemberTypeNode(
+                "count",
+                true,
+                false,
+                Json(Number())),
+            new NamedTupleMemberTypeNode(
+                "remaining",
+                false,
+                true,
+                new ArrayTypeNode(Json(String()))
+                {
+                    Transport = JsonTransport("string[]"),
+                }),
+        ])
+        {
+            Transport = JsonTransport("[name: string, count?: number, ...remaining: string[]]"),
+        };
+
+        var projection = resolver.Project(tuple, "Fixture/tuple");
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+
+        Assert.StartsWith(
+            "global::Blazor.DOM.AdvancedTypes.FixtureTupleShape_",
+            projection.RenderedType);
+        Assert.True(projection.IsCollection);
+        Assert.Contains("[JsonConverter(typeof(", definition.Source);
+        Assert.Contains("required string Name { get; init; }", definition.Source);
+        Assert.Contains("double? Count { get; init; } = default;", definition.Source);
+        Assert.Contains(
+            "IReadOnlyList<string>? Remaining { get; init; } = default;",
+            definition.Source);
+        Assert.Contains("writer.WriteStartArray();", definition.Source);
+        Assert.DoesNotContain("ValueTuple", definition.Source);
+        Assert.DoesNotContain("object[]", definition.Source);
+    }
+
+    [Fact]
+    public void Tuple_UnsupportedTransportDefersWithoutObjectFallback()
+    {
+        var resolver = new TypeResolver([]);
+        var tuple = new TupleTypeNode([String(), Number()])
+        {
+            Transport = UnsupportedTransport(
+                "[string, number]",
+                "fixture contains an unsupported transport"),
+        };
+
+        var error = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(tuple, "Fixture/unsupported-tuple"));
+
+        Assert.Equal("tuple-transport", error.Phase);
+        Assert.Empty(resolver.SynthesizedTypes);
+        Assert.DoesNotContain("object", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void TypeLiteral_EmitsDeterministicJsonRecordAndRejectsClrCollisions()
+    {
+        var resolver = new TypeResolver([]);
+        var literal = new TypeLiteralTypeNode(
+        [
+            Property(0, "display-name", Json(String())) with
+            {
+                Readonly = true,
+                Documentation = new DocumentationModel("Display label.", [], false),
+            },
+            Property(1, "count", Json(Number())) with { Optional = true },
+        ])
+        {
+            Transport = JsonTransport("{ display-name: string; count?: number }"),
+        };
+
+        var first = resolver.Project(literal, "Fixture/options");
+        var second = resolver.Project(literal, "Fixture/options");
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+
+        Assert.Equal(first.CanonicalType, second.CanonicalType);
+        Assert.Contains("public sealed record FixtureRecordShape_", definition.Source);
+        Assert.Contains("[JsonPropertyName(\"display-name\")]", definition.Source);
+        Assert.Contains("required string DisplayName { get; init; }", definition.Source);
+        Assert.Contains("double? Count { get; init; } = default;", definition.Source);
+        Assert.Contains("/// Display label.", definition.Source);
+
+        var collision = new TypeLiteralTypeNode(
+        [
+            Property(0, "item-name", Json(String())),
+            Property(1, "item_name", Json(String())),
+        ])
+        {
+            Transport = JsonTransport("{ item-name: string; item_name: string }"),
+        };
+        var error = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(collision, "Fixture/collision"));
+        Assert.Equal("synthesized-identity-collision", error.Phase);
+    }
+
+    [Fact]
+    public void Intersection_MergesJsonPropertiesAndDefersBrandedOrCollidingArms()
+    {
+        var resolver = new TypeResolver([]);
+        var left = new TypeLiteralTypeNode(
+            [Property(0, "name", Json(String()))])
+        {
+            Transport = JsonTransport("{ name: string }"),
+        };
+        var right = new TypeLiteralTypeNode(
+            [Property(0, "count", Json(Number()))])
+        {
+            Transport = JsonTransport("{ count: number }"),
+        };
+        var intersection = new IntersectionTypeNode([left, right])
+        {
+            Transport = JsonTransport(
+                "{ name: string } & { count: number }"),
+        };
+
+        resolver.Project(intersection, "Fixture/intersection");
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+        Assert.Contains("required string Name", definition.Source);
+        Assert.Contains("required double Count", definition.Source);
+
+        var branded = new IntersectionTypeNode([String(), left]);
+        var brandedError = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(branded, "Fixture/branded"));
+        Assert.Equal("branded-intersection", brandedError.Phase);
+
+        var collision = new IntersectionTypeNode(
+        [
+            left,
+            new TypeLiteralTypeNode(
+                [Property(0, "name", Json(Number()))])
+            {
+                Transport = JsonTransport("{ name: number }"),
+            },
+        ])
+        {
+            Transport = JsonTransport(
+                "{ name: string } & { name: number }"),
+        };
+        var collisionError = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(collision, "Fixture/intersection-collision"));
+        Assert.Equal("intersection-member-collision", collisionError.Phase);
+    }
+
     private static SymbolModel Interface(
         string name,
         IReadOnlyList<MemberModel> members,
@@ -215,6 +370,30 @@ public sealed class AdvancedTypeProjectionTests
 
     private static KeywordTypeNode String() => new("StringKeyword");
     private static KeywordTypeNode Number() => new("NumberKeyword");
+
+    private static T Json<T>(T node) where T : TypeNode
+        => (T)(node with
+        {
+            Transport = JsonTransport(node.CheckerType ?? node.Kind),
+        });
+
+    private static TransportModel JsonTransport(string sourceType) => new(
+        "json-value",
+        false,
+        sourceType,
+        false,
+        true,
+        null);
+
+    private static TransportModel UnsupportedTransport(
+        string sourceType,
+        string reason) => new(
+        "unsupported",
+        false,
+        sourceType,
+        false,
+        false,
+        reason);
     private static DocumentationModel Documentation() => new("", [], false);
     private static LocationModel Location() => new(
         "fixture.ts",

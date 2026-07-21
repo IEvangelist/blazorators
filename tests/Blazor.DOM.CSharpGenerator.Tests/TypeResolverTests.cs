@@ -91,22 +91,26 @@ public sealed class TypeResolverTests
     // ── Hard errors on unsupported shapes ─────────────────────────────────────
 
     [Fact]
-    public void Project_IntersectionType_ThrowsTypeProjectionException()
+    public void Project_IntersectionType_DefersUnprovenComposition()
     {
         var resolver = EmptyResolver();
         var node = new IntersectionTypeNode([
             new KeywordTypeNode("StringKeyword"),
             new KeywordTypeNode("BooleanKeyword"),
         ]);
-        Assert.Throws<TypeProjectionException>(() => resolver.Project(node, "test/intersection"));
+        var error = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(node, "test/intersection"));
+        Assert.Equal("intersection-composition", error.Phase);
     }
 
     [Fact]
-    public void Project_TypeLiteral_ThrowsTypeProjectionException()
+    public void Project_EmptyTypeLiteral_DefersAnonymousShape()
     {
         var resolver = EmptyResolver();
         var node = new TypeLiteralTypeNode([]);
-        Assert.Throws<TypeProjectionException>(() => resolver.Project(node, "test/typeLiteral"));
+        var error = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(node, "test/typeLiteral"));
+        Assert.Equal("anonymous-structural-members", error.Phase);
     }
 
     [Fact]
