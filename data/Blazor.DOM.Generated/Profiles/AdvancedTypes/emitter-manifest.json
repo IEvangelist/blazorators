@@ -1,0 +1,592 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "1.0.0",
+  "sourceManifest": {
+    "typescriptSymbolsSha256": "e3795c0df5fffaaad69af5def9757c4889ceb2b94e60d04a7ecc3503fb3bd51e",
+    "webIdlSymbolsSha256": "33756ee13b8bea4bc67adf154877e2e45ec580fc18bd0c3198399c0f52e17876"
+  },
+  "accounting": {
+    "totalSymbols": 3,
+    "projected": 2,
+    "projectedClean": 2,
+    "projectedWithDeferredMembers": 0,
+    "excluded": 0,
+    "deferred": 1,
+    "generationFailed": 0,
+    "projectedSymbols": [
+      "Headers",
+      "HeadersInit"
+    ],
+    "excludedSymbols": [],
+    "deferredSymbols": [
+      {
+        "symbol": "HeadersIterator",
+        "phase": "iterator-transport",
+        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification."
+      }
+    ],
+    "failedSymbols": [],
+    "deferredMemberEntries": [],
+    "failedMemberEntries": [],
+    "totalMembers": 14,
+    "projectedMembers": 13,
+    "deferredMembers": 1,
+    "failedMembers": 0,
+    "expectedMembers": 14,
+    "memberReconciliationValid": true,
+    "failedSymbolMemberOutcomes": [],
+    "notAttemptedAfterFailureMembers": 0,
+    "sourceDeclarations": 5,
+    "accountedSourceDeclarations": 5,
+    "sourceMembers": 14,
+    "accountedSourceMembers": 14,
+    "sourceOverloads": 13,
+    "accountedSourceOverloads": 13,
+    "sourceParameters": 10,
+    "accountedSourceParameters": 10,
+    "declarationReconciliationValid": true,
+    "overloadReconciliationValid": true,
+    "parameterReconciliationValid": true,
+    "sourceDeclarationEntries": [
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Headers/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17761:1"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 1,
+        "kind": "globalVariable",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Logical factory contract emitted.",
+        "provenance": "Headers/decl[1]/globalVariable",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17801:13"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "Headers/decl[2]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:187:1"
+      },
+      {
+        "symbolName": "HeadersInit",
+        "declarationOrdinal": 0,
+        "kind": "typeAlias",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "HeadersInit/decl[0]/typeAlias",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:39203:1"
+      },
+      {
+        "symbolName": "HeadersIterator",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Deferred",
+        "phase": "iterator-transport",
+        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification.",
+        "provenance": "HeadersIterator/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:183:1"
+      }
+    ],
+    "sourceMemberEntries": [
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "append",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[0]/method/append",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17767:5",
+        "qualifiedKey": "Headers/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "memberName": "delete",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[1]/method/delete",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17773:5",
+        "qualifiedKey": "Headers/decl[0]/member[1]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 2,
+        "memberName": "get",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[2]/method/get",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17779:5",
+        "qualifiedKey": "Headers/decl[0]/member[2]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 3,
+        "memberName": "getSetCookie",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[3]/method/getSetCookie",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17785:5",
+        "qualifiedKey": "Headers/decl[0]/member[3]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 4,
+        "memberName": "has",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[4]/method/has",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17791:5",
+        "qualifiedKey": "Headers/decl[0]/member[4]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 5,
+        "memberName": "set",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[5]/method/set",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17797:5",
+        "qualifiedKey": "Headers/decl[0]/member[5]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 6,
+        "memberName": "forEach",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[0]/member[6]/method/forEach",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17798:5",
+        "qualifiedKey": "Headers/decl[0]/member[6]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 0,
+        "memberName": "prototype",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "Headers/decl[1]/typeLiteral/member[0]/property/prototype",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17802:5",
+        "qualifiedKey": "Headers/decl[1]/typeLiteral/member[0]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "memberName": "constructSignature",
+        "memberKind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "Headers/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17803:5",
+        "qualifiedKey": "Headers/decl[1]/typeLiteral/member[1]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 0,
+        "memberName": "Symbol.iterator",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[2]/member[0]/method/Symbol.iterator",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:188:5",
+        "qualifiedKey": "Headers/decl[2]/member[0]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 1,
+        "memberName": "entries",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[2]/member[1]/method/entries",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:190:5",
+        "qualifiedKey": "Headers/decl[2]/member[1]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 2,
+        "memberName": "keys",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[2]/member[2]/method/keys",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:192:5",
+        "qualifiedKey": "Headers/decl[2]/member[2]"
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 3,
+        "memberName": "values",
+        "memberKind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "provenance": "Headers/decl[2]/member[3]/method/values",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:194:5",
+        "qualifiedKey": "Headers/decl[2]/member[3]"
+      },
+      {
+        "symbolName": "HeadersIterator",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "Symbol.iterator",
+        "memberKind": "method",
+        "status": "Deferred",
+        "phase": "iterator-transport",
+        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification.",
+        "provenance": "HeadersIterator/decl[0]/member[0]/method/Symbol.iterator",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:184:5",
+        "qualifiedKey": "HeadersIterator/decl[0]/member[0]"
+      }
+    ],
+    "sourceOverloadEntries": [
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "name": "append",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[0]/overload",
+        "provenance": "Headers/decl[0]/member[0]/method/append/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17767:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "name",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[0]/method/append/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17767:12"
+          },
+          {
+            "ordinal": 1,
+            "name": "value",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[0]/method/append/overload/parameter[1]/value",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17767:26"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 1,
+        "name": "delete",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[1]/overload",
+        "provenance": "Headers/decl[0]/member[1]/method/delete/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17773:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "name",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[1]/method/delete/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17773:12"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 2,
+        "name": "get",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[2]/overload",
+        "provenance": "Headers/decl[0]/member[2]/method/get/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17779:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "name",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[2]/method/get/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17779:9"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 3,
+        "name": "getSetCookie",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[3]/overload",
+        "provenance": "Headers/decl[0]/member[3]/method/getSetCookie/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17785:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 4,
+        "name": "has",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[4]/overload",
+        "provenance": "Headers/decl[0]/member[4]/method/has/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17791:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "name",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[4]/method/has/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17791:9"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 5,
+        "name": "set",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[5]/overload",
+        "provenance": "Headers/decl[0]/member[5]/method/set/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17797:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "name",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[5]/method/set/overload/parameter[0]/name",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17797:9"
+          },
+          {
+            "ordinal": 1,
+            "name": "value",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[5]/method/set/overload/parameter[1]/value",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17797:23"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 6,
+        "name": "forEach",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[0]/member[6]/overload",
+        "provenance": "Headers/decl[0]/member[6]/method/forEach/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17798:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "callbackfn",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[6]/method/forEach/overload/parameter[0]/callbackfn",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17798:13"
+          },
+          {
+            "ordinal": 1,
+            "name": "thisArg",
+            "status": "Projected",
+            "phase": null,
+            "reason": "",
+            "provenance": "Headers/decl[0]/member[6]/method/forEach/overload/parameter[1]/thisArg",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17798:80"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "name": "constructSignature",
+        "kind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "qualifiedKey": "Headers/decl[1]/typeLiteral/member[1]/overload",
+        "provenance": "Headers/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:17803:5",
+        "parameterOutcomes": [
+          {
+            "ordinal": 0,
+            "name": "init",
+            "status": "Projected",
+            "phase": null,
+            "reason": "emitted",
+            "provenance": "Headers/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload/parameter[0]/init",
+            "sourceLocation": "typescript/lib/lib.dom.d.ts:17803:9"
+          }
+        ]
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 0,
+        "name": "Symbol.iterator",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[2]/member[0]/overload",
+        "provenance": "Headers/decl[2]/member[0]/method/Symbol.iterator/overload",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:188:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 1,
+        "name": "entries",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[2]/member[1]/overload",
+        "provenance": "Headers/decl[2]/member[1]/method/entries/overload",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:190:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 2,
+        "name": "keys",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[2]/member[2]/overload",
+        "provenance": "Headers/decl[2]/member[2]/method/keys/overload",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:192:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "Headers",
+        "declarationOrdinal": 2,
+        "memberOrdinal": 3,
+        "name": "values",
+        "kind": "method",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
+        "qualifiedKey": "Headers/decl[2]/member[3]/overload",
+        "provenance": "Headers/decl[2]/member[3]/method/values/overload",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:194:5",
+        "parameterOutcomes": []
+      },
+      {
+        "symbolName": "HeadersIterator",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "name": "Symbol.iterator",
+        "kind": "method",
+        "status": "Deferred",
+        "phase": "iterator-transport",
+        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification.",
+        "qualifiedKey": "HeadersIterator/decl[0]/member[0]/overload",
+        "provenance": "HeadersIterator/decl[0]/member[0]/method/Symbol.iterator/overload",
+        "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:184:5",
+        "parameterOutcomes": []
+      }
+    ]
+  },
+  "diagnostics": [],
+  "synthesizedTypes": [
+    {
+      "name": "HeadersInitTupleShape_d077850b0e",
+      "kind": "Tuple",
+      "provenance": "HeadersInit[0][]",
+      "fingerprint": "tuple(item1:string:False:False,item2:string:False:False)",
+      "relativePath": "AdvancedTypes\\HeadersInitTupleShape_d077850b0e.g.cs"
+    },
+    {
+      "name": "HeadersTupleShape_37fceffa8a",
+      "kind": "Tuple",
+      "provenance": "Headers/decl[2]/entries/return/typeArgument[0]",
+      "fingerprint": "tuple(item1:string:False:False,item2:string:False:False)",
+      "relativePath": "AdvancedTypes\\HeadersTupleShape_37fceffa8a.g.cs"
+    },
+    {
+      "name": "HeadersTupleShape_9c3a98fd4b",
+      "kind": "Tuple",
+      "provenance": "Headers/decl[2]/Symbol.iterator/return/typeArgument[0]",
+      "fingerprint": "tuple(item1:string:False:False,item2:string:False:False)",
+      "relativePath": "AdvancedTypes\\HeadersTupleShape_9c3a98fd4b.g.cs"
+    }
+  ]
+}
