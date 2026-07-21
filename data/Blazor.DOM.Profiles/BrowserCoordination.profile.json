@@ -1,0 +1,65 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "BrowserCoordination",
+  "description": "Browser coordination APIs for cross-context messaging, Web Locks, and page visibility.",
+  "rootSymbols": [
+    "BroadcastChannel",
+    "LockManager",
+    "Lock",
+    "Document"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": [
+    "broadcast-channel",
+    "web-locks",
+    "page-visibility"
+  ],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/BrowserCoordination",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "BroadcastChannel": [
+      "prototype",
+      "$constructSignature",
+      "name",
+      "close",
+      "postMessage",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "BroadcastChannelEventMap": ["message", "messageerror"],
+    "Document": [
+      "hidden",
+      "visibilityState",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "DocumentEventMap": ["visibilitychange"],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"],
+    "Lock": ["mode", "name"],
+    "LockInfo": ["*"],
+    "LockGrantedCallback": ["*"],
+    "LockManager": ["query", "request@0/1"],
+    "LockManagerSnapshot": ["*"],
+    "LockOptions": ["*"]
+  },
+  "entryPoints": [
+    {
+      "name": "BroadcastChannel",
+      "symbol": "BroadcastChannel",
+      "javaScriptPath": "BroadcastChannel"
+    },
+    {
+      "name": "Document",
+      "symbol": "Document",
+      "javaScriptPath": "document"
+    },
+    {
+      "name": "LockManager",
+      "symbol": "LockManager",
+      "javaScriptPath": "navigator.locks"
+    }
+  ]
+}
