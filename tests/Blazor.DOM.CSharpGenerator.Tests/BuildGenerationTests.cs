@@ -127,7 +127,6 @@ public sealed class BuildGenerationTests
                     "Blazor.DOM.WebAssembly.csproj"),
                 "--configuration",
                 "Release",
-                "--no-restore",
                 $"-p:DomGeneratedOutputRoot={generated}",
                 $"-p:DomGenerationSentinel={sentinel}",
                 $"-p:PackageOutputPath={packages}");
@@ -140,25 +139,45 @@ public sealed class BuildGenerationTests
                 "Blazor.DOM.WebAssembly.host-parity.json",
                 requireStaticAsset: true);
 
-            var focusedPack = await RunDotNetAsync(
-                root,
-                "pack",
-                Path.Combine("src", "Blazor.WakeLock", "Blazor.WakeLock.csproj"),
-                "--configuration",
-                "Release",
-                "--no-restore",
-                $"-p:DomGeneratedOutputRoot={generated}",
-                $"-p:DomGenerationSentinel={sentinel}",
-                $"-p:PackageOutputPath={packages}");
-            AssertSucceeded(focusedPack);
-            AssertPackage(
-                packages,
+            string[] focusedPackages =
+            [
                 "Blazor.WakeLock",
-                "Blazor.WakeLock.dll",
-                "Blazor.WakeLock.host-manifest.json",
-                "Blazor.WakeLock.host-parity.json",
-                "Blazor.WakeLock.profile-coverage.json",
-                requireStaticAsset: true);
+                "Blazor.WakeLock.WebAssembly",
+                "Blazor.Permissions",
+                "Blazor.Permissions.WebAssembly",
+                "Blazor.Clipboard",
+                "Blazor.Clipboard.WebAssembly",
+                "Blazor.Share",
+                "Blazor.Share.WebAssembly",
+                "Blazor.StorageManagement",
+                "Blazor.StorageManagement.WebAssembly",
+                "Blazor.Screen",
+                "Blazor.Screen.WebAssembly",
+            ];
+            foreach (var focusedPackageName in focusedPackages)
+            {
+                var focusedPack = await RunDotNetAsync(
+                    root,
+                    "pack",
+                    Path.Combine(
+                        "src",
+                        focusedPackageName,
+                        $"{focusedPackageName}.csproj"),
+                    "--configuration",
+                    "Release",
+                    $"-p:DomGeneratedOutputRoot={generated}",
+                    $"-p:DomGenerationSentinel={sentinel}",
+                    $"-p:PackageOutputPath={packages}");
+                AssertSucceeded(focusedPack);
+                AssertPackage(
+                    packages,
+                    focusedPackageName,
+                    $"{focusedPackageName}.dll",
+                    $"{focusedPackageName}.host-manifest.json",
+                    $"{focusedPackageName}.host-parity.json",
+                    $"{focusedPackageName}.profile-coverage.json",
+                    requireStaticAsset: true);
+            }
 
             var tracked = await RunProcessAsync(
                 root,
