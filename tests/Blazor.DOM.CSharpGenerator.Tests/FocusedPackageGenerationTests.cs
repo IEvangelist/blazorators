@@ -1,6 +1,7 @@
 using Blazor.DOM.CSharpGenerator.IR;
 using Blazor.DOM.CSharpGenerator.Hosts;
 using Blazor.DOM.CSharpGenerator.Profiles;
+using Blazor.DOM.CSharpGenerator.Anchors;
 using Xunit;
 
 namespace Blazor.DOM.CSharpGenerator.Tests;
@@ -580,6 +581,270 @@ public sealed class FocusedPackageGenerationTests
             Directory.Delete(output, true);
         }
     }
+
+    [Fact]
+    public void MediaDevicesProfile_EmitsExactProxyTransportAndLifecycleSurface()
+    {
+        var output = CreateTempDir();
+        try
+        {
+            var result = GenerateRepositoryProfile("MediaDevices", output);
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            var generated = Path.Combine(output, "Profiles", "MediaDevices");
+            var serverHost = ReadGenerated(
+                generated, "Server", "GeneratedDomHost.g.cs");
+            var wasmHost = ReadGenerated(
+                generated, "WebAssembly", "GeneratedDomHost.g.cs");
+            var serverMediaDevices = ReadGenerated(
+                generated, "Server", "Interfaces", "IMediaDevices.g.cs");
+            var wasmMediaDevices = ReadGenerated(
+                generated, "WebAssembly", "Interfaces", "IMediaDevices.g.cs");
+            var serverTrack = ReadGenerated(
+                generated, "Server", "Interfaces", "IMediaStreamTrack.g.cs");
+            var allHostSources = string.Join(
+                Environment.NewLine,
+                Directory.EnumerateFiles(generated, "*.cs", SearchOption.AllDirectories)
+                    .Where(path => path.Contains(
+                        $"{Path.DirectorySeparatorChar}Server{Path.DirectorySeparatorChar}",
+                        StringComparison.Ordinal)
+                        || path.Contains(
+                            $"{Path.DirectorySeparatorChar}WebAssembly{Path.DirectorySeparatorChar}",
+                            StringComparison.Ordinal))
+                    .Select(File.ReadAllText));
+
+            Assert.True(hosts.Parity.Exact);
+            Assert.Equal(76, hosts.Server.Operations.Count);
+            Assert.Equal(76, hosts.WebAssembly.Operations.Count);
+            Assert.Equal(37, result.IncludedSymbolCount);
+            Assert.Equal(38, result.ClosureSize);
+            Assert.Equal(1, result.ExternalReferenceCount);
+            Assert.Equal(["Promise"], result.Coverage.ExternalReferences);
+            Assert.Equal(18, hosts.Server.GeneratedFiles.Count);
+            Assert.Equal(18, hosts.WebAssembly.GeneratedFiles.Count);
+            Assert.Contains(
+                "ValueTask<global::Blazor.DOM.IMediaDevices> GetMediaDevicesAsync",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "global::Blazor.DOM.IMediaDevices GetMediaDevices()",
+                wasmHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "browser.GetGlobalAsync<global::Blazor.DOM.IMediaDevices>(\"navigator.mediaDevices\"",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "IBrowserArray<IMediaDeviceInfo>> EnumerateDevicesAsync",
+                serverMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "DomTransportDescriptor.JsReference(\"MediaDeviceInfo[]\"",
+                serverMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<IMediaStream> GetUserMediaAsync",
+                serverMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<IMediaStream> GetDisplayMediaAsync",
+                serverMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "GetCapabilitiesAsync",
+                serverTrack,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "GetConstraintsAsync",
+                serverTrack,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "GetSettingsAsync",
+                serverTrack,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "RemoveEventListenerAsync",
+                serverMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "RemoveEventListener(",
+                wasmMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                ": global::Microsoft.JSInterop.DomProxyBase",
+                serverMediaDevices,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                ": global::Microsoft.JSInterop.WasmDomProxyBase",
+                wasmMediaDevices,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "selectAudioOutput",
+                allHostSources,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "DomTransportKind.Unsupported",
+                allHostSources,
+                StringComparison.Ordinal);
+            Assert.True(File.Exists(Path.Combine(
+                generated, "Server", "host-manifest.json")));
+            Assert.True(File.Exists(Path.Combine(
+                generated, "WebAssembly", "host-manifest.json")));
+            Assert.True(File.Exists(Path.Combine(generated, "host-parity.json")));
+            Assert.True(File.Exists(Path.Combine(generated, "profile-coverage.json")));
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
+    public void NotificationsProfile_EmitsConstructorStaticEventsAndLifecycleSurface()
+    {
+        var output = CreateTempDir();
+        try
+        {
+            var result = GenerateRepositoryProfile("Notifications", output);
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            var generated = Path.Combine(output, "Profiles", "Notifications");
+            var serverHost = ReadGenerated(
+                generated, "Server", "GeneratedDomHost.g.cs");
+            var wasmHost = ReadGenerated(
+                generated, "WebAssembly", "GeneratedDomHost.g.cs");
+            var serverFactory = ReadGenerated(
+                generated, "Server", "Factories", "INotificationFactory.g.cs");
+            var wasmFactory = ReadGenerated(
+                generated, "WebAssembly", "Factories", "INotificationFactory.g.cs");
+            var serverNotification = ReadGenerated(
+                generated, "Server", "Interfaces", "INotification.g.cs");
+            var wasmNotification = ReadGenerated(
+                generated, "WebAssembly", "Interfaces", "INotification.g.cs");
+            var allHostSources = string.Join(
+                Environment.NewLine,
+                Directory.EnumerateFiles(generated, "*.cs", SearchOption.AllDirectories)
+                    .Where(path => path.Contains(
+                        $"{Path.DirectorySeparatorChar}Server{Path.DirectorySeparatorChar}",
+                        StringComparison.Ordinal)
+                        || path.Contains(
+                            $"{Path.DirectorySeparatorChar}WebAssembly{Path.DirectorySeparatorChar}",
+                            StringComparison.Ordinal))
+                    .Select(File.ReadAllText));
+
+            Assert.True(hosts.Parity.Exact);
+            Assert.Equal(30, hosts.Server.Operations.Count);
+            Assert.Equal(30, hosts.WebAssembly.Operations.Count);
+            Assert.Equal(14, result.IncludedSymbolCount);
+            Assert.Equal(15, result.ClosureSize);
+            Assert.Equal(1, result.ExternalReferenceCount);
+            Assert.Equal(["Promise"], result.Coverage.ExternalReferences);
+            Assert.Equal(8, hosts.Server.GeneratedFiles.Count);
+            Assert.Equal(8, hosts.WebAssembly.GeneratedFiles.Count);
+            Assert.Contains(
+                "ValueTask<global::Blazor.DOM.INotificationFactory> GetNotificationAsync",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "global::Blazor.DOM.INotificationFactory GetNotification()",
+                wasmHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "browser.GetGlobalAsync<global::Blazor.DOM.INotificationFactory>(\"Notification\"",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<INotification> CreateAsync(string title, NotificationOptions? options",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ConstructAsync<INotification>",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "\"Notification\"",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "GetPermissionAsync",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<NotificationPermission> RequestPermissionAsync",
+                serverFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<NotificationPermission> RequestPermissionAsync",
+                wasmFactory,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "RemoveEventListenerAsync",
+                serverNotification,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "RemoveEventListener(",
+                wasmNotification,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                ": global::Microsoft.JSInterop.DomProxyBase",
+                serverNotification,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                ": global::Microsoft.JSInterop.WasmDomProxyBase",
+                wasmNotification,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "maxActions",
+                allHostSources,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "NotificationAction",
+                allHostSources,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "DomTransportKind.Unsupported",
+                allHostSources,
+                StringComparison.Ordinal);
+            Assert.True(File.Exists(Path.Combine(
+                generated, "Server", "host-manifest.json")));
+            Assert.True(File.Exists(Path.Combine(
+                generated, "WebAssembly", "host-manifest.json")));
+            Assert.True(File.Exists(Path.Combine(generated, "host-parity.json")));
+            Assert.True(File.Exists(Path.Combine(generated, "profile-coverage.json")));
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    private static ProfileGenerationResult GenerateRepositoryProfile(
+            string profileName,
+            string output)
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var anchors = InteropAnchorLoader.Load(Path.Combine(
+            root,
+            "src",
+            "Blazor.DOM.Anchors"));
+        var profile = InteropAnchorLoader.Apply(
+            ProfileLoader.Load(Path.Combine(
+                root,
+                "data",
+                "Blazor.DOM.Profiles",
+                $"{profileName}.profile.json")),
+            anchors);
+
+        return ProfilePipeline.Run(
+            profile,
+            IrLoader.Load(data),
+            output,
+            EmitterOverridesLoader.Load(data));
+    }
+
+    private static string ReadGenerated(string root, params string[] path)
+        => File.ReadAllText(path.Aggregate(root, Path.Combine));
 
     private static string CreateTempDir()
     {
