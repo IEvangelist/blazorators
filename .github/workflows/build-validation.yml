@@ -113,6 +113,16 @@ jobs:
         dotnet build ./tests/Blazor.DOM.AdvancedTypes.CompilationTests/Blazor.DOM.AdvancedTypes.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
         dotnet build ./tests/Blazor.DOM.AdvancedTypes.CompilationTests/Blazor.DOM.AdvancedTypes.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
 
+    - name: Restore DOM typed union compilation tests
+      run: |
+        dotnet restore ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj
+
+    - name: Build DOM typed union compilation tests with warnings as errors
+      run: |
+        dotnet build ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
+        dotnet build ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
+        dotnet build ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
+
     - name: Build end-to-end tests
       run: |
         dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release

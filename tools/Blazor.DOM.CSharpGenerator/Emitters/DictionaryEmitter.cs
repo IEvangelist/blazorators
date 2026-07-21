@@ -335,7 +335,8 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
 
         var hasJsonAttr = !string.Equals(memberName, csName, StringComparison.Ordinal);
         var jsonAttr = hasJsonAttr ? $"[JsonPropertyName(\"{memberName}\")]" : "";
-        var propLine = $"public {csType} {csName} {{ get; init; }}";
+        var required = member.Optional ? "" : "required ";
+        var propLine = $"public {required}{csType} {csName} {{ get; init; }}";
 
         return (docLines, propLine, hasJsonAttr, jsonAttr);
     }

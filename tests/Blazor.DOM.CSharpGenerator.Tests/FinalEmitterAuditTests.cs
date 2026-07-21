@@ -176,13 +176,13 @@ public sealed class FinalEmitterAuditTests
 
             Assert.True(result.Validation.IsValid);
             Assert.Equal(1866, accounting.TotalSymbols);
-            Assert.Equal(1503, accounting.Projected);
-            Assert.Equal(1174, accounting.ProjectedClean);
-            Assert.Equal(329, accounting.ProjectedWithDeferredMembers);
+            Assert.Equal(1569, accounting.Projected);
+            Assert.Equal(1208, accounting.ProjectedClean);
+            Assert.Equal(361, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
-            Assert.Equal(248, accounting.Deferred);
-            Assert.Equal(115, accounting.GenerationFailed);
-            Assert.Equal(1921, result.WrittenFiles.Count);
+            Assert.Equal(260, accounting.Deferred);
+            Assert.Equal(37, accounting.GenerationFailed);
+            Assert.Equal(2097, result.WrittenFiles.Count);
             Assert.Equal((2598, 2598), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
@@ -191,9 +191,9 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceMembers));
             Assert.Equal(11310, accounting.TotalMembers);
             Assert.Equal(11310, accounting.ExpectedMembers);
-            Assert.Equal(9555, accounting.ProjectedMembers);
-            Assert.Equal(1363, accounting.DeferredMembers);
-            Assert.Equal(392, accounting.FailedMembers);
+            Assert.Equal(9802, accounting.ProjectedMembers);
+            Assert.Equal(1295, accounting.DeferredMembers);
+            Assert.Equal(213, accounting.FailedMembers);
             Assert.Equal((3666, 3666), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
@@ -202,28 +202,33 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceParameters));
             Assert.True(accounting.ParameterReconciliationValid);
             Assert.True(result.Validation.ParameterReconciliationValid);
-            Assert.Equal(115, result.Errors.Count);
-            Assert.Equal(115, result.Manifest.Diagnostics.Count);
-            Assert.Equal(6, result.Manifest.SynthesizedTypes?.Count);
+            Assert.Equal(37, result.Errors.Count);
+            Assert.Equal(37, result.Manifest.Diagnostics.Count);
+            Assert.Equal(83, result.Manifest.SynthesizedTypes?.Count);
             Assert.Equal(
-                (5, 1),
+                (5, 1, 14, 63),
                 (
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Tuple"),
                     result.Manifest.SynthesizedTypes?.Count(type =>
-                        type.Kind == "Record")));
+                        type.Kind == "Record"),
+                    result.Manifest.SynthesizedTypes?.Count(type =>
+                        type.Kind == "String"),
+                    result.Manifest.SynthesizedTypes?.Count(type =>
+                        type.Kind == "Union")));
             var failureCategories = accounting.FailedSymbols
                 .GroupBy(entry => StrictFailureCategory(entry.Reason))
                 .ToDictionary(
                     group => group.Key,
                     group => group.Count(),
                     StringComparer.Ordinal);
-            Assert.Equal(71, failureCategories["typed-union"]);
-            Assert.Equal(21, failureCategories["accessor"]);
-            Assert.Equal(12, failureCategories["unresolved-standard-type"]);
+            Assert.False(failureCategories.ContainsKey("typed-union"));
+            Assert.Equal(22, failureCategories["accessor"]);
+            Assert.Equal(2, failureCategories["unresolved-standard-type"]);
             Assert.Equal(6, failureCategories["heritage"]);
             Assert.Equal(3, failureCategories["override"]);
-            Assert.Equal(2, failureCategories["overload-collision"]);
+            Assert.Equal(3, failureCategories["overload-collision"]);
+            Assert.Equal(1, failureCategories["advanced-leaf"]);
             Assert.Equal(6, failureCategories.Count);
             Assert.All(result.Manifest.Diagnostics, diagnostic =>
             {
@@ -281,12 +286,14 @@ public sealed class FinalEmitterAuditTests
                             "primary-contract",
                             "promise-transport",
                             "standard-container-transport",
+                            "typed-union-arm-discriminator",
+                            "typed-union-interface-discriminator",
                         });
                     deferredTypeLiteralDeclarations++;
                 }
             }
-            Assert.Equal(542, projectedTypeLiteralDeclarations);
-            Assert.Equal(107, deferredTypeLiteralDeclarations);
+            Assert.Equal(587, projectedTypeLiteralDeclarations);
+            Assert.Equal(62, deferredTypeLiteralDeclarations);
 
             var factoryMembers = (accounting.SourceMemberEntries ?? [])
                 .Where(entry => entry.QualifiedKey.Contains(
@@ -341,7 +348,7 @@ public sealed class FinalEmitterAuditTests
                 150,
                 globalFunctionOverloads.Sum(entry => entry.ParameterOutcomes.Count));
             Assert.Equal(
-                (109, 8, 3),
+                (112, 8, 0),
                 (
                     globalFunctionOverloads.Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Projected)),
@@ -350,7 +357,7 @@ public sealed class FinalEmitterAuditTests
                     globalFunctionOverloads.Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Failed))));
             Assert.Equal(
-                (125, 22, 3),
+                (131, 19, 0),
                 (
                     globalFunctionOverloads
                         .SelectMany(entry => entry.ParameterOutcomes)
@@ -452,11 +459,11 @@ public sealed class FinalEmitterAuditTests
                         StringComparison.Ordinal));
             Assert.Equal(2463, factoryMembers.Count);
             Assert.Equal(
-                2228,
+                2326,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Projected)));
             Assert.Equal(
-                15,
+                0,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Deferred)
                     && entry.Phase == "factory-constructor"));
@@ -466,7 +473,7 @@ public sealed class FinalEmitterAuditTests
                 entry => entry.Status == nameof(MemberOutcomeStatus.Deferred)
                     && entry.Phase == "advanced-generic-constraints"));
             Assert.Equal(
-                180,
+                94,
                 factoryMembers.Count(entry =>
                 entry.Status == nameof(MemberOutcomeStatus.Deferred)
                 && entry.Phase == "primary-contract"));
@@ -476,10 +483,15 @@ public sealed class FinalEmitterAuditTests
                 entry.Status == nameof(MemberOutcomeStatus.Deferred)
                 && entry.Phase == "promise-transport"));
             Assert.Equal(
-                36,
+                38,
                 factoryMembers.Count(entry =>
                 entry.Status == nameof(MemberOutcomeStatus.Deferred)
                 && entry.Phase == "standard-container-transport"));
+            Assert.Equal(
+                1,
+                factoryMembers.Count(entry =>
+                entry.Status == nameof(MemberOutcomeStatus.Deferred)
+                && entry.Phase == "typed-union-interface-discriminator"));
 
             var wakeLockMembers = factoryMembers
                 .Where(entry => entry.SymbolName == "WakeLock")

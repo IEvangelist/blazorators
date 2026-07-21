@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\WakeLock\**\*.g.cs" />
+    <ProjectReference Include="..\..\src\Blazor.DOM\Blazor.DOM.csproj" />
   </ItemGroup>
 
 </Project>

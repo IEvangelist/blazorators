@@ -10,16 +10,16 @@ using System.Text.Json.Serialization;
 
 namespace Blazor.DOM.AdvancedTypes;
 
-[JsonConverter(typeof(HeadersInitTupleShape_d077850b0eJsonConverter))]
-public sealed record HeadersInitTupleShape_d077850b0e
+[JsonConverter(typeof(HeadersInitTupleShape_11e4ef35ddJsonConverter))]
+public sealed record HeadersInitTupleShape_11e4ef35dd
 {
     public required string Item1 { get; init; }
     public required string Item2 { get; init; }
 }
 
-internal sealed class HeadersInitTupleShape_d077850b0eJsonConverter : JsonConverter<HeadersInitTupleShape_d077850b0e>
+internal sealed class HeadersInitTupleShape_11e4ef35ddJsonConverter : JsonConverter<HeadersInitTupleShape_11e4ef35dd>
 {
-    public override HeadersInitTupleShape_d077850b0e Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override HeadersInitTupleShape_11e4ef35dd Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartArray)
             throw new JsonException("Expected a JSON array for a TypeScript tuple.");
@@ -34,14 +34,14 @@ internal sealed class HeadersInitTupleShape_d077850b0eJsonConverter : JsonConver
         reader.Read();
         if (reader.TokenType != JsonTokenType.EndArray)
             throw new JsonException("TypeScript tuple has too many elements.");
-        return new HeadersInitTupleShape_d077850b0e
+        return new HeadersInitTupleShape_11e4ef35dd
         {
             Item1 = value0,
             Item2 = value1,
         };
     }
 
-    public override void Write(Utf8JsonWriter writer, HeadersInitTupleShape_d077850b0e value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, HeadersInitTupleShape_11e4ef35dd value, JsonSerializerOptions options)
     {
         writer.WriteStartArray();
         JsonSerializer.Serialize(writer, value.Item1, options);

@@ -1,0 +1,14 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "TypedUnions",
+  "description": "Named and anonymous discriminated unions with nullable callbacks and mixed transport arms.",
+  "rootSymbols": [
+    "BlobCallback",
+    "ClipboardItemData"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["typed-unions", "mixed-union-transport"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/TypedUnions"
+}

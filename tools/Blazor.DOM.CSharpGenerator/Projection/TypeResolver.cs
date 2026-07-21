@@ -527,9 +527,10 @@ public sealed class TypeResolver
         // Promise<T> -> ValueTask<T>
         if (isGlobalBuiltIn && name == "Promise")
         {
-            EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
+            if (rf.TypeArguments[0] is not UnionTypeNode)
+                EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             var inner = Project(
                 rf.TypeArguments[0],
                 $"{provenance}/Promise<T>",
@@ -799,9 +800,10 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name == "PromiseLike")
         {
-            EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
+            if (rf.TypeArguments[0] is not UnionTypeNode)
+                EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             var inner = Project(
                 rf.TypeArguments[0],
                 $"{provenance}/PromiseLike<T>",

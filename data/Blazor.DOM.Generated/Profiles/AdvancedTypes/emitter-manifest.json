@@ -568,11 +568,11 @@
   "diagnostics": [],
   "synthesizedTypes": [
     {
-      "name": "HeadersInitTupleShape_d077850b0e",
+      "name": "HeadersInitTupleShape_11e4ef35dd",
       "kind": "Tuple",
-      "provenance": "HeadersInit[0][]",
+      "provenance": "HeadersInit/typeAlias/arm[0][]",
       "fingerprint": "tuple(item1:string:False:False,item2:string:False:False)",
-      "relativePath": "AdvancedTypes\\HeadersInitTupleShape_d077850b0e.g.cs"
+      "relativePath": "AdvancedTypes\\HeadersInitTupleShape_11e4ef35dd.g.cs"
     },
     {
       "name": "HeadersTupleShape_37fceffa8a",
