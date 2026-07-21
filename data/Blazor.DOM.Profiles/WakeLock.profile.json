@@ -7,5 +7,12 @@
   "requiresUserActivation": false,
   "features": ["screen-wake-lock"],
   "outputNamespace": "Blazor.DOM",
-  "outputSubdirectory": "Profiles/WakeLock"
+  "outputSubdirectory": "Profiles/WakeLock",
+  "entryPoints": [
+    {
+      "name": "WakeLock",
+      "symbol": "WakeLock",
+      "javaScriptPath": "navigator.wakeLock"
+    }
+  ]
 }

@@ -13,7 +13,9 @@ public sealed record HostCapabilityMetadata(
     bool RequiresUserActivation,
     IReadOnlyList<HostEntryPoint> EntryPoints);
 
-public sealed record HostPackageOptions(HostCapabilityMetadata Capability)
+public sealed record HostPackageOptions(
+    HostCapabilityMetadata Capability,
+    bool EmitCapabilityFacade = true)
 {
     public static HostPackageOptions Exhaustive { get; } = new(
         new HostCapabilityMetadata(
@@ -26,5 +28,6 @@ public sealed record HostPackageOptions(HostCapabilityMetadata Capability)
                 new("Window", "Window", "window"),
                 new("Document", "Document", "document"),
                 new("Navigator", "Navigator", "navigator"),
-            ]));
+            ]),
+        EmitCapabilityFacade: false);
 }

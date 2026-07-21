@@ -1,0 +1,18 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Permissions",
+  "description": "Permissions API - query browser permission state and observe changes.",
+  "rootSymbols": ["Permissions", "PermissionStatus"],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["permissions"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Permissions",
+  "entryPoints": [
+    {
+      "name": "Permissions",
+      "symbol": "Permissions",
+      "javaScriptPath": "navigator.permissions"
+    }
+  ]
+}
