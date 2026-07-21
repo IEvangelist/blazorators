@@ -24,5 +24,7 @@ public sealed record ProfileDefinition(
     [property: JsonPropertyName("minimalDependencyContracts")]
         bool MinimalDependencyContracts = false,
     [property: JsonPropertyName("entryPoints")]
-        IReadOnlyList<HostEntryPoint>? EntryPoints = null
+        IReadOnlyList<HostEntryPoint>? EntryPoints = null,
+    [property: JsonPropertyName("permissions")]
+        IReadOnlyList<string>? Permissions = null
 );

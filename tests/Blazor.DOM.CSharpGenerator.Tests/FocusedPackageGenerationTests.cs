@@ -227,7 +227,8 @@ public sealed class FocusedPackageGenerationTests
                         "Notification",
                         "Notification",
                         "Notification"),
-                ]);
+                ],
+                Permissions: ["notifications"]);
 
             var result = ProfilePipeline.Run(
                 profile,
@@ -266,6 +267,14 @@ public sealed class FocusedPackageGenerationTests
                 StringComparison.Ordinal);
             Assert.DoesNotContain(
                 "ValueTask<global::Blazor.DOM.INotification> GetNotificationAsync",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "IReadOnlyList<string> Permissions",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "[\"notifications\"]",
                 serverSource,
                 StringComparison.Ordinal);
         }

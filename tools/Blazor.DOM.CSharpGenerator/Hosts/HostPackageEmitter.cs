@@ -416,6 +416,11 @@ public static class HostPackageEmitter
                     $"    [{string.Join(", ", capability.Features.Select(value => $"\"{value}\""))}];");
                 writer.AppendLine(
                     "public static global::System.Collections.Generic." +
+                    "IReadOnlyList<string> Permissions { get; } =");
+                writer.AppendLine(
+                    $"    [{string.Join(", ", (capability.Permissions ?? []).Select(value => $"\"{value}\""))}];");
+                writer.AppendLine(
+                    "public static global::System.Collections.Generic." +
                     "IReadOnlyList<string> FeatureDetectionPaths { get; } =");
                 writer.AppendLine(
                     $"    [{string.Join(", ", capability.EntryPoints.Select(value => $"\"{value.JavaScriptPath}\""))}];");
