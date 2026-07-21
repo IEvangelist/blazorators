@@ -584,7 +584,8 @@ public sealed class TypeResolver
             "statically-reduced-indexed-access" or
             "readonly-operator" or
             "readonly-array" or
-            "resolved-import-type"
+            "resolved-import-type" or
+            "Promise<T>→ValueTask<T>"
             || projection.ProviderNote.StartsWith(
                 "type-parameter:",
                 StringComparison.Ordinal)
@@ -3245,9 +3246,6 @@ public sealed class TypeResolver
 
         return inner.Transport with
         {
-            SourceType = promise.Transport?.SourceType
-                ?? promise.CheckerType
-                ?? $"Promise<{inner.Transport.SourceType}>",
             Nullable = inner.IsNullable || inner.Transport.Nullable,
         };
     }
