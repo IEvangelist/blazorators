@@ -1255,6 +1255,7 @@ public sealed class InterfaceEmitter(
 
                     var resolvedBaseName = hrt.ResolvedSymbol ?? hrt.Expression;
                     if (!typeResolver.IsKnownSymbol(resolvedBaseName)
+                        && !typeResolver.IsStandardStructuralHeritage(hrt)
                         && resolvedBaseName is not
                             "ReadonlyMap" and
                             not "Map" and
@@ -1279,7 +1280,8 @@ public sealed class InterfaceEmitter(
                     }
 
                     if (typeResolver.IsKnownSymbol(resolvedBaseName)
-                        && !typeResolver.IsInterfaceOrMixin(resolvedBaseName))
+                        && !typeResolver.IsInterfaceOrMixin(resolvedBaseName)
+                        && !typeResolver.IsDictionarySymbol(resolvedBaseName))
                     {
                         throw new TypeProjectionException(
                             $"Interface '{symbolName}' decl[{decl.Ordinal}] extends '{resolvedBaseName}' which has classification " +
@@ -1288,10 +1290,17 @@ public sealed class InterfaceEmitter(
                             $"{symbolName}/extends/{resolvedBaseName}");
                     }
 
-                    var projection = typeResolver.Project(
-                        hrt,
-                        $"{symbolName}/decl[{decl.Ordinal}]/extends/{resolvedBaseName}",
-                        declarationScope);
+                    var heritageProvenance =
+                        $"{symbolName}/decl[{decl.Ordinal}]/extends/{resolvedBaseName}";
+                    var projection = typeResolver.IsDictionarySymbol(resolvedBaseName)
+                        ? typeResolver.ProjectDictionaryContract(
+                            hrt,
+                            heritageProvenance,
+                            declarationScope)
+                        : typeResolver.Project(
+                            hrt,
+                            heritageProvenance,
+                            declarationScope);
                     if (projection.Identity.Kind != ClrTypeKind.Reference)
                     {
                         throw new TypeProjectionException(

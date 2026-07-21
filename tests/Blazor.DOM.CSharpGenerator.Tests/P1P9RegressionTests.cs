@@ -197,12 +197,8 @@ public sealed class P1P9RegressionTests
     }
 
     [Fact]
-    public void InterfaceEmitter_NonInterfaceBase_FailsClosed()
+    public void InterfaceEmitter_DictionaryBase_UsesStructuralContract()
     {
-        var resolver = new TypeResolver([
-            MakeSemanticSymbol("QueuingStrategy", "dictionary", [MakeInterfaceDecl("QueuingStrategy", [])])
-        ]);
-        var emitter = new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM");
         var symbol = MakeSymbol("CountQueuingStrategy", "interface",
         [
             MakeInterfaceDecl("CountQueuingStrategy", [], heritage:
@@ -210,11 +206,27 @@ public sealed class P1P9RegressionTests
                 new HeritageClauseModel("extends", [new HeritageReferenceTypeNode("QueuingStrategy", null, [])])
             ])
         ]);
+        var dictionarySymbol = MakeSemanticSymbol(
+            "QueuingStrategy",
+            "dictionary",
+            [MakeInterfaceDecl("QueuingStrategy", [])]);
+        var resolver = new TypeResolver([dictionarySymbol, symbol]);
+        var emitter = new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM");
 
-        var ex = Assert.Throws<InterfaceEmitException>(() => emitter.Emit(symbol));
+        var result = emitter.Emit(symbol);
+        var dictionary = new DictionaryEmitter(
+            resolver,
+            "1.0.0",
+            "Blazor.DOM").Emit(
+                dictionarySymbol);
 
-        Assert.Contains("not interface/mixin", ex.Message);
-        Assert.Contains("dictionary", ex.Message);
+        Assert.Contains(
+            "public partial interface ICountQueuingStrategy : IQueuingStrategyContract",
+            result.Source);
+        Assert.Contains("public interface IQueuingStrategyContract", dictionary);
+        Assert.Contains(
+            "public record QueuingStrategy : IQueuingStrategyContract",
+            dictionary);
     }
 
     [Fact]

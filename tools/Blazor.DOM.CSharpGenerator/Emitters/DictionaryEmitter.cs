@@ -37,6 +37,13 @@ public sealed class DictionaryEmitException(
 
 public sealed class DictionaryEmitter(TypeResolver typeResolver, string generatorVersion, string ns)
 {
+    private sealed record DictionaryPropertyOutput(
+        string DocLines,
+        string PropertyLine,
+        string ContractLine,
+        bool HasJsonAttr,
+        string JsonAttr);
+
     private static readonly IReadOnlySet<string> EmittedDeclarationKinds =
         new HashSet<string>(["interface", "typeAlias"], StringComparer.Ordinal);
 
@@ -121,7 +128,7 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
             symbol.Name);
 
         // ── Collect all member outputs; deduplicate by member name; fail before writing ──
-        var propertyOutputs = new List<(string DocLines, string PropertyLine, bool HasJsonAttr, string JsonAttr)>();
+        var propertyOutputs = new List<DictionaryPropertyOutput>();
         var seenMemberNames = new HashSet<string>(StringComparer.Ordinal);
         var memberOutcomes = new List<MemberOutcome>();
 
@@ -179,7 +186,7 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                         continue;
                     }
 
-                    propertyOutputs.Add(entry.Value);
+                    propertyOutputs.Add(entry);
                     memberOutcomes.Add(new MemberOutcome(
                         member.Ordinal,
                         memberName,
@@ -259,19 +266,51 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         }
 
         var declaredName = $"{csName}{generic.TypeParameterList}";
-        var header = string.IsNullOrEmpty(baseClause)
+        var contractName = $"I{csName}Contract{generic.TypeParameterList}";
+        var emitContract = typeResolver.RequiresDictionaryContract(symbol.Name);
+        if (emitContract)
+        {
+            var contractBase = BuildContractBaseClause(
+                symbol.Name,
+                decls,
+                generic.Scope);
+            var contractHeader = string.IsNullOrEmpty(contractBase)
+                ? $"public interface {contractName}{generic.ConstraintSuffix}"
+                : $"public interface {contractName} : {contractBase}{generic.ConstraintSuffix}";
+            w.Block(contractHeader, () =>
+            {
+                for (var index = 0; index < propertyOutputs.Count; index++)
+                {
+                    if (index > 0) w.AppendLine();
+                    var property = propertyOutputs[index];
+                    if (!string.IsNullOrEmpty(property.DocLines))
+                        w.AppendLine(property.DocLines.TrimEnd());
+                    w.AppendLine(property.ContractLine);
+                }
+            });
+            w.AppendLine();
+        }
+
+        var recordBases = new List<string>();
+        if (!string.IsNullOrEmpty(baseClause))
+            recordBases.Add(baseClause);
+        if (emitContract)
+            recordBases.Add(contractName);
+        var header = recordBases.Count == 0
             ? $"public record {declaredName}{generic.ConstraintSuffix}"
-            : $"public record {declaredName} : {baseClause}{generic.ConstraintSuffix}";
+            : $"public record {declaredName} : {string.Join(", ", recordBases)}" +
+              $"{generic.ConstraintSuffix}";
 
         w.Block(header, () =>
         {
             for (var i = 0; i < propertyOutputs.Count; i++)
             {
                 if (i > 0) w.AppendLine();
-                var (docLines, propLine, hasJsonAttr, jsonAttr) = propertyOutputs[i];
-                if (!string.IsNullOrEmpty(docLines)) w.AppendLine(docLines.TrimEnd());
-                if (hasJsonAttr) w.AppendLine(jsonAttr);
-                w.AppendLine(propLine);
+                var property = propertyOutputs[i];
+                if (!string.IsNullOrEmpty(property.DocLines))
+                    w.AppendLine(property.DocLines.TrimEnd());
+                if (property.HasJsonAttr) w.AppendLine(property.JsonAttr);
+                w.AppendLine(property.PropertyLine);
             }
         });
 
@@ -298,7 +337,7 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
             outcomes.OverloadOutcomes);
     }
 
-    private (string DocLines, string PropertyLine, bool HasJsonAttr, string JsonAttr)? BuildProperty(
+    private DictionaryPropertyOutput? BuildProperty(
         MemberModel member,
         string symbolName,
         int declarationOrdinal,
@@ -338,7 +377,12 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         var required = member.Optional ? "" : "required ";
         var propLine = $"public {required}{csType} {csName} {{ get; init; }}";
 
-        return (docLines, propLine, hasJsonAttr, jsonAttr);
+        return new DictionaryPropertyOutput(
+            docLines,
+            propLine,
+            $"{csType} {csName} {{ get; }}",
+            hasJsonAttr,
+            jsonAttr);
     }
 
     /// <summary>
@@ -408,5 +452,25 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                 $"{symbolName}/extends");
 
         return csNames[0];
+    }
+
+    private string BuildContractBaseClause(
+        string symbolName,
+        IReadOnlyList<DeclarationModel> declarations,
+        GenericScope genericScope)
+    {
+        var contracts = declarations
+            .SelectMany(declaration => declaration.Heritage)
+            .Where(heritage => heritage.Token == "extends")
+            .SelectMany(heritage => heritage.Types)
+            .OfType<HeritageReferenceTypeNode>()
+            .Select(reference => typeResolver.ProjectDictionaryContract(
+                reference,
+                $"{symbolName}/contract/extends/" +
+                $"{reference.ResolvedSymbol ?? reference.Expression}",
+                genericScope).RenderedType)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        return string.Join(", ", contracts);
     }
 }

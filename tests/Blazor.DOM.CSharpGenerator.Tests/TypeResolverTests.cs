@@ -34,11 +34,18 @@ public sealed class TypeResolverTests
     }
 
     [Fact]
-    public void Project_NeverKeyword_ThrowsTypeProjectionException()
+    public void Project_NeverKeyword_UsesUninhabitedMarker()
     {
         var resolver = EmptyResolver();
         var node = new KeywordTypeNode("NeverKeyword");
-        Assert.Throws<TypeProjectionException>(() => resolver.Project(node, "test"));
+        var projection = resolver.Project(node, "test");
+
+        Assert.Equal(
+            "global::Blazor.DOM.StandardTypes.TypeScriptNever",
+            projection.CSharpType);
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+        Assert.Equal("Never", definition.Kind);
+        Assert.Contains("private TypeScriptNever()", definition.Source);
     }
 
     [Fact]

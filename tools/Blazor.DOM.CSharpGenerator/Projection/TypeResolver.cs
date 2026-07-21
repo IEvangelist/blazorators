@@ -156,6 +156,106 @@ public sealed class TypeResolver
         => _symbolIndex.TryGetValue(name, out var sym)
            && EffectiveClassificationPolicy.Classify(sym, _overrides).Name == "dictionary";
 
+    public bool IsStandardStructuralHeritage(HeritageReferenceTypeNode reference)
+        => reference.TypeArguments.Count == 0
+            && string.Equals(reference.Expression, "Error", StringComparison.Ordinal)
+            && string.Equals(
+                reference.ResolvedSymbol ?? reference.Expression,
+                "Error",
+                StringComparison.Ordinal)
+            && !_symbolIndex.ContainsKey("Error");
+
+    public bool RequiresDictionaryContract(string symbolName)
+        => RequiresDictionaryContract(
+            symbolName,
+            new HashSet<string>(StringComparer.Ordinal));
+
+    private bool RequiresDictionaryContract(
+        string symbolName,
+        ISet<string> visiting)
+    {
+        if (!visiting.Add(symbolName))
+            return false;
+        try
+        {
+            foreach (var symbol in _symbolIndex.Values)
+            {
+                var classification =
+                    EffectiveClassificationPolicy.Classify(symbol, _overrides).Name;
+                var extendsTarget = symbol.Declarations
+                    .SelectMany(declaration => declaration.Heritage)
+                    .Where(heritage => heritage.Token == "extends")
+                    .SelectMany(heritage => heritage.Types)
+                    .OfType<HeritageReferenceTypeNode>()
+                    .Any(reference => string.Equals(
+                        reference.ResolvedSymbol ?? reference.Expression,
+                        symbolName,
+                        StringComparison.Ordinal));
+                if (!extendsTarget)
+                    continue;
+                if (classification is "interface" or "mixin"
+                    || classification == "dictionary"
+                    && RequiresDictionaryContract(symbol.Name, visiting))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        finally
+        {
+            visiting.Remove(symbolName);
+        }
+    }
+
+    public TypeProjection ProjectDictionaryContract(
+        HeritageReferenceTypeNode reference,
+        string provenance,
+        GenericScope? scope)
+    {
+        var symbolName = reference.ResolvedSymbol ?? reference.Expression;
+        if (!_symbolIndex.TryGetValue(symbolName, out var symbol)
+            || !IsDictionarySymbol(symbolName))
+        {
+            throw new TypeProjectionException(
+                $"Structural heritage '{symbolName}' at '{provenance}' is not a " +
+                "known TypeScript/Web IDL dictionary.",
+                provenance);
+        }
+
+        var parameters = GetSymbolTypeParameters(
+            symbol,
+            $"{symbolName}/typeParameters");
+        var arguments = ProjectTypeArguments(
+            reference.TypeArguments,
+            parameters,
+            symbolName,
+            provenance,
+            scope,
+            0);
+        for (var index = 0; index < arguments.Count; index++)
+            ValidateGenericArgument(symbolName, arguments[index], provenance, index);
+
+        var simpleName = $"I{Naming.ToCSharpSimpleTypeName(symbolName)}Contract";
+        var contractName = symbolName.Contains('.', StringComparison.Ordinal)
+            ? $"global::{Naming.ToGeneratedNamespace(_generatedNamespace, symbolName)}.{simpleName}"
+            : simpleName;
+        if (arguments.Count > 0)
+        {
+            contractName += $"<{string.Join(", ", arguments.Select(
+                argument => argument.RenderedType))}>";
+        }
+        var canonical = arguments.Count == 0
+            ? contractName
+            : $"{contractName[..contractName.IndexOf('<')]}<" +
+              $"{string.Join(",", arguments.Select(argument => argument.CanonicalType))}>";
+        return ReferenceType(
+            contractName,
+            providerNote: "structural dictionary heritage contract",
+            canonicalType: canonical,
+            typeArguments: arguments.Select(argument => argument.Identity).ToList());
+    }
+
     public string GetCSharpTypeReference(string symbolName)
     {
         if (!_symbolIndex.TryGetValue(symbolName, out var symbol))
@@ -457,8 +557,12 @@ public sealed class TypeResolver
         if (KeywordMap.TryGetValue(name, out var mapped))
         {
             if (mapped == "never")
-                throw new TypeProjectionException(
-                    $"'never' type at '{provenance}' cannot be projected to C#.", provenance);
+            {
+                var neverType = _synthesizedTypes.RegisterTypeScriptNever();
+                return ReferenceType(
+                    neverType,
+                    providerNote: "TypeScript never (uninhabited)");
+            }
             if (mapped == "null")
                 return NullType();
             return ProjectMappedPrimitive(mapped);
