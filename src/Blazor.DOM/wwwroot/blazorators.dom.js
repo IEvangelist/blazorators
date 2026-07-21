@@ -191,6 +191,45 @@ export function invokeMethodReferenceCallback(
                     }
                 });
             }
+
+            /**
+             * Invoke a method whose one-shot callback receives a live JS object and returns
+             * the JSON-valued result used to settle the JavaScript operation.
+             */
+            export function invokeMethodReferenceResultCallback(
+                ref,
+                name,
+                args,
+                callbackArgumentIndex,
+                dotnetRef,
+                callbackMethodName) {
+                const invocationArgs = [...(args ?? [])];
+                if (!Number.isInteger(callbackArgumentIndex) ||
+                    callbackArgumentIndex < 0 ||
+                    callbackArgumentIndex > invocationArgs.length) {
+                    throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
+                }
+
+                const callback = async (value) => {
+                    const reference = value === null || value === undefined
+                        ? null
+                        : DotNet.createJSObjectReference(value);
+                    try {
+                        const delivery = await dotnetRef.invokeMethodAsync(
+                            callbackMethodName,
+                            reference);
+                        if (delivery?.accepted !== true) {
+                            throw new Error('.NET rejected callback reference delivery.');
+                        }
+                        return delivery.result;
+                    } catch (error) {
+                        _disposeJSReference(reference);
+                        throw error;
+                    }
+                };
+                invocationArgs.splice(callbackArgumentIndex, 0, callback);
+                return ref[name](...invocationArgs);
+            }
         } catch (error) {
             settled = true;
             reject(error);

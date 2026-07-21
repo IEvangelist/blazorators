@@ -274,7 +274,9 @@ public static class ProfilePipeline
         }
 
         var leakedReferences = externalReferences
-            .Where(reference => reference is not "Promise")
+            .Where(reference => reference is not (
+                "Promise"
+                or "ReadonlyArray"))
             .ToList();
         if (leakedReferences.Count > 0)
         {

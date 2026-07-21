@@ -443,6 +443,9 @@ public static class HostPackageEmitter
                 writer.AppendLine(
                     "        var factory = new DomProxyFactory(" +
                     "provider.GetRequiredService<IDomRuntime>());");
+                writer.AppendLine(
+                    "        factory.RegisterOpenGeneric(" +
+                    "typeof(IBrowserArray<>), typeof(DomBrowserArrayProxy<>));");
                 writer.AppendLine("        GeneratedDomHost.RegisterProxies(factory);");
                 writer.AppendLine("        return factory;");
                 writer.AppendLine("    });");

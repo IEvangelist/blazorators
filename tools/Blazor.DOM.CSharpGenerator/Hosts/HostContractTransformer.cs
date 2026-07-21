@@ -354,6 +354,26 @@ public sealed partial class HostContractTransformer(DomHostKind host)
         List<HostApiOperation> operations)
     {
         var parsed = ParseMethodDeclaration(declaration);
+        if (TryEmitLockRequest(
+            symbol,
+            parsed,
+            pending,
+            metadata,
+            output,
+            operations))
+        {
+            return;
+        }
+        if (TryEmitPerformanceEntryList(
+            symbol,
+            parsed,
+            pending,
+            metadata,
+            output,
+            operations))
+        {
+            return;
+        }
         output.AddRange(pending);
         var asyncDispatch = host == DomHostKind.Server || metadata.Promise;
         if (asyncDispatch)
@@ -393,6 +413,135 @@ public sealed partial class HostContractTransformer(DomHostKind host)
                 $"{metadata.Descriptor})";
         output.Add($"    {syncSignature} => {syncInvocation};");
         AddOperation(symbol, "method", parsed.Name, syncSignature, metadata, operations);
+    }
+
+    private static bool TryEmitLockRequest(
+        SymbolModel symbol,
+        ParsedMethod parsed,
+        IReadOnlyList<string> pending,
+        DispatchMetadata metadata,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        if (!string.Equals(symbol.Name, "LockManager", StringComparison.Ordinal)
+            || !string.Equals(parsed.Name, "RequestAsync", StringComparison.Ordinal)
+            || parsed.Parameters.Count != 2
+            || !parsed.Parameters[1].Contains(
+                "LockGrantedCallback<",
+                StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        output.AddRange(pending.Where(line =>
+            !line.Contains("DomOperation(", StringComparison.Ordinal)));
+        output.Add(
+            "    [global::Microsoft.JSInterop.DomOperation(" +
+            "\"web-locks:request\", \"request\", " +
+            "global::Microsoft.JSInterop.DomTransportKind.JsonValue, " +
+            "\"Promise<T>\", Promise = true, StructuredClone = true)]");
+        var callback =
+            "global::System.Func<global::Microsoft.JSInterop." +
+            "DomBorrowedReference<global::Blazor.DOM.ILock>?, " +
+            "global::System.Threading.Tasks.Task<T>> callback";
+        var parameters = new[]
+        {
+            parsed.Parameters[0],
+            callback,
+            "global::System.Threading.CancellationToken cancellationToken = default",
+        };
+        var signature = BuildMethodSignature(
+            "global::System.Threading.Tasks.ValueTask<T>",
+            parsed.Name,
+            parsed.Generic,
+            parameters,
+            parsed.Constraints);
+        output.Add(
+            $"    {signature} => global::Microsoft.JSInterop.DomDispatch." +
+            "InvokeReferenceResultCallbackAsync<global::Blazor.DOM.ILock, T>(" +
+            $"{DispatchCast}, \"request\", 1, [{parsed.ParameterNames[0]}], " +
+            "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+            "\"Lock | null\", nullable: true), callback, cancellationToken);");
+        operations.Add(new HostApiOperation(
+            $"{symbol.Name}/web-locks:request",
+            symbol.Name,
+            "reference-result-callback",
+            "request",
+            true,
+            signature));
+        return true;
+    }
+
+    private bool TryEmitPerformanceEntryList(
+        SymbolModel symbol,
+        ParsedMethod parsed,
+        IReadOnlyList<string> pending,
+        DispatchMetadata metadata,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        if (!string.Equals(
+            parsed.ReturnType,
+            "PerformanceEntryList",
+            StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        output.AddRange(pending.Where(line =>
+            !line.Contains("DomOperation(", StringComparison.Ordinal)));
+        output.Add(
+            "    [global::Microsoft.JSInterop.DomOperation(" +
+            $"\"performance-entry-list:{parsed.Name}\", " +
+            $"{metadata.JavaScriptNameLiteral}, " +
+            "global::Microsoft.JSInterop.DomTransportKind.JsReference, " +
+            "\"PerformanceEntryList\")]");
+        const string result =
+            "global::Microsoft.JSInterop.IBrowserArray<" +
+            "global::Blazor.DOM.IPerformanceEntry>";
+        var arguments = BuildArguments(parsed);
+        string signature;
+        if (host == DomHostKind.Server)
+        {
+            var parameters = AddCancellation(
+                parsed.Parameters,
+                out var cancellationName);
+            signature = BuildMethodSignature(
+                $"global::System.Threading.Tasks.ValueTask<{result}>",
+                EnsureAsync(parsed.Name),
+                parsed.Generic,
+                parameters,
+                parsed.Constraints);
+            output.Add(
+                $"    {signature} => global::Microsoft.JSInterop.DomDispatch." +
+                $"InvokeAsync<{result}>({DispatchCast}, " +
+                $"{metadata.JavaScriptNameLiteral}, {arguments}, " +
+                "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+                $"\"PerformanceEntryList\"), {cancellationName});");
+        }
+        else
+        {
+            signature = BuildMethodSignature(
+                result,
+                parsed.Name,
+                parsed.Generic,
+                parsed.Parameters,
+                parsed.Constraints);
+            output.Add(
+                $"    {signature} => global::Microsoft.JSInterop.WasmDomDispatch." +
+                $"Invoke<{result}>({DispatchCast}, " +
+                $"{metadata.JavaScriptNameLiteral}, {arguments}, " +
+                "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+                "\"PerformanceEntryList\"));");
+        }
+        operations.Add(new HostApiOperation(
+            $"{symbol.Name}/performance-entry-list:{parsed.Name}",
+            symbol.Name,
+            "reference-list",
+            Unquote(metadata.JavaScriptNameLiteral),
+            false,
+            signature));
+        return true;
     }
 
     private void EmitIndexMethod(

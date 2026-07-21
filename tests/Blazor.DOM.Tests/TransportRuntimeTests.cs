@@ -287,6 +287,41 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Reference_result_callback_returns_value_and_releases_borrowed_proxy(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var factory = CreateFactory(host.Runtime);
+        var reference = new FakeJSObjectReference();
+        host.Module.InvocationHandlers["invokeMethodReferenceResultCallback"] =
+            async (args, _) =>
+            {
+                var handler = Assert.IsType<DotNetObjectReference<
+                    DomReferenceResultCallbackHandler<FixtureBlobProxy, int>>>(
+                    args![4]);
+                var delivery = await handler.Value
+                    .HandleReferenceResultAsync(reference);
+                Assert.True(delivery.Accepted);
+                return delivery.Result;
+            };
+
+        var result = await host.Runtime
+            .InvokeMethodReferenceResultCallbackAsync<FixtureBlobProxy, int>(
+                new FakeJSObjectReference(),
+                "request",
+                1,
+                ["exclusive"],
+                factory,
+                DomTransportDescriptor.JsReference("FixtureBlob | null", true),
+                value => Task.FromResult(value is null ? 0 : 42));
+
+        Assert.Equal(42, result);
+        Assert.True(reference.IsDisposed);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Unsupported_transport_fails_before_JS_invocation(bool wasm)
     {
         var host = CreateHost(wasm);
