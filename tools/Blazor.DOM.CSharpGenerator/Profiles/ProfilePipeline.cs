@@ -14,6 +14,21 @@ namespace Blazor.DOM.CSharpGenerator.Profiles;
 
 public static class ProfilePipeline
 {
+    private static readonly IReadOnlySet<string> SupportedAmbientReferences =
+        new HashSet<string>(
+        [
+            "ArrayBuffer",
+            "ArrayBufferView",
+            "Date",
+            "Error",
+            "Iterable",
+            "Promise",
+            "ReadonlyArray",
+            "Record",
+            "Uint8Array",
+        ],
+        StringComparer.Ordinal);
+
     public static ProfileGenerationResult Run(
         ProfileDefinition profile,
         IrBundle ir,
@@ -274,7 +289,7 @@ public static class ProfilePipeline
         }
 
         var leakedReferences = externalReferences
-            .Where(reference => reference is not "Promise")
+            .Where(reference => !SupportedAmbientReferences.Contains(reference))
             .ToList();
         if (leakedReferences.Count > 0)
         {

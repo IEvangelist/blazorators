@@ -149,6 +149,54 @@ public sealed class FocusedPackageGenerationTests
     }
 
     [Fact]
+    public void PackageProfile_AllowsSupportedAmbientTypeScriptReferences()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "AmbientReferences",
+                "Supported TypeScript ambient references.",
+                ["IDBObjectStore"],
+                false,
+                false,
+                [],
+                "Blazor.DOM",
+                "Profiles/AmbientReferences",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["IDBObjectStore"] = ["add", "getAllKeys"],
+                },
+                true,
+                EntryPoints:
+                [
+                    new HostEntryPoint(
+                        "IDBObjectStore",
+                        "IDBObjectStore",
+                        "indexedDB.fixture"),
+                ]);
+
+            var exception = Record.Exception(() => ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data)));
+
+            Assert.False(
+                exception?.Message.Contains(
+                    "closure leaks unresolved reference",
+                    StringComparison.Ordinal) == true,
+                exception?.ToString());
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
     public void PackageProfile_UnsupportedTransportFailsWithoutCanonicalOutput()
     {
         var root = FindRepositoryRoot();
