@@ -85,9 +85,8 @@ public sealed class DictionaryEmitterTests
     }
 
     [Fact]
-    public void Emit_ProjectionFailed_Throws_NotComment()
+    public void Emit_UnsupportedIntersection_IsExplicitNamedDeferral()
     {
-        // Member with an unsupported intersection type must throw, not emit a PROJECTION-FAILED comment
         var resolver = EmptyResolver();
         var emitter = new DictionaryEmitter(resolver, "1.0.0", "Blazor.DOM");
 
@@ -99,8 +98,13 @@ public sealed class DictionaryEmitterTests
             ])),
         ]);
 
-        // Fail-closed: must throw, not produce a comment fallback
-        Assert.Throws<TypeProjectionException>(() => emitter.Emit(symbol));
+        var result = emitter.EmitWithOutcomes(symbol);
+        var outcome = Assert.Single(result.MemberOutcomes);
+
+        Assert.Equal(MemberOutcomeStatus.Deferred, outcome.Status);
+        Assert.Equal("intersection-composition", outcome.Phase);
+        Assert.DoesNotContain("object", result.Source);
+        Assert.DoesNotContain("Bad", result.Source);
     }
 
     [Fact]
