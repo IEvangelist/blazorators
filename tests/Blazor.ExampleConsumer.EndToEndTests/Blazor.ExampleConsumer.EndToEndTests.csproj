@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\samples\Blazor.ExampleConsumer\Blazor.ExampleConsumer.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\samples\BlazorServer.ExampleConsumer\BlazorServer.ExampleConsumer.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
