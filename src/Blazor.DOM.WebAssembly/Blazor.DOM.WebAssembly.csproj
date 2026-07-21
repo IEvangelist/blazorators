@@ -47,6 +47,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsPackable>true</IsPackable>
     <PackageIcon>logo.png</PackageIcon>
+    <_SharedDomStaticAsset>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM\wwwroot\blazorators.dom.js'))</_SharedDomStaticAsset>
+    <_SharedDomStaticAssetRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM\wwwroot\'))</_SharedDomStaticAssetRoot>
   </PropertyGroup>
 
   <ItemGroup>
@@ -79,7 +81,7 @@
              LinkBase="SharedRuntime\Proxies" />
     <Compile Include="..\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
              Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
-    <Content Include="..\Blazor.DOM\wwwroot\blazorators.dom.js"
+    <Content Include="$(_SharedDomStaticAsset)"
              Link="wwwroot\blazorators.dom.js"
              CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
@@ -101,6 +103,15 @@
           Pack="true"
           PackagePath="build\Blazor.DOM.WebAssembly.host-parity.json" />
   </ItemGroup>
+
+  <Target Name="CorrectLinkedDomStaticAssetRoot"
+          AfterTargets="ResolveProjectStaticWebAssets">
+    <ItemGroup>
+      <StaticWebAsset Update="$(_SharedDomStaticAsset)">
+        <ContentRoot>$(_SharedDomStaticAssetRoot)</ContentRoot>
+      </StaticWebAsset>
+    </ItemGroup>
+  </Target>
 
   <ItemGroup Label="Files">
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
