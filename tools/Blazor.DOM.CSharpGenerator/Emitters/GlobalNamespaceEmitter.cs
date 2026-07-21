@@ -1633,10 +1633,14 @@ internal sealed class GlobalNamespaceEmitter(
             RoutedDeclaration contributor,
             out string? collisionReason)
         {
+            var stagedEntries = new Dictionary<string, ContractEntry>(
+                _entries,
+                StringComparer.Ordinal);
+            var stagedOrder = _order.ToList();
             foreach (var signature in callable.Signatures)
             {
                 var key = $"method:{signature.CanonicalKey}";
-                if (_entries.TryGetValue(key, out var existing))
+                if (stagedEntries.TryGetValue(key, out var existing))
                 {
                     if (!string.Equals(
                             existing.CanonicalType,
@@ -1663,7 +1667,7 @@ internal sealed class GlobalNamespaceEmitter(
                         && signature.OptionalParameterCount
                             > existing.OptionalParameterCount)
                     {
-                        _entries[key] = existing with
+                        stagedEntries[key] = existing with
                         {
                             Rendered = signature.Rendered,
                             OptionalParameterCount =
@@ -1674,7 +1678,7 @@ internal sealed class GlobalNamespaceEmitter(
                     continue;
                 }
 
-                _entries.Add(
+                stagedEntries.Add(
                     key,
                     new ContractEntry(
                         signature.Rendered,
@@ -1683,9 +1687,14 @@ internal sealed class GlobalNamespaceEmitter(
                         Mutable: false,
                         signature.OptionalParameterCount,
                         signature.HasRestParameter));
-                _order.Add(key);
+                stagedOrder.Add(key);
             }
 
+            _entries.Clear();
+            foreach (var pair in stagedEntries)
+                _entries.Add(pair.Key, pair.Value);
+            _order.Clear();
+            _order.AddRange(stagedOrder);
             _contributors.Add(contributor);
             collisionReason = null;
             return true;

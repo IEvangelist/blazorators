@@ -671,11 +671,132 @@ public sealed class GenericEmitterTests
             "1.0.0",
             "Blazor.DOM").Emit(collisionHost);
         Assert.Contains("double Pick();", collisionResult.Source);
+        Assert.DoesNotContain("T Pick<T>();", collisionResult.Source);
         Assert.Equal(
             "generic-method-defaults",
             Assert.Single(
                 collisionResult.MemberOutcomes,
                 outcome => outcome.Ordinal == 1).Phase);
+    }
+
+    [Fact]
+    public void DefaultExpandedMethods_AreLegalAndTransactional()
+    {
+        var voidDefault = new TypeParameterModel(
+            0,
+            "T",
+            null,
+            new KeywordTypeNode("VoidKeyword"));
+        var use = MakeMethod(
+            0,
+            "Use",
+            [voidDefault],
+            [
+                new ParameterModel(
+                    0,
+                    "value",
+                    false,
+                    false,
+                    new ReferenceTypeNode("T", "LegalityHost.Use.T", []),
+                    null,
+                    EmptyDocumentation,
+                    EmptyLocation),
+            ],
+            new KeywordTypeNode("VoidKeyword"));
+        var legalityHost = MakeInterfaceSymbol("LegalityHost", [use]);
+        var legalityResult = new InterfaceEmitter(
+            new TypeResolver([legalityHost]),
+            "1.0.0",
+            "Blazor.DOM").Emit(legalityHost);
+        var legalityOutcome = Assert.Single(legalityResult.MemberOutcomes);
+        Assert.Equal(MemberOutcomeStatus.Deferred, legalityOutcome.Status);
+        Assert.Equal("generic-method-defaults", legalityOutcome.Phase);
+        Assert.Contains(
+            "LegalityHost/decl[0]/Use/parameter[0]/value/defaultExpansion",
+            legalityOutcome.Reason);
+        Assert.DoesNotContain("void Use<", legalityResult.Source);
+        Assert.DoesNotContain("void Use(", legalityResult.Source);
+
+        var nullDefault = new TypeParameterModel(
+            0,
+            "T",
+            null,
+            new KeywordTypeNode("NullKeyword"));
+        var get = MakeMethod(
+            0,
+            "Get",
+            [nullDefault],
+            [],
+            new ReferenceTypeNode("T", "NullHost.Get.T", []));
+        var nullHost = MakeInterfaceSymbol("NullHost", [get]);
+        var nullResult = new InterfaceEmitter(
+            new TypeResolver([nullHost]),
+            "1.0.0",
+            "Blazor.DOM").Emit(nullHost);
+        var nullOutcome = Assert.Single(nullResult.MemberOutcomes);
+        Assert.Equal(MemberOutcomeStatus.Deferred, nullOutcome.Status);
+        Assert.Equal("generic-method-defaults", nullOutcome.Phase);
+        Assert.Contains(
+            "NullHost/decl[0]/Get/return/defaultExpansion",
+            nullOutcome.Reason);
+        Assert.DoesNotContain(" Get<", nullResult.Source);
+        Assert.DoesNotContain(" Get(", nullResult.Source);
+
+        var ordinary = MakeMethod(
+            0,
+            "Choose",
+            [new TypeParameterModel(0, "T", null, null)],
+            [],
+            new KeywordTypeNode("NumberKeyword"));
+        var partiallyColliding = MakeMethod(
+            1,
+            "Choose",
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    null,
+                    new KeywordTypeNode("StringKeyword")),
+                new TypeParameterModel(
+                    1,
+                    "U",
+                    null,
+                    new ReferenceTypeNode("T", "OrderingHost.Choose.T", [])),
+            ],
+            [],
+            new ReferenceTypeNode("U", "OrderingHost.Choose.U", []));
+        var orderingHost = MakeInterfaceSymbol(
+            "OrderingHost",
+            [ordinary, partiallyColliding]);
+        var orderingResult = new InterfaceEmitter(
+            new TypeResolver([orderingHost]),
+            "1.0.0",
+            "Blazor.DOM").Emit(orderingHost);
+        Assert.Contains("double Choose<T>();", orderingResult.Source);
+        Assert.DoesNotContain("U Choose<T, U>();", orderingResult.Source);
+        Assert.DoesNotContain("string Choose();", orderingResult.Source);
+        var orderingOutcome = Assert.Single(
+            orderingResult.MemberOutcomes,
+            outcome => outcome.Ordinal == 1);
+        Assert.Equal(MemberOutcomeStatus.Deferred, orderingOutcome.Status);
+        Assert.Equal("generic-method-defaults", orderingOutcome.Phase);
+
+        var legalVoid = MakeInterfaceSymbol(
+            "VoidHost",
+            [
+                MakeMethod(
+                    0,
+                    "Complete",
+                    [],
+                    [],
+                    new KeywordTypeNode("VoidKeyword")),
+            ]);
+        Assert.Contains(
+            "void Complete();",
+            new InterfaceEmitter(
+                new TypeResolver([legalVoid]),
+                "1.0.0",
+                "Blazor.DOM").Emit(legalVoid).Source);
     }
 
     [Fact]

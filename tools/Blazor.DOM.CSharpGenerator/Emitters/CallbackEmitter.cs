@@ -296,12 +296,20 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
         string returnType;
         try
         {
-            returnType = source.ReturnType is null
-                ? "void"
+            var returnProjection = source.ReturnType is null
+                ? null
                 : typeResolver.Project(
                     source.ReturnType,
                     $"{source.Provenance}/return",
-                    declarationScope).RenderedType;
+                    declarationScope);
+            if (returnProjection?.Identity.Kind == ClrTypeKind.Null)
+            {
+                throw new TypeProjectionException(
+                    $"Callback return at '{source.Provenance}' resolves to illegal " +
+                    $"standalone CLR type '{returnProjection.RenderedType}'.",
+                    $"{source.Provenance}/return");
+            }
+            returnType = returnProjection?.RenderedType ?? "void";
         }
         catch (GenericDeferralException)
         {
@@ -339,6 +347,13 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                     parameter.Type,
                     provenance,
                     declarationScope);
+                if (projection.Identity.Kind is ClrTypeKind.Null or ClrTypeKind.Void)
+                {
+                    throw new TypeProjectionException(
+                        $"Callback parameter '{parameter.Name}' resolves to illegal CLR " +
+                        $"type '{projection.RenderedType}'.",
+                        provenance);
+                }
                 var csType = projection.RenderedType;
                 var csName = Naming.ToCSharpParameterName(parameter.Name);
                 if (parameter.Rest)
