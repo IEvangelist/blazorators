@@ -5,6 +5,7 @@
 using Blazor.DOM.CSharpGenerator.Accounting;
 using Blazor.DOM.CSharpGenerator.Emitters;
 using Blazor.DOM.CSharpGenerator.IR;
+using Blazor.DOM.CSharpGenerator.Hosts;
 using Blazor.DOM.CSharpGenerator.Output;
 using Blazor.DOM.CSharpGenerator.Projection;
 
@@ -22,7 +23,8 @@ public sealed class GenerationPipeline
         IrBundle ir,
         string outputDirectory,
         IReadOnlyDictionary<string, EmitterOverrideEntry>? overrides = null,
-        bool verboseFailures = false)
+        bool verboseFailures = false,
+        bool emitHosts = false)
     {
         _ = verboseFailures;
         overrides ??= new Dictionary<string, EmitterOverrideEntry>(
@@ -86,6 +88,18 @@ public sealed class GenerationPipeline
             routingPlan,
             primaryEmissions).Emit(writer);
 
+        HostPackageGenerationResult? hostPackages = null;
+        if (emitHosts)
+        {
+            hostPackages = HostPackageEmitter.Emit(
+                ir,
+                writer,
+                overrides,
+                resolver,
+                routingPlan,
+                interfaceEmitter);
+        }
+
         foreach (var synthesized in resolver.SynthesizedTypes)
         {
             writer.Write(
@@ -126,7 +140,8 @@ public sealed class GenerationPipeline
             validation,
             writer.WrittenFiles,
             errors,
-            manifest);
+            manifest,
+            hostPackages);
     }
 
     private static PrimarySymbolEmission EmitPrimary(
@@ -688,7 +703,8 @@ public sealed record GenerationResult(
     AccountingValidationResult Validation,
     IReadOnlyList<GeneratedFile> WrittenFiles,
     IReadOnlyList<GenerationError> Errors,
-    EmitterManifest Manifest);
+    EmitterManifest Manifest,
+    HostPackageGenerationResult? HostPackages = null);
 
 public sealed record GenerationError(
     string SymbolName,

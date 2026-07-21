@@ -373,6 +373,14 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask<TValue> GetIndexAsync<TValue>(
         IJSObjectReference reference, int index, CancellationToken cancellationToken = default)
+        => await GetIndexAsync<TValue>(
+            reference,
+            (object)index,
+            cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask<TValue> GetIndexAsync<TValue>(
+        IJSObjectReference reference, object index, CancellationToken cancellationToken = default)
     {
         DomTransportValidator.ValidateJsonResult<TValue>();
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
@@ -384,6 +392,16 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     public async ValueTask<IJSObjectReference> GetIndexRefAsync(
         IJSObjectReference reference,
         int index,
+        CancellationToken cancellationToken = default)
+        => await GetIndexRefAsync(
+            reference,
+            (object)index,
+            cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask<IJSObjectReference> GetIndexRefAsync(
+        IJSObjectReference reference,
+        object index,
         CancellationToken cancellationToken = default)
     {
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
@@ -420,6 +438,15 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask SetIndexAsync(
         IJSObjectReference reference, int index, object? value, CancellationToken cancellationToken = default)
+        => await SetIndexAsync(
+            reference,
+            (object)index,
+            value,
+            cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask SetIndexAsync(
+        IJSObjectReference reference, object index, object? value, CancellationToken cancellationToken = default)
     {
         var preparedValue = DomArguments.PrepareValue(value, $"index [{index}]");
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);

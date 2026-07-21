@@ -77,6 +77,41 @@ public static class WasmDomDispatch
             arguments);
     }
 
+    /// <summary>Reads an indexed value synchronously.</summary>
+    public static TResult GetIndex<TResult>(
+        IDomDispatchProxy proxy,
+        object key,
+        DomTransportDescriptor transport)
+    {
+        DomDispatch.Validate(proxy, "index", transport);
+        var runtime = RequireSyncRuntime(proxy);
+        var reference = RequireSyncReference(proxy);
+        if (typeof(IDomProxy).IsAssignableFrom(typeof(TResult)))
+        {
+            transport.RequireReference(nameof(transport));
+            return (TResult)proxy.DispatchFactory.Create(
+                typeof(TResult),
+                runtime.GetIndexRef(reference, key));
+        }
+
+        DomDispatch.RequireJsonLike(transport);
+        return runtime.GetIndex<TResult>(reference, key);
+    }
+
+    /// <summary>Writes an indexed value synchronously.</summary>
+    public static void SetIndex<TValue>(
+        IDomDispatchProxy proxy,
+        object key,
+        TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(proxy);
+        ArgumentNullException.ThrowIfNull(key);
+        RequireSyncRuntime(proxy).SetIndex(
+            RequireSyncReference(proxy),
+            key,
+            value);
+    }
+
     private static IDomSyncRuntime RequireSyncRuntime(IDomDispatchProxy proxy) =>
         proxy.DispatchRuntime as IDomSyncRuntime
         ?? throw new InvalidOperationException(

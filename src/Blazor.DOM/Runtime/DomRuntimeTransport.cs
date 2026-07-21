@@ -154,7 +154,7 @@ internal static class DomRuntimeTransport
     public static ValueTask<IJSObjectReference> GetIndexObjectReferenceAsync(
         IJSObjectReference module,
         IJSObjectReference target,
-        int index,
+        object index,
         CancellationToken cancellationToken) =>
         ReceiveRequiredObjectReferenceAsync(
             module,

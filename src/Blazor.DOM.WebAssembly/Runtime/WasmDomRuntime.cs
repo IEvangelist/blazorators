@@ -170,12 +170,22 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public TValue GetIndex<TValue>(IJSInProcessObjectReference reference, int index) =>
+        GetIndex<TValue>(reference, (object)index);
+
+    /// <inheritdoc />
+    public TValue GetIndex<TValue>(IJSInProcessObjectReference reference, object index) =>
         GetJsonIndex<TValue>(reference, index);
 
     /// <inheritdoc />
     public IJSInProcessObjectReference GetIndexRef(
         IJSInProcessObjectReference reference,
         int index) =>
+        GetIndexRef(reference, (object)index);
+
+    /// <inheritdoc />
+    public IJSInProcessObjectReference GetIndexRef(
+        IJSInProcessObjectReference reference,
+        object index) =>
         GetSyncModule().Invoke<IJSInProcessObjectReference>(
             "getIndex",
             reference,
@@ -183,6 +193,10 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public void SetIndex(IJSInProcessObjectReference reference, int index, object? value) =>
+        SetIndex(reference, (object)index, value);
+
+    /// <inheritdoc />
+    public void SetIndex(IJSInProcessObjectReference reference, object index, object? value) =>
         GetSyncModule().InvokeVoid(
             "setIndex",
             reference,
@@ -199,7 +213,7 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
 
     private TValue GetJsonIndex<TValue>(
         IJSInProcessObjectReference reference,
-        int index)
+        object index)
     {
         DomTransportValidator.ValidateJsonResult<TValue>();
         return GetSyncModule().Invoke<TValue>("getIndex", reference, index);
@@ -475,6 +489,14 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask<TValue> GetIndexAsync<TValue>(
         IJSObjectReference reference, int index, CancellationToken cancellationToken = default)
+        => await GetIndexAsync<TValue>(
+            reference,
+            (object)index,
+            cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask<TValue> GetIndexAsync<TValue>(
+        IJSObjectReference reference, object index, CancellationToken cancellationToken = default)
     {
         DomTransportValidator.ValidateJsonResult<TValue>();
         var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);
@@ -486,6 +508,16 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
     public async ValueTask<IJSObjectReference> GetIndexRefAsync(
         IJSObjectReference reference,
         int index,
+        CancellationToken cancellationToken = default)
+        => await GetIndexRefAsync(
+            reference,
+            (object)index,
+            cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask<IJSObjectReference> GetIndexRefAsync(
+        IJSObjectReference reference,
+        object index,
         CancellationToken cancellationToken = default)
     {
         var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);
@@ -522,6 +554,15 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask SetIndexAsync(
         IJSObjectReference reference, int index, object? value, CancellationToken cancellationToken = default)
+        => await SetIndexAsync(
+            reference,
+            (object)index,
+            value,
+            cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask SetIndexAsync(
+        IJSObjectReference reference, object index, object? value, CancellationToken cancellationToken = default)
     {
         var preparedValue = DomArguments.PrepareValue(value, $"index [{index}]");
         var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);

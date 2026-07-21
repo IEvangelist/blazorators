@@ -76,7 +76,11 @@ int exitCode = 0;
 try
 {
     Console.Write("Generating (pass 1)...");
-    var result1 = GenerationPipeline.Run(ir, stagingRun1, overrides);
+    var result1 = GenerationPipeline.Run(
+        ir,
+        stagingRun1,
+        overrides,
+        emitHosts: true);
 
     Console.WriteLine($" done — {result1.WrittenFiles.Count} files.");
     Console.WriteLine($"  Projected         : {result1.Manifest.Accounting.Projected}");
@@ -143,7 +147,11 @@ try
     if (cliArgs.Verify)
     {
         Console.WriteLine("\nRunning second generation pass for byte-identity verification...");
-        var result2 = GenerationPipeline.Run(ir, stagingRun2, overrides);
+        var result2 = GenerationPipeline.Run(
+            ir,
+            stagingRun2,
+            overrides,
+            emitHosts: true);
 
         var scan1 = OutputVerifier.ScanDirectory(stagingRun1);
         var scan2 = OutputVerifier.ScanDirectory(stagingRun2);
