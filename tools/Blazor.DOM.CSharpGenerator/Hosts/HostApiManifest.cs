@@ -1,5 +1,7 @@
 namespace Blazor.DOM.CSharpGenerator.Hosts;
 
+using System.Text.Json.Serialization;
+
 public enum DomHostKind
 {
     Server,
@@ -23,7 +25,8 @@ public sealed record HostApiManifest(
     IReadOnlyList<string> HostSymbols,
     IReadOnlyList<HostApiOperation> Operations,
     IReadOnlyList<string> GeneratedFiles,
-    HostCapabilityMetadata? Capability = null)
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        HostCapabilityMetadata? Capability = null)
 {
     public IReadOnlyList<string> CoveredSymbols => SharedSymbols
         .Concat(HostSymbols)
