@@ -76,7 +76,7 @@ public sealed class EventMapEmitterTests
     }
 
     [Fact]
-    public void Emit_FailsClosedForNonReferencePayload()
+    public void Emit_JsonPayloadCreatesTypedValueDescriptor()
     {
         var invalid = EventMap(
             "InvalidEventMap",
@@ -87,14 +87,14 @@ public sealed class EventMapEmitterTests
                     "json-value", false, "number", false, true, null),
             })]);
 
-        var exception = Assert.Throws<TypeProjectionException>(() =>
-            new EventMapEmitter(
-                new TypeResolver([invalid]),
-                "1.0.0",
-                "Blazor.DOM",
-                [invalid]).Emit(invalid));
+        var result = new EventMapEmitter(
+            new TypeResolver([invalid]),
+            "1.0.0",
+            "Blazor.DOM",
+            [invalid]).Emit(invalid);
 
-        Assert.Contains("live-reference payload", exception.Message);
+        Assert.Contains("DomEventDescriptor<double>.Value(", result.Source);
+        Assert.Contains("\"count\"", result.Source);
     }
 
     [Fact]

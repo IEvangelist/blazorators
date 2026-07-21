@@ -128,12 +128,13 @@ public sealed class EventMapEmitter(
                     var projection = typeResolver.Project(
                         member.Type,
                         $"{provenance}/payload");
-                    if (projection.Transport?.Kind != "js-reference"
-                        || projection.Identity.Kind != ClrTypeKind.Reference)
+                    if (projection.Transport?.Kind is not ("js-reference" or "json-value")
+                        || projection.Transport.Kind == "js-reference"
+                        && projection.Identity.Kind != ClrTypeKind.Reference)
                     {
                         throw new TypeProjectionException(
                             $"Event '{member.Name.Text}' on '{symbol.Name}' must use " +
-                            "a reviewed live-reference payload transport.",
+                            "a reviewed live-reference or JSON-value payload transport.",
                             provenance);
                     }
                     var sourceType = projection.Transport.SourceType;
@@ -259,12 +260,20 @@ public sealed class EventMapEmitter(
                     writer.AppendLine(
                         $"public static global::Microsoft.JSInterop.DomEventDescriptor<" +
                         $"{entry.Projection.RenderedType}> {entry.MemberName} {{ get; }} =");
+                    var factory = entry.Projection.Transport?.Kind == "json-value"
+                        ? "Value"
+                        : "Reference";
                     writer.AppendLine(
                         $"    global::Microsoft.JSInterop.DomEventDescriptor<" +
-                        $"{entry.Projection.RenderedType}>.Reference(");
+                        $"{entry.Projection.RenderedType}>.{factory}(");
                     writer.AppendLine($"        \"{Escape(entry.Name)}\",");
                     writer.AppendLine($"        \"{Escape(symbol.Name)}\",");
                     writer.AppendLine($"        \"{Escape(entry.SourceType)}\",");
+                    if (factory == "Value")
+                    {
+                        writer.AppendLine(
+                            $"        {entry.Projection.IsNullable.ToString().ToLowerInvariant()},");
+                    }
                     writer.AppendLine(
                         $"        {entry.Deprecated.ToString().ToLowerInvariant()},");
                     for (var provenanceIndex = 0;

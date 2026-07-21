@@ -51,4 +51,16 @@ public interface IDomEventTargetProxy : IDomProxy
         DomEventListenerOptions? options = null,
         CancellationToken cancellationToken = default)
         where TEvent : class, IDomProxy;
+
+    /// <summary>Subscribes to an event whose payload is a proven JSON value.</summary>
+    [DomEventSubscription(
+        DomEventSubscriptionOperation.Subscribe,
+        SupportsOmittedOptions = true,
+        SupportsBooleanCapture = true,
+        SupportsObjectOptions = true)]
+    ValueTask<DomEventSubscription> SubscribeValueAsync<TValue>(
+        DomEventDescriptor<TValue> descriptor,
+        Func<TValue, Task> callback,
+        DomEventListenerOptions? options = null,
+        CancellationToken cancellationToken = default);
 }

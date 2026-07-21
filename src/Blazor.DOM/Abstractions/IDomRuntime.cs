@@ -247,6 +247,14 @@ public interface IDomRuntime
             CancellationToken cancellationToken = default)
         where TEvent : class, IDomProxy;
 
+    /// <summary>Attaches a descriptor-selected, proven JSON-valued listener.</summary>
+    ValueTask<DomEventSubscription> SubscribeValueAsync<TValue>(
+        IJSObjectReference target,
+        DomEventDescriptor<TValue> descriptor,
+        Func<TValue, Task> callback,
+        DomEventListenerOptions? options = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Removes a previously registered event listener by its runtime ID.
     /// Called automatically by <see cref="DomEventSubscription.DisposeAsync"/>.

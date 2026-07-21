@@ -467,14 +467,58 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
                 target,
                 type,
                 handlerRef,
+                null,
                 cancellationToken).ConfigureAwait(false);
 
             return new DomEventSubscription(this, listenerId, handlerRef);
         }
+
         catch
         {
             handler.Dispose();
             handlerRef.Dispose();
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<DomEventSubscription> SubscribeValueAsync<TValue>(
+        IJSObjectReference target,
+        DomEventDescriptor<TValue> descriptor,
+        Func<TValue, Task> callback,
+        DomEventListenerOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(descriptor);
+        ArgumentNullException.ThrowIfNull(callback);
+        if (descriptor.Transport.Kind != DomTransportKind.JsonValue)
+        {
+            throw new ArgumentException(
+                "Value subscriptions require a JSON-valued descriptor.",
+                nameof(descriptor));
+        }
+        var handler = new DomCallbackHandler(json =>
+        {
+            var value = System.Text.Json.JsonSerializer.Deserialize<TValue>(json);
+            return callback(value!);
+        });
+        var handlerReference = DotNetObjectReference.Create(handler);
+        try
+        {
+            var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+            var listenerId = await DomRuntimeTransport.AddEventListenerAsync(
+                module,
+                target,
+                descriptor.Name,
+                handlerReference,
+                options,
+                cancellationToken).ConfigureAwait(false);
+            return new DomEventSubscription(this, listenerId, handlerReference);
+        }
+        catch
+        {
+            handler.Dispose();
+            handlerReference.Dispose();
             throw;
         }
     }

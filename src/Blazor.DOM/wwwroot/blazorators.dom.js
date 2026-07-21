@@ -335,6 +335,7 @@ let _nextListenerId = 1;
  * @param {string}               callbackMethodName JSInvokable method name on the dotnet side
  * @param {DotNetObjectReference} registrationDotnetRef Registration receiver
  * @param {string} registrationCallbackMethodName Registration callback method
+ * @param {boolean|AddEventListenerOptions|null} options
  * @returns {Promise<void>}
  */
 export async function addDotNetEventListener(
@@ -343,15 +344,16 @@ export async function addDotNetEventListener(
     dotnetRef,
     callbackMethodName,
     registrationDotnetRef,
-    registrationCallbackMethodName) {
+    registrationCallbackMethodName,
+    options) {
     const id = _nextListenerId++;
     const listener = (event) => {
         const eventData = _serializeEvent(event);
         dotnetRef.invokeMethodAsync(callbackMethodName, JSON.stringify(eventData))
             .catch((err) => console.error(`[blazorators.dom] event callback error (${type}):`, err));
     };
-    target.addEventListener(type, listener);
-    _listeners.set(id, { target, type, listener, dotnetRef });
+    target.addEventListener(type, listener, options ?? false);
+    _listeners.set(id, { target, type, listener, dotnetRef, options });
     try {
         const accepted = await registrationDotnetRef.invokeMethodAsync(
             registrationCallbackMethodName,
@@ -425,7 +427,10 @@ export async function addDotNetReferenceEventListener(
 export function removeDotNetEventListener(id) {
     const entry = _listeners.get(id);
     if (!entry) return;
-    entry.target.removeEventListener(entry.type, entry.listener);
+    entry.target.removeEventListener(
+        entry.type,
+        entry.listener,
+        entry.options ?? false);
     try { entry.dotnetRef.dispose(); } catch { /* already disposed */ }
     _listeners.delete(id);
 }
