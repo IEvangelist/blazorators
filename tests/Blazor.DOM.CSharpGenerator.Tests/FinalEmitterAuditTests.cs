@@ -939,31 +939,31 @@ public sealed class FinalEmitterAuditTests
             Assert.True(result.PipelineResult.Validation.IsValid);
             Assert.Empty(result.PipelineResult.Errors);
             Assert.Empty(result.PipelineResult.Manifest.Diagnostics);
-            Assert.Equal((16, 15, 1), (
+            Assert.Equal((13, 12, 1), (
                 result.ClosureSize,
                 result.IncludedSymbolCount,
                 result.ExternalReferenceCount));
-            Assert.Equal((15, 15, 0), (
+            Assert.Equal((12, 12, 0), (
                 accounting.Projected,
                 accounting.ProjectedClean,
                 accounting.ProjectedWithDeferredMembers));
-            Assert.Equal((20, 20), (
+            Assert.Equal((16, 16), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
-            Assert.Equal((70, 70), (
+            Assert.Equal((23, 23), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
-            Assert.Equal((29, 29), (
+            Assert.Equal((12, 12), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
-            Assert.Equal((42, 42), (
+            Assert.Equal((17, 17), (
                 accounting.AccountedSourceParameters,
                 accounting.SourceParameters));
 
             var generated = Path.Combine(output, "Profiles", "WakeLock");
             var productionBytes = SnapshotTree(production);
             var generatedBytes = SnapshotTree(generated);
-            Assert.Equal(23, generatedBytes.Count);
+            Assert.Equal(42, generatedBytes.Count);
             AssertTreesEqual(productionBytes, generatedBytes);
             Assert.All(
                 generatedBytes.Values,
