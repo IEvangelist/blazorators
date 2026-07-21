@@ -8,6 +8,15 @@ namespace Microsoft.JSInterop;
 /// </summary>
 public static class DomDispatch
 {
+    /// <summary>Infers transport for a standard structural container result.</summary>
+    public static DomTransportDescriptor InferTransport<TResult>(string sourceType)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceType);
+        return typeof(IDomProxy).IsAssignableFrom(typeof(TResult))
+            ? DomTransportDescriptor.JsReference(sourceType)
+            : DomTransportDescriptor.JsonValue(sourceType);
+    }
+
     /// <summary>Reads a Server/async property using reviewed transport metadata.</summary>
     public static async ValueTask<TResult> GetPropertyAsync<TResult>(
         IDomDispatchProxy proxy,

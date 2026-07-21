@@ -31,6 +31,8 @@ jobs:
         - Blazor.SpeechSynthesis
         - Blazor.SpeechRecognition.WebAssembly
         - Blazor.SpeechRecognition
+        - Blazor.DOM
+        - Blazor.DOM.WebAssembly
     steps:
     - uses: actions/checkout@main
 

@@ -34,7 +34,9 @@
     <IncludeSymbols>false</IncludeSymbols>
     <IncludeSource>false</IncludeSource>
     <RootNamespace>Blazor.DOM.WebAssembly</RootNamespace>
-    <NoWarn>NU5125;NU5039;</NoWarn>
+    <!-- Generated lib.dom inheritance intentionally preserves obsolete bases and
+         TypeScript redeclarations that C# reports as member hiding. -->
+    <NoWarn>NU5125;NU5039;CS0108;CS0612;CS8766;</NoWarn>
     <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
     <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -68,8 +70,35 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Blazor.DOM\Blazor.DOM.csproj" />
+  <ItemGroup Label="Shared runtime sources">
+    <Compile Include="..\Blazor.DOM\Abstractions\**\*.cs"
+             LinkBase="SharedRuntime\Abstractions" />
+    <Compile Include="..\Blazor.DOM\Exceptions\**\*.cs"
+             LinkBase="SharedRuntime\Exceptions" />
+    <Compile Include="..\Blazor.DOM\Proxies\**\*.cs"
+             LinkBase="SharedRuntime\Proxies" />
+    <Compile Include="..\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
+             Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
+    <Content Include="..\Blazor.DOM\wwwroot\blazorators.dom.js"
+             Link="wwwroot\blazorators.dom.js"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup Label="Generated DOM contracts">
+    <Compile Include="..\..\data\Blazor.DOM.Generated\AdvancedTypes\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Callbacks\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Dictionaries\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Enums\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\EventMaps\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Typedefs\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\WebAssembly\Interfaces\**\*.cs" />
+    <Compile Include="..\..\data\Blazor.DOM.Generated\WebAssembly\GeneratedDomHost.g.cs" />
+    <None Include="..\..\data\Blazor.DOM.Generated\WebAssembly\host-manifest.json"
+          Pack="true"
+          PackagePath="build\Blazor.DOM.WebAssembly.host-manifest.json" />
+    <None Include="..\..\data\Blazor.DOM.Generated\host-parity.json"
+          Pack="true"
+          PackagePath="build\Blazor.DOM.WebAssembly.host-parity.json" />
   </ItemGroup>
 
   <ItemGroup Label="Files">

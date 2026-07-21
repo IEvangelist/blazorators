@@ -40,7 +40,12 @@ public static class DomWebAssemblyServiceCollectionExtensions
 
         // Proxy factory — receives IDomRuntime which is actually WasmDomRuntime.
         services.AddScoped<IDomProxyFactory>(
-            static sp => new DomProxyFactory(sp.GetRequiredService<IDomRuntime>()));
+            static sp =>
+            {
+                var factory = new DomProxyFactory(sp.GetRequiredService<IDomRuntime>());
+                global::Microsoft.JSInterop.GeneratedDomHost.RegisterProxies(factory);
+                return factory;
+            });
 
         services.AddScoped<IBrowser, WasmBrowser>();
 

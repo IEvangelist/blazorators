@@ -137,7 +137,7 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         {
             w.AppendLine($"public {innerType} Value {{ get; }}");
             w.AppendLine($"public {csName}({innerType} value) => Value = value;");
-            if (!isIface)
+            if (!isIface && CanEmitImplicitConversion(innerType))
             {
                 w.AppendLine($"public static implicit operator {innerType}({declaredName} a) => a.Value;");
                 w.AppendLine($"public static implicit operator {declaredName}({innerType} v) => new(v);");
@@ -179,11 +179,12 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             w.AppendLine($"public {innerType}? Value {{ get; }}");
             w.AppendLine($"public bool HasValue => Value is not null;");
             w.AppendLine($"public {csName}({innerType}? value) => Value = value;");
-            if (!isIface)
+            if (!isIface && CanEmitImplicitConversion(innerType))
             {
                 w.AppendLine($"public static implicit operator {innerType}?({declaredName} a) => a.Value;");
                 w.AppendLine($"public static implicit operator {declaredName}({innerType}? v) => new(v);");
             }
+
             else
             {
                 w.AppendLine($"public static {declaredName} From({innerType}? v) => new(v);");
@@ -192,6 +193,10 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         });
         return w.ToString();
     }
+
+    private static bool CanEmitImplicitConversion(string innerType) =>
+        !string.Equals(innerType, "object", StringComparison.Ordinal)
+        && !innerType.Contains("IntersectionShape_", StringComparison.Ordinal);
 
     private string EmitMixedUnionWrapper(
         SymbolModel symbol,

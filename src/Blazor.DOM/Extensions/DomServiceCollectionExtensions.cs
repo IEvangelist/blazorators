@@ -26,7 +26,12 @@ public static class DomServiceCollectionExtensions
         services.AddScoped<IDomRuntime>(
             static sp => sp.GetRequiredService<ServerDomRuntime>());
         services.AddScoped<IDomProxyFactory>(
-            static sp => new DomProxyFactory(sp.GetRequiredService<IDomRuntime>()));
+            static sp =>
+            {
+                var factory = new DomProxyFactory(sp.GetRequiredService<IDomRuntime>());
+                global::Microsoft.JSInterop.GeneratedDomHost.RegisterProxies(factory);
+                return factory;
+            });
         services.AddScoped<IBrowser, ServerBrowser>();
 
         return services;
