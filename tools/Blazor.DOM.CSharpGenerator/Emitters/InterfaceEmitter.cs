@@ -176,6 +176,7 @@ public sealed class InterfaceEmitter(
         var emittedDeferredMethodOutputs = new HashSet<string>(StringComparer.Ordinal);
         var emittedMethodKeys = new Dictionary<string, MethodSig>(StringComparer.Ordinal);
         var emittedMethodOutputIndices = new Dictionary<string, int>(StringComparer.Ordinal);
+        var emittedIndexSignatures = new HashSet<string>(StringComparer.Ordinal);
         var literalDispatchMethods = FindLiteralDispatchMethods(allDecls);
 
         var reconciledAccessors = new AccessorReconciler(typeResolver).Reconcile(
@@ -471,14 +472,42 @@ public sealed class InterfaceEmitter(
             }
 
             foreach (var m in decl.Members.Where(m => m.Kind == "indexSignature"))
-                memberOutcomes.Add(new MemberOutcome(
-                    m.Ordinal,
-                    m.Name?.Text ?? "indexSignature",
-                    "indexSignature",
-                    MemberOutcomeStatus.Deferred,
-                    "index-accessor",
-                    "Index signatures deferred to index-accessor phase.",
-                    decl.Ordinal));
+            {
+                try
+                {
+                    var indexAccessor = BuildIndexAccessor(
+                        m,
+                        symbol.Name,
+                        decl.Ordinal,
+                        generic.Scope);
+                    if (emittedIndexSignatures.Add(indexAccessor.CanonicalKey))
+                        propertyOutputs.Add(indexAccessor.Rendered);
+                    memberOutcomes.Add(new MemberOutcome(
+                        m.Ordinal,
+                        m.Name?.Text ?? "indexSignature",
+                        "indexSignature",
+                        MemberOutcomeStatus.Projected,
+                        null,
+                        "Emitted explicit typed indexed get/set operations.",
+                        decl.Ordinal));
+                }
+                catch (GenericDeferralException)
+                {
+                    throw;
+                }
+                catch (TypeProjectionException exception)
+                {
+                    memberFailures.Add(exception);
+                    memberOutcomes.Add(new MemberOutcome(
+                        m.Ordinal,
+                        m.Name?.Text ?? "indexSignature",
+                        "indexSignature",
+                        MemberOutcomeStatus.Failed,
+                        null,
+                        exception.Message,
+                        decl.Ordinal));
+                }
+            }
 
             foreach (var m in decl.Members.Where(m => m.Kind == "callSignature"))
                 memberOutcomes.Add(new MemberOutcome(
@@ -1192,6 +1221,15 @@ public sealed class InterfaceEmitter(
         w.XmlDoc(docText, deprecated);
         foreach (var defaultNote in methodGeneric.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        if (memberName is "Symbol.iterator" or "Symbol.asyncIterator")
+        {
+            var symbol = memberName == "Symbol.iterator"
+                ? "Iterator"
+                : "AsyncIterator";
+            w.AppendLine(
+                "[global::Microsoft.JSInterop.DomSymbol(" +
+                $"global::Microsoft.JSInterop.DomWellKnownSymbol.{symbol})]");
+        }
         w.AppendLine(
             $"{csReturn} {emittedName}{methodGeneric.TypeParameterList}(" +
             $"{string.Join(", ", parts)}){methodGeneric.ConstraintSuffix};");
@@ -1342,6 +1380,115 @@ public sealed class InterfaceEmitter(
             ReturnProjection: returnProjection,
             ReturnSources: [returnSource],
             Scope: methodGeneric.Scope);
+    }
+
+    private sealed record IndexAccessorBuild(string Rendered, string CanonicalKey);
+
+    private IndexAccessorBuild BuildIndexAccessor(
+        MemberModel member,
+        string symbolName,
+        int declarationOrdinal,
+        GenericScope scope)
+    {
+        var provenance =
+            $"{symbolName}/decl[{declarationOrdinal}]/member[{member.Ordinal}]/indexSignature";
+        if (member.Parameters.Count != 1
+            || member.Parameters[0].Type is null)
+        {
+            throw new TypeProjectionException(
+                $"Index signature at '{provenance}' must have exactly one typed key parameter.",
+                provenance);
+        }
+        var parameter = member.Parameters[0];
+        var keySourceType = parameter.Type!;
+        var valueSource = member.ReturnType ?? member.Type
+            ?? throw new TypeProjectionException(
+                $"Index signature at '{provenance}' has no value type.",
+                provenance);
+        var key = typeResolver.Project(
+            keySourceType,
+            $"{provenance}/key",
+            scope);
+        var value = typeResolver.Project(
+            valueSource,
+            $"{provenance}/value",
+            scope);
+        if (key.Identity.Kind is ClrTypeKind.Null or ClrTypeKind.Void
+            || value.Identity.Kind is ClrTypeKind.Null or ClrTypeKind.Void)
+        {
+            throw new TypeProjectionException(
+                $"Index signature at '{provenance}' projects an illegal key or value type.",
+                provenance);
+        }
+
+        var keyKind = key.CanonicalType switch
+        {
+            "string" => "String",
+            "double" or "float" or "decimal" or "byte" or "sbyte" or "short"
+                or "ushort" or "int" or "uint" or "long" or "ulong" => "Number",
+            _ when keySourceType.CheckerType == "symbol" => "Symbol",
+            _ => throw new TypeProjectionException(
+                $"Index signature at '{provenance}' uses unsupported key type " +
+                $"'{keySourceType.CheckerType ?? key.RenderedType}'.",
+                $"{provenance}/key"),
+        };
+        var keyName = Naming.ToCSharpParameterName(parameter.Name);
+        var writer = new CSharpWriter();
+        writer.AppendLine(RenderIndexMetadata(
+            "Get",
+            keyKind,
+            keySourceType,
+            value));
+        writer.AppendLine(
+            $"{value.RenderedType} GetIndexedValueBy{keyKind}" +
+            $"({key.RenderedType} {keyName});");
+        if (!member.Readonly)
+        {
+            writer.AppendLine(RenderIndexMetadata(
+                "Set",
+                keyKind,
+                keySourceType,
+                value));
+            writer.AppendLine(
+                $"void SetIndexedValueBy{keyKind}({key.RenderedType} {keyName}, " +
+                $"{value.RenderedType} value);");
+        }
+        return new IndexAccessorBuild(
+            writer.ToString().TrimEnd(),
+            $"{key.CanonicalType}->{value.CanonicalType}:{member.Readonly}");
+    }
+
+    private static string RenderIndexMetadata(
+        string operation,
+        string keyKind,
+        TypeNode key,
+        TypeProjection value)
+    {
+        var transport = value.Transport;
+        var transportKind = transport?.Kind switch
+        {
+            "json-value" => "JsonValue",
+            "js-reference" => "JsReference",
+            "js-stream" => "JsStream",
+            "binary" => "Binary",
+            "transferable" => "Transferable",
+            _ => "Unsupported",
+        };
+        var keySource = key.Transport?.SourceType
+            ?? key.CheckerType
+            ?? key.Kind;
+        var valueSource = transport?.SourceType
+            ?? value.CSharpType;
+        return
+            "[global::Microsoft.JSInterop.DomIndexAccessor(" +
+            $"global::Microsoft.JSInterop.DomAccessorOperation.{operation}, " +
+            $"global::Microsoft.JSInterop.DomIndexKeyKind.{keyKind}, " +
+            $"\"{EscapeCSharp(keySource)}\", " +
+            $"global::Microsoft.JSInterop.DomTransportKind.{transportKind}, " +
+            $"\"{EscapeCSharp(valueSource)}\", " +
+            $"Nullable = {(value.IsNullable || transport?.Nullable == true).ToString().ToLowerInvariant()}, " +
+            $"Streamable = {(transport?.Streamable == true).ToString().ToLowerInvariant()}, " +
+            $"StructuredClone = {(transport?.StructuredClone == true).ToString().ToLowerInvariant()})]";
     }
 
     private static HashSet<(int DeclarationOrdinal, int MemberOrdinal)>

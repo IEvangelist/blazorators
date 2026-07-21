@@ -49,6 +49,20 @@ public sealed class GenericEmitterTests
                 "T StructuredClone<T>(T @value, StructuredSerializeOptions? options = default);",
                 Read(output, "Interfaces", "IWindowOrWorkerGlobalScope.g.cs"));
             Assert.Contains(
+                "DomWellKnownSymbol.Iterator",
+                Read(output, "Interfaces", "IHeaders.g.cs"));
+            var indexedCss = Read(
+                output,
+                "Interfaces",
+                "ICSSStyleDeclaration.g.cs");
+            Assert.Contains("DomIndexKeyKind.Number", indexedCss);
+            Assert.Contains(
+                "string GetIndexedValueByNumber(double index);",
+                indexedCss);
+            Assert.Contains(
+                "void SetIndexedValueByNumber(double index, string value);",
+                indexedCss);
+            Assert.DoesNotContain(
                 result.Manifest.Accounting.DeferredSymbols,
                 entry => entry.Symbol == "FormDataIterator"
                     && entry.Phase == "iterator-transport");
@@ -220,7 +234,8 @@ public sealed class GenericEmitterTests
                     [new KeywordTypeNode("VoidKeyword")]),
                 "fixture/promise-like").RenderedType);
         Assert.Equal(
-            "IAsyncEnumerable<string>",
+            "global::Microsoft.JSInterop.IBrowserAsyncIterator<string, " +
+            "global::Microsoft.JSInterop.BrowserUndefined, object>",
             resolver.Project(
                 new ReferenceTypeNode(
                     "AsyncIteratorObject",
@@ -566,18 +581,20 @@ public sealed class GenericEmitterTests
             "Iterator proxy transport is not implemented.");
         var resolver = new TypeResolver([MakeInterfaceSymbol("Mutable", [])]);
 
-        var iteratorError = Assert.Throws<GenericDeferralException>(() =>
-            resolver.Project(
-                new ReferenceTypeNode(
-                    "IteratorObject",
-                    "IteratorObject",
-                    [new KeywordTypeNode("StringKeyword")])
-                {
-                    Transport = unsupportedTransport,
-                },
-                "fixture/iterator"));
-        Assert.Equal("iterator-transport", iteratorError.Phase);
-        Assert.Equal("fixture/iterator/transport", iteratorError.Provenance);
+        var iterator = resolver.Project(
+            new ReferenceTypeNode(
+                "IteratorObject",
+                "IteratorObject",
+                [new KeywordTypeNode("StringKeyword")])
+            {
+                Transport = unsupportedTransport,
+            },
+            "fixture/iterator");
+        Assert.Equal(
+            "global::Microsoft.JSInterop.IBrowserIterator<string, " +
+            "global::Microsoft.JSInterop.BrowserUndefined, object>",
+            iterator.RenderedType);
+        Assert.Equal("js-reference", iterator.Transport?.Kind);
 
         var readonlyError = Assert.Throws<GenericDeferralException>(() =>
             resolver.Project(
