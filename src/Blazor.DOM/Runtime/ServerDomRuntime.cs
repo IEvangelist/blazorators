@@ -176,6 +176,25 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     }
 
     /// <inheritdoc />
+    public async ValueTask<TResult> InvokeMethodUnionAsync<TResult>(
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        IReadOnlyList<DomUnionInboundArm<TResult>> arms,
+        CancellationToken cancellationToken = default)
+    {
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.InvokeMethodUnionAsync(
+            module,
+            reference,
+            name,
+            preparedArgs,
+            arms,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask InvokeMethodVoidAsync(
         IJSObjectReference reference, string name, object?[]? args, CancellationToken cancellationToken = default)
     {

@@ -199,6 +199,94 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Inbound_union_delivers_discriminated_JSON_arm(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        host.Module.InvocationHandlers["invokeMethodUnion"] = async (args, _) =>
+        {
+            var handler = Assert.IsType<
+                DotNetObjectReference<DomUnionDeliveryHandler<string>>>(args![4]);
+            Assert.True(await handler.Value.ReceiveJsonAsync(
+                0,
+                JsonSerializer.SerializeToElement("clipboard text")));
+            return null;
+        };
+
+        var result = await host.Runtime.InvokeMethodUnionAsync(
+            new FakeJSObjectReference(),
+            "read",
+            null,
+            [
+                DomUnionInboundArm<string>.String(value => $"text:{value}"),
+                DomUnionInboundArm<string>.Reference("Blob", _ => "blob"),
+            ]);
+
+        Assert.Equal("text:clipboard text", result);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Inbound_union_delivers_discriminated_reference_arm(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var reference = new FakeJSObjectReference();
+        host.Module.InvocationHandlers["invokeMethodUnion"] = async (args, _) =>
+        {
+            var handler = Assert.IsType<
+                DotNetObjectReference<DomUnionDeliveryHandler<string>>>(args![4]);
+            Assert.True(await handler.Value.ReceiveReferenceAsync(1, reference));
+            return null;
+        };
+
+        var result = await host.Runtime.InvokeMethodUnionAsync(
+            new FakeJSObjectReference(),
+            "read",
+            null,
+            [
+                DomUnionInboundArm<string>.String(value => $"text:{value}"),
+                DomUnionInboundArm<string>.Reference(
+                    "Blob",
+                    value => ReferenceEquals(reference, value) ? "blob" : "wrong"),
+            ]);
+
+        Assert.Equal("blob", result);
+        Assert.False(reference.IsDisposed);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Inbound_union_factory_failure_rolls_back_reference(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var reference = new FakeJSObjectReference();
+        host.Module.InvocationHandlers["invokeMethodUnion"] = async (args, _) =>
+        {
+            var handler = Assert.IsType<
+                DotNetObjectReference<DomUnionDeliveryHandler<string>>>(args![4]);
+            Assert.True(await handler.Value.ReceiveReferenceAsync(0, reference));
+            return null;
+        };
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => host.Runtime.InvokeMethodUnionAsync(
+                new FakeJSObjectReference(),
+                "read",
+                null,
+                [
+                    DomUnionInboundArm<string>.Reference(
+                        "Blob",
+                        _ => throw new InvalidOperationException("factory failed")),
+                ]).AsTask());
+
+        Assert.True(reference.IsDisposed);
+        Assert.Equal(1, reference.DisposeCallCount);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Unsupported_transport_fails_before_JS_invocation(bool wasm)
     {
         var host = CreateHost(wasm);

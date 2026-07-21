@@ -64,6 +64,59 @@ export function invokeMethod(ref, name, args) {
     return ref[name](...(args ?? []));
 }
 
+export function selectUnionArm(value, arms) {
+    for (let index = 0; index < arms.length; index++) {
+        const arm = arms[index];
+        if (arm.kind === 'string-literal' &&
+            typeof value === 'string' &&
+            value === arm.literal) {
+            return index;
+        }
+    }
+    for (let index = 0; index < arms.length; index++) {
+        const arm = arms[index];
+        if (arm.kind === 'string' && typeof value === 'string') return index;
+        if (arm.kind === 'reference') {
+            const ctor = globalThis[arm.brand];
+            if (typeof ctor === 'function' && value instanceof ctor) return index;
+        }
+    }
+    throw new TypeError('JavaScript value does not match a proven union arm.');
+}
+
+export async function invokeMethodUnion(
+    ref,
+    name,
+    args,
+    arms,
+    dotnetRef,
+    jsonCallbackMethodName,
+    referenceCallbackMethodName) {
+    const value = await ref[name](...(args ?? []));
+    const armIndex = selectUnionArm(value, arms);
+    const arm = arms[armIndex];
+    if (arm.kind !== 'reference') {
+        const accepted = await dotnetRef.invokeMethodAsync(
+            jsonCallbackMethodName,
+            armIndex,
+            value);
+        _requireDeliveryAcknowledgement(accepted, 'union JSON');
+        return;
+    }
+
+    const reference = DotNet.createJSObjectReference(value);
+    try {
+        const accepted = await dotnetRef.invokeMethodAsync(
+            referenceCallbackMethodName,
+            armIndex,
+            reference);
+        _requireDeliveryAcknowledgement(accepted, 'union reference');
+    } catch (error) {
+        _disposeJSReference(reference);
+        throw error;
+    }
+}
+
 export async function getPropertyDotNetObjectReference(
     ref,
     name,
