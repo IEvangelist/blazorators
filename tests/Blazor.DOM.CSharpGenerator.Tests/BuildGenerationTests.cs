@@ -153,6 +153,8 @@ public sealed class BuildGenerationTests
                 "Blazor.StorageManagement.WebAssembly",
                 "Blazor.Screen",
                 "Blazor.Screen.WebAssembly",
+                "Blazor.OfflineStorage",
+                "Blazor.OfflineStorage.WebAssembly",
             ];
             foreach (var focusedPackageName in focusedPackages)
             {
