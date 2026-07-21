@@ -19,6 +19,9 @@ public static class ProfilePipeline
         [
             "ArrayBuffer",
             "ArrayBufferView",
+            "Array",
+            "AsyncIteratorObject",
+            "BuiltinIteratorReturn",
             "Date",
             "Error",
             "Exclude",
@@ -384,55 +387,55 @@ public static class ProfilePipeline
                     $"Entry point '{entryPoint.Name}' is outside the resolved closure.");
             }
         }
+    }
 
-        private static void ValidateReviewedExclusions(
-            ProfileDefinition profile,
-            IReadOnlyDictionary<string, SymbolModel> sourceIndex,
-            IReadOnlyDictionary<string, SymbolModel> generationIndex)
+    private static void ValidateReviewedExclusions(
+        ProfileDefinition profile,
+        IReadOnlyDictionary<string, SymbolModel> sourceIndex,
+        IReadOnlyDictionary<string, SymbolModel> generationIndex)
+    {
+        foreach (var exclusion in profile.ReviewedExclusions ?? [])
         {
-            foreach (var exclusion in profile.ReviewedExclusions ?? [])
+            if (!sourceIndex.TryGetValue(exclusion.Symbol, out var source))
             {
-                if (!sourceIndex.TryGetValue(exclusion.Symbol, out var source))
-                {
-                    throw new InvalidDataException(
-                        $"Package profile '{profile.Name}' reviewed exclusion references " +
-                        $"missing symbol '{exclusion.Symbol}'.");
-                }
-
-                var sourceMatches = MatchingMembers(source, exclusion.Member).ToList();
-                if (sourceMatches.Count == 0)
-                {
-                    throw new InvalidDataException(
-                        $"Package profile '{profile.Name}' reviewed exclusion did not match " +
-                        $"'{exclusion.Symbol}.{exclusion.Member}'.");
-                }
-
-                if (generationIndex.TryGetValue(exclusion.Symbol, out var selected)
-                    && MatchingMembers(selected, exclusion.Member).Any())
-                {
-                    throw new InvalidDataException(
-                        $"Package profile '{profile.Name}' reviewed exclusion " +
-                        $"'{exclusion.Symbol}.{exclusion.Member}' is still selected.");
-                }
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' reviewed exclusion references " +
+                    $"missing symbol '{exclusion.Symbol}'.");
             }
 
-            static IEnumerable<MemberModel> MatchingMembers(
-                SymbolModel symbol,
-                string memberIdentity)
+            var sourceMatches = MatchingMembers(source, exclusion.Member).ToList();
+            if (sourceMatches.Count == 0)
             {
-                foreach (var declaration in symbol.Declarations)
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' reviewed exclusion did not match " +
+                    $"'{exclusion.Symbol}.{exclusion.Member}'.");
+            }
+
+            if (generationIndex.TryGetValue(exclusion.Symbol, out var selected)
+                && MatchingMembers(selected, exclusion.Member).Any())
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' reviewed exclusion " +
+                    $"'{exclusion.Symbol}.{exclusion.Member}' is still selected.");
+            }
+        }
+
+        static IEnumerable<MemberModel> MatchingMembers(
+            SymbolModel symbol,
+            string memberIdentity)
+        {
+            foreach (var declaration in symbol.Declarations)
+            {
+                foreach (var member in declaration.Members)
                 {
-                    foreach (var member in declaration.Members)
+                    var name = member.Name?.Text ?? $"${member.Kind}";
+                    if (string.Equals(memberIdentity, name, StringComparison.Ordinal)
+                        || string.Equals(
+                            memberIdentity,
+                            $"{name}@{declaration.Ordinal}/{member.Ordinal}",
+                            StringComparison.Ordinal))
                     {
-                        var name = member.Name?.Text ?? $"${member.Kind}";
-                        if (string.Equals(memberIdentity, name, StringComparison.Ordinal)
-                            || string.Equals(
-                                memberIdentity,
-                                $"{name}@{declaration.Ordinal}/{member.Ordinal}",
-                                StringComparison.Ordinal))
-                        {
-                            yield return member;
-                        }
+                        yield return member;
                     }
                 }
             }
