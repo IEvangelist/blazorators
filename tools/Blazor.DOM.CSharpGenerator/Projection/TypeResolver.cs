@@ -1142,12 +1142,6 @@ public sealed class TypeResolver
             };
         }
 
-        // EventHandler -> not projected (deferred to events phase)
-        if (name is "EventHandler" or "OnErrorEventHandler" or "OnBeforeUnloadEventHandler")
-            throw new TypeProjectionException(
-                $"EventHandler type '{name}' at '{provenance}' is deferred to the events phase.",
-                provenance);
-
         // ResolvedSymbol is authoritative for namespace-local references. Falling
         // back to Name is allowed only when the extractor did not resolve a
         // symbol, or when both spellings are identical.

@@ -271,6 +271,7 @@ internal static class DomRuntimeTransport
             IJSObjectReference target,
             string type,
             DomTransportDescriptor transport,
+            DomEventListenerOptions? options,
             Func<DomBorrowedReference<TProxy>, Task> callback,
             CancellationToken cancellationToken)
         where TProxy : class, IDomProxy
@@ -310,6 +311,7 @@ internal static class DomRuntimeTransport
                     "HandleReference",
                     registrationHandlerReference,
                     "ReceiveRegistration",
+                    options?.ToInteropValue(),
                 ])
                 .ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();

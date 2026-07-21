@@ -234,6 +234,20 @@ public interface IDomRuntime
         where TProxy : class, IDomProxy;
 
     /// <summary>
+    /// Attaches a listener from generated descriptor metadata, retaining the
+    /// exact options with the established reference-listener registration.
+    /// </summary>
+    ValueTask<DomReferenceEventSubscription<TEvent>>
+        SubscribeAsync<TEvent>(
+            IJSObjectReference target,
+            DomEventDescriptor<TEvent> descriptor,
+            IDomProxyFactory proxyFactory,
+            Func<DomBorrowedReference<TEvent>, Task> callback,
+            DomEventListenerOptions? options = null,
+            CancellationToken cancellationToken = default)
+        where TEvent : class, IDomProxy;
+
+    /// <summary>
     /// Removes a previously registered event listener by its runtime ID.
     /// Called automatically by <see cref="DomEventSubscription.DisposeAsync"/>.
     /// </summary>
