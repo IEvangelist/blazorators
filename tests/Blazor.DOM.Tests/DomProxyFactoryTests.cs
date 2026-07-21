@@ -64,6 +64,22 @@ public sealed class DomProxyFactoryTests
     }
 
     [Fact]
+    public void Create_constructed_generic_uses_open_registration()
+    {
+        var (factory, _) = CreateFactory();
+        factory.RegisterOpenGeneric(
+            typeof(IGenericDomContract<>),
+            typeof(GenericDomProxy<>));
+
+        var proxy = factory.Create(
+            typeof(IGenericDomContract<string>),
+            new FakeJSObjectReference());
+
+        Assert.IsType<GenericDomProxy<string>>(proxy);
+        Assert.IsAssignableFrom<IGenericDomContract<string>>(proxy);
+    }
+
+    [Fact]
     public void Register_overwrites_previous_registration_for_same_type()
     {
         var (factory, _) = CreateFactory();
@@ -123,4 +139,12 @@ public sealed class DomProxyFactoryTests
         IDomRuntime runtime,
         IDomProxyFactory factory)
         : DomProxyBase(reference, runtime, factory), ITestDomContract;
+
+    internal interface IGenericDomContract<T> : IDomProxy;
+
+    internal sealed class GenericDomProxy<T>(
+        IJSObjectReference reference,
+        IDomRuntime runtime,
+        IDomProxyFactory factory)
+        : DomProxyBase(reference, runtime, factory), IGenericDomContract<T>;
 }

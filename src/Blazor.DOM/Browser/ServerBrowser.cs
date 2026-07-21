@@ -8,7 +8,9 @@ namespace Microsoft.JSInterop;
 /// references to common browser globals via the <see cref="IDomRuntime"/>.
 /// Does not cache references; callers own returned references.
 /// </summary>
-internal sealed class ServerBrowser(IDomRuntime runtime) : IBrowser, IDisposable
+internal sealed class ServerBrowser(
+    IDomRuntime runtime,
+    IDomProxyFactory proxyFactory) : IBrowser, IDisposable
 {
     /// <inheritdoc />
     public ValueTask<IJSObjectReference> GetWindowAsync(CancellationToken cancellationToken = default) =>
@@ -26,6 +28,14 @@ internal sealed class ServerBrowser(IDomRuntime runtime) : IBrowser, IDisposable
     public ValueTask<IJSObjectReference> GetGlobalAsync(
         string path, CancellationToken cancellationToken = default) =>
         runtime.GetGlobalAsync(path, cancellationToken);
+
+    /// <inheritdoc />
+    public async ValueTask<TProxy> GetGlobalAsync<TProxy>(
+        string path,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy =>
+        proxyFactory.Create<TProxy>(
+            await runtime.GetGlobalAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <inheritdoc />
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
