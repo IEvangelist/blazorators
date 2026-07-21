@@ -1,0 +1,134 @@
+﻿{
+  "profileName": "Accessors",
+  "description": "Mutable property generation plus a compilation fixture for asymmetric directional transport.",
+  "rootSymbols": [
+    "SVGNumber"
+  ],
+  "features": [
+    "accessor-reconciliation",
+    "directional-transport-fixture"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "closureSize": 1,
+  "includedSymbolCount": 1,
+  "externalReferenceCount": 0,
+  "externalReferences": [],
+  "accounting": {
+    "totalSymbols": 1,
+    "projected": 1,
+    "projectedClean": 1,
+    "projectedWithDeferredMembers": 0,
+    "excluded": 0,
+    "deferred": 0,
+    "generationFailed": 0,
+    "projectedSymbols": [
+      "SVGNumber"
+    ],
+    "excludedSymbols": [],
+    "deferredSymbols": [],
+    "failedSymbols": [],
+    "deferredMemberEntries": [],
+    "failedMemberEntries": [],
+    "totalMembers": 3,
+    "projectedMembers": 3,
+    "deferredMembers": 0,
+    "failedMembers": 0,
+    "expectedMembers": 3,
+    "memberReconciliationValid": true,
+    "failedSymbolMemberOutcomes": [],
+    "notAttemptedAfterFailureMembers": 0,
+    "sourceDeclarations": 2,
+    "accountedSourceDeclarations": 2,
+    "sourceMembers": 3,
+    "accountedSourceMembers": 3,
+    "sourceOverloads": 1,
+    "accountedSourceOverloads": 1,
+    "sourceParameters": 0,
+    "accountedSourceParameters": 0,
+    "declarationReconciliationValid": true,
+    "overloadReconciliationValid": true,
+    "parameterReconciliationValid": true,
+    "sourceDeclarationEntries": [
+      {
+        "symbolName": "SVGNumber",
+        "declarationOrdinal": 0,
+        "kind": "interface",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "provenance": "SVGNumber/decl[0]/interface",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:28858:1"
+      },
+      {
+        "symbolName": "SVGNumber",
+        "declarationOrdinal": 1,
+        "kind": "globalVariable",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Logical factory contract emitted.",
+        "provenance": "SVGNumber/decl[1]/globalVariable",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:28867:13"
+      }
+    ],
+    "sourceMemberEntries": [
+      {
+        "symbolName": "SVGNumber",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 0,
+        "memberName": "value",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Reconciled into canonical \u0027value\u0027 get/set accessor from 1 getter source(s) and 1 setter source(s).",
+        "provenance": "SVGNumber/decl[0]/member[0]/property/value",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:28864:5",
+        "qualifiedKey": "SVGNumber/decl[0]/member[0]"
+      },
+      {
+        "symbolName": "SVGNumber",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 0,
+        "memberName": "prototype",
+        "memberKind": "property",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "SVGNumber/decl[1]/typeLiteral/member[0]/property/prototype",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:28868:5",
+        "qualifiedKey": "SVGNumber/decl[1]/typeLiteral/member[0]"
+      },
+      {
+        "symbolName": "SVGNumber",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "memberName": "constructSignature",
+        "memberKind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "Emitted in the logical factory contract.",
+        "provenance": "SVGNumber/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:28869:5",
+        "qualifiedKey": "SVGNumber/decl[1]/typeLiteral/member[1]"
+      }
+    ],
+    "sourceOverloadEntries": [
+      {
+        "symbolName": "SVGNumber",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 1,
+        "name": "constructSignature",
+        "kind": "constructSignature",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
+        "qualifiedKey": "SVGNumber/decl[1]/typeLiteral/member[1]/overload",
+        "provenance": "SVGNumber/decl[1]/typeLiteral/member[1]/constructSignature/(unnamed)/overload",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:28869:5",
+        "parameterOutcomes": []
+      }
+    ]
+  },
+  "errors": [],
+  "byteIdentityVerified": true
+}

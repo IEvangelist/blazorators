@@ -19,6 +19,7 @@ public partial interface IWritableStreamDefaultController
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/signal)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("signal", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "AbortSignal", Nullable = false, Streamable = false, StructuredClone = false)]
 IAbortSignal Signal { get; }
 
     /// <summary>

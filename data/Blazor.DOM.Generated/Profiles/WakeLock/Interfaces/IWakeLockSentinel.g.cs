@@ -19,6 +19,8 @@ public partial interface IWakeLockSentinel : IEventTarget
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/release_event)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("onrelease", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: WakeLockSentinel, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.")]
+[global::Microsoft.JSInterop.DomAccessor("onrelease", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: WakeLockSentinel, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: WakeLockSentinel, ev: Event) => any) | null' is unsupported: TypeScript '(this: WakeLockSentinel, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Onrelease { get; set; }
 
     /// <summary>
@@ -26,6 +28,7 @@ Func<IEvent, object>? Onrelease { get; set; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/released)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("released", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool Released { get; }
 
     /// <summary>
@@ -33,6 +36,7 @@ bool Released { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/type)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("type", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"screen\"", Nullable = false, Streamable = false, StructuredClone = true)]
 WakeLockType Type { get; }
 
     /// <summary>

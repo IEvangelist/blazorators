@@ -19,11 +19,14 @@ public partial interface IAbortSignal : IEventTarget
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/aborted)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("aborted", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool Aborted { get; }
 
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_event)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("onabort", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: AbortSignal, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: AbortSignal, ev: Event) => any) | null' is unsupported: TypeScript '(this: AbortSignal, ev: Event) => any' has an ambiguous function shape.")]
+[global::Microsoft.JSInterop.DomAccessor("onabort", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: AbortSignal, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: AbortSignal, ev: Event) => any) | null' is unsupported: TypeScript '(this: AbortSignal, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Onabort { get; set; }
 
     /// <summary>
@@ -31,6 +34,7 @@ Func<IEvent, object>? Onabort { get; set; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/reason)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("reason", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "any", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript 'any' requires an explicit runtime transport escape hatch.")]
 object Reason { get; }
 
     /// <summary>

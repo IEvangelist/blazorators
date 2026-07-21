@@ -1,0 +1,13 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Accessors",
+  "description": "Mutable property generation plus a compilation fixture for asymmetric directional transport.",
+  "rootSymbols": [
+    "SVGNumber"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["accessor-reconciliation", "directional-transport-fixture"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Accessors"
+}

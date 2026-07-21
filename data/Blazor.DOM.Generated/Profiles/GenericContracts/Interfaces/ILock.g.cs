@@ -21,6 +21,7 @@ public partial interface ILock
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Lock/mode)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("mode", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "LockMode", Nullable = false, Streamable = false, StructuredClone = true)]
 LockMode Mode { get; }
 
     /// <summary>
@@ -28,5 +29,6 @@ LockMode Mode { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Lock/name)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("name", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
 string Name { get; }
 }

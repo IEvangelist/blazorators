@@ -19,12 +19,15 @@ public partial interface IEvent
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/bubbles)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("bubbles", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool Bubbles { get; }
 
     /// <summary>
 /// The **`cancelBubble`** property of the Event interface is deprecated.
 /// </summary>
 [Obsolete]
+[global::Microsoft.JSInterop.DomAccessor("cancelBubble", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomAccessor("cancelBubble", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool CancelBubble { get; set; }
 
     /// <summary>
@@ -32,6 +35,7 @@ bool CancelBubble { get; set; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelable)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("cancelable", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool Cancelable { get; }
 
     /// <summary>
@@ -39,6 +43,7 @@ bool Cancelable { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composed)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("composed", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool Composed { get; }
 
     /// <summary>
@@ -46,6 +51,7 @@ bool Composed { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/currentTarget)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("currentTarget", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "EventTarget | null", Nullable = true, Streamable = false, StructuredClone = false)]
 IEventTarget? CurrentTarget { get; }
 
     /// <summary>
@@ -53,6 +59,7 @@ IEventTarget? CurrentTarget { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/defaultPrevented)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("defaultPrevented", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool DefaultPrevented { get; }
 
     /// <summary>
@@ -60,6 +67,7 @@ bool DefaultPrevented { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/eventPhase)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("eventPhase", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
 double EventPhase { get; }
 
     /// <summary>
@@ -67,18 +75,22 @@ double EventPhase { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/isTrusted)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("isTrusted", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool IsTrusted { get; }
 
     /// <summary>
 /// The Event property **`returnValue`** indicates whether the default action for this event has been prevented or not.
 /// </summary>
 [Obsolete]
+[global::Microsoft.JSInterop.DomAccessor("returnValue", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomAccessor("returnValue", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool ReturnValue { get; set; }
 
     /// <summary>
 /// The deprecated **`Event.srcElement`** is an alias for the Event.target property.
 /// </summary>
 [Obsolete]
+[global::Microsoft.JSInterop.DomAccessor("srcElement", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "EventTarget | null", Nullable = true, Streamable = false, StructuredClone = false)]
 IEventTarget? SrcElement { get; }
 
     /// <summary>
@@ -86,6 +98,7 @@ IEventTarget? SrcElement { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/target)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("target", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "EventTarget | null", Nullable = true, Streamable = false, StructuredClone = false)]
 IEventTarget? Target { get; }
 
     /// <summary>
@@ -93,6 +106,7 @@ IEventTarget? Target { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/timeStamp)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("timeStamp", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
 double TimeStamp { get; }
 
     /// <summary>
@@ -100,15 +114,20 @@ double TimeStamp { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/type)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("type", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
 string Type { get; }
 
-    double NONE { get; }
+    [global::Microsoft.JSInterop.DomAccessor("NONE", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "0", Nullable = false, Streamable = false, StructuredClone = true)]
+double NONE { get; }
 
-    double CAPTURINGPHASE { get; }
+    [global::Microsoft.JSInterop.DomAccessor("CAPTURING_PHASE", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "1", Nullable = false, Streamable = false, StructuredClone = true)]
+double CAPTURINGPHASE { get; }
 
-    double ATTARGET { get; }
+    [global::Microsoft.JSInterop.DomAccessor("AT_TARGET", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "2", Nullable = false, Streamable = false, StructuredClone = true)]
+double ATTARGET { get; }
 
-    double BUBBLINGPHASE { get; }
+    [global::Microsoft.JSInterop.DomAccessor("BUBBLING_PHASE", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "3", Nullable = false, Streamable = false, StructuredClone = true)]
+double BUBBLINGPHASE { get; }
 
     // DEFERRED (standard-container-transport): composedPath — Array at 'Event/decl[0]/composedPath/return' has authoritative unsupported transport metadata: Collection 'EventTarget[]' contains a non-JSON transport.
 

@@ -20,6 +20,7 @@ public partial interface IReadableStreamDefaultController<R>
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/desiredSize)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("desiredSize", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number | null", Nullable = true, Streamable = false, StructuredClone = true)]
 double? DesiredSize { get; }
 
     /// <summary>

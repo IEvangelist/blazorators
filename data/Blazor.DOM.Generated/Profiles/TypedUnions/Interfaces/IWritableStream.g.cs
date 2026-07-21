@@ -21,6 +21,7 @@ public partial interface IWritableStream<W>
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("locked", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
 bool Locked { get; }
 
     /// <summary>

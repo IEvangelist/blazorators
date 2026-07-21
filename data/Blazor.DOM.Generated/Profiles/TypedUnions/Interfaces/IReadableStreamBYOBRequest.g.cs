@@ -19,6 +19,7 @@ public partial interface IReadableStreamBYOBRequest
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/view)
 /// </summary>
+[global::Microsoft.JSInterop.DomAccessor("view", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Binary, "ArrayBufferView<ArrayBuffer> | null", Nullable = true, Streamable = true, StructuredClone = true)]
 byte[]? View { get; }
 
     /// <summary>
