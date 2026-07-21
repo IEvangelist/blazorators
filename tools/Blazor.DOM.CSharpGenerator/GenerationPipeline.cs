@@ -483,6 +483,18 @@ public sealed class GenerationPipeline
             return;
         }
 
+        if (primary.Disposition == SymbolEmissionDisposition.Deferred)
+        {
+            ledger.RecordDeferred(
+                symbol,
+                primary.Phase ?? "declaration-routing",
+                primary.Reason ?? "The primary declaration is deferred.",
+                members,
+                declarations,
+                overloads);
+            return;
+        }
+
         var files = new[] { primary.GeneratedFile }
             .Where(path => path is not null)
             .Cast<string>()

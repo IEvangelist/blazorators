@@ -182,12 +182,49 @@ internal sealed class GlobalNamespaceEmitter(
             .ToDictionary(
                 source => source.MemberOrdinal!.Value,
                 source => source);
+        var builder = GetBuilder(route.Symbol);
+        if (primaryEmissions.TryGetValue(route.Symbol.Name, out var primary)
+            && primary.Disposition is SymbolEmissionDisposition.Deferred
+                or SymbolEmissionDisposition.Failed)
+        {
+            var phase = primary.Phase ?? "primary-contract";
+            var reason =
+                $"Supplemental factory suppressed because primary contract " +
+                $"'{route.Symbol.Name}' is {primary.Disposition.ToString().ToLowerInvariant()}: " +
+                $"{primary.Reason ?? "no primary contract was emitted"}";
+            foreach (var source in sourceMembers)
+            {
+                AddMemberOutcome(
+                    source,
+                    MemberOutcomeStatus.Deferred,
+                    phase,
+                    reason);
+                if (sourceOverloads.TryGetValue(source.Member.Ordinal, out var overload))
+                {
+                    AddOverloadOutcome(
+                        overload,
+                        MemberOutcomeStatus.Deferred,
+                        phase,
+                        reason,
+                        CreateParameterOutcomes(
+                            overload,
+                            MemberOutcomeStatus.Deferred,
+                            phase,
+                            reason));
+                }
+            }
+            AddDeclarationOutcome(
+                route,
+                MemberOutcomeStatus.Deferred,
+                phase,
+                reason);
+            return null;
+        }
         var properties = new Dictionary<string, FactoryProperty>(
             StringComparer.Ordinal);
         var signatures = new Dictionary<string, FactorySignature>(
             StringComparer.Ordinal);
         var orderedOutputs = new List<FactoryOutput>();
-        var builder = GetBuilder(route.Symbol);
 
         foreach (var source in sourceMembers)
         {
@@ -329,8 +366,12 @@ internal sealed class GlobalNamespaceEmitter(
                                     return null;
                                 }
 
-                                if (signature.OptionalParameterCount
-                                    > existingSignature.Signature.OptionalParameterCount)
+                                if (signature.HasRestParameter
+                                        && !existingSignature.Signature.HasRestParameter
+                                    || signature.HasRestParameter
+                                        == existingSignature.Signature.HasRestParameter
+                                    && signature.OptionalParameterCount
+                                        > existingSignature.Signature.OptionalParameterCount)
                                 {
                                     ReplaceFactoryOutput(
                                         orderedOutputs,
@@ -1579,7 +1620,8 @@ internal sealed class GlobalNamespaceEmitter(
                     property.CanonicalType,
                     "",
                     property.Mutable,
-                    OptionalParameterCount: 0));
+                    OptionalParameterCount: 0,
+                    HasRestParameter: false));
             _order.Add(property.CanonicalKey);
             _contributors.Add(contributor);
             collisionReason = null;
@@ -1616,14 +1658,17 @@ internal sealed class GlobalNamespaceEmitter(
                             "has incompatible generic constraints.";
                         return false;
                     }
-                    if (signature.OptionalParameterCount
-                        > existing.OptionalParameterCount)
+                    if (signature.HasRestParameter && !existing.HasRestParameter
+                        || signature.HasRestParameter == existing.HasRestParameter
+                        && signature.OptionalParameterCount
+                            > existing.OptionalParameterCount)
                     {
                         _entries[key] = existing with
                         {
                             Rendered = signature.Rendered,
                             OptionalParameterCount =
                                 signature.OptionalParameterCount,
+                            HasRestParameter = signature.HasRestParameter,
                         };
                     }
                     continue;
@@ -1636,7 +1681,8 @@ internal sealed class GlobalNamespaceEmitter(
                         signature.CanonicalReturnType,
                         signature.CanonicalConstraints,
                         Mutable: false,
-                        signature.OptionalParameterCount));
+                        signature.OptionalParameterCount,
+                        signature.HasRestParameter));
                 _order.Add(key);
             }
 
@@ -1650,7 +1696,8 @@ internal sealed class GlobalNamespaceEmitter(
             string CanonicalType,
             string CanonicalConstraints,
             bool Mutable,
-            int OptionalParameterCount);
+            int OptionalParameterCount,
+            bool HasRestParameter);
     }
 
     private sealed class SupplementalBuilder(SymbolModel symbol)

@@ -10,7 +10,8 @@ internal sealed record ContractSignature(
     string CanonicalKey,
     string CanonicalReturnType,
     string CanonicalConstraints,
-    int OptionalParameterCount);
+    int OptionalParameterCount,
+    bool HasRestParameter);
 
 internal sealed record ContractCallableResult(
     IReadOnlyList<ContractSignature> Signatures,
@@ -97,6 +98,24 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     MemberOutcomeStatus.Deferred,
                     exception.Phase,
                     exception.Message));
+        }
+        IReadOnlyList<GenericDeclaration> defaultExpansions;
+        try
+        {
+            defaultExpansions = typeResolver.CreateDefaultExpandedDeclarations(
+                typeParameters,
+                provenance,
+                canonicalPrefix: "!!");
+        }
+        catch (GenericDeferralException exception)
+        {
+            return CreateGenericDeferral(
+                jsName,
+                typeParameters,
+                parameters,
+                returnType,
+                provenance,
+                exception);
         }
 
         TypeProjection returnProjection;
@@ -284,12 +303,130 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
             reason = "emitted";
         }
 
+        var allSignatures = signatures.ToList();
+        try
+        {
+            foreach (var expansion in defaultExpansions)
+            {
+                var expandedReturn = typeResolver.Project(
+                    returnType,
+                    $"{provenance}/return/defaultExpansion",
+                    expansion.Scope);
+                var expandedProjections = orderedParameters
+                    .Select((parameter, index) => typeResolver.Project(
+                        TryGetBoolOptionsUnion(parameter.Type, out var expandedOptions)
+                            ? new ReferenceTypeNode(
+                                expandedOptions,
+                                expandedOptions,
+                                [])
+                            : parameter.Type,
+                        $"{provenance}/parameter[{parameter.Ordinal}]/" +
+                        $"{parameter.Name}/defaultExpansion",
+                        expansion.Scope))
+                    .ToList();
+                var invalidParameter = expandedProjections
+                    .Select((projection, index) => (projection, index))
+                    .FirstOrDefault(item =>
+                        item.projection.Identity.Kind
+                            is ClrTypeKind.Null or ClrTypeKind.Void);
+                if (invalidParameter.projection is not null)
+                {
+                    throw new TypeProjectionException(
+                        $"Default-expanded parameter at index " +
+                        $"{invalidParameter.index} resolves to illegal CLR type " +
+                        $"'{invalidParameter.projection.RenderedType}'.",
+                        $"{provenance}/parameter[{invalidParameter.index}]/" +
+                        "defaultExpansion");
+                }
+                if (boolOptionsIndex >= 0)
+                {
+                    _ = TryGetBoolOptionsUnion(
+                        orderedParameters[boolOptionsIndex].Type,
+                        out var expandedOptionsTypeName);
+                    var expandedOptionsType = typeResolver.Project(
+                        new ReferenceTypeNode(
+                            expandedOptionsTypeName,
+                            expandedOptionsTypeName,
+                            []),
+                        $"{provenance}/options/defaultExpansion",
+                        expansion.Scope);
+                    allSignatures.Add(BuildSignature(
+                        emittedName,
+                        expandedReturn,
+                        orderedParameters,
+                        expandedProjections,
+                        documentation,
+                        expansion,
+                        dropFromIndex: boolOptionsIndex));
+                    allSignatures.Add(BuildSignature(
+                        emittedName,
+                        expandedReturn,
+                        orderedParameters,
+                        expandedProjections,
+                        new DocumentationModel("", [], false),
+                        expansion,
+                        substituteIndex: boolOptionsIndex,
+                        substituteType: "bool",
+                        substituteCanonicalType: "bool",
+                        substituteName: "capture"));
+                    allSignatures.Add(BuildSignature(
+                        emittedName,
+                        expandedReturn,
+                        orderedParameters,
+                        expandedProjections,
+                        new DocumentationModel("", [], false),
+                        expansion,
+                        substituteIndex: boolOptionsIndex,
+                        substituteType: $"{expandedOptionsType.RenderedType}?",
+                        substituteCanonicalType: expandedOptionsType.CanonicalType,
+                        substituteName: orderedParameters[boolOptionsIndex].Name));
+                }
+                else
+                {
+                    allSignatures.Add(BuildSignature(
+                        emittedName,
+                        expandedReturn,
+                        orderedParameters,
+                        expandedProjections,
+                        documentation,
+                        expansion));
+                }
+            }
+        }
+        catch (GenericDeferralException exception)
+        {
+            return CreateGenericDeferral(
+                jsName,
+                typeParameters,
+                parameters,
+                returnType,
+                provenance,
+                exception);
+        }
+        catch (TypeProjectionException exception)
+        {
+            return CreateGenericDeferral(
+                jsName,
+                typeParameters,
+                parameters,
+                returnType,
+                provenance,
+                new GenericDeferralException(
+                    $"Default-expanded generic callable '{jsName}' cannot be emitted: " +
+                    exception.Message,
+                    exception.Provenance,
+                    "generic-method-defaults"));
+        }
+
         return new ContractCallableResult(
-            signatures,
-            signatures.Select(signature => signature.CanonicalKey).ToList(),
+            allSignatures,
+            allSignatures.Select(signature => signature.CanonicalKey).ToList(),
             MemberOutcomeStatus.Projected,
             null,
-            reason,
+            defaultExpansions.Count == 0
+                ? reason
+                : $"{reason}; emitted {defaultExpansions.Count} " +
+                  "default-expanded overload set(s).",
             parameterOutcomes);
     }
 
@@ -367,6 +504,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
         var parts = new List<string>();
         var canonicalTypes = new List<string>();
         var optionalCount = 0;
+        var hasRestParameter = false;
         for (var index = 0; index < parameters.Count; index++)
         {
             if (dropFromIndex >= 0 && index >= dropFromIndex)
@@ -388,6 +526,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
             var name = Naming.ToCSharpParameterName(parameter.Name);
             if (parameter.Rest)
             {
+                hasRestParameter = true;
                 var elementType = type.EndsWith("[]", StringComparison.Ordinal)
                     ? type[..^2]
                     : type;
@@ -414,17 +553,20 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
 
         var writer = new CSharpWriter();
         writer.XmlDoc(documentation.Text, documentation.Deprecated);
+        foreach (var defaultNote in generic.DefaultNotes)
+            writer.AppendLine($"// TypeScript generic default: {defaultNote}.");
         writer.AppendLine(
             $"{returnProjection.RenderedType} {emittedName}" +
             $"{generic.TypeParameterList}({string.Join(", ", parts)})" +
             $"{generic.ConstraintSuffix};");
         return new ContractSignature(
             writer.ToString().TrimEnd(),
-            $"{emittedName}`{generic.Scope.Parameters.Count}(" +
+            $"{emittedName}`{generic.EmittedArity}(" +
             $"{string.Join(",", canonicalTypes)})",
             returnProjection.CanonicalType,
             generic.CanonicalConstraints,
-            optionalCount);
+            optionalCount,
+            hasRestParameter);
     }
 
     private static bool IsEventSubscriptionOverload(

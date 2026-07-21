@@ -248,6 +248,94 @@ public sealed class TypeResolver
             parent,
             canonicalPrefix);
 
+    public IReadOnlyList<GenericDeclaration> CreateDefaultExpandedDeclarations(
+        IReadOnlyList<TypeParameterModel> parameters,
+        string provenance,
+        GenericScope? parent = null,
+        string canonicalPrefix = "!")
+    {
+        if (parameters.Count == 0 || parameters.All(parameter => parameter.Default is null))
+            return [];
+        var firstDefault = parameters
+            .Select((parameter, index) => (parameter, index))
+            .First(item => item.parameter.Default is not null)
+            .index;
+        if (parameters.Skip(firstDefault).Any(parameter => parameter.Default is null))
+        {
+            throw new GenericDeferralException(
+                $"Generic defaults at '{provenance}' are not trailing and cannot be " +
+                "expanded into deterministic CLR overloads.",
+                $"{provenance}/typeParameters",
+                "generic-method-defaults");
+        }
+
+        var fullScope = GenericScope.Create(
+            parameters,
+            provenance,
+            parent,
+            canonicalPrefix: "^");
+        var expansions = new List<GenericDeclaration>();
+        for (var retained = firstDefault; retained < parameters.Count; retained++)
+        {
+            var retainedDeclaration = CreateGenericDeclaration(
+                parameters.Take(retained).ToList(),
+                provenance,
+                parent,
+                canonicalPrefix);
+            var substitutions = fullScope.Parameters
+                .Select((parameter, index) => index < retained
+                    ? TypeParameter(retainedDeclaration.Scope.Parameters[index])
+                    : TypeParameter(parameter))
+                .ToList();
+            for (var index = retained; index < parameters.Count; index++)
+            {
+                var parameter = parameters[index];
+                var defaultScope = fullScope.WithSubstitutions(substitutions);
+                TypeProjection projectedDefault;
+                try
+                {
+                    projectedDefault = Project(
+                        parameter.Default,
+                        $"{provenance}/defaultExpansion[{retained}]/" +
+                        $"typeParameter[{parameter.Ordinal}]",
+                        defaultScope);
+                }
+                catch (GenericDeferralException)
+                {
+                    throw;
+                }
+                catch (TypeProjectionException exception)
+                {
+                    throw new GenericDeferralException(
+                        $"Generic method default for '{parameter.Name}' at " +
+                        $"'{provenance}' cannot be expanded faithfully: " +
+                        exception.Message,
+                        exception.Provenance,
+                        "generic-method-defaults");
+                }
+                if (ContainsUnsubstitutedTargetParameter(projectedDefault.Identity))
+                {
+                    var defaultProvenance =
+                        $"{provenance}/defaultExpansion[{retained}]/" +
+                        $"typeParameter[{parameter.Ordinal}]";
+                    throw new GenericDeferralException(
+                        $"Generic method default for '{parameter.Name}' at " +
+                        $"'{defaultProvenance}' is cyclic or depends on an omitted target " +
+                        "parameter.",
+                        defaultProvenance,
+                        "generic-method-defaults");
+                }
+                substitutions[index] = projectedDefault;
+            }
+            expansions.Add(retainedDeclaration with
+            {
+                Scope = fullScope.WithSubstitutions(substitutions),
+                DefaultNotes = [],
+            });
+        }
+        return expansions;
+    }
+
     /// <summary>
     /// Projects a TypeScript type node to C#. Throws <see cref="TypeProjectionException"/>
     /// for unsupported projections. Never returns <c>object</c> for supported types.
