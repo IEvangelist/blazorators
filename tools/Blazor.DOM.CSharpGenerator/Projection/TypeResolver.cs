@@ -586,6 +586,9 @@ public sealed class TypeResolver
             "readonly-array" or
             "resolved-import-type"
             || projection.ProviderNote.StartsWith(
+                "type-parameter:",
+                StringComparison.Ordinal)
+            || projection.ProviderNote.StartsWith(
                 "browser-",
                 StringComparison.Ordinal)
             || projection.ProviderNote.StartsWith(
@@ -2807,6 +2810,12 @@ public sealed class TypeResolver
             return (marker, marker);
         }
 
+        if (constraintNode.Transport?.Kind == "binary")
+        {
+            const string binaryCollection = "global::System.Collections.IList";
+            return (binaryCollection, binaryCollection);
+        }
+
         if (constraintNode is OperatorTypeNode
             or IndexedAccessTypeNode
             or IntersectionTypeNode
@@ -3559,7 +3568,7 @@ public sealed class TypeResolver
             providerNote,
             transport);
 
-    private static TypeProjection TypeParameter(GenericParameterBinding parameter)
+    private TypeProjection TypeParameter(GenericParameterBinding parameter)
         => new(
             parameter.CSharpName,
             false,
@@ -3568,7 +3577,13 @@ public sealed class TypeResolver
                 parameter.CanonicalIdentity,
                 ClrTypeKind.Reference,
                 IsTypeParameter: true),
-            $"type-parameter:{parameter.SourceName}");
+            $"type-parameter:{parameter.SourceName}",
+            parameter.Model.Constraint?.Transport is
+            {
+                Kind: not "unsupported",
+            } constraintTransport
+                ? constraintTransport
+                : null);
 
     private static TypeProjection VoidType()
         => new("void", false, false, new ClrTypeIdentity("void", ClrTypeKind.Void));

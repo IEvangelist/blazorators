@@ -21,6 +21,7 @@ public static class ProfilePipeline
             "ArrayBufferView",
             "Date",
             "Error",
+            "Exclude",
             "Iterable",
             "Promise",
             "ReadonlyArray",
