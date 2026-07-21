@@ -59,6 +59,24 @@ public sealed class InteropAnchorTests
         Assert.Equal(
             "window.screen",
             Assert.Single(appliedScreen.EntryPoints!).JavaScriptPath);
+
+        foreach (var (profileName, expectedPath) in new[]
+        {
+            ("MediaDevices", "navigator.mediaDevices"),
+            ("Notifications", "Notification"),
+        })
+        {
+            var profile = ProfileLoader.Load(Path.Combine(
+                root,
+                "data",
+                "Blazor.DOM.Profiles",
+                $"{profileName}.profile.json"));
+            var appliedProfile = InteropAnchorLoader.Apply(profile, anchors);
+
+            Assert.Equal(
+                expectedPath,
+                Assert.Single(appliedProfile.EntryPoints!).JavaScriptPath);
+        }
     }
 
     [Fact]

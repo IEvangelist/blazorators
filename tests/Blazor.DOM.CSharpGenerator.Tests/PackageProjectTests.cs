@@ -90,6 +90,10 @@ public sealed class PackageProjectTests
     [InlineData("Blazor.StorageManagement.WebAssembly", "StorageManagement", "WebAssembly")]
     [InlineData("Blazor.Screen", "Screen", "Server")]
     [InlineData("Blazor.Screen.WebAssembly", "Screen", "WebAssembly")]
+    [InlineData("Blazor.MediaDevices", "MediaDevices", "Server")]
+    [InlineData("Blazor.MediaDevices.WebAssembly", "MediaDevices", "WebAssembly")]
+    [InlineData("Blazor.Notifications", "Notifications", "Server")]
+    [InlineData("Blazor.Notifications.WebAssembly", "Notifications", "WebAssembly")]
     public void FocusedPackage_UsesGeneratedProfileAssets(
         string projectName,
         string profileName,
@@ -134,6 +138,8 @@ public sealed class PackageProjectTests
     [InlineData("Share", 5)]
     [InlineData("StorageManagement", 11)]
     [InlineData("Screen", 30)]
+    [InlineData("MediaDevices", 76)]
+    [InlineData("Notifications", 30)]
     public void FocusedPackage_HostPairsHaveExpectedExactParity(
         string profileName,
         int operationCount)

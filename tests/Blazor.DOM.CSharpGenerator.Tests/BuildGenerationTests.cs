@@ -153,6 +153,10 @@ public sealed class BuildGenerationTests
                 "Blazor.StorageManagement.WebAssembly",
                 "Blazor.Screen",
                 "Blazor.Screen.WebAssembly",
+                "Blazor.MediaDevices",
+                "Blazor.MediaDevices.WebAssembly",
+                "Blazor.Notifications",
+                "Blazor.Notifications.WebAssembly",
             ];
             foreach (var focusedPackageName in focusedPackages)
             {
@@ -211,9 +215,13 @@ public sealed class BuildGenerationTests
             .Select(entry => entry.FullName)
             .ToList();
 
-        Assert.Contains(entries, path => path.EndsWith(
-            $"/{assembly}",
-            StringComparison.Ordinal));
+        foreach (var framework in new[] { "net8.0", "net9.0", "net10.0" })
+        {
+            Assert.Contains(
+                $"lib/{framework}/{assembly}",
+                entries,
+                StringComparer.Ordinal);
+        }
         Assert.Contains(entries, path => path.EndsWith(
             $"/{manifest}",
             StringComparison.Ordinal));
