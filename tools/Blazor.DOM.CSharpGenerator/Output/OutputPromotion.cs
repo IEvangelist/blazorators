@@ -39,6 +39,7 @@ public static class OutputPromotion
         "Callbacks",
         "Dictionaries",
         "Enums",
+        "EventMaps",
         "Factories",
         "Globals",
         "Interfaces",
