@@ -155,6 +155,9 @@ internal sealed class GlobalNamespaceEmitter(
         RoutedDeclaration route,
         OutputWriter writer)
     {
+        if (route.Declaration.Type is QueryTypeNode query)
+            return EmitFactoryAlias(route, query);
+
         if (route.Declaration.Type is not TypeLiteralTypeNode typeLiteral)
         {
             AddDeclarationOutcome(
@@ -507,6 +510,75 @@ internal sealed class GlobalNamespaceEmitter(
                 $"property:{accessorName}",
                 accessorType,
                 Mutable: false));
+    }
+
+    private FactoryProduct? EmitFactoryAlias(
+        RoutedDeclaration route,
+        QueryTypeNode query)
+    {
+        var targetIdentity = string.IsNullOrWhiteSpace(query.ResolvedSymbol)
+            ? query.ExpressionName
+            : query.ResolvedSymbol;
+        var targetRoute = routingPlan.SupplementalDeclarations
+            .Where(candidate =>
+                candidate.Route == DeclarationRouteKind.FactoryConstructor
+                && string.Equals(
+                    candidate.Symbol.Name,
+                    targetIdentity,
+                    StringComparison.Ordinal)
+                && candidate.Declaration.Type is TypeLiteralTypeNode)
+            .OrderBy(candidate => candidate.Declaration.Ordinal)
+            .FirstOrDefault();
+        if (targetRoute is null)
+        {
+            AddDeclarationOutcome(
+                route,
+                MemberOutcomeStatus.Failed,
+                null,
+                $"Constructor alias '{route.Declaration.Name}' targets " +
+                $"'{targetIdentity ?? "<unresolved>"}', which has no concrete " +
+                "factory declaration.");
+            GetBuilder(route.Symbol).Fail(
+                $"Constructor alias '{route.Declaration.Name}' cannot resolve its " +
+                "canonical factory target.",
+                "MissingFactoryAliasTargetException");
+            return null;
+        }
+
+        var targetFactoryName = FactoryTypeName(targetRoute);
+        var targetNamespace = Naming.ToGeneratedNamespace(
+            rootNamespace,
+            targetRoute.Symbol.Name);
+        var accessorType = targetRoute.Symbol.Name.Contains(
+            '.',
+            StringComparison.Ordinal)
+                ? $"global::{targetNamespace}.{targetFactoryName}"
+                : targetFactoryName;
+        var accessorName = FactoryAccessorName(route);
+        var javaScriptName = route.Declaration.Name.Replace(
+            "\"",
+            "\\\"",
+            StringComparison.Ordinal);
+        var accessor = new ContractPropertyResult(
+            $"[global::Microsoft.JSInterop.DomGlobalAlias(\"{javaScriptName}\")]\n" +
+            RenderProperty(
+                route.Declaration.Documentation,
+                accessorType,
+                accessorName,
+                mutable: false),
+            $"property:{accessorName}",
+            accessorType,
+            Mutable: false);
+        AddDeclarationOutcome(
+            route,
+            MemberOutcomeStatus.Projected,
+            null,
+            $"Legacy constructor alias reuses canonical factory " +
+            $"'{targetRoute.Symbol.Name}'.");
+        return new FactoryProduct(
+            route,
+            route.TypeScriptNamespace,
+            accessor);
     }
 
     private void EmitGlobalFunction(RoutedDeclaration route)

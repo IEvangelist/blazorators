@@ -177,8 +177,8 @@ public sealed class FinalEmitterAuditTests
             Assert.True(result.Validation.IsValid);
             Assert.Equal(1866, accounting.TotalSymbols);
             Assert.Equal(1866, accounting.Projected);
-            Assert.Equal(1861, accounting.ProjectedClean);
-            Assert.Equal(5, accounting.ProjectedWithDeferredMembers);
+            Assert.Equal(1866, accounting.ProjectedClean);
+            Assert.Equal(0, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
             Assert.Equal(0, accounting.Deferred);
             Assert.Equal(0, accounting.GenerationFailed);
@@ -186,6 +186,11 @@ public sealed class FinalEmitterAuditTests
             Assert.Equal((2598, 2598), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
+            Assert.All(
+                accounting.SourceDeclarationEntries ?? [],
+                entry => Assert.Equal(
+                    nameof(MemberOutcomeStatus.Projected),
+                    entry.Status));
             Assert.Equal((11310, 11310), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
