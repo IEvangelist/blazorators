@@ -101,18 +101,14 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
     }
 
     private static bool IsInterfaceType(string csharpType)
-        // Interface types are emitted with the I-prefix convention.
-        // A type like IFoo, IFooBar, or IReadOnlyList<...> is an interface.
-        // Exclude IReadOnlyList/IEnumerable/IAsyncEnumerable which are BCL interfaces
-        // that C# does allow struct conversions for.
+        // User-defined conversions to or from any interface are prohibited by C#.
+        // Generated DOM interfaces and the projected BCL collection interfaces all
+        // follow the I + uppercase naming convention.
     {
         var simpleType = csharpType[(csharpType.LastIndexOf('.') + 1)..];
         return simpleType.StartsWith("I", StringComparison.Ordinal)
             && simpleType.Length > 1
-            && char.IsUpper(simpleType[1])
-            && !simpleType.StartsWith("IReadOnly", StringComparison.Ordinal)
-            && !simpleType.StartsWith("IEnumerable", StringComparison.Ordinal)
-            && !simpleType.StartsWith("IAsyncEnumerable", StringComparison.Ordinal);
+            && char.IsUpper(simpleType[1]);
     }
 
     private string EmitSimpleAlias(
@@ -254,8 +250,10 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
                 // Skip null/void arms; they cannot be meaningfully stored in the union wrapper
                 if (t is "null" or "void") continue;
                 if (!seenTypes.Add(t)) continue;
-                var safeName = t.Replace("[]", "Array").Replace("<", "_").Replace(">", "_")
-                    .Replace(",", "_").Replace(" ", "").Replace("?", "Nullable");
+                var safeName = Naming.ToCSharpTypeName(
+                    t.Replace("global::", "Global_", StringComparison.Ordinal)
+                        .Replace("[]", "Array", StringComparison.Ordinal)
+                        .Replace("?", "Nullable", StringComparison.Ordinal));
                 var isIface = IsInterfaceType(t);
                 if (isIface)
                 {

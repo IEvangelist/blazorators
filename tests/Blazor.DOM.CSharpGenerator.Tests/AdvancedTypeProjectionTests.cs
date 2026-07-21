@@ -137,6 +137,32 @@ public sealed class AdvancedTypeProjectionTests
     }
 
     [Fact]
+    public void Corpus_HeadersInitUnionUsesValidSynthesizedMemberNames()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var ir = IrLoader.Load(data);
+        var resolver = new TypeResolver(
+            ir.TypescriptSymbols,
+            EmitterOverridesLoader.Load(data));
+        var symbol = Assert.Single(
+            ir.TypescriptSymbols,
+            symbol => symbol.Name == "HeadersInit");
+
+        var source = new AliasEmitter(resolver, "1.0.0", "Blazor.DOM").Emit(symbol);
+
+        Assert.Contains("AsGlobal_Blazor_DOM_AdvancedTypes_", source);
+        Assert.Contains(
+            "FromIReadOnlyDictionary_string_string_(",
+            source);
+        Assert.DoesNotContain(
+            "implicit operator HeadersInit(IReadOnlyDictionary",
+            source);
+        Assert.DoesNotContain("Asglobal::", source);
+        Assert.DoesNotContain("Isglobal::", source);
+    }
+
+    [Fact]
     public void Tuple_EmitsJsonArrayConverterWithLabelsOptionalAndRest()
     {
         var resolver = new TypeResolver([]);
