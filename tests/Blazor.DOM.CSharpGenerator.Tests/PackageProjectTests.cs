@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using System.Text.Json;
 using Xunit;
 
 namespace Blazor.DOM.CSharpGenerator.Tests;
@@ -74,6 +75,14 @@ public sealed class PackageProjectTests
     [InlineData("Blazor.WakeLock.WebAssembly", "WakeLock", "WebAssembly")]
     [InlineData("Blazor.Permissions", "Permissions", "Server")]
     [InlineData("Blazor.Permissions.WebAssembly", "Permissions", "WebAssembly")]
+    [InlineData("Blazor.Clipboard", "Clipboard", "Server")]
+    [InlineData("Blazor.Clipboard.WebAssembly", "Clipboard", "WebAssembly")]
+    [InlineData("Blazor.Share", "Share", "Server")]
+    [InlineData("Blazor.Share.WebAssembly", "Share", "WebAssembly")]
+    [InlineData("Blazor.StorageManagement", "StorageManagement", "Server")]
+    [InlineData("Blazor.StorageManagement.WebAssembly", "StorageManagement", "WebAssembly")]
+    [InlineData("Blazor.Screen", "Screen", "Server")]
+    [InlineData("Blazor.Screen.WebAssembly", "Screen", "WebAssembly")]
     public void FocusedPackage_UsesGeneratedProfileAssets(
         string projectName,
         string profileName,
@@ -107,6 +116,61 @@ public sealed class PackageProjectTests
             "host-manifest.json")));
         Assert.True(File.Exists(Path.Combine(profile, "host-parity.json")));
         Assert.True(File.Exists(Path.Combine(profile, "profile-coverage.json")));
+    }
+
+    [Theory]
+    [InlineData("WakeLock", "IWakeLock", "GetWakeLock")]
+    [InlineData("Permissions", "IPermissions", "GetPermissions")]
+    [InlineData("Clipboard", "IClipboard", "GetClipboard")]
+    [InlineData("Share", "INavigator", "GetNavigator")]
+    [InlineData("StorageManagement", "IStorageManager", "GetStorageManager")]
+    [InlineData("Screen", "IScreen", "GetScreen")]
+    public void FocusedPackage_HostPairsHaveExactParityAndIntentionalSyncDelta(
+        string profileName,
+        string rootInterface,
+        string rootMethod)
+    {
+        var root = FindRepositoryRoot();
+        var profile = Path.Combine(
+            root,
+            "data",
+            "Blazor.DOM.Generated",
+            "Profiles",
+            profileName);
+        var parity = JsonDocument.Parse(File.ReadAllText(
+            Path.Combine(profile, "host-parity.json")));
+
+        Assert.True(parity.RootElement.GetProperty("exact").GetBoolean());
+        Assert.Equal(
+            parity.RootElement.GetProperty("serverOperationCount").GetInt32(),
+            parity.RootElement
+                .GetProperty("webAssemblyOperationCount")
+                .GetInt32());
+        Assert.Empty(
+            parity.RootElement.GetProperty("unexplainedDeltas")
+                .EnumerateArray());
+
+        var server = File.ReadAllText(Path.Combine(
+            profile,
+            "Server",
+            "GeneratedDomHost.g.cs"));
+        var webAssembly = File.ReadAllText(Path.Combine(
+            profile,
+            "WebAssembly",
+            "GeneratedDomHost.g.cs"));
+        var syncSignature =
+            $"global::Blazor.DOM.{rootInterface} {rootMethod}()";
+
+        Assert.DoesNotContain(syncSignature, server, StringComparison.Ordinal);
+        Assert.Contains(syncSignature, webAssembly, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "DomTransportKind.Unsupported",
+            server,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "DomTransportKind.Unsupported",
+            webAssembly,
+            StringComparison.Ordinal);
     }
 
     [Fact]

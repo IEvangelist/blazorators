@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>NU5125;NU5039;CS0108;CS0612;CS8766</NoWarn>
+    <AssemblyName>Blazor.StorageManagement</AssemblyName>
+    <RootNamespace>Blazor.StorageManagement</RootNamespace>
+    <PackageId>Blazor.StorageManagement</PackageId>
+    <Title>Blazor Storage Management - Server and hosting-neutral DOM interop</Title>
+    <Description>Generated Storage API bindings for Blazor Server and hosting-neutral asynchronous JavaScript interop.</Description>
+    <PackageTags>dotnet;blazor;server;dom;interop;storage-management;opfs</PackageTags>
+    <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>David Pine</Authors>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+    <DomProfileName>StorageManagement</DomProfileName>
+    <DomProfileHost>Server</DomProfileHost>
+  </PropertyGroup>
+
+  <ItemGroup Label="Package files">
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <Import Project="..\Blazor.DOM.FocusedPackage.props" />
+</Project>
