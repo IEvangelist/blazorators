@@ -22,7 +22,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blazor.DOM\Blazor.DOM.csproj" />
-    <ProjectReference Include="..\..\src\Blazor.DOM.WebAssembly\Blazor.DOM.WebAssembly.csproj" />
+    <Compile Include="..\..\src\Blazor.DOM.WebAssembly\Abstractions\IDomSyncRuntime.cs"
+             Link="WebAssembly\IDomSyncRuntime.cs" />
+    <Compile Include="..\..\src\Blazor.DOM.WebAssembly\Browser\WasmBrowser.cs"
+             Link="WebAssembly\WasmBrowser.cs" />
+    <Compile Include="..\..\src\Blazor.DOM.WebAssembly\Extensions\DomWebAssemblyServiceCollectionExtensions.cs"
+             Link="WebAssembly\DomWebAssemblyServiceCollectionExtensions.cs" />
+    <Compile Include="..\..\src\Blazor.DOM.WebAssembly\Proxies\WasmDomDispatch.cs"
+             Link="WebAssembly\WasmDomDispatch.cs" />
+    <Compile Include="..\..\src\Blazor.DOM.WebAssembly\Proxies\WasmDomProxyBase.cs"
+             Link="WebAssembly\WasmDomProxyBase.cs" />
+    <Compile Include="..\..\src\Blazor.DOM.WebAssembly\Runtime\WasmDomRuntime.cs"
+             Link="WebAssembly\WasmDomRuntime.cs" />
   </ItemGroup>
 
 </Project>
