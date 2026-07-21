@@ -237,6 +237,83 @@ public sealed class FocusedPackageGenerationTests
         }
     }
 
+    [Fact]
+    public void PackageProfile_ConstructorGlobalEmitsFactoryCapabilityRoot()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "BroadcastChannelConstructor",
+                "Broadcast channel constructor root.",
+                ["BroadcastChannel"],
+                false,
+                false,
+                ["broadcast-channel"],
+                "Blazor.DOM",
+                "Profiles/BroadcastChannelConstructor",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["BroadcastChannel"] = ["name", "close"],
+                    ["EventTarget"] = [],
+                },
+                true,
+                EntryPoints:
+                [
+                    new HostEntryPoint(
+                        "BroadcastChannel",
+                        "BroadcastChannel",
+                        "BroadcastChannel"),
+                ]);
+
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+
+            Assert.Empty(result.PipelineResult.Errors);
+            var generated = Path.Combine(
+                output,
+                "Profiles",
+                "BroadcastChannelConstructor");
+            var serverSource = File.ReadAllText(Path.Combine(
+                generated,
+                "Server",
+                "GeneratedDomHost.g.cs"));
+            Assert.Contains(
+                "ValueTask<global::Blazor.DOM.IBroadcastChannelFactory> " +
+                "GetBroadcastChannelAsync",
+                serverSource,
+                StringComparison.Ordinal);
+            var wasmSource = File.ReadAllText(Path.Combine(
+                generated,
+                "WebAssembly",
+                "GeneratedDomHost.g.cs"));
+            Assert.Contains(
+                "global::Blazor.DOM.IBroadcastChannelFactory " +
+                "GetBroadcastChannel()",
+                wasmSource,
+                StringComparison.Ordinal);
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            Assert.Contains(
+                hosts.Server.Operations,
+                operation =>
+                    operation.Kind == "constructor-global"
+                    && operation.Signature.Contains(
+                        "IBroadcastChannelFactory",
+                        StringComparison.Ordinal));
+            Assert.True(hosts.Parity.Exact);
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
     private static string CreateTempDir()
     {
         var directory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());

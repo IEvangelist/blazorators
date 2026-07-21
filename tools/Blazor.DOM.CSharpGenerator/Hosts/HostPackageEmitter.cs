@@ -186,11 +186,13 @@ public static class HostPackageEmitter
         var serverInfrastructure = EmitInfrastructure(
             DomHostKind.Server,
             proxyRegistrations,
+            rootFactories,
             options.Capability,
             options.EmitCapabilityFacade);
         var wasmInfrastructure = EmitInfrastructure(
             DomHostKind.WebAssembly,
             proxyRegistrations,
+            rootFactories,
             options.Capability,
             options.EmitCapabilityFacade);
         serverFiles.Add(writer.Write(
@@ -255,6 +257,7 @@ public static class HostPackageEmitter
     private static InfrastructureResult EmitInfrastructure(
         DomHostKind host,
         IReadOnlyList<ProxyRegistration> registrations,
+        IReadOnlyList<RootFactory> rootFactories,
         HostCapabilityMetadata capability,
         bool emitCapabilityFacade)
     {
@@ -276,16 +279,16 @@ public static class HostPackageEmitter
             {
                 foreach (var entry in capability.EntryPoints)
                 {
-                    var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
+                    var type = ResolveEntryPointContract(entry, rootFactories);
                     var name = Naming.ToCSharpMemberName(entry.Name);
                     writer.AppendLine(
                         "public static global::System.Threading.Tasks.ValueTask<" +
-                        $"global::Blazor.DOM.I{type}> Get{name}ProxyAsync(");
+                        $"{type.QualifiedName}> Get{name}ProxyAsync(");
                     writer.AppendLine(
                         "    this IBrowser browser, global::System.Threading." +
                         "CancellationToken cancellationToken = default) =>");
                     writer.AppendLine(
-                        $"    browser.GetGlobalAsync<global::Blazor.DOM.I{type}>(" +
+                        $"    browser.GetGlobalAsync<{type.QualifiedName}>(" +
                         $"\"{entry.JavaScriptPath}\", cancellationToken);");
                     writer.AppendLine();
                 }
@@ -306,17 +309,21 @@ public static class HostPackageEmitter
         if (emitCapabilityFacade)
         {
             writer.AppendLine();
-            EmitCapabilityFacade(writer, host, capability);
+            EmitCapabilityFacade(writer, host, rootFactories, capability);
         }
         var operations = capability.EntryPoints
-            .Select(entry => new HostApiOperation(
-                $"global:{entry.JavaScriptPath}",
-                entry.Symbol,
-                "global",
-                entry.JavaScriptPath,
-                false,
-                $"ValueTask<I{Naming.ToCSharpSimpleTypeName(entry.Symbol)}> " +
-                $"Get{Naming.ToCSharpMemberName(entry.Name)}ProxyAsync(CancellationToken)"))
+            .Select(entry =>
+            {
+                var type = ResolveEntryPointContract(entry, rootFactories);
+                return new HostApiOperation(
+                    $"global:{entry.JavaScriptPath}",
+                    entry.Symbol,
+                    type.IsFactory ? "constructor-global" : "global",
+                    entry.JavaScriptPath,
+                    false,
+                    $"ValueTask<{type.DisplayName}> " +
+                    $"Get{Naming.ToCSharpMemberName(entry.Name)}ProxyAsync(CancellationToken)");
+            })
             .ToList();
         return new InfrastructureResult(writer.ToString(), operations);
     }
@@ -324,6 +331,7 @@ public static class HostPackageEmitter
     private static void EmitCapabilityFacade(
         CSharpWriter writer,
         DomHostKind host,
+        IReadOnlyList<RootFactory> rootFactories,
         HostCapabilityMetadata capability)
     {
         var capabilityName = Naming.ToCSharpSimpleTypeName(capability.Name);
@@ -333,16 +341,16 @@ public static class HostPackageEmitter
             {
                 foreach (var entry in capability.EntryPoints)
                 {
-                    var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
+                    var type = ResolveEntryPointContract(entry, rootFactories);
                     var name = Naming.ToCSharpMemberName(entry.Name);
                     writer.AppendLine(
-                        $"global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.I{type}> " +
+                        $"global::System.Threading.Tasks.ValueTask<{type.QualifiedName}> " +
                         $"Get{name}Async(global::System.Threading.CancellationToken " +
                         "cancellationToken = default);");
                     if (host == DomHostKind.WebAssembly)
                     {
                         writer.AppendLine(
-                            $"global::Blazor.DOM.I{type} Get{name}();");
+                            $"{type.QualifiedName} Get{name}();");
                     }
                 }
             });
@@ -357,22 +365,22 @@ public static class HostPackageEmitter
             {
                 foreach (var entry in capability.EntryPoints)
                 {
-                    var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
+                    var type = ResolveEntryPointContract(entry, rootFactories);
                     var name = Naming.ToCSharpMemberName(entry.Name);
                     writer.AppendLine(
-                        $"public global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.I{type}> " +
+                        $"public global::System.Threading.Tasks.ValueTask<{type.QualifiedName}> " +
                         $"Get{name}Async(global::System.Threading.CancellationToken " +
                         "cancellationToken = default) =>");
                     writer.AppendLine(
-                        $"    browser.GetGlobalAsync<global::Blazor.DOM.I{type}>(" +
+                        $"    browser.GetGlobalAsync<{type.QualifiedName}>(" +
                         $"\"{entry.JavaScriptPath}\", cancellationToken);");
                     if (host == DomHostKind.WebAssembly)
                     {
                         writer.AppendLine();
                         writer.AppendLine(
-                            $"public global::Blazor.DOM.I{type} Get{name}() =>");
+                            $"public {type.QualifiedName} Get{name}() =>");
                         writer.AppendLine(
-                            $"    proxyFactory.Create<global::Blazor.DOM.I{type}>(" +
+                            $"    proxyFactory.Create<{type.QualifiedName}>(" +
                             "((IDomSyncRuntime)runtime).GetGlobalRef(" +
                             $"\"{entry.JavaScriptPath}\"));");
                     }
@@ -449,6 +457,34 @@ public static class HostPackageEmitter
                 writer.AppendLine("    return services;");
                 writer.AppendLine("}");
             });
+    }
+
+    private static EntryPointContract ResolveEntryPointContract(
+        HostEntryPoint entry,
+        IReadOnlyList<RootFactory> rootFactories)
+    {
+        var factory = rootFactories.SingleOrDefault(candidate =>
+            string.Equals(
+                candidate.JavaScriptName,
+                entry.JavaScriptPath,
+                StringComparison.Ordinal)
+            && string.Equals(
+                candidate.JavaScriptName,
+                entry.Symbol,
+                StringComparison.Ordinal));
+        if (factory is not null)
+        {
+            return new EntryPointContract(
+                $"global::{factory.Namespace}.{factory.ContractType}",
+                factory.ContractType,
+                IsFactory: true);
+        }
+
+        var type = Naming.ToCSharpSimpleTypeName(entry.Symbol);
+        return new EntryPointContract(
+            $"global::Blazor.DOM.I{type}",
+            $"I{type}",
+            IsFactory: false);
     }
 
     private static void ValidateEntryPoints(
@@ -583,6 +619,11 @@ public static class HostPackageEmitter
         string Namespace,
         string ContractType,
         string AccessorName);
+
+    private sealed record EntryPointContract(
+        string QualifiedName,
+        string DisplayName,
+        bool IsFactory);
 
     private sealed record InfrastructureResult(
         string Source,
