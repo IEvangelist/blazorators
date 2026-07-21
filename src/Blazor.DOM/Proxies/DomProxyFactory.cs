@@ -100,6 +100,21 @@ public sealed class DomProxyFactory(IDomRuntime runtime) : IDomProxyFactory
                 ?? throw new InvalidOperationException(
                     $"Generated proxy '{proxyType}' could not be constructed."));
         }
+        if (contractType.IsConstructedGenericType
+            && contractType.GetGenericTypeDefinition() is var arrayContract
+            && (arrayContract == typeof(IReadOnlyBrowserArray<>)
+                || arrayContract == typeof(IBrowserArray<>)))
+        {
+            var proxyType = typeof(BrowserArrayDomProxy<>).MakeGenericType(
+                contractType.GetGenericArguments());
+            return (IDomProxy)(Activator.CreateInstance(
+                proxyType,
+                reference,
+                runtime,
+                this)
+                ?? throw new InvalidOperationException(
+                    $"Browser array proxy '{proxyType}' could not be constructed."));
+        }
 
         throw new InvalidOperationException(
             $"No proxy factory registered for '{contractType.Name}'. " +
