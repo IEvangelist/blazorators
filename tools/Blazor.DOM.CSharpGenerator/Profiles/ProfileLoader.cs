@@ -135,6 +135,26 @@ public static class ProfileLoader
                     $"Entry point '{entry.Name}' has invalid JavaScript path " +
                     $"'{entry.JavaScriptPath}'.");
             }
+            if (!entry.InvokesFunction && entry.Parameter is not null)
+            {
+                throw new InvalidDataException(
+                    $"Entry point '{entry.Name}' declares a function parameter " +
+                    "without enabling function invocation.");
+            }
+            if (entry.InvokesFunction
+                && !entry.JavaScriptPath.Contains('.', StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    $"Function entry point '{entry.Name}' must declare an explicit " +
+                    "receiver-qualified JavaScript path.");
+            }
+            if (entry.Parameter is { } parameter
+                && (!IsValidIdentifier(parameter.Name)
+                    || !IsValidIdentifier(parameter.Type)))
+            {
+                throw new InvalidDataException(
+                    $"Function entry point '{entry.Name}' has an invalid parameter.");
+            }
         }
     }
 
@@ -144,4 +164,10 @@ public static class ProfileLoader
             && (char.IsLetter(segment[0]) || segment[0] is '_' or '$')
             && segment.Skip(1).All(character =>
                 char.IsLetterOrDigit(character) || character is '_' or '$'));
+
+    private static bool IsValidIdentifier(string value)
+        => value.Length > 0
+            && (char.IsLetter(value[0]) || value[0] is '_')
+            && value.Skip(1).All(character =>
+                char.IsLetterOrDigit(character) || character is '_');
 }

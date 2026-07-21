@@ -101,6 +101,32 @@ public sealed class ServerDomRuntimeTests
     }
 
     [Fact]
+    public async Task InvokeGlobalRefAsync_calls_receiver_qualified_function()
+    {
+        var (runtime, module) = CreateRuntime();
+        var resultReference = new FakeJSObjectReference();
+        module.ReturnValues["invokeGlobal"] = resultReference;
+        object?[] options =
+        [
+            new Dictionary<string, object?>
+            {
+                ["sysex"] = true,
+            },
+        ];
+
+        var result = await runtime.InvokeGlobalRefAsync(
+            "navigator.requestMIDIAccess",
+            options);
+
+        Assert.Same(resultReference, result);
+        var call = Assert.Single(
+            module.Invocations,
+            invocation => invocation.Identifier == "invokeGlobal");
+        Assert.Equal("navigator.requestMIDIAccess", call.Args![0]);
+        Assert.Equal(options, Assert.IsType<object?[]>(call.Args[1]));
+    }
+
+    [Fact]
     public async Task ConstructAsync_calls_construct_with_path_and_args()
     {
         var (runtime, module) = CreateRuntime();

@@ -583,6 +583,91 @@ public sealed class FocusedPackageGenerationTests
     }
 
     [Fact]
+    public void GlobalFunctionEntryPoint_EmitsPromiseProxyInvocationWithTypedOptions()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "WebMIDI",
+                "Web MIDI.",
+                ["MIDIAccess", "MIDIOptions"],
+                true,
+                false,
+                ["web-midi"],
+                "Blazor.DOM",
+                "Profiles/WebMIDI",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["MIDIAccess"] = ["sysexEnabled"],
+                    ["MIDIOptions"] = ["*"],
+                },
+                true,
+                EntryPoints:
+                [
+                    new HostEntryPoint(
+                        "RequestMIDIAccess",
+                        "MIDIAccess",
+                        "navigator.requestMIDIAccess",
+                        InvokesFunction: true,
+                        Parameter: new HostEntryPointParameter(
+                            "options",
+                            "MIDIOptions",
+                            Optional: true)),
+                ]);
+
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+
+            Assert.Empty(result.PipelineResult.Errors);
+            var generated = Path.Combine(output, "Profiles", "WebMIDI");
+            var serverSource = File.ReadAllText(Path.Combine(
+                generated,
+                "Server",
+                "GeneratedDomHost.g.cs"));
+            var wasmSource = File.ReadAllText(Path.Combine(
+                generated,
+                "WebAssembly",
+                "GeneratedDomHost.g.cs"));
+            const string signature =
+                "RequestMIDIAccessAsync(global::Blazor.DOM.MIDIOptions? options = null";
+            Assert.Contains(signature, serverSource, StringComparison.Ordinal);
+            Assert.Contains(signature, wasmSource, StringComparison.Ordinal);
+            Assert.Contains(
+                "browser.InvokeGlobalAsync<global::Blazor.DOM.IMIDIAccess>(",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "\"navigator.requestMIDIAccess\", options is null ? null : [options]",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "IMIDIAccess GetRequestMIDIAccess()",
+                wasmSource,
+                StringComparison.Ordinal);
+
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            Assert.True(hosts.Parity.Exact);
+            Assert.Contains(
+                hosts.Server.Operations,
+                operation =>
+                    operation.Kind == "global-function"
+                    && operation.Promise
+                    && operation.JavaScriptName == "navigator.requestMIDIAccess");
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
     public void MediaDevicesProfile_EmitsExactProxyTransportAndLifecycleSurface()
     {
         var output = CreateTempDir();

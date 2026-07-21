@@ -402,6 +402,20 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     }
 
     /// <inheritdoc />
+    public async ValueTask<IJSObjectReference> InvokeGlobalRefAsync(
+        string path,
+        object?[]? args,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await module.InvokeAsync<IJSObjectReference>(
+            "invokeGlobal", cancellationToken, [path, preparedArgs])
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask<IJSObjectReference> ConstructAsync(
         string ctorPath, object?[]? args, CancellationToken cancellationToken = default)
     {

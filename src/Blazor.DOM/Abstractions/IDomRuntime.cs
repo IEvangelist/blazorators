@@ -163,6 +163,15 @@ public interface IDomRuntime
         string path,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Invokes an explicit receiver-qualified global function and returns its
+    /// fulfilled live JavaScript object reference.
+    /// </summary>
+    ValueTask<IJSObjectReference> InvokeGlobalRefAsync(
+        string path,
+        object?[]? args,
+        CancellationToken cancellationToken = default);
+
     // ── Constructor ──────────────────────────────────────────────────────────
 
     /// <summary>

@@ -28,6 +28,23 @@ export function getGlobal(path) {
     return obj;
 }
 
+/**
+ * Invoke a receiver-qualified function from the global scope.
+ * @param {string} path e.g. "navigator.requestMIDIAccess"
+ * @param {Array} args
+ * @returns {*}
+ */
+export function invokeGlobal(path, args) {
+    const parts = path.split('.');
+    const name = parts.pop();
+    const receiver = getGlobal(parts.join('.'));
+    const fn = receiver?.[name];
+    if (typeof fn !== 'function') {
+        throw new TypeError(`'${path}' is not a function (got ${typeof fn})`);
+    }
+    return fn.apply(receiver, args ?? []);
+}
+
 // ─── Property access ──────────────────────────────────────────────────────────
 
 /**

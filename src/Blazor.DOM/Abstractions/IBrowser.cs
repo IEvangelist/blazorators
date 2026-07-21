@@ -33,4 +33,14 @@ public interface IBrowser : IAsyncDisposable
         string path,
         CancellationToken cancellationToken = default)
         where TProxy : class, IDomProxy;
+
+    /// <summary>
+    /// Invokes an explicit receiver-qualified global function and owns the
+    /// returned typed proxy.
+    /// </summary>
+    ValueTask<TProxy> InvokeGlobalAsync<TProxy>(
+        string path,
+        object?[]? args,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
 }

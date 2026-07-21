@@ -82,6 +82,10 @@ public static partial class InteropAnchorLoader
             .OrderBy(entryPoint => entryPoint.Name, StringComparer.Ordinal)
             .ToList();
         var configured = profile.EntryPoints
+            .Select(entryPoint => new HostEntryPoint(
+                entryPoint.Name,
+                entryPoint.Symbol,
+                entryPoint.JavaScriptPath))
             .Select(Normalize)
             .OrderBy(entryPoint => entryPoint.Name, StringComparer.Ordinal)
             .ToList();

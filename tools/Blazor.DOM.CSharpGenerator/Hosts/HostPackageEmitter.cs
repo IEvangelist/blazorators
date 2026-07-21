@@ -280,16 +280,28 @@ public static class HostPackageEmitter
                 foreach (var entry in capability.EntryPoints)
                 {
                     var type = ResolveEntryPointContract(entry, rootFactories);
-                    var name = Naming.ToCSharpMemberName(entry.Name);
+                    var methodName = EntryPointMethodName(
+                        entry,
+                        proxySuffix: true);
+                    var parameters = EntryPointParameters(entry);
                     writer.AppendLine(
                         "public static global::System.Threading.Tasks.ValueTask<" +
-                        $"{type.QualifiedName}> Get{name}ProxyAsync(");
+                        $"{type.QualifiedName}> {methodName}(");
                     writer.AppendLine(
-                        "    this IBrowser browser, global::System.Threading." +
-                        "CancellationToken cancellationToken = default) =>");
-                    writer.AppendLine(
-                        $"    browser.GetGlobalAsync<{type.QualifiedName}>(" +
-                        $"\"{entry.JavaScriptPath}\", cancellationToken);");
+                        $"    this IBrowser browser, {parameters}) =>");
+                    if (entry.InvokesFunction)
+                    {
+                        writer.AppendLine(
+                            $"    browser.InvokeGlobalAsync<{type.QualifiedName}>(" +
+                            $"\"{entry.JavaScriptPath}\", {EntryPointArguments(entry)}, " +
+                            "cancellationToken);");
+                    }
+                    else
+                    {
+                        writer.AppendLine(
+                            $"    browser.GetGlobalAsync<{type.QualifiedName}>(" +
+                            $"\"{entry.JavaScriptPath}\", cancellationToken);");
+                    }
                     writer.AppendLine();
                 }
                 writer.Block(
@@ -316,13 +328,18 @@ public static class HostPackageEmitter
             {
                 var type = ResolveEntryPointContract(entry, rootFactories);
                 return new HostApiOperation(
-                    $"global:{entry.JavaScriptPath}",
+                    entry.InvokesFunction
+                        ? $"global-function:{entry.JavaScriptPath}"
+                        : $"global:{entry.JavaScriptPath}",
                     entry.Symbol,
-                    type.IsFactory ? "constructor-global" : "global",
+                    entry.InvokesFunction
+                        ? "global-function"
+                        : type.IsFactory ? "constructor-global" : "global",
                     entry.JavaScriptPath,
-                    false,
+                    entry.InvokesFunction,
                     $"ValueTask<{type.DisplayName}> " +
-                    $"Get{Naming.ToCSharpMemberName(entry.Name)}ProxyAsync(CancellationToken)");
+                    $"{EntryPointMethodName(entry, proxySuffix: true)}" +
+                    $"({EntryPointManifestParameters(entry)})");
             })
             .ToList();
         return new InfrastructureResult(writer.ToString(), operations);
@@ -342,13 +359,15 @@ public static class HostPackageEmitter
                 foreach (var entry in capability.EntryPoints)
                 {
                     var type = ResolveEntryPointContract(entry, rootFactories);
-                    var name = Naming.ToCSharpMemberName(entry.Name);
+                    var methodName = EntryPointMethodName(
+                        entry,
+                        proxySuffix: false);
                     writer.AppendLine(
                         $"global::System.Threading.Tasks.ValueTask<{type.QualifiedName}> " +
-                        $"Get{name}Async(global::System.Threading.CancellationToken " +
-                        "cancellationToken = default);");
-                    if (host == DomHostKind.WebAssembly)
+                        $"{methodName}({EntryPointParameters(entry)});");
+                    if (host == DomHostKind.WebAssembly && !entry.InvokesFunction)
                     {
+                        var name = Naming.ToCSharpMemberName(entry.Name);
                         writer.AppendLine(
                             $"{type.QualifiedName} Get{name}();");
                     }
@@ -367,14 +386,26 @@ public static class HostPackageEmitter
                 {
                     var type = ResolveEntryPointContract(entry, rootFactories);
                     var name = Naming.ToCSharpMemberName(entry.Name);
+                    var methodName = EntryPointMethodName(
+                        entry,
+                        proxySuffix: false);
                     writer.AppendLine(
                         $"public global::System.Threading.Tasks.ValueTask<{type.QualifiedName}> " +
-                        $"Get{name}Async(global::System.Threading.CancellationToken " +
-                        "cancellationToken = default) =>");
-                    writer.AppendLine(
-                        $"    browser.GetGlobalAsync<{type.QualifiedName}>(" +
-                        $"\"{entry.JavaScriptPath}\", cancellationToken);");
-                    if (host == DomHostKind.WebAssembly)
+                        $"{methodName}({EntryPointParameters(entry)}) =>");
+                    if (entry.InvokesFunction)
+                    {
+                        writer.AppendLine(
+                            $"    browser.InvokeGlobalAsync<{type.QualifiedName}>(" +
+                            $"\"{entry.JavaScriptPath}\", {EntryPointArguments(entry)}, " +
+                            "cancellationToken);");
+                    }
+                    else
+                    {
+                        writer.AppendLine(
+                            $"    browser.GetGlobalAsync<{type.QualifiedName}>(" +
+                            $"\"{entry.JavaScriptPath}\", cancellationToken);");
+                    }
+                    if (host == DomHostKind.WebAssembly && !entry.InvokesFunction)
                     {
                         writer.AppendLine();
                         writer.AppendLine(
@@ -516,7 +547,54 @@ public static class HostPackageEmitter
                     $"Host entry point '{entry.Name}' references ambiguous symbol " +
                     $"'{entry.Symbol}'.");
             }
+            if (entry.Parameter is { } parameter
+                && !symbols.ContainsKey(parameter.Type))
+            {
+                throw new InvalidOperationException(
+                    $"Host entry point '{entry.Name}' references missing parameter " +
+                    $"type '{parameter.Type}'.");
+            }
         }
+    }
+
+    private static string EntryPointMethodName(
+        HostEntryPoint entry,
+        bool proxySuffix)
+    {
+        var name = Naming.ToCSharpMemberName(entry.Name);
+        if (entry.InvokesFunction)
+            return $"{name}{(proxySuffix ? "Proxy" : string.Empty)}Async";
+        return $"Get{name}{(proxySuffix ? "Proxy" : string.Empty)}Async";
+    }
+
+    private static string EntryPointParameters(HostEntryPoint entry)
+    {
+        const string cancellation =
+            "global::System.Threading.CancellationToken cancellationToken = default";
+        if (entry.Parameter is not { } parameter)
+            return cancellation;
+        var type = $"global::Blazor.DOM.{parameter.Type}";
+        var optional = parameter.Optional ? "? " : " ";
+        var defaultValue = parameter.Optional ? " = null" : string.Empty;
+        return $"{type}{optional}{parameter.Name}{defaultValue}, {cancellation}";
+    }
+
+    private static string EntryPointArguments(HostEntryPoint entry)
+    {
+        if (entry.Parameter is not { } parameter)
+            return "null";
+        return parameter.Optional
+            ? $"{parameter.Name} is null ? null : [{parameter.Name}]"
+            : $"[{parameter.Name}]";
+    }
+
+    private static string EntryPointManifestParameters(HostEntryPoint entry)
+    {
+        var parameter = entry.Parameter is null
+            ? string.Empty
+            : $"{entry.Parameter.Type}{(entry.Parameter.Optional ? "?" : string.Empty)} " +
+                $"{entry.Parameter.Name}, ";
+        return $"{parameter}CancellationToken";
     }
 
     private static InfrastructureResult EmitFactoryNavigation(

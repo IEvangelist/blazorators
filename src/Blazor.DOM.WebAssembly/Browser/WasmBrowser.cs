@@ -36,6 +36,16 @@ internal sealed class WasmBrowser(
             await runtime.GetGlobalAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <inheritdoc />
+    public async ValueTask<TProxy> InvokeGlobalAsync<TProxy>(
+        string path,
+        object?[]? args,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy =>
+        proxyFactory.Create<TProxy>(
+            await runtime.InvokeGlobalRefAsync(path, args, cancellationToken)
+                .ConfigureAwait(false));
+
+    /// <inheritdoc />
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     /// <inheritdoc />

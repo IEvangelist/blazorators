@@ -148,6 +148,32 @@ public sealed class WasmDomRuntimeTests
         Assert.Equal("asyncVal", result);
     }
 
+    [Fact]
+    public async Task InvokeGlobalRefAsync_uses_async_module_and_preserves_args()
+    {
+        var (runtime, module) = await CreateInitializedRuntime();
+        var resultReference = new FakeJSInProcessObjectReference();
+        module.ReturnValues["invokeGlobal"] = resultReference;
+        object?[] options =
+        [
+            new Dictionary<string, object?>
+            {
+                ["sysex"] = true,
+            },
+        ];
+
+        var result = await runtime.InvokeGlobalRefAsync(
+            "navigator.requestMIDIAccess",
+            options);
+
+        Assert.Same(resultReference, result);
+        var call = Assert.Single(
+            module.Invocations,
+            invocation => invocation.Identifier == "invokeGlobal");
+        Assert.Equal("navigator.requestMIDIAccess", call.Args![0]);
+        Assert.Equal(options, Assert.IsType<object?[]>(call.Args[1]));
+    }
+
     // ── Init guard ────────────────────────────────────────────────────────
 
     [Fact]
