@@ -13,7 +13,7 @@ namespace Blazor.DOM.AdvancedTypes;
 
 // TypeScript union: void | PromiseLike<void>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct UnderlyingDefaultSourceUnionShape_d730ede0a6<R> : IEquatable<UnderlyingDefaultSourceUnionShape_d730ede0a6<R>>, IDomUnionValue
+public readonly struct UnderlyingByteSourceUnionShape_a50e47fe70 : IEquatable<UnderlyingByteSourceUnionShape_a50e47fe70>, IDomUnionValue
 {
     public enum ArmKind : byte
     {
@@ -32,30 +32,30 @@ public readonly struct UnderlyingDefaultSourceUnionShape_d730ede0a6<R> : IEquata
         ArmKind.PromiseLike => DomTransportDescriptor.JsonValue("PromiseLike<void>", nullable: false),
         _ => DomTransportDescriptor.Unsupported("uninitialized union", "A default union value has no selected arm."),
     };
-    private UnderlyingDefaultSourceUnionShape_d730ede0a6(ArmKind kind, object? value) => (Kind, _value) = (kind, value);
+    private UnderlyingByteSourceUnionShape_a50e47fe70(ArmKind kind, object? value) => (Kind, _value) = (kind, value);
 
-    public static UnderlyingDefaultSourceUnionShape_d730ede0a6<R> FromUndefined() => new(ArmKind.Undefined, null);
+    public static UnderlyingByteSourceUnionShape_a50e47fe70 FromUndefined() => new(ArmKind.Undefined, null);
     public bool IsUndefined => Kind == ArmKind.Undefined;
 
-    public static UnderlyingDefaultSourceUnionShape_d730ede0a6<R> FromPromiseLike(ValueTask value) => new(ArmKind.PromiseLike, value);
+    public static UnderlyingByteSourceUnionShape_a50e47fe70 FromPromiseLike(global::Microsoft.JSInterop.IBrowserPromise value) => new(ArmKind.PromiseLike, value);
     public bool IsPromiseLike => Kind == ArmKind.PromiseLike;
-    public ValueTask GetPromiseLike() => Kind == ArmKind.PromiseLike ? (ValueTask)_value! : throw new InvalidOperationException($"The union contains '{Kind}', not 'PromiseLike'.");
-    public bool TryGetPromiseLike([MaybeNullWhen(false)] out ValueTask value)
+    public global::Microsoft.JSInterop.IBrowserPromise GetPromiseLike() => Kind == ArmKind.PromiseLike ? (global::Microsoft.JSInterop.IBrowserPromise)_value! : throw new InvalidOperationException($"The union contains '{Kind}', not 'PromiseLike'.");
+    public bool TryGetPromiseLike([MaybeNullWhen(false)] out global::Microsoft.JSInterop.IBrowserPromise value)
     {
         if (Kind == ArmKind.PromiseLike)
         {
-            value = (ValueTask)_value!;
+            value = (global::Microsoft.JSInterop.IBrowserPromise)_value!;
             return true;
         }
         value = default;
         return false;
     }
 
-    public bool Equals(UnderlyingDefaultSourceUnionShape_d730ede0a6<R> other) => Kind == other.Kind && EqualityComparer<object?>.Default.Equals(_value, other._value);
-    public override bool Equals(object? obj) => obj is UnderlyingDefaultSourceUnionShape_d730ede0a6<R> other && Equals(other);
+    public bool Equals(UnderlyingByteSourceUnionShape_a50e47fe70 other) => Kind == other.Kind && EqualityComparer<object?>.Default.Equals(_value, other._value);
+    public override bool Equals(object? obj) => obj is UnderlyingByteSourceUnionShape_a50e47fe70 other && Equals(other);
     public override int GetHashCode() => HashCode.Combine(Kind, _value);
-    public static bool operator ==(UnderlyingDefaultSourceUnionShape_d730ede0a6<R> left, UnderlyingDefaultSourceUnionShape_d730ede0a6<R> right) => left.Equals(right);
-    public static bool operator !=(UnderlyingDefaultSourceUnionShape_d730ede0a6<R> left, UnderlyingDefaultSourceUnionShape_d730ede0a6<R> right) => !left.Equals(right);
+    public static bool operator ==(UnderlyingByteSourceUnionShape_a50e47fe70 left, UnderlyingByteSourceUnionShape_a50e47fe70 right) => left.Equals(right);
+    public static bool operator !=(UnderlyingByteSourceUnionShape_a50e47fe70 left, UnderlyingByteSourceUnionShape_a50e47fe70 right) => !left.Equals(right);
     public override string ToString() => Kind switch
     {
         ArmKind.Uninitialized => "(uninitialized)",

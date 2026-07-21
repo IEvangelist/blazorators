@@ -44,6 +44,7 @@ WakeLockType Type { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/release)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("release")]
 ValueTask ReleaseAsync();
 
     // DEFERRED (event-subscription): addEventListener<K> — deferred to typed event subscription phase.

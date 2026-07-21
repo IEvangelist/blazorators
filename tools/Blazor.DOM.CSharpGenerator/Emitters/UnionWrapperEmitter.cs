@@ -148,8 +148,9 @@ internal static class UnionWrapperEmitter
                 writer.AppendLine(
                     $"public {candidate.Projection!.RenderedType} " +
                     $"TakeUnclassifiedAs{candidate.Name}(" +
-                    "IDomProxyFactory proxyFactory) => GetUnclassifiedReference().TakeAs<" +
-                    $"{candidate.Projection.RenderedType}>(proxyFactory);");
+                    $"Func<IJSObjectReference, {candidate.Projection.RenderedType}> " +
+                    "candidateFactory) => GetUnclassifiedReference().TakeAs(" +
+                    "candidateFactory);");
             }
             writer.AppendLine();
         }

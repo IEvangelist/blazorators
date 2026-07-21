@@ -7,12 +7,11 @@
 
 namespace Blazor.DOM;
 
-// Typedef alias: ClipboardItemData = ValueTask<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76>
+// Typedef alias: ClipboardItemData = global::Microsoft.JSInterop.IBrowserPromise<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76>
 public readonly struct ClipboardItemData
 {
-    public ValueTask<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76> Value { get; }
-    public ClipboardItemData(ValueTask<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76> value) => Value = value;
-    public static implicit operator ValueTask<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76>(ClipboardItemData a) => a.Value;
-    public static implicit operator ClipboardItemData(ValueTask<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76> v) => new(v);
+    public global::Microsoft.JSInterop.IBrowserPromise<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76> Value { get; }
+    public ClipboardItemData(global::Microsoft.JSInterop.IBrowserPromise<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76> value) => Value = value;
+    public static ClipboardItemData From(global::Microsoft.JSInterop.IBrowserPromise<global::Blazor.DOM.AdvancedTypes.ClipboardItemDataUnionShape_14acc04c76> v) => new(v);
     public override string ToString() => $"{Value}";
 }

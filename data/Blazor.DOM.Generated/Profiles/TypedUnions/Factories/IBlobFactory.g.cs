@@ -10,4 +10,6 @@ namespace Blazor.DOM;
 public partial interface IBlobFactory
 {
     IBlob Prototype { get; set; }
+
+    IBlob Create(global::Microsoft.JSInterop.IBrowserArray<BlobPart>? blobParts = default, BlobPropertyBag? options = default);
 }

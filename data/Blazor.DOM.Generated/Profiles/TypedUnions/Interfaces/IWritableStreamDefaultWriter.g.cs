@@ -20,8 +20,8 @@ public partial interface IWritableStreamDefaultWriter<W>
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)
 /// </summary>
-[global::Microsoft.JSInterop.DomAccessor("closed", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = true)]
-ValueTask Closed { get; }
+[global::Microsoft.JSInterop.DomAccessor("closed", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = false)]
+global::Microsoft.JSInterop.IBrowserPromise Closed { get; }
 
     /// <summary>
 /// The **`desiredSize`** read-only property of the to fill the stream's internal queue.
@@ -36,14 +36,15 @@ double? DesiredSize { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready)
 /// </summary>
-[global::Microsoft.JSInterop.DomAccessor("ready", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = true)]
-ValueTask Ready { get; }
+[global::Microsoft.JSInterop.DomAccessor("ready", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<void>", Nullable = false, Streamable = false, StructuredClone = false)]
+global::Microsoft.JSInterop.IBrowserPromise Ready { get; }
 
     /// <summary>
 /// The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded.
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("abort")]
 ValueTask AbortAsync(object? reason = default);
 
     /// <summary>
@@ -51,6 +52,7 @@ ValueTask AbortAsync(object? reason = default);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("close")]
 ValueTask CloseAsync();
 
     /// <summary>
@@ -65,5 +67,6 @@ void ReleaseLock();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("write")]
 ValueTask WriteAsync(W? chunk = default);
 }

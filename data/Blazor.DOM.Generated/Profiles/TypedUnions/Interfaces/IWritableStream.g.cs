@@ -29,6 +29,7 @@ bool Locked { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("abort")]
 ValueTask AbortAsync(object? reason = default);
 
     /// <summary>
@@ -36,6 +37,7 @@ ValueTask AbortAsync(object? reason = default);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("close")]
 ValueTask CloseAsync();
 
     /// <summary>

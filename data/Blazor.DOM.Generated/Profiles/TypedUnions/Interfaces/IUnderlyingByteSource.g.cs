@@ -19,7 +19,7 @@ UnderlyingSourceCancelCallback? Cancel { get; set; }
 
     [global::Microsoft.JSInterop.DomAccessor("pull", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableByteStreamController) => void | PromiseLike<void>", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableByteStreamController) => void | PromiseLike<void>' has an ambiguous function shape.")]
 [global::Microsoft.JSInterop.DomAccessor("pull", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableByteStreamController) => void | PromiseLike<void>", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableByteStreamController) => void | PromiseLike<void>' has an ambiguous function shape.")]
-Func<IReadableByteStreamController, global::Blazor.DOM.AdvancedTypes.UnderlyingByteSourceUnionShape_d4d73ae565>? Pull { get; set; }
+Func<IReadableByteStreamController, global::Blazor.DOM.AdvancedTypes.UnderlyingByteSourceUnionShape_a50e47fe70>? Pull { get; set; }
 
     [global::Microsoft.JSInterop.DomAccessor("start", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableByteStreamController) => any", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableByteStreamController) => any' has an ambiguous function shape.")]
 [global::Microsoft.JSInterop.DomAccessor("start", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "(controller: ReadableByteStreamController) => any", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript '(controller: ReadableByteStreamController) => any' has an ambiguous function shape.")]
@@ -27,5 +27,5 @@ Func<IReadableByteStreamController, object>? Start { get; set; }
 
     [global::Microsoft.JSInterop.DomAccessor("type", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"bytes\"", Nullable = false, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomAccessor("type", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"bytes\"", Nullable = false, Streamable = false, StructuredClone = true)]
-string Type { get; set; }
+global::Blazor.DOM.AdvancedTypes.UnderlyingByteSourceStringShape_20c4f51c50 Type { get; set; }
 }

@@ -7,4 +7,4 @@
 
 namespace Blazor.DOM;
 
-public delegate global::Blazor.DOM.AdvancedTypes.UnderlyingByteSourceUnionShape_d4d73ae565 UnderlyingSinkCloseCallback();
+public delegate global::Blazor.DOM.AdvancedTypes.UnderlyingByteSourceUnionShape_a50e47fe70 UnderlyingSinkCloseCallback();

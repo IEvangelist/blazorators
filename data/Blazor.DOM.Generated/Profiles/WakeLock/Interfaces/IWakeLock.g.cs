@@ -21,5 +21,6 @@ public partial interface IWakeLock
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLock/request)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("request")]
 ValueTask<IWakeLockSentinel> RequestAsync(WakeLockType type = default);
 }

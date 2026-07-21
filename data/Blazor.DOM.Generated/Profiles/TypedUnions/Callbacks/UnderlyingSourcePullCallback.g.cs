@@ -7,4 +7,4 @@
 
 namespace Blazor.DOM;
 
-public delegate global::Blazor.DOM.AdvancedTypes.UnderlyingDefaultSourceUnionShape_d730ede0a6<R> UnderlyingSourcePullCallback<R>(ReadableStreamController<R> controller);
+public delegate global::Blazor.DOM.AdvancedTypes.UnderlyingDefaultSourceUnionShape_08e9d95ddb<R> UnderlyingSourcePullCallback<R>(ReadableStreamController<R> controller);

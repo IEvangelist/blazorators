@@ -1,0 +1,17 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "NonEventDeferrals",
+  "description": "Compact proof for live containers, iterators, absence, constrained values, and promise references.",
+  "rootSymbols": [
+    "AbortSignal",
+    "CSSNumericArray",
+    "Crypto",
+    "PromiseRejectionEvent",
+    "Transformer"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["non-event-deferrals"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/NonEventDeferrals"
+}

@@ -14,7 +14,13 @@ namespace Blazor.DOM;
 /// </summary>
 public partial interface IReadableStreamBYOBReader : IReadableStreamGenericReader
 {
-    // DEFERRED (advanced-generic-constraints): read — Generic constraint for 'T' at 'ReadableStreamBYOBReader/decl[0]/read' targets 'ArrayBufferView', which is not a generated reference/base contract and cannot be used as a faithful C# constraint.
+    /// <summary>
+/// The **`read()`** method of the ReadableStreamBYOBReader interface is used to read data into a view on a user-supplied buffer from an associated readable byte stream.
+///
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/read)
+/// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("read")]
+ValueTask<ReadableStreamReadResult<T>> ReadAsync<T>(T view) where T : global::Blazor.DOM.AdvancedTypes.ReadableStreamBYOBReaderConstraintShape_eacc59663b;
 
     /// <summary>
 /// The **`releaseLock()`** method of the ReadableStreamBYOBReader interface releases the reader's lock on the stream.

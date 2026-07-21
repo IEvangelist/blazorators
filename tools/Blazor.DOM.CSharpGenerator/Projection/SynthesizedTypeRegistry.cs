@@ -59,17 +59,28 @@ internal sealed class SynthesizedTypeRegistry(
 
     public string RegisterReferenceTuple(
         string provenance,
-        IReadOnlyList<SynthesizedTupleElement> elements)
+        IReadOnlyList<SynthesizedTupleElement> elements,
+        GenericScope? scope)
     {
+        var parameters = scope?.GetAllParameters()
+            .Where(parameter => parameter.Substitution is null)
+            .GroupBy(parameter => parameter.CanonicalIdentity, StringComparer.Ordinal)
+            .Select(group => group.First())
+            .ToList() ?? [];
+        var genericList = parameters.Count == 0
+            ? ""
+            : $"<{string.Join(", ", parameters.Select(parameter => parameter.CSharpName))}>";
         var fingerprint =
             $"reference-tuple({string.Join(",", elements.Select(element =>
                 $"{element.SourceName}:{element.Projection.CanonicalType}:" +
-                $"{element.Optional}:{element.Rest}"))})";
+                $"{element.Optional}:{element.Rest}"))})" +
+            $"<params:{string.Join(",", parameters.Select(parameter => parameter.CanonicalIdentity))}>";
         return Register(
             "ReferenceTuple",
             provenance,
             fingerprint,
-            name => EmitReferenceTuple(name, elements));
+            name => EmitReferenceTuple($"{name}{genericList}", elements),
+            genericList);
     }
 
     public string RegisterJsonRecord(
@@ -401,14 +412,14 @@ internal sealed class SynthesizedTypeRegistry(
     }
 
     private string EmitReferenceTuple(
-        string name,
+        string declaredName,
         IReadOnlyList<SynthesizedTupleElement> elements)
     {
         var writer = Header();
         writer.AppendLine();
         writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
         writer.AppendLine();
-        writer.Block($"public partial interface {name} : global::Microsoft.JSInterop.IDomProxy", () =>
+        writer.Block($"public partial interface {declaredName} : global::Microsoft.JSInterop.IDomProxy", () =>
         {
             for (var index = 0; index < elements.Count; index++)
             {

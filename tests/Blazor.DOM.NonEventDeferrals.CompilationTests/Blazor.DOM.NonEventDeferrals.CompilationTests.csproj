@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\NonEventDeferrals\**\*.g.cs" />
+    <ProjectReference Include="..\..\src\Blazor.DOM\Blazor.DOM.csproj" />
+  </ItemGroup>
+
+</Project>

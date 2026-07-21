@@ -21,9 +21,12 @@ public partial interface ISubtleCrypto
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
 ValueTask<JsonWebKey> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_5694ca1bfd format, ICryptoKey key);
 
-    ValueTask<byte[]> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_2ae44cd65a format, ICryptoKey key);
+    [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
+ValueTask<byte[]> ExportKeyAsync(global::Blazor.DOM.AdvancedTypes.SubtleCryptoStringShape_2ae44cd65a format, ICryptoKey key);
 
-    ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef> ExportKeyAsync(KeyFormat format, ICryptoKey key);
+    [global::Microsoft.JSInterop.DomJavaScriptName("exportKey")]
+ValueTask<global::Blazor.DOM.AdvancedTypes.SubtleCryptoUnionShape_fd4d9891ef> ExportKeyAsync(KeyFormat format, ICryptoKey key);
 }

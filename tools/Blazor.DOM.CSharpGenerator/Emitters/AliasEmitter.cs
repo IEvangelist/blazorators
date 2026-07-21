@@ -100,7 +100,11 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         // Generated DOM interfaces and the projected BCL collection interfaces all
         // follow the I + uppercase naming convention.
     {
-        var simpleType = csharpType[(csharpType.LastIndexOf('.') + 1)..];
+        var genericStart = csharpType.IndexOf('<');
+        var typeName = genericStart < 0
+            ? csharpType
+            : csharpType[..genericStart];
+        var simpleType = typeName[(typeName.LastIndexOf('.') + 1)..];
         return simpleType.StartsWith("I", StringComparison.Ordinal)
             && simpleType.Length > 1
             && char.IsUpper(simpleType[1]);
@@ -140,8 +144,6 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             }
             else
             {
-                // C# does not allow implicit operators from/to interfaces
-                w.AppendLine($"public static explicit operator {innerType}({declaredName} a) => a.Value;");
                 w.AppendLine($"public static {declaredName} From({innerType} v) => new(v);");
             }
             w.AppendLine("public override string ToString() => $\"{Value}\";");
@@ -184,8 +186,6 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             }
             else
             {
-                // C# does not allow implicit operators from/to interfaces
-                w.AppendLine($"public static explicit operator {innerType}?({declaredName} a) => a.Value;");
                 w.AppendLine($"public static {declaredName} From({innerType}? v) => new(v);");
             }
             w.AppendLine("public override string ToString() => Value?.ToString() ?? \"(null)\";");

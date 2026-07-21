@@ -38,6 +38,27 @@ public sealed class DomUnclassifiedReference : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Atomically transfers ownership through a strongly typed candidate factory.
+    /// </summary>
+    public TContract TakeAs<TContract>(
+        Func<IJSObjectReference, TContract> candidateFactory)
+    {
+        ArgumentNullException.ThrowIfNull(candidateFactory);
+        var reference = Interlocked.Exchange(ref _reference, null)
+            ?? throw new InvalidOperationException(
+                "The unclassified reference was already transferred or disposed.");
+        try
+        {
+            return candidateFactory(reference);
+        }
+        catch
+        {
+            _reference = reference;
+            throw;
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         var reference = Interlocked.Exchange(ref _reference, null);
