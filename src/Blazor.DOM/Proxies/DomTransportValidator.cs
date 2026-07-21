@@ -78,6 +78,8 @@ internal static class DomTransportValidator
             case DotNetStreamReference:
             case byte[]:
                 return value;
+            case IDomUnionValue union:
+                return PrepareUnion(union, path);
             case DomDynamicValue dynamicValue:
                 return PrepareDynamic(dynamicValue, path);
             default:
@@ -105,10 +107,17 @@ internal static class DomTransportValidator
         Dictionary<object, string> visiting,
         int containerDepth)
     {
+        if (value is IDomUnionValue union)
+        {
+            return PrepareUnion(union, path)
+                ?? throw new DomTransportException(
+                    $"JSON union value at '{path}' selected a null arm.");
+        }
         if (value is JsonElement element)
         {
             return NormalizeJsonElement(element, path, containerDepth);
         }
+
         if (value is JsonDocument document)
         {
             return NormalizeJsonElement(document.RootElement, path, containerDepth);
@@ -192,6 +201,59 @@ internal static class DomTransportValidator
         }
 
         throw UnsupportedJson(type, path);
+    }
+
+    private static object? PrepareUnion(IDomUnionValue union, string path)
+    {
+        if (union.ArmIndex <= 0)
+        {
+            throw new DomTransportException(
+                $"Union value at '{path}' has no selected arm.");
+        }
+        var field = union.GetType().GetField(
+            "_value",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field is null)
+        {
+            throw new DomTransportException(
+                $"Union value '{union.GetType().FullName}' at '{path}' does not expose " +
+                "the generated transport storage contract.");
+        }
+        var value = field.GetValue(union);
+        var descriptor = union.SelectedTransport;
+        if (descriptor.Kind == DomTransportKind.Unsupported)
+        {
+            throw new DomTransportException(
+                $"TypeScript union arm '{descriptor.SourceType}' is unsupported: " +
+                descriptor.Reason);
+        }
+        if (value is null)
+        {
+            if (!descriptor.Nullable)
+            {
+                throw new DomTransportException(
+                    $"TypeScript union arm '{descriptor.SourceType}' at '{path}' is not nullable.");
+            }
+            return null;
+        }
+        return descriptor.Kind switch
+        {
+            DomTransportKind.JsonValue => NormalizeJsonValue(value, path),
+            DomTransportKind.JsReference or DomTransportKind.Transferable =>
+                PrepareDynamicReference(value, descriptor),
+            DomTransportKind.Binary => value is byte[] bytes
+                ? bytes
+                : throw WrongDynamicType(descriptor, value, "byte[]"),
+            DomTransportKind.JsStream => value is DotNetStreamReference stream
+                ? stream
+                : throw WrongDynamicType(
+                    descriptor,
+                    value,
+                    nameof(DotNetStreamReference)),
+            _ => throw new DomTransportException(
+                $"Transport '{descriptor.Kind}' cannot be used for union arm " +
+                $"'{descriptor.SourceType}'."),
+        };
     }
 
     private static JsonElement NormalizeReviewedJsonValue(

@@ -676,10 +676,10 @@ public sealed class HardeningRegressionTests
     }
 
     [Fact]
-    public void TypeResolver_BoolOrEventListenerOptions_ThrowsNotCollapsed()
+    public void TypeResolver_BoolOrEventListenerOptions_UsesTypedUnionWithoutCollapsing()
     {
-        // Pattern 6 (bool|EventListenerOptions collapse to nullable) is removed.
-        // TypeResolver must throw TypeProjectionException for this mixed union.
+        // A mixed bool/options value remains a discriminated union; it must not
+        // collapse to either bool or a nullable options record.
         var eventListenerOptions = new SymbolModel(0, "EventListenerOptions", 0,
             [MakeInterfaceDecl("EventListenerOptions", [])], false,
             new SemanticModel("matched", "EventListenerOptions", "definition", null, ["dictionary"],
@@ -689,7 +689,10 @@ public sealed class HardeningRegressionTests
             new KeywordTypeNode("BooleanKeyword"),
             new ReferenceTypeNode("EventListenerOptions", null, []),
         ]);
-        Assert.Throws<TypeProjectionException>(() => resolver.Project(union, "test/bool-options"));
+        var result = resolver.Project(union, "test/bool-options");
+        Assert.Equal("typed-union", result.ProviderNote);
+        Assert.Contains("UnionShape_", result.RenderedType);
+        Assert.NotEqual("bool", result.RenderedType);
     }
 
     [Fact]

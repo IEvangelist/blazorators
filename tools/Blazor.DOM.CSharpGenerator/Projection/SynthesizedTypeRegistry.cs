@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Blazor.DOM.CSharpGenerator.Emitters;
 using Blazor.DOM.CSharpGenerator.Output;
 
 namespace Blazor.DOM.CSharpGenerator.Projection;
@@ -87,15 +88,56 @@ internal sealed class SynthesizedTypeRegistry(
             name => EmitStringDomain(name, ordered));
     }
 
+    public string RegisterUnion(
+        string provenance,
+        NormalizedUnion normalized,
+        IReadOnlyList<ProjectedUnionArm> arms,
+        GenericScope? scope)
+    {
+        var parameters = scope?.GetAllParameters()
+            .Where(parameter => parameter.Substitution is null)
+            .GroupBy(parameter => parameter.CanonicalIdentity, StringComparer.Ordinal)
+            .Select(group => group.First())
+            .ToList() ?? [];
+        var genericList = parameters.Count == 0
+            ? ""
+            : $"<{string.Join(", ", parameters.Select(parameter => parameter.CSharpName))}>";
+        var fingerprint =
+            $"union({string.Join("|", arms.Select(arm =>
+                $"{arm.Source.Fingerprint}:{arm.Projection?.CanonicalType ?? arm.Source.Special.ToString()}"))})" +
+            $"<params:{string.Join(",", parameters.Select(parameter => parameter.CanonicalIdentity))}>";
+        return Register(
+            "Union",
+            provenance,
+            fingerprint,
+            name => UnionWrapperEmitter.Emit(
+                name,
+                $"{name}{genericList}",
+                "",
+                $"{generatedNamespace}.AdvancedTypes",
+                generatorVersion,
+                arms,
+                "",
+                false,
+                string.Join(" | ", arms.Select(arm =>
+                    arm.Source.Type.CheckerType ?? arm.Source.Type.Kind))),
+            genericList,
+            includeProvenanceInIdentity: false);
+    }
+
     private string Register(
         string kind,
         string provenance,
         string fingerprint,
-        Func<string, string> emit)
+        Func<string, string> emit,
+        string typeArguments = "",
+        bool includeProvenanceInIdentity = true)
     {
-        var identity = $"{kind}:{provenance}:{fingerprint}";
+        var identity = includeProvenanceInIdentity
+            ? $"{kind}:{provenance}:{fingerprint}"
+            : $"{kind}:{fingerprint}";
         if (_byIdentity.TryGetValue(identity, out var existing))
-            return Qualified(existing.Name);
+            return Qualified(existing.Name) + typeArguments;
 
         var owner = provenance
             .Split(['/', '['], 2, StringSplitOptions.RemoveEmptyEntries)
@@ -128,7 +170,7 @@ internal sealed class SynthesizedTypeRegistry(
                 fingerprint,
                 relativePath,
                 emit(name)));
-        return Qualified(name);
+        return Qualified(name) + typeArguments;
     }
 
     private string Qualified(string name)

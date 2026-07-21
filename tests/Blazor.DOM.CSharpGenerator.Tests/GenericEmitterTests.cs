@@ -38,7 +38,7 @@ public sealed class GenericEmitterTests
             Assert.Contains(
                 "public record QueuingStrategy<T>",
                 Read(output, "Dictionaries", "QueuingStrategy.g.cs"));
-            Assert.Contains(
+            Assert.DoesNotContain(
                 result.Manifest.Accounting.DeferredSymbols,
                 entry => entry.Symbol == "ReadableStreamController"
                     && entry.Phase == "typed-union");

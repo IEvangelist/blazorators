@@ -7,7 +7,8 @@ namespace Blazor.DOM.CSharpGenerator.Emitters;
 internal sealed record ProjectedUnionArm(
     NormalizedUnionArm Source,
     TypeProjection? Projection,
-    string Name);
+    string Name,
+    string TransportExpression);
 
 internal static class UnionWrapperEmitter
 {
@@ -29,6 +30,7 @@ internal static class UnionWrapperEmitter
             generatorVersion));
         writer.AppendLine("using System.Diagnostics;");
         writer.AppendLine("using System.Diagnostics.CodeAnalysis;");
+        writer.AppendLine("using Microsoft.JSInterop;");
         writer.AppendLine();
         writer.AppendLine($"namespace {ns};");
         writer.AppendLine();
@@ -36,7 +38,8 @@ internal static class UnionWrapperEmitter
         writer.AppendLine($"// TypeScript union: {sourceDescription}");
         writer.AppendLine($"[DebuggerDisplay(\"{{DebuggerDisplay,nq}}\")]");
         writer.Block(
-            $"public readonly struct {declaredName} : IEquatable<{declaredName}>" +
+            $"public readonly struct {declaredName} : IEquatable<{declaredName}>, " +
+            "IDomUnionValue" +
             declarationSuffix,
             () => EmitBody(writer, name, declaredName, arms));
         return writer.ToString();
@@ -61,6 +64,15 @@ internal static class UnionWrapperEmitter
         writer.AppendLine("private readonly object? _value;");
         writer.AppendLine("public ArmKind Kind { get; }");
         writer.AppendLine("public bool IsInitialized => Kind != ArmKind.Uninitialized;");
+        writer.AppendLine("int IDomUnionValue.ArmIndex => (int)Kind;");
+        writer.AppendLine("DomTransportDescriptor IDomUnionValue.SelectedTransport => Kind switch");
+        writer.OpenBrace();
+        foreach (var arm in arms)
+            writer.AppendLine($"ArmKind.{arm.Name} => {arm.TransportExpression},");
+        writer.AppendLine(
+            "_ => DomTransportDescriptor.Unsupported(\"uninitialized union\", " +
+            "\"A default union value has no selected arm.\"),");
+        writer.CloseBrace(";");
         writer.AppendLine(
             $"private {name}(ArmKind kind, object? value) => (Kind, _value) = (kind, value);");
         writer.AppendLine();
@@ -142,7 +154,8 @@ internal static class UnionWrapperEmitter
             .Select(arm => new ProjectedUnionArm(
                 arm,
                 arm.Special == UnionSpecialArm.None ? project(arm) : null,
-                GetBaseName(arm.Type, arm.Special)))
+                GetBaseName(arm.Type, arm.Special),
+                GetTransportExpression(arm)))
             .ToList();
         var nameGroups = projected
             .GroupBy(arm => arm.Name, StringComparer.Ordinal)
@@ -152,6 +165,59 @@ internal static class UnionWrapperEmitter
         return projected.Select(arm => nameGroups.Contains(arm.Name)
             ? arm with { Name = $"Arm{arm.Source.SourceIndex + 1}" }
             : arm).ToList();
+    }
+
+    public static void ValidateRuntimeArms(
+        string unionName,
+        IReadOnlyList<ProjectedUnionArm> arms)
+    {
+        foreach (var group in arms
+            .Where(arm => arm.Projection is not null)
+            .GroupBy(arm => arm.Projection!.CanonicalType, StringComparer.Ordinal))
+        {
+            if (group.Count() < 2)
+                continue;
+            var items = group.ToList();
+            if (items.All(item => item.Source.Type is LiteralTypeNode))
+                continue;
+            var transportKinds = items
+                .Select(item => item.Source.Type.Transport?.Kind)
+                .ToList();
+            if (transportKinds.All(kind => kind is not null)
+                && transportKinds.Distinct(StringComparer.Ordinal).Count()
+                    == transportKinds.Count)
+            {
+                continue;
+            }
+            if (items.All(item => item.Source.Type.Transport?.Kind == "binary")
+                && items.Select(item => item.Source.Type.CheckerType)
+                    .Distinct(StringComparer.Ordinal)
+                    .Count() == items.Count)
+            {
+                continue;
+            }
+            throw new GenericDeferralException(
+                $"Union '{unionName}' has distinct TypeScript arms at " +
+                $"[{string.Join(", ", items.SelectMany(item => item.Source.Provenances))}] " +
+                $"that project to the same CLR type '{group.Key}' without an inbound " +
+                "runtime discriminator.",
+                items[1].Source.Provenances[0],
+                "typed-union-arm-discriminator");
+        }
+
+        var interfaceArms = arms.Where(arm =>
+            arm.Source.Type is ReferenceTypeNode
+            && arm.Projection?.Identity.Kind == ClrTypeKind.Reference
+            && arm.Source.Type.Transport?.Kind is "js-reference" or "transferable").ToList();
+        if (interfaceArms.Count > 1)
+        {
+            throw new GenericDeferralException(
+                $"Union '{unionName}' contains multiple live interface arms " +
+                $"[{string.Join(", ", interfaceArms.Select(arm => arm.Name))}] with no " +
+                "authoritative inbound brand discriminator.",
+                interfaceArms[1].Source.Provenances[0],
+                "typed-union-interface-discriminator");
+        }
     }
 
     private static string GetBaseName(TypeNode type, UnionSpecialArm special)
@@ -173,4 +239,40 @@ internal static class UnionWrapperEmitter
         };
         return Naming.ToCSharpSimpleTypeName(source);
     }
+
+    private static string GetTransportExpression(NormalizedUnionArm arm)
+    {
+        if (arm.Special != UnionSpecialArm.None)
+        {
+            return $"DomTransportDescriptor.JsonValue(\"{arm.Special.ToString().ToLowerInvariant()}\", " +
+                "nullable: true)";
+        }
+        var transport = arm.Type.Transport;
+        var sourceType = Escape(transport?.SourceType ?? arm.Type.CheckerType ?? arm.Type.Kind);
+        var nullable = transport?.Nullable == true ? "true" : "false";
+        var streamable = transport?.Streamable == true ? "true" : "false";
+        var structuredClone = transport?.StructuredClone == true ? "true" : "false";
+        return transport?.Kind switch
+        {
+            "js-reference" =>
+                $"DomTransportDescriptor.JsReference(\"{sourceType}\", nullable: {nullable}, " +
+                $"streamable: {streamable}, structuredClone: {structuredClone})",
+            "transferable" =>
+                $"DomTransportDescriptor.Transferable(\"{sourceType}\", nullable: {nullable})",
+            "binary" =>
+                $"DomTransportDescriptor.Binary(\"{sourceType}\", nullable: {nullable}, " +
+                $"streamable: {streamable})",
+            "js-stream" =>
+                $"DomTransportDescriptor.JsStream(\"{sourceType}\", nullable: {nullable})",
+            "unsupported" =>
+                $"DomTransportDescriptor.Unsupported(\"{sourceType}\", " +
+                $"\"{Escape(transport.Reason ?? "No authoritative arm transport.")}\", " +
+                $"nullable: {nullable})",
+            _ => $"DomTransportDescriptor.JsonValue(\"{sourceType}\", nullable: {nullable})",
+        };
+    }
+
+    private static string Escape(string value)
+        => value.Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("\"", "\\\"", StringComparison.Ordinal);
 }
