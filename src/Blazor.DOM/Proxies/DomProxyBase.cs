@@ -8,7 +8,7 @@ namespace Microsoft.JSInterop;
 /// reference, the async dispatch runtime, and the proxy factory used to
 /// create child proxies.  Disposing the proxy disposes its owned JS reference.
 /// </summary>
-public abstract class DomProxyBase : IDomEventTargetProxy
+public abstract class DomProxyBase : IDomDispatchProxy
 {
     private int _disposed;
 
@@ -20,6 +20,12 @@ public abstract class DomProxyBase : IDomEventTargetProxy
 
     /// <summary>Proxy factory for creating child proxies from returned references.</summary>
     protected IDomProxyFactory Factory { get; }
+
+    /// <inheritdoc />
+    IDomRuntime IDomDispatchProxy.DispatchRuntime => Runtime;
+
+    /// <inheritdoc />
+    IDomProxyFactory IDomDispatchProxy.DispatchFactory => Factory;
 
     /// <param name="reference">Owned JS object reference.</param>
     /// <param name="runtime">DOM runtime for dispatch.</param>
