@@ -134,7 +134,12 @@ public sealed class ProfileClosureRoutingTests
                             0,
                             "property",
                             "qualified",
-                            Reference("X", "N.X")),
+                            Reference("Root.X", "Root.X")),
+                        Member(
+                            1,
+                            "property",
+                            "lexical",
+                            Reference("X", "Root.X")),
                     ],
                     typeParameters:
                     [
@@ -142,14 +147,14 @@ public sealed class ProfileClosureRoutingTests
                     ])
             ]);
         var dependency = Symbol(
-            "N.X",
+            "Root.X",
             1,
             "interface",
             [InterfaceDeclaration("X")]);
         var symbols = new[] { root, dependency };
 
         Assert.Equal(
-            ["N", "N.X", "Root"],
+            ["Root", "Root.X"],
             TransitiveDependencyResolver.Resolve(["Root"], Index(symbols))
                 .OrderBy(name => name, StringComparer.Ordinal));
 
@@ -161,12 +166,20 @@ public sealed class ProfileClosureRoutingTests
                 "Root",
                 symbols,
                 output);
-            AssertProfileSuccess(result, included: 2, external: ["N"]);
+            AssertProfileSuccess(result, included: 2, external: []);
             Assert.Contains(
                 result.PipelineResult.WrittenFiles,
                 file => file.RelativePath.EndsWith(
-                    Path.Combine("N", "IX.g.cs"),
+                    Path.Combine("Root", "IX.g.cs"),
                     StringComparison.Ordinal));
+            var rootContract = File.ReadAllText(Path.Combine(
+                ProfileRoot(output, "QualifiedTypeParameterCollision"),
+                "Interfaces",
+                "IRoot.g.cs"));
+            Assert.Contains(
+                "global::Blazor.DOM.Namespaces.Root.IX Qualified { get; set; }",
+                rootContract);
+            Assert.Contains("X Lexical { get; set; }", rootContract);
         }
         finally
         {

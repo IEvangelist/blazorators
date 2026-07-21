@@ -162,7 +162,9 @@ public static class TransitiveDependencyResolver
                     ? r.Name
                     : r.ResolvedSymbol;
                 if (!string.IsNullOrEmpty(referenceIdentity)
-                    && !typeParameterScope.Contains(referenceIdentity))
+                    && (!typeParameterScope.Contains(referenceIdentity)
+                        || r.Name.Contains('.', StringComparison.Ordinal)
+                        || !typeParameterScope.Contains(r.Name)))
                     yield return referenceIdentity;
                 foreach (var ta in r.TypeArguments)
                     foreach (var n in CollectTypeNames(ta, typeParameterScope))
