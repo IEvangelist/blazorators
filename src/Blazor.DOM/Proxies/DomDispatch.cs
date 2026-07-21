@@ -93,6 +93,47 @@ public static class DomDispatch
             cancellationToken);
     }
 
+    /// <summary>Reads an indexed value asynchronously.</summary>
+    public static async ValueTask<TResult> GetIndexAsync<TResult>(
+        IDomDispatchProxy proxy,
+        object key,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+    {
+        Validate(proxy, "index", transport);
+        if (IsProxyContract<TResult>())
+        {
+            transport.RequireReference(nameof(transport));
+            var reference = await proxy.DispatchRuntime.GetIndexRefAsync(
+                proxy.Reference,
+                key,
+                cancellationToken).ConfigureAwait(false);
+            return CreateProxy<TResult>(proxy, reference);
+        }
+
+        RequireJsonLike(transport);
+        return await proxy.DispatchRuntime.GetIndexAsync<TResult>(
+            proxy.Reference,
+            key,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Writes an indexed value asynchronously.</summary>
+    public static ValueTask SetIndexAsync<TValue>(
+        IDomDispatchProxy proxy,
+        object key,
+        TValue value,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(proxy);
+        ArgumentNullException.ThrowIfNull(key);
+        return proxy.DispatchRuntime.SetIndexAsync(
+            proxy.Reference,
+            key,
+            value,
+            cancellationToken);
+    }
+
     /// <summary>Combines fixed arguments and a TypeScript rest argument.</summary>
     public static object?[] CombineArguments(object?[] fixedArguments, Array rest)
     {

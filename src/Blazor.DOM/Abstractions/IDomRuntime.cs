@@ -165,10 +165,22 @@ public interface IDomRuntime
         int index,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Reads a reviewed JSON-valued string, number, or symbol key.</summary>
+    ValueTask<TValue> GetIndexAsync<TValue>(
+        IJSObjectReference reference,
+        object index,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Reads a numeric index as a live JS object reference.</summary>
     ValueTask<IJSObjectReference> GetIndexRefAsync(
         IJSObjectReference reference,
         int index,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Reads a string, number, or symbol key as a live JS reference.</summary>
+    ValueTask<IJSObjectReference> GetIndexRefAsync(
+        IJSObjectReference reference,
+        object index,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -186,6 +198,13 @@ public interface IDomRuntime
     ValueTask SetIndexAsync(
         IJSObjectReference reference,
         int index,
+        object? value,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Writes a value to a string, number, or symbol key.</summary>
+    ValueTask SetIndexAsync(
+        IJSObjectReference reference,
+        object index,
         object? value,
         CancellationToken cancellationToken = default);
 
