@@ -431,6 +431,41 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
     }
 
     /// <inheritdoc />
+    public async ValueTask<TResult>
+        InvokeMethodReferenceResultCallbackAsync<TProxy, TResult>(
+            IJSObjectReference reference,
+            string name,
+            int callbackArgumentIndex,
+            object?[]? args,
+            IDomProxyFactory proxyFactory,
+            DomTransportDescriptor transport,
+            Func<DomBorrowedReference<TProxy>?, Task<TResult>> callback,
+            CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(proxyFactory);
+        ArgumentNullException.ThrowIfNull(transport);
+        transport.RequireReference(nameof(transport));
+        ArgumentNullException.ThrowIfNull(callback);
+        var preparedArgs = DomArguments.Prepare(args);
+        var module = await GetAsyncModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport
+            .InvokeReferenceResultCallbackAsync(
+                module,
+                proxyFactory,
+                reference,
+                name,
+                callbackArgumentIndex,
+                preparedArgs,
+                transport,
+                callback,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask<DomReadStream> InvokeMethodStreamAsync(
         IJSObjectReference reference,
         string name,

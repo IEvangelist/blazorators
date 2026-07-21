@@ -124,6 +124,34 @@ public static class DomDispatch
             cancellationToken);
     }
 
+    /// <summary>
+    /// Invokes a Promise-returning method with a one-shot typed-reference callback
+    /// whose managed result becomes the operation result.
+    /// </summary>
+    public static ValueTask<TResult> InvokeReferenceResultCallbackAsync<TProxy, TResult>(
+        IDomDispatchProxy proxy,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? arguments,
+        DomTransportDescriptor callbackTransport,
+        Func<DomBorrowedReference<TProxy>?, Task<TResult>> callback,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        Validate(proxy, name, callbackTransport);
+        ArgumentNullException.ThrowIfNull(callback);
+        return proxy.DispatchRuntime
+            .InvokeMethodReferenceResultCallbackAsync(
+                proxy.Reference,
+                name,
+                callbackArgumentIndex,
+                arguments,
+                proxy.DispatchFactory,
+                callbackTransport,
+                callback,
+                cancellationToken);
+    }
+
     /// <summary>Reads an indexed value asynchronously.</summary>
     public static async ValueTask<TResult> GetIndexAsync<TResult>(
         IDomDispatchProxy proxy,

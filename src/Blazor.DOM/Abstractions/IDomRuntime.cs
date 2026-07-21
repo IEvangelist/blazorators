@@ -114,6 +114,21 @@ public interface IDomRuntime
         where TProxy : class, IDomProxy;
 
     /// <summary>
+    /// Invokes a method with a one-shot callback whose nullable typed-reference
+    /// argument produces the JSON-valued result of the JavaScript operation.
+    /// </summary>
+    ValueTask<TResult> InvokeMethodReferenceResultCallbackAsync<TProxy, TResult>(
+        IJSObjectReference reference,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? args,
+        IDomProxyFactory proxyFactory,
+        DomTransportDescriptor transport,
+        Func<DomBorrowedReference<TProxy>?, Task<TResult>> callback,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy;
+
+    /// <summary>
     /// Invokes a method and opens its Blob, ArrayBuffer, or typed-array result
     /// through an owned, bounded <see cref="IJSStreamReference"/>.
     /// </summary>
