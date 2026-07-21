@@ -1,0 +1,13 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "AdvancedTypes",
+  "description": "Finite key domains and JSON-array tuple value projections.",
+  "rootSymbols": [
+    "HeadersInit"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["advanced-types"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/AdvancedTypes"
+}
