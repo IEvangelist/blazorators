@@ -256,6 +256,51 @@ public sealed class TypeResolver
             typeArguments: arguments.Select(argument => argument.Identity).ToList());
     }
 
+    public TypeProjection ProjectLiteralStringParameter(
+        LiteralTypeNode literal,
+        string provenance)
+    {
+        if (literal.LiteralKind != "StringLiteral")
+        {
+            throw new TypeProjectionException(
+                $"Literal specialization at '{provenance}' requires a string literal.",
+                provenance);
+        }
+        var value = Unquote(literal.Text);
+        var domain = _synthesizedTypes.RegisterStringDomain(
+            $"{provenance}/literal-domain",
+            [value]);
+        return ValueType(
+            domain,
+            providerNote: $"literal-string-domain:{value}",
+            canonicalType: domain,
+            transport: literal.Transport ?? new TransportModel(
+                "json-value",
+                false,
+                literal.CheckerType ?? literal.Text,
+                false,
+                true,
+                null));
+    }
+
+    public TypeProjection ProjectOverloadReturnUnion(
+        IReadOnlyList<TypeNode?> returnTypes,
+        string provenance,
+        GenericScope? scope)
+    {
+        if (returnTypes.Any(type => type is null))
+        {
+            throw new TypeProjectionException(
+                $"Return-only overload set at '{provenance}' includes an implicit " +
+                "void return and cannot form a value union.",
+                provenance);
+        }
+        return Project(
+            new UnionTypeNode(returnTypes.Cast<TypeNode>().ToList()),
+            $"{provenance}/return-union",
+            scope);
+    }
+
     public string GetCSharpTypeReference(string symbolName)
     {
         if (!_symbolIndex.TryGetValue(symbolName, out var symbol))

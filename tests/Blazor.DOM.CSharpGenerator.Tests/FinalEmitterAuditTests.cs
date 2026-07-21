@@ -857,7 +857,7 @@ public sealed class FinalEmitterAuditTests
     }
 
     [Fact]
-    public void InterfaceEmitter_NullableValueTaskReturnCollision_FailsActualMember()
+    public void InterfaceEmitter_NullableValueTaskReturnCollision_EmitsTypedUnion()
     {
         var promise = new ReferenceTypeNode(
             "Promise",
@@ -872,20 +872,197 @@ public sealed class FinalEmitterAuditTests
                 MakeMethod(1, "read", [], nullablePromise),
             ]);
 
-        var exception = Assert.Throws<InterfaceEmitException>(
-            () => new InterfaceEmitter(
+        var resolver = new TypeResolver([]);
+        var result = new InterfaceEmitter(
+            resolver,
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+
+        Assert.Equal(1, result.Source.Split(" ReadAsync(").Length - 1);
+        Assert.Contains("ValueTask<double>? ReadAsync(", result.Source);
+        Assert.All(
+            result.MemberOutcomes.Where(outcome => outcome.Name == "read"),
+            outcome => Assert.Equal(MemberOutcomeStatus.Projected, outcome.Status));
+        Assert.Empty(resolver.SynthesizedTypes);
+    }
+
+    [Fact]
+    public void InterfaceEmitter_LiteralDispatchedReturns_UseDistinctFiniteDomains()
+    {
+        var resolver = new TypeResolver([]);
+        var symbol = MakeInterfaceSymbol(
+            "LiteralDispatchHost",
+            [
+                MakeMethod(
+                    0,
+                    "read",
+                    [MakeParameter(
+                        "kind",
+                        new LiteralTypeNode("StringLiteral", "\"text\""))],
+                    new KeywordTypeNode("StringKeyword")),
+                MakeMethod(
+                    1,
+                    "read",
+                    [MakeParameter(
+                        "kind",
+                        new LiteralTypeNode("StringLiteral", "\"count\""))],
+                    new KeywordTypeNode("NumberKeyword")),
+            ]);
+
+        var result = new InterfaceEmitter(
+            resolver,
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+
+        Assert.Equal(2, result.Source.Split(" Read(").Length - 1);
+        Assert.DoesNotContain("string kind", result.Source);
+        var domains = resolver.SynthesizedTypes
+            .Where(type => type.Kind == "String")
+            .ToList();
+        Assert.Equal(2, domains.Count);
+        Assert.Contains(domains, domain =>
+            domain.Source.Contains("Value = \"text\"", StringComparison.Ordinal));
+        Assert.Contains(domains, domain =>
+            domain.Source.Contains("Value = \"count\"", StringComparison.Ordinal));
+        Assert.All(
+            result.MemberOutcomes.Where(outcome => outcome.Name == "read"),
+            outcome => Assert.Equal(MemberOutcomeStatus.Projected, outcome.Status));
+    }
+
+    [Fact]
+    public void InterfaceEmitter_MergedReturnOnlyOverloads_EmitTypedUnion()
+    {
+        var resolver = new TypeResolver([]);
+        var declarations = new[]
+        {
+            MakeInterfaceDeclaration(
+                "ReturnUnionHost",
+                0,
+                [MakeMethod(0, "read", [], new KeywordTypeNode("StringKeyword"))]),
+            MakeInterfaceDeclaration(
+                "ReturnUnionHost",
+                1,
+                [MakeMethod(0, "read", [], new KeywordTypeNode("NumberKeyword"))]),
+        };
+        var symbol = MakeInterfaceSymbol(
+            "ReturnUnionHost",
+            [],
+            declarations: declarations);
+
+        var result = new InterfaceEmitter(
+            resolver,
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+
+        Assert.Equal(1, result.Source.Split(" Read(").Length - 1);
+        Assert.Contains("UnionShape_", result.Source);
+        Assert.Single(
+            resolver.SynthesizedTypes,
+            type => type.Kind == "Union");
+        Assert.Equal(
+            2,
+            result.MemberOutcomes.Count(outcome =>
+                outcome.Name == "read"
+                && outcome.Status == MemberOutcomeStatus.Projected));
+    }
+
+    [Fact]
+    public void InterfaceEmitter_NormalizedJavaScriptOperationCollision_FailsClosed()
+    {
+        var symbol = MakeInterfaceSymbol(
+            "NormalizedHost",
+            [
+                MakeMethod(0, "readValue", []),
+                MakeMethod(1, "ReadValue", []),
+            ]);
+
+        var exception = Assert.Throws<InterfaceEmitException>(() =>
+            new InterfaceEmitter(
                 new TypeResolver([]),
                 "1.0.0",
                 "Blazor.DOM").Emit(symbol));
 
-        Assert.Equal(2, exception.PartialOutcomes.Count);
+        Assert.Contains("JavaScript operations", exception.Message);
+        Assert.Contains("normalize to the same CLR signature", exception.Message);
+    }
+
+    [Fact]
+    public void InterfaceEmitter_ClrIdenticalReturnTransportCollision_FailsClosed()
+    {
+        var jsonString = new KeywordTypeNode("StringKeyword")
+        {
+            Transport = new TransportModel(
+                "json-value",
+                false,
+                "string",
+                false,
+                true,
+                null),
+        };
+        var binaryString = new KeywordTypeNode("StringKeyword")
+        {
+            Transport = new TransportModel(
+                "binary",
+                false,
+                "EncodedString",
+                false,
+                false,
+                null),
+        };
+        var symbol = MakeInterfaceSymbol(
+            "TransportHost",
+            [
+                MakeMethod(0, "read", [], jsonString),
+                MakeMethod(1, "read", [], binaryString),
+            ]);
+
+        var exception = Assert.Throws<InterfaceEmitException>(() =>
+            new InterfaceEmitter(
+                new TypeResolver([]),
+                "1.0.0",
+                "Blazor.DOM").Emit(symbol));
+
+        Assert.Contains("CLR-identical return type", exception.Message);
+        Assert.Contains("incompatible return transports", exception.Message);
+    }
+
+    [Fact]
+    public void InterfaceEmitter_LiteralDispatchOrdering_IsDeterministic()
+    {
+        var symbol = MakeInterfaceSymbol(
+            "OrderedDispatchHost",
+            [
+                MakeMethod(
+                    0,
+                    "open",
+                    [MakeParameter(
+                        "kind",
+                        new LiteralTypeNode("StringLiteral", "\"first\""))],
+                    new KeywordTypeNode("StringKeyword")),
+                MakeMethod(
+                    1,
+                    "open",
+                    [MakeParameter(
+                        "kind",
+                        new LiteralTypeNode("StringLiteral", "\"second\""))],
+                    new KeywordTypeNode("NumberKeyword")),
+            ]);
+        var firstResolver = new TypeResolver([]);
+        var secondResolver = new TypeResolver([]);
+
+        var first = new InterfaceEmitter(
+            firstResolver,
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+        var second = new InterfaceEmitter(
+            secondResolver,
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+
+        Assert.Equal(first.Source, second.Source);
         Assert.Equal(
-            MemberOutcomeStatus.Projected,
-            exception.PartialOutcomes.Single(outcome => outcome.Ordinal == 0).Status);
-        Assert.Equal(
-            MemberOutcomeStatus.Failed,
-            exception.PartialOutcomes.Single(outcome => outcome.Ordinal == 1).Status);
-        Assert.Contains("incompatible return types", exception.Message);
+            firstResolver.SynthesizedTypes.Select(type => (type.Name, type.Source)),
+            secondResolver.SynthesizedTypes.Select(type => (type.Name, type.Source)));
     }
 
     [Fact]
