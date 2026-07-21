@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.JSInterop;
 
@@ -261,28 +262,161 @@ internal static class DomTransportValidator
         };
     }
 
-    private static JsonElement NormalizeReviewedJsonValue(
+    private static object NormalizeReviewedJsonValue(
         object value,
         string path,
         int containerDepth)
     {
-        JsonElement materialized;
+        return NormalizeReviewedJsonValue(
+            value,
+            path,
+            new Dictionary<object, string>(
+                ReferenceEqualityComparer.Instance),
+            containerDepth);
+    }
+
+    private static object NormalizeReviewedJsonValue(
+        object value,
+        string path,
+        Dictionary<object, string> visiting,
+        int containerDepth)
+    {
+        EnterContainer(value, path, visiting, containerDepth);
         try
         {
-            materialized = JsonSerializer.SerializeToElement(
-                value,
-                value.GetType(),
-                s_reviewedJsonSerializerOptions);
+            var normalized = new Dictionary<string, object?>(
+                StringComparer.Ordinal);
+            foreach (var property in value.GetType()
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(property =>
+                    property.GetMethod is not null
+                    && property.GetIndexParameters().Length == 0)
+                .OrderBy(property => property.MetadataToken))
+            {
+                var ignore = property.GetCustomAttribute<JsonIgnoreAttribute>();
+                if (ignore?.Condition == JsonIgnoreCondition.Always)
+                    continue;
+                var name = property.GetCustomAttribute<JsonPropertyNameAttribute>()
+                    ?.Name
+                    ?? s_reviewedJsonSerializerOptions.PropertyNamingPolicy
+                        ?.ConvertName(property.Name)
+                    ?? property.Name;
+                var propertyValue = property.GetValue(value);
+                normalized[name] = propertyValue is null
+                    ? null
+                    : NormalizeReviewedMember(
+                        propertyValue,
+                        $"{path}.{name}",
+                        visiting,
+                        containerDepth + 1);
+            }
+            return normalized;
         }
-        catch (Exception exception) when (
-            exception is JsonException or NotSupportedException or InvalidOperationException)
+        finally
         {
-            throw new DomTransportException(
-                $"JSON value at '{path}' could not be safely materialized: " +
-                exception.Message);
+            visiting.Remove(value);
+        }
+    }
+
+    private static object? NormalizeReviewedMember(
+        object value,
+        string path,
+        Dictionary<object, string> visiting,
+        int containerDepth)
+    {
+        if (value is IDomProxy proxy)
+            return proxy.Reference;
+        if (value is IJSObjectReference
+            or IJSStreamReference
+            or DotNetStreamReference
+            or byte[])
+        {
+            return value;
+        }
+        if (value is IDomUnionValue union)
+            return PrepareUnion(union, path);
+        if (value is DomDynamicValue dynamicValue)
+            return PrepareDynamic(dynamicValue, path);
+        if (value is JsonElement element)
+        {
+            return NormalizeJsonElement(element, path, containerDepth);
+        }
+        if (value is JsonDocument document)
+        {
+            return NormalizeJsonElement(
+                document.RootElement,
+                path,
+                containerDepth);
         }
 
-        return NormalizeJsonElement(materialized, path, containerDepth);
+        var type = value.GetType();
+        if (IsScalar(type) || type.IsEnum)
+            return value;
+        if (type.GetCustomAttribute<DomJsonValueAttribute>() is not null)
+        {
+            return NormalizeReviewedJsonValue(
+                value,
+                path,
+                visiting,
+                containerDepth);
+        }
+        if (value is IDictionary dictionary)
+        {
+            EnterContainer(value, path, visiting, containerDepth);
+            try
+            {
+                var normalized = new Dictionary<string, object?>(
+                    dictionary.Count,
+                    StringComparer.Ordinal);
+                foreach (DictionaryEntry entry in dictionary)
+                {
+                    if (entry.Key is not string key)
+                    {
+                        throw new DomTransportException(
+                            $"JSON dictionary at '{path}' has a non-string key.");
+                    }
+                    normalized[key] = entry.Value is null
+                        ? null
+                        : NormalizeReviewedMember(
+                            entry.Value,
+                            AppendDictionaryPath(path, key),
+                            visiting,
+                            containerDepth + 1);
+                }
+                return normalized;
+            }
+            finally
+            {
+                visiting.Remove(value);
+            }
+        }
+        if (value is IEnumerable sequence && value is not string)
+        {
+            EnterContainer(value, path, visiting, containerDepth);
+            try
+            {
+                var normalized = new List<object?>();
+                var index = 0;
+                foreach (var item in sequence)
+                {
+                    normalized.Add(item is null
+                        ? null
+                        : NormalizeReviewedMember(
+                            item,
+                            $"{path}[{index}]",
+                            visiting,
+                            containerDepth + 1));
+                    index++;
+                }
+                return normalized.ToArray();
+            }
+            finally
+            {
+                visiting.Remove(value);
+            }
+        }
+
+        throw UnsupportedJson(type, path);
     }
 
     private static JsonElement NormalizeJsonElement(
