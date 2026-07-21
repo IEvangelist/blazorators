@@ -911,10 +911,6 @@ public sealed class TypeResolver
             "Iterator" or
             "AsyncIterator")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "iterator-transport");
             if (rf.TypeArguments.Count is not (1 or 3))
             {
                 throw new TypeProjectionException(
@@ -922,30 +918,39 @@ public sealed class TypeResolver
                     "the complete three-argument iterator form.",
                     provenance);
             }
-            if (rf.TypeArguments.Count == 3
-                && (!IsDefaultIteratorReturn(rf.TypeArguments[1])
-                    || !IsUnknownLike(rf.TypeArguments[2])))
-            {
-                throw new GenericDeferralException(
-                    $"{name} at '{provenance}' has non-standard return/next " +
-                    "arguments that cannot be represented by the CLR enumerable contract.",
-                    provenance,
-                    "advanced-iterator-contracts");
-            }
             var item = Project(
                 rf.TypeArguments[0],
                 $"{provenance}/{name}<T>",
                 scope,
                 depth + 1);
             ValidateGenericArgument(name, item, provenance, 0);
+            var returnType = rf.TypeArguments.Count == 3
+                ? ProjectIteratorGenericArgument(
+                    rf.TypeArguments[1],
+                    $"{provenance}/{name}<TReturn>",
+                    scope,
+                    depth)
+                : BrowserUndefinedType();
+            var nextType = rf.TypeArguments.Count == 3
+                ? ProjectIteratorGenericArgument(
+                    rf.TypeArguments[2],
+                    $"{provenance}/{name}<TNext>",
+                    scope,
+                    depth)
+                : ReferenceType("object");
             var clrName = name is "AsyncIteratorObject" or "AsyncIterator"
-                ? "IAsyncEnumerable"
-                : "IEnumerable";
+                ? "IBrowserAsyncIterator"
+                : "IBrowserIterator";
             return ReferenceType(
-                $"{clrName}<{item.RenderedType}>",
+                $"global::Microsoft.JSInterop.{clrName}<" +
+                $"{item.RenderedType}, {returnType.RenderedType}, {nextType.RenderedType}>",
                 isCollection: true,
-                canonicalType: $"{clrName}<{item.CanonicalType}>",
-                typeArguments: [item.Identity]);
+                providerNote: "browser-iterator-reference",
+                canonicalType:
+                    $"global::Microsoft.JSInterop.{clrName}<" +
+                    $"{item.CanonicalType},{returnType.CanonicalType},{nextType.CanonicalType}>",
+                typeArguments: [item.Identity, returnType.Identity, nextType.Identity],
+                transport: BrowserReferenceTransport(rf));
         }
 
         if (isGlobalBuiltIn && name is
@@ -955,10 +960,6 @@ public sealed class TypeResolver
             "MapIterator" or
             "SetIterator")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "iterator-transport");
             if (rf.TypeArguments.Count == 1)
             {
                 var elem = Project(
@@ -967,11 +968,17 @@ public sealed class TypeResolver
                     scope,
                     depth + 1);
                 ValidateGenericArgument(name, elem, provenance, 0);
+                var contract = name == "Iterable"
+                    ? "IBrowserIterable"
+                    : "IBrowserIterableIterator";
                 return ReferenceType(
-                    $"IEnumerable<{elem.RenderedType}>",
+                    $"global::Microsoft.JSInterop.{contract}<{elem.RenderedType}>",
                     isCollection: true,
-                    canonicalType: $"IEnumerable<{elem.CanonicalType}>",
-                    typeArguments: [elem.Identity]);
+                    providerNote: "browser-iterable-reference",
+                    canonicalType:
+                        $"global::Microsoft.JSInterop.{contract}<{elem.CanonicalType}>",
+                    typeArguments: [elem.Identity],
+                    transport: BrowserReferenceTransport(rf));
             }
             throw new TypeProjectionException(
                 $"Unparameterized '{name}' at '{provenance}' cannot be projected to C#. " +
@@ -980,10 +987,6 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name is "AsyncIterable" or "AsyncIterableIterator")
         {
-            EnsureSupportedStandardContainerTransport(
-                rf,
-                provenance,
-                "iterator-transport");
             if (rf.TypeArguments.Count == 1)
             {
                 var elem = Project(
@@ -992,11 +995,17 @@ public sealed class TypeResolver
                     scope,
                     depth + 1);
                 ValidateGenericArgument(name, elem, provenance, 0);
+                var contract = name == "AsyncIterable"
+                    ? "IBrowserAsyncIterable"
+                    : "IBrowserAsyncIterableIterator";
                 return ReferenceType(
-                    $"IAsyncEnumerable<{elem.RenderedType}>",
+                    $"global::Microsoft.JSInterop.{contract}<{elem.RenderedType}>",
                     isCollection: true,
-                    canonicalType: $"IAsyncEnumerable<{elem.CanonicalType}>",
-                    typeArguments: [elem.Identity]);
+                    providerNote: "browser-async-iterable-reference",
+                    canonicalType:
+                        $"global::Microsoft.JSInterop.{contract}<{elem.CanonicalType}>",
+                    typeArguments: [elem.Identity],
+                    transport: BrowserReferenceTransport(rf));
             }
             throw new TypeProjectionException(
                 $"Unparameterized '{name}' at '{provenance}' cannot be projected to C#. " +
@@ -3223,6 +3232,26 @@ public sealed class TypeResolver
             {
                 Name: "UnknownKeyword" or "AnyKeyword" or "unknown" or "any",
             };
+
+    private TypeProjection ProjectIteratorGenericArgument(
+        TypeNode type,
+        string provenance,
+        GenericScope? scope,
+        int depth)
+    {
+        if (type is ReferenceTypeNode { Name: "BuiltinIteratorReturn" })
+            return BrowserUndefinedType();
+        var projection = Project(type, provenance, scope, depth + 1);
+        return projection.Identity.Kind is ClrTypeKind.Null or ClrTypeKind.Void
+            ? BrowserUndefinedType()
+            : projection;
+    }
+
+    private static TypeProjection BrowserUndefinedType()
+        => ValueType(
+            "global::Microsoft.JSInterop.BrowserUndefined",
+            providerNote: "browser-undefined",
+            canonicalType: "global::Microsoft.JSInterop.BrowserUndefined");
 
     private static void ValidateJsonGenericTransport(
         TypeNode typeNode,
