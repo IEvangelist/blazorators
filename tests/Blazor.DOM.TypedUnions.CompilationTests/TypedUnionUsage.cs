@@ -1,19 +1,24 @@
 using Blazor.DOM.AdvancedTypes;
+using Microsoft.JSInterop;
 
 namespace Blazor.DOM.TypedUnions.CompilationTests;
 
 public static class TypedUnionUsage
 {
-    public static ClipboardItemData CreateTextPromise(string text)
+    public static ClipboardItemData CreateTextPromise(
+        string text,
+        IBrowserPromise<ClipboardItemDataUnionShape_14acc04c76> promise)
     {
-        var value = ClipboardItemDataUnionShape_14acc04c76.FromString(text);
-        return new ClipboardItemData(ValueTask.FromResult(value));
+        _ = ClipboardItemDataUnionShape_14acc04c76.FromString(text);
+        return new ClipboardItemData(promise);
     }
 
-    public static ClipboardItemData CreateBlobPromise(IBlob blob)
+    public static ClipboardItemData CreateBlobPromise(
+        IBlob blob,
+        IBrowserPromise<ClipboardItemDataUnionShape_14acc04c76> promise)
     {
-        var value = ClipboardItemDataUnionShape_14acc04c76.FromBlob(blob);
-        return new ClipboardItemData(ValueTask.FromResult(value));
+        _ = ClipboardItemDataUnionShape_14acc04c76.FromBlob(blob);
+        return new ClipboardItemData(promise);
     }
 
     public static string ReadText(ClipboardItemDataUnionShape_14acc04c76 value)

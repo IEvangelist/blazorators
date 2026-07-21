@@ -15,7 +15,13 @@ namespace Blazor.DOM;
 // TypeScript generic default: R = object.
 public partial interface IReadableStreamDefaultReader<R> : IReadableStreamGenericReader
 {
-    // DEFERRED (promise-transport): read — Standard generic 'Promise' at 'ReadableStreamDefaultReader/decl[0]/read/return' has authoritative unsupported transport metadata: Web IDL dictionary 'ReadableStreamReadResult' is not a reviewed JSON-only shape: 'alias' uses unsupported (Union 'ReadableStreamReadResult<T>' is unsupported: Named TypeScript type 'ReadableStreamReadValueResult' has no reviewed DOM transport classification. Named TypeScript type 'ReadableStreamReadDoneResult' has no reviewed DOM transport classification.).
+    /// <summary>
+/// The **`read()`** method of the ReadableStreamDefaultReader interface returns a Promise providing access to the next chunk in the stream's internal queue.
+///
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/read)
+/// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("read")]
+ValueTask<ReadableStreamReadResult<R>> ReadAsync();
 
     /// <summary>
 /// The **`releaseLock()`** method of the ReadableStreamDefaultReader interface releases the reader's lock on the stream.

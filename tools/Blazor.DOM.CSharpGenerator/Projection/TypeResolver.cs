@@ -1679,7 +1679,7 @@ public sealed class TypeResolver
         }
 
         var typeName = liveReference
-            ? _synthesizedTypes.RegisterReferenceTuple(provenance, elements)
+            ? _synthesizedTypes.RegisterReferenceTuple(provenance, elements, scope)
             : _synthesizedTypes.RegisterTuple(provenance, elements);
         return ReferenceType(
             typeName,
@@ -3171,7 +3171,11 @@ public sealed class TypeResolver
 
     private static bool IsCallableReturn(string provenance)
         => provenance.EndsWith("/return", StringComparison.Ordinal)
-            || provenance.EndsWith("/return/defaultExpansion", StringComparison.Ordinal);
+            || provenance.EndsWith("/return/defaultExpansion", StringComparison.Ordinal)
+            || provenance.EndsWith("/return/nullable", StringComparison.Ordinal)
+            || provenance.EndsWith(
+                "/return/defaultExpansion/nullable",
+                StringComparison.Ordinal);
 
     private static bool RequiresLiveContainer(ReferenceTypeNode reference)
         => reference.Transport?.Kind is "unsupported" or "js-reference"

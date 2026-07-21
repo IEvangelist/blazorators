@@ -13,7 +13,7 @@ namespace Blazor.DOM.AdvancedTypes;
 
 // TypeScript union: void | PromiseLike<void>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct UnderlyingByteSourceUnionShape_d4d73ae565 : IEquatable<UnderlyingByteSourceUnionShape_d4d73ae565>, IDomUnionValue
+public readonly struct TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> : IEquatable<TransformerTransformCallbackUnionShape_ab68b2ba31<I, O>>, IDomUnionValue
 {
     public enum ArmKind : byte
     {
@@ -32,30 +32,30 @@ public readonly struct UnderlyingByteSourceUnionShape_d4d73ae565 : IEquatable<Un
         ArmKind.PromiseLike => DomTransportDescriptor.JsonValue("PromiseLike<void>", nullable: false),
         _ => DomTransportDescriptor.Unsupported("uninitialized union", "A default union value has no selected arm."),
     };
-    private UnderlyingByteSourceUnionShape_d4d73ae565(ArmKind kind, object? value) => (Kind, _value) = (kind, value);
+    private TransformerTransformCallbackUnionShape_ab68b2ba31(ArmKind kind, object? value) => (Kind, _value) = (kind, value);
 
-    public static UnderlyingByteSourceUnionShape_d4d73ae565 FromUndefined() => new(ArmKind.Undefined, null);
+    public static TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> FromUndefined() => new(ArmKind.Undefined, null);
     public bool IsUndefined => Kind == ArmKind.Undefined;
 
-    public static UnderlyingByteSourceUnionShape_d4d73ae565 FromPromiseLike(ValueTask value) => new(ArmKind.PromiseLike, value);
+    public static TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> FromPromiseLike(global::Microsoft.JSInterop.IBrowserPromise value) => new(ArmKind.PromiseLike, value);
     public bool IsPromiseLike => Kind == ArmKind.PromiseLike;
-    public ValueTask GetPromiseLike() => Kind == ArmKind.PromiseLike ? (ValueTask)_value! : throw new InvalidOperationException($"The union contains '{Kind}', not 'PromiseLike'.");
-    public bool TryGetPromiseLike([MaybeNullWhen(false)] out ValueTask value)
+    public global::Microsoft.JSInterop.IBrowserPromise GetPromiseLike() => Kind == ArmKind.PromiseLike ? (global::Microsoft.JSInterop.IBrowserPromise)_value! : throw new InvalidOperationException($"The union contains '{Kind}', not 'PromiseLike'.");
+    public bool TryGetPromiseLike([MaybeNullWhen(false)] out global::Microsoft.JSInterop.IBrowserPromise value)
     {
         if (Kind == ArmKind.PromiseLike)
         {
-            value = (ValueTask)_value!;
+            value = (global::Microsoft.JSInterop.IBrowserPromise)_value!;
             return true;
         }
         value = default;
         return false;
     }
 
-    public bool Equals(UnderlyingByteSourceUnionShape_d4d73ae565 other) => Kind == other.Kind && EqualityComparer<object?>.Default.Equals(_value, other._value);
-    public override bool Equals(object? obj) => obj is UnderlyingByteSourceUnionShape_d4d73ae565 other && Equals(other);
+    public bool Equals(TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> other) => Kind == other.Kind && EqualityComparer<object?>.Default.Equals(_value, other._value);
+    public override bool Equals(object? obj) => obj is TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> other && Equals(other);
     public override int GetHashCode() => HashCode.Combine(Kind, _value);
-    public static bool operator ==(UnderlyingByteSourceUnionShape_d4d73ae565 left, UnderlyingByteSourceUnionShape_d4d73ae565 right) => left.Equals(right);
-    public static bool operator !=(UnderlyingByteSourceUnionShape_d4d73ae565 left, UnderlyingByteSourceUnionShape_d4d73ae565 right) => !left.Equals(right);
+    public static bool operator ==(TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> left, TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> right) => left.Equals(right);
+    public static bool operator !=(TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> left, TransformerTransformCallbackUnionShape_ab68b2ba31<I, O> right) => !left.Equals(right);
     public override string ToString() => Kind switch
     {
         ArmKind.Uninitialized => "(uninitialized)",

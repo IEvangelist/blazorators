@@ -29,9 +29,15 @@ bool Locked { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("cancel")]
 ValueTask CancelAsync(object? reason = default);
 
-    // DEFERRED (literal-value-domain): getReader — Anonymous structural member 'mode' at 'ReadableStream/decl[0]/getReader/parameter[0]/options' contains a constrained literal value that cannot be widened.
+    /// <summary>
+/// The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it.
+///
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)
+/// </summary>
+IReadableStreamBYOBReader GetReader(global::Blazor.DOM.AdvancedTypes.ReadableStreamRecordShape_acba760152 options);
 
     IReadableStreamDefaultReader<R> GetReader();
 
@@ -49,11 +55,18 @@ IReadableStream<T> PipeThrough<T>(ReadableWritablePair<T, R> transform, StreamPi
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("pipeTo")]
 ValueTask PipeToAsync(IWritableStream<R> destination, StreamPipeOptions? options = default);
 
-    // DEFERRED (tuple-transport): tee — Tuple at 'ReadableStream/decl[0]/tee/return' has authoritative transport 'unsupported': Collection '[ReadableStream<R>, ReadableStream<R>]' contains a non-JSON transport.
+    /// <summary>
+/// The **`tee()`** method of the two-element array containing the two resulting branches as new ReadableStream instances.
+///
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/tee)
+/// </summary>
+global::Blazor.DOM.AdvancedTypes.ReadableStreamReferenceTupleShape_1a6eec15d5<R> Tee();
 
-    IReadableStreamAsyncIterator<R> SymbolAsyncIterator(ReadableStreamIteratorOptions? options = default);
+    [global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.AsyncIterator)]
+IReadableStreamAsyncIterator<R> SymbolAsyncIterator(ReadableStreamIteratorOptions? options = default);
 
     IReadableStreamAsyncIterator<R> Values(ReadableStreamIteratorOptions? options = default);
 }

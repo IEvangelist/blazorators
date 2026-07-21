@@ -21,9 +21,17 @@ public partial interface ILockManager
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager/query)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("query")]
 ValueTask<LockManagerSnapshot> QueryAsync();
 
-    // DEFERRED (promise-transport): request — Standard generic 'Promise' at 'LockManager/decl[0]/request/return' has authoritative unsupported transport metadata: Named TypeScript type 'T' has no reviewed DOM transport classification.
+    /// <summary>
+/// The **`request()`** method of the LockManager interface requests a Lock object with parameters specifying its name and characteristics.
+///
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/LockManager/request)
+/// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("request")]
+ValueTask<T> RequestAsync<T>(string name, LockGrantedCallback<T> callback);
 
-    // DEFERRED (promise-transport): request — Standard generic 'Promise' at 'LockManager/decl[0]/request/return' has authoritative unsupported transport metadata: Named TypeScript type 'T' has no reviewed DOM transport classification.
+    [global::Microsoft.JSInterop.DomJavaScriptName("request")]
+ValueTask<T> RequestAsync<T>(string name, LockOptions options, LockGrantedCallback<T> callback);
 }

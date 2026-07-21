@@ -129,7 +129,12 @@ double ATTARGET { get; }
     [global::Microsoft.JSInterop.DomAccessor("BUBBLING_PHASE", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "3", Nullable = false, Streamable = false, StructuredClone = true)]
 double BUBBLINGPHASE { get; }
 
-    // DEFERRED (standard-container-transport): composedPath — Array at 'Event/decl[0]/composedPath/return' has authoritative unsupported transport metadata: Collection 'EventTarget[]' contains a non-JSON transport.
+    /// <summary>
+/// The **`composedPath()`** method of the Event interface returns the event's path which is an array of the objects on which listeners will be invoked.
+///
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composedPath)
+/// </summary>
+global::Microsoft.JSInterop.IBrowserArray<IEventTarget> ComposedPath();
 
     /// <summary>
 /// The **`Event.initEvent()`** method is used to initialize the value of an event created using Document.createEvent().

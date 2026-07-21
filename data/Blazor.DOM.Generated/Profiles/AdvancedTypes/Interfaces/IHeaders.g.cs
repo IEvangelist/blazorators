@@ -58,7 +58,8 @@ void Set(string name, string @value);
 
     void ForEach(Action<string, string, IHeaders> callbackfn, object? thisArg = default);
 
-    IHeadersIterator<global::Blazor.DOM.AdvancedTypes.HeadersTupleShape_9c3a98fd4b> SymbolIterator();
+    [global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.Iterator)]
+IHeadersIterator<global::Blazor.DOM.AdvancedTypes.HeadersTupleShape_9c3a98fd4b> SymbolIterator();
 
     /// <summary>
 /// Returns an iterator allowing to go through all key/value pairs contained in this object.

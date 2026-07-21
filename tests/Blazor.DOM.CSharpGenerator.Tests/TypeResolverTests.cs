@@ -29,7 +29,7 @@ public sealed class TypeResolverTests
     {
         var resolver = EmptyResolver();
         var node = new KeywordTypeNode(kwName);
-        var result = resolver.Project(node, "test");
+        var result = resolver.Project(node, "test/return");
         Assert.Equal(expectedCsType, result.CSharpType);
     }
 
@@ -238,7 +238,7 @@ public sealed class TypeResolverTests
     {
         var resolver = EmptyResolver();
         var node = new ReferenceTypeNode("GLenum", "GLenum", []);
-        var result = resolver.Project(node, "test");
+        var result = resolver.Project(node, "test/return");
         Assert.Equal("uint", result.CSharpType);
         Assert.NotEqual("object", result.CSharpType);
     }
@@ -249,7 +249,7 @@ public sealed class TypeResolverTests
         var resolver = EmptyResolver();
         var node = new ReferenceTypeNode("Promise", "Promise<void>",
             [new KeywordTypeNode("VoidKeyword")]);
-        var result = resolver.Project(node, "test");
+        var result = resolver.Project(node, "test/return");
         Assert.Equal("ValueTask", result.CSharpType);
     }
 
@@ -259,7 +259,7 @@ public sealed class TypeResolverTests
         var resolver = EmptyResolver();
         var node = new ReferenceTypeNode("Promise", "Promise<string>",
             [new KeywordTypeNode("StringKeyword")]);
-        var result = resolver.Project(node, "test");
+        var result = resolver.Project(node, "test/return");
         Assert.Equal("ValueTask<string>", result.CSharpType);
     }
 

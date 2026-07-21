@@ -7,4 +7,4 @@
 
 namespace Blazor.DOM;
 
-public delegate global::Blazor.DOM.AdvancedTypes.UnderlyingDefaultSourceUnionShape_d730ede0a6<W> UnderlyingSinkWriteCallback<W>(W chunk, IWritableStreamDefaultController controller);
+public delegate global::Blazor.DOM.AdvancedTypes.UnderlyingDefaultSourceUnionShape_08e9d95ddb<W> UnderlyingSinkWriteCallback<W>(W chunk, IWritableStreamDefaultController controller);

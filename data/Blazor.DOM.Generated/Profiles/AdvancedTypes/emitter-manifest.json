@@ -7,30 +7,25 @@
   },
   "accounting": {
     "totalSymbols": 3,
-    "projected": 2,
-    "projectedClean": 2,
+    "projected": 3,
+    "projectedClean": 3,
     "projectedWithDeferredMembers": 0,
     "excluded": 0,
-    "deferred": 1,
+    "deferred": 0,
     "generationFailed": 0,
     "projectedSymbols": [
       "Headers",
-      "HeadersInit"
+      "HeadersInit",
+      "HeadersIterator"
     ],
     "excludedSymbols": [],
-    "deferredSymbols": [
-      {
-        "symbol": "HeadersIterator",
-        "phase": "iterator-transport",
-        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification."
-      }
-    ],
+    "deferredSymbols": [],
     "failedSymbols": [],
     "deferredMemberEntries": [],
     "failedMemberEntries": [],
     "totalMembers": 14,
-    "projectedMembers": 13,
-    "deferredMembers": 1,
+    "projectedMembers": 14,
+    "deferredMembers": 0,
     "failedMembers": 0,
     "expectedMembers": 14,
     "memberReconciliationValid": true,
@@ -92,9 +87,9 @@
         "symbolName": "HeadersIterator",
         "declarationOrdinal": 0,
         "kind": "interface",
-        "status": "Deferred",
-        "phase": "iterator-transport",
-        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification.",
+        "status": "Projected",
+        "phase": null,
+        "reason": "emitted",
         "provenance": "HeadersIterator/decl[0]/interface",
         "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:183:1"
       }
@@ -275,9 +270,9 @@
         "memberOrdinal": 0,
         "memberName": "Symbol.iterator",
         "memberKind": "method",
-        "status": "Deferred",
-        "phase": "iterator-transport",
-        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification.",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
         "provenance": "HeadersIterator/decl[0]/member[0]/method/Symbol.iterator",
         "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:184:5",
         "qualifiedKey": "HeadersIterator/decl[0]/member[0]"
@@ -555,9 +550,9 @@
         "memberOrdinal": 0,
         "name": "Symbol.iterator",
         "kind": "method",
-        "status": "Deferred",
-        "phase": "iterator-transport",
-        "reason": "Standard generic \u0027IteratorObject\u0027 at \u0027HeadersIterator/decl[0]/extends/IteratorObject\u0027 has authoritative unsupported transport metadata: Named TypeScript type \u0027IteratorObject\u0027 has no reviewed DOM transport classification.",
+        "status": "Projected",
+        "phase": null,
+        "reason": "",
         "qualifiedKey": "HeadersIterator/decl[0]/member[0]/overload",
         "provenance": "HeadersIterator/decl[0]/member[0]/method/Symbol.iterator/overload",
         "sourceLocation": "typescript/lib/lib.dom.iterable.d.ts:184:5",

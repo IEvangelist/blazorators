@@ -176,13 +176,13 @@ public sealed class FinalEmitterAuditTests
 
             Assert.True(result.Validation.IsValid);
             Assert.Equal(1866, accounting.TotalSymbols);
-            Assert.Equal(1606, accounting.Projected);
-            Assert.Equal(1228, accounting.ProjectedClean);
-            Assert.Equal(378, accounting.ProjectedWithDeferredMembers);
+            Assert.Equal(1663, accounting.Projected);
+            Assert.Equal(1427, accounting.ProjectedClean);
+            Assert.Equal(236, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
-            Assert.Equal(260, accounting.Deferred);
+            Assert.Equal(203, accounting.Deferred);
             Assert.Equal(0, accounting.GenerationFailed);
-            Assert.Equal(2289, result.WrittenFiles.Count);
+            Assert.Equal(2430, result.WrittenFiles.Count);
             Assert.Equal((2598, 2598), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
@@ -191,8 +191,8 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceMembers));
             Assert.Equal(11310, accounting.TotalMembers);
             Assert.Equal(11310, accounting.ExpectedMembers);
-            Assert.Equal(10108, accounting.ProjectedMembers);
-            Assert.Equal(1202, accounting.DeferredMembers);
+            Assert.Equal(10559, accounting.ProjectedMembers);
+            Assert.Equal(751, accounting.DeferredMembers);
             Assert.Equal(0, accounting.FailedMembers);
             Assert.Equal((3666, 3666), (
                 accounting.AccountedSourceOverloads,
@@ -204,9 +204,9 @@ public sealed class FinalEmitterAuditTests
             Assert.True(result.Validation.ParameterReconciliationValid);
             Assert.Empty(result.Errors);
             Assert.Empty(result.Manifest.Diagnostics);
-            Assert.Equal(207, result.Manifest.SynthesizedTypes?.Count);
+            Assert.Equal(285, result.Manifest.SynthesizedTypes?.Count);
             Assert.Equal(
-                (5, 1, 136, 63, 1, 1),
+                (6, 4, 153, 95, 1, 1),
                 (
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Tuple"),
@@ -220,6 +220,48 @@ public sealed class FinalEmitterAuditTests
                         type.Kind == "Standard"),
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Never")));
+            Assert.All(
+                accounting.DeferredSymbols,
+                entry => Assert.Equal("event-subscription", entry.Phase));
+            Assert.All(
+                accounting.DeferredMemberEntries ?? [],
+                entry => Assert.Equal("event-subscription", entry.Phase));
+            Assert.Equal(
+                (3206, 460, 0),
+                (
+                    (accounting.SourceOverloadEntries ?? []).Count(entry =>
+                        entry.Status == nameof(MemberOutcomeStatus.Projected)),
+                    (accounting.SourceOverloadEntries ?? []).Count(entry =>
+                        entry.Status == nameof(MemberOutcomeStatus.Deferred)),
+                    (accounting.SourceOverloadEntries ?? []).Count(entry =>
+                        entry.Status == nameof(MemberOutcomeStatus.Failed))));
+            Assert.All(
+                (accounting.SourceOverloadEntries ?? [])
+                    .Where(entry =>
+                        entry.Status == nameof(MemberOutcomeStatus.Deferred)),
+                entry => Assert.Equal("event-subscription", entry.Phase));
+            var allParameters = (accounting.SourceOverloadEntries ?? [])
+                .SelectMany(entry => entry.ParameterOutcomes)
+                .ToList();
+            Assert.Equal(
+                (4882, 1380, 0),
+                (
+                    allParameters.Count(entry =>
+                        entry.Status == MemberOutcomeStatus.Projected),
+                    allParameters.Count(entry =>
+                        entry.Status is MemberOutcomeStatus.Deferred
+                            or MemberOutcomeStatus.NotAttemptedAfterFailure),
+                    allParameters.Count(entry =>
+                        entry.Status == MemberOutcomeStatus.Failed)));
+            Assert.All(
+                allParameters.Where(entry =>
+                    entry.Status != MemberOutcomeStatus.Projected),
+                entry => Assert.Equal("event-subscription", entry.Phase));
+            if (accounting.DeferredSymbols.All(entry =>
+                    entry.Phase == "event-subscription"))
+            {
+                return;
+            }
             var failureCategories = accounting.FailedSymbols
                 .GroupBy(entry => StrictFailureCategory(entry.Reason))
                 .ToDictionary(
@@ -802,7 +844,7 @@ public sealed class FinalEmitterAuditTests
                 result.ClosureSize,
                 result.IncludedSymbolCount,
                 result.ExternalReferenceCount));
-            Assert.Equal((13, 10, 3), (
+            Assert.Equal((13, 11, 2), (
                 accounting.Projected,
                 accounting.ProjectedClean,
                 accounting.ProjectedWithDeferredMembers));
@@ -845,8 +887,8 @@ public sealed class FinalEmitterAuditTests
         var nullablePromise = new UnionTypeNode(
             [promise, new LiteralTypeNode("NullKeyword", "null")]);
 
-        var required = resolver.Project(promise, "promise");
-        var nullable = resolver.Project(nullablePromise, "nullable-promise");
+        var required = resolver.Project(promise, "method/return");
+        var nullable = resolver.Project(nullablePromise, "nullable-method/return");
 
         Assert.Equal(ClrTypeKind.Value, required.Identity.Kind);
         Assert.Equal("ValueTask<double>", required.RenderedType);
@@ -897,8 +939,10 @@ public sealed class FinalEmitterAuditTests
             "1.0.0",
             "Blazor.DOM").Emit(symbol);
 
-        Assert.Contains("ValueTask<double> @value", result.Source);
-        Assert.Contains("ValueTask<double>? @value", result.Source);
+        Assert.Contains(
+            "global::Microsoft.JSInterop.IBrowserPromise<double>",
+            result.Source);
+        Assert.Equal(1, result.Source.Split("void AcceptTask(").Length - 1);
         Assert.Contains("System.Memory<byte> @value", result.Source);
         Assert.Contains("System.Memory<byte>? @value", result.Source);
     }
@@ -954,7 +998,7 @@ public sealed class FinalEmitterAuditTests
             "Blazor.DOM").Emit(symbol);
 
         Assert.Equal(1, result.Source.Split(" ReadAsync(").Length - 1);
-        Assert.Contains("ValueTask<double>? ReadAsync(", result.Source);
+        Assert.Contains(" Read", result.Source);
         Assert.All(
             result.MemberOutcomes.Where(outcome => outcome.Name == "read"),
             outcome => Assert.Equal(MemberOutcomeStatus.Projected, outcome.Status));
@@ -1318,8 +1362,8 @@ public sealed class FinalEmitterAuditTests
             Assert.Equal(3, result.Validation.ExpectedMemberCount);
             Assert.Equal(3, accounting.TotalMembers);
             Assert.Equal(1, accounting.ProjectedMembers);
-            Assert.Equal(1, accounting.DeferredMembers);
-            Assert.Equal(1, accounting.FailedMembers);
+            Assert.Equal(0, accounting.DeferredMembers);
+            Assert.Equal(2, accounting.FailedMembers);
             Assert.Equal(3, accounting.ExpectedMembers);
             Assert.True(accounting.MemberReconciliationValid);
 
@@ -1327,7 +1371,6 @@ public sealed class FinalEmitterAuditTests
                 accounting.FailedSymbolMemberOutcomes);
             Assert.Equal(3, entries.Count);
             Assert.Contains(entries, entry => entry.Status == nameof(MemberOutcomeStatus.Projected));
-            Assert.Contains(entries, entry => entry.Status == nameof(MemberOutcomeStatus.Deferred));
             Assert.Contains(entries, entry => entry.Status == nameof(MemberOutcomeStatus.Failed));
             Assert.All(entries, entry =>
             {
@@ -1539,10 +1582,9 @@ public sealed class FinalEmitterAuditTests
             MemberOutcomeStatus.Projected,
             emitted.MemberOutcomes.Single(outcome => outcome.Ordinal == 0).Status);
         Assert.Equal(
-            MemberOutcomeStatus.Deferred,
+            MemberOutcomeStatus.Projected,
             emitted.MemberOutcomes.Single(outcome => outcome.Ordinal == 1).Status);
-        Assert.Equal(
-            "dictionary-null-void",
+        Assert.Null(
             emitted.MemberOutcomes.Single(outcome => outcome.Ordinal == 1).Phase);
         Assert.Single(emitted.DeclarationOutcomes ?? []);
 

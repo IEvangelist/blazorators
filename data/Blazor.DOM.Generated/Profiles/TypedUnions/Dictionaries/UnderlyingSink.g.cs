@@ -21,6 +21,9 @@ public record UnderlyingSink<W>
     [JsonPropertyName("start")]
     public UnderlyingSinkStartCallback? Start { get; init; }
 
+    [JsonPropertyName("type")]
+    public global::Microsoft.JSInterop.BrowserUndefined? Type { get; init; }
+
     [JsonPropertyName("write")]
     public UnderlyingSinkWriteCallback<W>? Write { get; init; }
 }

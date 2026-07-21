@@ -35,6 +35,7 @@ string Type { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/arrayBuffer)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("arrayBuffer")]
 ValueTask<byte[]> ArrayBufferAsync();
 
     /// <summary>
@@ -42,6 +43,7 @@ ValueTask<byte[]> ArrayBufferAsync();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/bytes)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("bytes")]
 ValueTask<byte[]> BytesAsync();
 
     /// <summary>
@@ -63,5 +65,6 @@ IReadableStream<byte[]> Stream();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)
 /// </summary>
+[global::Microsoft.JSInterop.DomJavaScriptName("text")]
 ValueTask<string> TextAsync();
 }
