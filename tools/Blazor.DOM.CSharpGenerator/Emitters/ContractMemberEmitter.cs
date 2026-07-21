@@ -51,10 +51,9 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
     {
         if (typeParameters.Count > 0 && IsEventSubscriptionOverload(jsName, typeParameters))
         {
-            const string phase = "event-subscription";
             const string eventReason =
-                "Event-map-keyed generic overload is deferred to the typed " +
-                "event-subscription phase.";
+                "Mapped to the Window target's DomEventDescriptor<TEvent> " +
+                "subscription contract.";
             return new ContractCallableResult(
                 [],
                 [BuildTypeScriptShapeKey(
@@ -62,14 +61,14 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     typeParameters,
                     parameters,
                     returnType)],
-                MemberOutcomeStatus.Deferred,
-                phase,
+                MemberOutcomeStatus.Projected,
+                null,
                 eventReason,
                 CreateParameterOutcomes(
                     parameters,
                     provenance,
-                    MemberOutcomeStatus.Deferred,
-                    phase,
+                    MemberOutcomeStatus.Projected,
+                    null,
                     eventReason));
         }
 
@@ -598,7 +597,7 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
             hasRestParameter);
     }
 
-    private static bool IsEventSubscriptionOverload(
+    private bool IsEventSubscriptionOverload(
         string name,
         IReadOnlyList<TypeParameterModel> typeParameters)
         => name is "addEventListener" or "removeEventListener"
@@ -608,9 +607,11 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     Operator: "keyof" or "KeyOfKeyword",
                     OperandType: ReferenceTypeNode reference,
                 }
-                && reference.Name.EndsWith(
-                    "EventMap",
-                    StringComparison.Ordinal));
+                && typeResolver.TryGetSymbol(
+                    reference.ResolvedSymbol ?? reference.Name,
+                    out var symbol)
+                && symbol.Declarations.Any(declaration =>
+                    declaration.EventMap.IsEventMap));
 
     private static bool TryGetBoolOptionsUnion(
         TypeNode? type,

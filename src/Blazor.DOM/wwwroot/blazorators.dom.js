@@ -374,6 +374,7 @@ export async function addDotNetEventListener(
  * @param {string} callbackMethodName
  * @param {DotNetObjectReference} registrationDotnetRef
  * @param {string} registrationCallbackMethodName
+ * @param {boolean|AddEventListenerOptions|null} options
  * @returns {Promise<void>}
  */
 export async function addDotNetReferenceEventListener(
@@ -382,7 +383,8 @@ export async function addDotNetReferenceEventListener(
     dotnetRef,
     callbackMethodName,
     registrationDotnetRef,
-    registrationCallbackMethodName) {
+    registrationCallbackMethodName,
+    options) {
     let disposed = false;
     const listener = (event) => {
         if (disposed) return;
@@ -396,10 +398,10 @@ export async function addDotNetReferenceEventListener(
         dispose() {
             if (disposed) return;
             disposed = true;
-            target.removeEventListener(type, listener);
+            target.removeEventListener(type, listener, options ?? false);
         }
     };
-    target.addEventListener(type, listener);
+    target.addEventListener(type, listener, options ?? false);
 
     let registrationReference;
     try {

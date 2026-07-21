@@ -509,6 +509,31 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
             target,
             type,
             transport,
+            null,
+            callback,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<DomReferenceEventSubscription<TEvent>>
+        SubscribeAsync<TEvent>(
+            IJSObjectReference target,
+            DomEventDescriptor<TEvent> descriptor,
+            IDomProxyFactory proxyFactory,
+            Func<DomBorrowedReference<TEvent>, Task> callback,
+            DomEventListenerOptions? options = null,
+            CancellationToken cancellationToken = default)
+        where TEvent : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(descriptor);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await DomRuntimeTransport.AddReferenceEventListenerAsync(
+            module,
+            proxyFactory,
+            target,
+            descriptor.Name,
+            descriptor.Transport,
+            options,
             callback,
             cancellationToken).ConfigureAwait(false);
     }

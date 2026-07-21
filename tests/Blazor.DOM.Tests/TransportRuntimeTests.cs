@@ -1075,6 +1075,56 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Descriptor_subscription_routes_name_transport_and_options_through_existing_registry(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var factory = CreateFactory(host.Runtime);
+        var targetReference = new FakeJSObjectReference();
+        var target = new FixtureBlobProxy(targetReference, host.Runtime, factory);
+        var registration = new FakeJSObjectReference();
+        object? interopOptions = null;
+        host.Module.InvocationHandlers["addDotNetReferenceEventListener"] =
+            async (args, _) =>
+            {
+                Assert.Equal("ready-state", args![1]);
+                interopOptions = args[6];
+                var registrationHandler = Assert.IsType<
+                    DotNetObjectReference<DomEventRegistrationHandler>>(args[4]);
+                await registrationHandler.Value.ReceiveRegistrationAsync(registration);
+                return null;
+            };
+        var descriptor = DomEventDescriptor<FixtureBlobProxy>.Reference(
+            "ready-state",
+            "FixtureEventMap",
+            "FixtureBlob",
+            deprecated: false,
+            "FixtureEventMap/decl[0]/member[0]/ready-state");
+
+        var subscription = await target.SubscribeAsync(
+            descriptor,
+            _ => Task.CompletedTask,
+            new DomEventListenerOptions
+            {
+                Capture = true,
+                Once = true,
+                Passive = false,
+            });
+        await subscription.DisposeAsync();
+
+        Assert.NotNull(interopOptions);
+        var type = interopOptions.GetType();
+        Assert.Equal(true, type.GetProperty("capture")!.GetValue(interopOptions));
+        Assert.Equal(true, type.GetProperty("once")!.GetValue(interopOptions));
+        Assert.Equal(false, type.GetProperty("passive")!.GetValue(interopOptions));
+        Assert.Single(
+            registration.Invocations,
+            invocation => invocation.Identifier == "dispose");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Typed_event_registration_failure_closes_handler_and_late_reference(bool wasm)
     {
         var host = CreateHost(wasm);

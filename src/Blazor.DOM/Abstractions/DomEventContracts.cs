@@ -21,6 +21,14 @@ public sealed record DomEventListenerOptions
     /// <summary>Preserves the TypeScript boolean-capture options form.</summary>
     public static implicit operator DomEventListenerOptions(bool capture) =>
         new() { Capture = capture };
+
+    internal object ToInteropValue() => new
+    {
+        capture = Capture,
+        once = Once,
+        passive = Passive,
+        signal = Signal?.Reference,
+    };
 }
 
 /// <summary>

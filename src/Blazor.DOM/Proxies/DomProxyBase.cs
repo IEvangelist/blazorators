@@ -8,7 +8,7 @@ namespace Microsoft.JSInterop;
 /// reference, the async dispatch runtime, and the proxy factory used to
 /// create child proxies.  Disposing the proxy disposes its owned JS reference.
 /// </summary>
-public abstract class DomProxyBase : IDomProxy
+public abstract class DomProxyBase : IDomEventTargetProxy
 {
     private int _disposed;
 
@@ -33,6 +33,22 @@ public abstract class DomProxyBase : IDomProxy
         Runtime   = runtime   ?? throw new ArgumentNullException(nameof(runtime));
         Factory   = factory   ?? throw new ArgumentNullException(nameof(factory));
     }
+
+    /// <inheritdoc />
+    public ValueTask<DomReferenceEventSubscription<TEvent>>
+        SubscribeAsync<TEvent>(
+            DomEventDescriptor<TEvent> descriptor,
+            Func<DomBorrowedReference<TEvent>, Task> callback,
+            DomEventListenerOptions? options = null,
+            CancellationToken cancellationToken = default)
+        where TEvent : class, IDomProxy =>
+        Runtime.SubscribeAsync(
+            Reference,
+            descriptor,
+            Factory,
+            callback,
+            options,
+            cancellationToken);
 
     /// <summary>
     /// Disposes the underlying JS reference.  Idempotent; safe to call

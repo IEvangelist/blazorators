@@ -14,7 +14,6 @@ internal sealed class GlobalNamespaceEmitter(
 {
     private const string FactoryPhase = "factory-constructor";
     private const string GlobalAliasPhase = "global-alias";
-    private const string EventPhase = "event-subscription";
 
     private readonly ContractMemberEmitter _memberEmitter = new(typeResolver);
     private readonly Dictionary<string, SupplementalBuilder> _builders =
@@ -679,14 +678,36 @@ internal sealed class GlobalNamespaceEmitter(
         if (route.TypeScriptNamespace is null
             && route.Declaration.Name.StartsWith("on", StringComparison.Ordinal))
         {
+            var eventName = route.Declaration.Name[2..];
+            if (!GetEffectiveEventNames("WindowEventMap").Contains(eventName))
+            {
+                FailRoute(
+                    route,
+                    $"Global event handler '{route.Declaration.Name}' has no " +
+                    $"authoritative descriptor in WindowEventMap for '{eventName}'.",
+                    "GlobalEventMapAssociationException");
+                return;
+            }
             const string reason =
-                "Global event-handler variable is deferred to typed event " +
-                "subscription emission.";
+                "Represented by the authoritative Window EventMap typed descriptor.";
             AddDeclarationOutcome(
                 route,
-                MemberOutcomeStatus.Deferred,
-                EventPhase,
+                MemberOutcomeStatus.Projected,
+                null,
                 reason);
+            if (!primaryEmissions.TryGetValue(
+                    "WindowEventMap",
+                    out var windowEventMap)
+                || windowEventMap.Disposition != SymbolEmissionDisposition.Projected
+                || windowEventMap.GeneratedFile is null)
+            {
+                FailRoute(
+                    route,
+                    "WindowEventMap descriptor catalog was not generated.",
+                    "MissingGeneratedContractException");
+                return;
+            }
+            GetBuilder(route.Symbol).AddFile(windowEventMap.GeneratedFile);
             return;
         }
 
@@ -802,6 +823,47 @@ internal sealed class GlobalNamespaceEmitter(
         }
 
         AddPropertyToContract(_windowContract, route, mergedProperty);
+    }
+
+    private HashSet<string> GetEffectiveEventNames(string eventMap)
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        Add(eventMap);
+        return names;
+
+        void Add(string mapName)
+        {
+            if (!visited.Add(mapName)
+                || !_symbolIndex.TryGetValue(mapName, out var symbol))
+            {
+                return;
+            }
+            foreach (var declaration in symbol.Declarations.Where(declaration =>
+                declaration.EventMap.IsEventMap))
+            {
+                foreach (var member in declaration.Members)
+                {
+                    if (member.Name is not null)
+                        names.Add(member.Name.Text);
+                }
+                foreach (var heritage in declaration.Heritage
+                    .Where(clause => clause.Token == "extends")
+                    .SelectMany(clause => clause.Types))
+                {
+                    var baseName = heritage switch
+                    {
+                        ReferenceTypeNode reference =>
+                            reference.ResolvedSymbol ?? reference.Name,
+                        HeritageReferenceTypeNode reference =>
+                            reference.ResolvedSymbol ?? reference.Expression,
+                        _ => null,
+                    };
+                    if (baseName is not null)
+                        Add(baseName);
+                }
+            }
+        }
     }
 
     private bool HasCompleteWindowContract()
