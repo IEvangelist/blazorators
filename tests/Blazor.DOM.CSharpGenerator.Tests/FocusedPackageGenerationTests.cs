@@ -303,7 +303,7 @@ public sealed class FocusedPackageGenerationTests
                 hosts.Server.Operations,
                 operation =>
                     operation.Kind == "constructor-global"
-                    && operation.Signature.Contains(
+                    && operation.HostSignature.Contains(
                         "IBroadcastChannelFactory",
                         StringComparison.Ordinal));
             Assert.True(hosts.Parity.Exact);
