@@ -117,6 +117,63 @@ public sealed class ProfileClosureRoutingTests
         Assert.Equal(25, CountExternal(innerWidth, index));
     }
 
+    [Fact]
+    public void QualifiedDependency_IsNotSuppressedBySameNamedTypeParameter()
+    {
+        var root = Symbol(
+            "Root",
+            0,
+            "interface",
+            [
+                Declaration(
+                    "interface",
+                    "Root",
+                    members:
+                    [
+                        Member(
+                            0,
+                            "property",
+                            "qualified",
+                            Reference("X", "N.X")),
+                    ],
+                    typeParameters:
+                    [
+                        new TypeParameterModel(0, "X", null, null),
+                    ])
+            ]);
+        var dependency = Symbol(
+            "N.X",
+            1,
+            "interface",
+            [InterfaceDeclaration("X")]);
+        var symbols = new[] { root, dependency };
+
+        Assert.Equal(
+            ["N", "N.X", "Root"],
+            TransitiveDependencyResolver.Resolve(["Root"], Index(symbols))
+                .OrderBy(name => name, StringComparer.Ordinal));
+
+        var output = CreateOutputDirectory();
+        try
+        {
+            var result = RunProfile(
+                "QualifiedTypeParameterCollision",
+                "Root",
+                symbols,
+                output);
+            AssertProfileSuccess(result, included: 2, external: ["N"]);
+            Assert.Contains(
+                result.PipelineResult.WrittenFiles,
+                file => file.RelativePath.EndsWith(
+                    Path.Combine("N", "IX.g.cs"),
+                    StringComparison.Ordinal));
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
+    }
+
     [Theory]
     [InlineData("WebAssembly", "WebAssemblyRoot")]
     [InlineData("WebAssembly.instantiate", "WebAssemblyInstantiate")]
@@ -630,13 +687,14 @@ public sealed class ProfileClosureRoutingTests
         TypeNode? returnType = null,
         string? variableKind = null,
         bool constructorObject = false,
-        IReadOnlyList<string>? namespaceMembers = null)
+        IReadOnlyList<string>? namespaceMembers = null,
+        IReadOnlyList<TypeParameterModel>? typeParameters = null)
         => new(
             ordinal,
             kind,
             name,
             [],
-            [],
+            typeParameters ?? [],
             [],
             members ?? [],
             type,

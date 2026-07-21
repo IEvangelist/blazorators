@@ -333,6 +333,8 @@ public sealed class TypeResolver
         int depth)
     {
         var name = rf.Name;
+        var isGlobalBuiltIn = string.IsNullOrWhiteSpace(rf.ResolvedSymbol)
+            || string.Equals(rf.ResolvedSymbol, name, StringComparison.Ordinal);
 
         if (scope?.TryResolve(name, rf.ResolvedSymbol, out var parameter) == true)
         {
@@ -368,7 +370,7 @@ public sealed class TypeResolver
         }
 
         // Promise<T> -> ValueTask<T>
-        if (name == "Promise")
+        if (isGlobalBuiltIn && name == "Promise")
         {
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
@@ -461,7 +463,7 @@ public sealed class TypeResolver
             return ValueType("System.Memory<byte>", providerNote: "DataView");
 
         // Generic collections
-        if (name is "Array" or "ReadonlyArray")
+        if (isGlobalBuiltIn && name is "Array" or "ReadonlyArray")
         {
             if (rf.TypeArguments.Count == 1)
             {
@@ -481,7 +483,7 @@ public sealed class TypeResolver
                 "Provide an explicit type argument or add a symbol override.", provenance);
         }
 
-        if (name is
+        if (isGlobalBuiltIn && name is
             "IteratorObject" or
             "AsyncIteratorObject" or
             "Iterator" or
@@ -519,7 +521,7 @@ public sealed class TypeResolver
                 typeArguments: [item.Identity]);
         }
 
-        if (name is
+        if (isGlobalBuiltIn && name is
             "Iterable" or
             "IterableIterator" or
             "ArrayIterator" or
@@ -544,7 +546,7 @@ public sealed class TypeResolver
                 "Provide an explicit type argument.", provenance);
         }
 
-        if (name is "AsyncIterable" or "AsyncIterableIterator")
+        if (isGlobalBuiltIn && name is "AsyncIterable" or "AsyncIterableIterator")
         {
             if (rf.TypeArguments.Count == 1)
             {
@@ -564,7 +566,7 @@ public sealed class TypeResolver
                 "Provide an explicit type argument.", provenance);
         }
 
-        if (name == "Record")
+        if (isGlobalBuiltIn && name == "Record")
         {
             if (rf.TypeArguments.Count != 2)
                 throw ArityError(name, 2, rf.TypeArguments.Count, provenance);
@@ -584,13 +586,13 @@ public sealed class TypeResolver
                 typeArguments: [key.Identity, val.Identity]);
         }
 
-        if (name is "Map" or "ReadonlyMap")
+        if (isGlobalBuiltIn && name is "Map" or "ReadonlyMap")
             return ProjectDictionaryContainer(rf, provenance, scope, depth, name);
 
-        if (name is "Set" or "ReadonlySet")
+        if (isGlobalBuiltIn && name is "Set" or "ReadonlySet")
             return ProjectSetContainer(rf, provenance, scope, depth, name);
 
-        if (name is "WeakMap" or "WeakSet")
+        if (isGlobalBuiltIn && name is "WeakMap" or "WeakSet")
         {
             throw new GenericDeferralException(
                 $"{name} at '{provenance}' has weak-key lifetime semantics with no " +
@@ -599,7 +601,7 @@ public sealed class TypeResolver
                 "standard-library-weak-collections");
         }
 
-        if (name == "PromiseLike")
+        if (isGlobalBuiltIn && name == "PromiseLike")
         {
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
@@ -624,7 +626,7 @@ public sealed class TypeResolver
                     : [inner.Identity]);
         }
 
-        if (name == "Readonly")
+        if (isGlobalBuiltIn && name == "Readonly")
         {
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
@@ -689,6 +691,7 @@ public sealed class TypeResolver
             var arguments = ProjectTypeArguments(
                 rf.TypeArguments,
                 typeParameters,
+                sym.Name,
                 provenance,
                 scope,
                 depth);
@@ -1052,6 +1055,7 @@ public sealed class TypeResolver
     private IReadOnlyList<TypeProjection> ProjectTypeArguments(
         IReadOnlyList<TypeNode> supplied,
         IReadOnlyList<TypeParameterModel> parameters,
+        string targetIdentity,
         string provenance,
         GenericScope? callerScope,
         int depth)
@@ -1079,7 +1083,7 @@ public sealed class TypeResolver
             depth + 1)).ToList();
         var targetScope = GenericScope.Create(
             parameters,
-            $"{provenance}/target",
+            targetIdentity,
             callerScope,
             canonicalPrefix: "^");
         while (projected.Count < parameters.Count)
@@ -1100,11 +1104,21 @@ public sealed class TypeResolver
             var defaultScope = targetScope.WithSubstitutions(substitutions);
             try
             {
-                projected.Add(Project(
+                var projectedDefault = Project(
                     parameter.Default,
                     $"{provenance}/defaultTypeArgument[{projected.Count}]",
                     defaultScope,
-                    depth + 1));
+                    depth + 1);
+                if (ContainsUnsubstitutedTargetParameter(projectedDefault.Identity))
+                {
+                    throw new GenericDeferralException(
+                        $"Omitted default type argument '{parameter.Name}' at " +
+                        $"'{provenance}' depends on an unresolved or cyclic target " +
+                        "type parameter.",
+                        $"{provenance}/defaultTypeArgument[{projected.Count}]",
+                        "generic-defaults");
+                }
+                projected.Add(projectedDefault);
             }
             catch (TypeProjectionException exception)
             {
@@ -1118,6 +1132,11 @@ public sealed class TypeResolver
         }
         return projected;
     }
+
+    private static bool ContainsUnsubstitutedTargetParameter(ClrTypeIdentity identity)
+        => identity.IsTypeParameter
+            ? identity.CanonicalName.StartsWith('^')
+            : identity.TypeArguments?.Any(ContainsUnsubstitutedTargetParameter) == true;
 
     private static IReadOnlyList<TypeParameterModel> GetSymbolTypeParameters(
         SymbolModel symbol,
