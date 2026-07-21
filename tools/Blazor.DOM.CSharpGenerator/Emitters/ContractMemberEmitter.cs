@@ -125,6 +125,10 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                 returnType,
                 $"{provenance}/return",
                 generic.Scope);
+            ValidateReturnIdentity(
+                returnProjection,
+                $"{provenance}/return",
+                defaultExpansion: false);
         }
         catch (GenericDeferralException exception)
         {
@@ -312,6 +316,10 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                     returnType,
                     $"{provenance}/return/defaultExpansion",
                     expansion.Scope);
+                ValidateReturnIdentity(
+                    expandedReturn,
+                    $"{provenance}/return/defaultExpansion",
+                    defaultExpansion: true);
                 var expandedProjections = orderedParameters
                     .Select((parameter, index) => typeResolver.Project(
                         TryGetBoolOptionsUnion(parameter.Type, out var expandedOptions)
@@ -331,12 +339,16 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                             is ClrTypeKind.Null or ClrTypeKind.Void);
                 if (invalidParameter.projection is not null)
                 {
+                    var sourceParameter =
+                        orderedParameters[invalidParameter.index];
+                    var invalidProvenance =
+                        $"{provenance}/parameter[{sourceParameter.Ordinal}]/" +
+                        $"{sourceParameter.Name}/defaultExpansion";
                     throw new TypeProjectionException(
-                        $"Default-expanded parameter at index " +
-                        $"{invalidParameter.index} resolves to illegal CLR type " +
+                        $"Default-expanded parameter '{sourceParameter.Name}' at " +
+                        $"'{invalidProvenance}' resolves to illegal CLR type " +
                         $"'{invalidParameter.projection.RenderedType}'.",
-                        $"{provenance}/parameter[{invalidParameter.index}]/" +
-                        "defaultExpansion");
+                        invalidProvenance);
                 }
                 if (boolOptionsIndex >= 0)
                 {
@@ -453,6 +465,21 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
                 MemberOutcomeStatus.Deferred,
                 exception.Phase,
                 exception.Message));
+
+    private static void ValidateReturnIdentity(
+        TypeProjection projection,
+        string provenance,
+        bool defaultExpansion)
+    {
+        if (projection.Identity.Kind != ClrTypeKind.Null)
+            return;
+        var message = defaultExpansion
+            ? $"Default-expanded return resolves to illegal standalone CLR type " +
+              $"'{projection.RenderedType}' at '{provenance}'."
+            : $"Return resolves to illegal standalone CLR type " +
+              $"'{projection.RenderedType}' at '{provenance}'.";
+        throw new TypeProjectionException(message, provenance);
+    }
 
     internal ContractPropertyResult EmitProperty(
         string jsName,

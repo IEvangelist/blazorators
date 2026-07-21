@@ -250,17 +250,17 @@ public sealed class InterfaceEmitter(
                         methodRef.DeclarationOrdinal,
                         generic.Scope);
                     var outcomes = build.Outcomes.ToList();
-
-                    if (build.DeferredOutput is not null
-                        && emittedDeferredMethodOutputs.Add(build.DeferredOutput))
-                    {
-                        methodOutputs.Add(build.DeferredOutput);
-                    }
-
+                    var stagedOutputs = methodOutputs.ToList();
+                    var stagedMethodKeys = new Dictionary<string, MethodSig>(
+                        emittedMethodKeys,
+                        StringComparer.Ordinal);
+                    var stagedOutputIndices = new Dictionary<string, int>(
+                        emittedMethodOutputIndices,
+                        StringComparer.Ordinal);
                     var dedupedFromDecl = new HashSet<int>();
                     foreach (var sig in build.Outputs)
                     {
-                        if (emittedMethodKeys.TryGetValue(sig.CanonicalKey, out var existing))
+                        if (stagedMethodKeys.TryGetValue(sig.CanonicalKey, out var existing))
                         {
                             if (!string.Equals(existing.ReturnType, sig.ReturnType, StringComparison.Ordinal))
                             {
@@ -305,19 +305,19 @@ public sealed class InterfaceEmitter(
                             if ((sig.HasRestParameter && !existing.HasRestParameter
                                     || sig.HasRestParameter == existing.HasRestParameter
                                     && sig.OptionalParamCount > existing.OptionalParamCount)
-                                && emittedMethodOutputIndices.TryGetValue(sig.CanonicalKey, out var outputIndex))
+                                && stagedOutputIndices.TryGetValue(sig.CanonicalKey, out var outputIndex))
                             {
-                                methodOutputs[outputIndex] = sig.Rendered;
-                                emittedMethodKeys[sig.CanonicalKey] = sig;
+                                stagedOutputs[outputIndex] = sig.Rendered;
+                                stagedMethodKeys[sig.CanonicalKey] = sig;
                             }
 
                             dedupedFromDecl.Add(existing.DeclarationOrdinal);
                             continue;
                         }
 
-                        emittedMethodKeys.Add(sig.CanonicalKey, sig);
-                        emittedMethodOutputIndices[sig.CanonicalKey] = methodOutputs.Count;
-                        methodOutputs.Add(sig.Rendered);
+                        stagedMethodKeys.Add(sig.CanonicalKey, sig);
+                        stagedOutputIndices[sig.CanonicalKey] = stagedOutputs.Count;
+                        stagedOutputs.Add(sig.Rendered);
                     }
 
                     if (dedupedFromDecl.Count > 0)
@@ -328,6 +328,19 @@ public sealed class InterfaceEmitter(
                             .ToList();
                     }
 
+                    methodOutputs.Clear();
+                    methodOutputs.AddRange(stagedOutputs);
+                    emittedMethodKeys.Clear();
+                    foreach (var pair in stagedMethodKeys)
+                        emittedMethodKeys.Add(pair.Key, pair.Value);
+                    emittedMethodOutputIndices.Clear();
+                    foreach (var pair in stagedOutputIndices)
+                        emittedMethodOutputIndices.Add(pair.Key, pair.Value);
+                    if (build.DeferredOutput is not null
+                        && emittedDeferredMethodOutputs.Add(build.DeferredOutput))
+                    {
+                        methodOutputs.Add(build.DeferredOutput);
+                    }
                     memberOutcomes.AddRange(outcomes);
                 }
                 catch (GenericDeferralException exception)
@@ -847,13 +860,28 @@ public sealed class InterfaceEmitter(
             isDefaultExpansion: false));
         foreach (var expansion in defaultExpansions)
         {
-            outputs.AddRange(BuildMethodVariant(
-                method,
-                symbolName,
-                declOrdinal,
-                provenance,
-                expansion,
-                isDefaultExpansion: true));
+            try
+            {
+                outputs.AddRange(BuildMethodVariant(
+                    method,
+                    symbolName,
+                    declOrdinal,
+                    provenance,
+                    expansion,
+                    isDefaultExpansion: true));
+            }
+            catch (GenericDeferralException)
+            {
+                throw;
+            }
+            catch (TypeProjectionException exception)
+            {
+                throw new GenericDeferralException(
+                    $"Default-expanded generic method '{symbolName}.{memberName}' " +
+                    $"cannot be emitted: {exception.Message}",
+                    exception.Provenance,
+                    "generic-method-defaults");
+            }
         }
         return new MethodBuildResult(
             outputs,
@@ -883,8 +911,11 @@ public sealed class InterfaceEmitter(
             ?? throw new InvalidOperationException("Method name is required.");
         var returnProj = typeResolver.Project(
             method.ReturnType,
-            $"{provenance}/return",
+            isDefaultExpansion
+                ? $"{provenance}/return/defaultExpansion"
+                : $"{provenance}/return",
             methodGeneric.Scope);
+        ValidateMethodReturn(returnProj, provenance, isDefaultExpansion);
         var (docText, deprecated) = MergeGlobalDocumentation(
             symbolName,
             memberName,
@@ -967,8 +998,13 @@ public sealed class InterfaceEmitter(
         {
             var pProj = typeResolver.Project(
                 p.Type,
-                $"{provenance}/{p.Name}",
+                ParameterProvenance(provenance, p, isDefaultExpansion),
                 methodGeneric.Scope);
+            ValidateMethodParameter(
+                pProj,
+                p,
+                provenance,
+                isDefaultExpansion);
             var pType = FormatParameterType(pProj);
             var pName = Naming.ToCSharpParameterName(p.Name);
 
@@ -1060,8 +1096,13 @@ public sealed class InterfaceEmitter(
             var p = paramList[i];
             var pProj = typeResolver.Project(
                 p.Type,
-                $"{provenance}/{p.Name}",
+                ParameterProvenance(provenance, p, isDefaultExpansion),
                 methodGeneric.Scope);
+            ValidateMethodParameter(
+                pProj,
+                p,
+                provenance,
+                isDefaultExpansion);
             var pType = FormatParameterType(pProj);
             var pName = Naming.ToCSharpParameterName(p.Name);
 
@@ -1304,6 +1345,61 @@ public sealed class InterfaceEmitter(
 
     private static string FormatParameterType(TypeProjection projection)
         => projection.RenderedType;
+
+    private static string ParameterProvenance(
+        string provenance,
+        ParameterModel parameter,
+        bool defaultExpansion)
+        => $"{provenance}/parameter[{parameter.Ordinal}]/{parameter.Name}" +
+            (defaultExpansion ? "/defaultExpansion" : "");
+
+    private static void ValidateMethodReturn(
+        TypeProjection projection,
+        string provenance,
+        bool defaultExpansion)
+    {
+        if (projection.Identity.Kind != ClrTypeKind.Null)
+            return;
+        ThrowIllegalMethodIdentity(
+            $"return resolves to illegal standalone CLR type " +
+            $"'{projection.RenderedType}'",
+            $"{provenance}/return" +
+            (defaultExpansion ? "/defaultExpansion" : ""),
+            defaultExpansion);
+    }
+
+    private static void ValidateMethodParameter(
+        TypeProjection projection,
+        ParameterModel parameter,
+        string provenance,
+        bool defaultExpansion)
+    {
+        if (projection.Identity.Kind is not (ClrTypeKind.Null or ClrTypeKind.Void))
+            return;
+        ThrowIllegalMethodIdentity(
+            $"parameter '{parameter.Name}' resolves to illegal CLR type " +
+            $"'{projection.RenderedType}'",
+            ParameterProvenance(provenance, parameter, defaultExpansion),
+            defaultExpansion);
+    }
+
+    private static void ThrowIllegalMethodIdentity(
+        string detail,
+        string provenance,
+        bool defaultExpansion)
+    {
+        var message = defaultExpansion
+            ? $"Default-expanded generic method {detail} at '{provenance}'."
+            : $"Method {detail} at '{provenance}'.";
+        if (defaultExpansion)
+        {
+            throw new GenericDeferralException(
+                message,
+                provenance,
+                "generic-method-defaults");
+        }
+        throw new TypeProjectionException(message, provenance);
+    }
 
     private static string AppendReason(string? existing, string addition)
         => string.IsNullOrWhiteSpace(existing) ? addition : $"{existing} {addition}";
