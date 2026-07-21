@@ -78,9 +78,14 @@ public sealed class GenericScope
         var ordered = parameters.ToList();
         var bindings = new List<GenericParameterBinding>(ordered.Count);
         var normalizedNames = new Dictionary<string, string>(StringComparer.Ordinal);
-        var ancestorNames = parent?.GetCSharpNames()
+        var preparedNames = ordered
+            .Select(parameter => (
+                Parameter: parameter,
+                CSharpName: Naming.ToCSharpTypeParameterName(parameter.Name)))
+            .ToList();
+        var ancestorNames = parent?.GetLogicalCSharpNames()
             ?? new HashSet<string>(StringComparer.Ordinal);
-        foreach (var parameter in ordered)
+        foreach (var (parameter, csharpName) in preparedNames)
         {
             if (string.IsNullOrWhiteSpace(parameter.Name))
             {
@@ -90,8 +95,7 @@ public sealed class GenericScope
                     $"{provenance}/typeParameter[{parameter.Ordinal}]");
             }
 
-            var csharpName = Naming.ToCSharpTypeParameterName(parameter.Name);
-            var identifier = csharpName.TrimStart('@');
+            var identifier = LogicalIdentifier(csharpName);
             if (identifier.Length == 0
                 || !(char.IsLetter(identifier[0]) || identifier[0] == '_')
                 || identifier.Skip(1).Any(character =>
@@ -102,25 +106,30 @@ public sealed class GenericScope
                     $"normalizes to invalid C# identifier '{csharpName}'.",
                     $"{provenance}/typeParameter[{parameter.Ordinal}]");
             }
-            if (!normalizedNames.TryAdd(csharpName, parameter.Name))
+            if (!normalizedNames.TryAdd(identifier, parameter.Name))
             {
                 throw new TypeProjectionException(
-                    $"Generic parameters '{normalizedNames[csharpName]}' and " +
+                    $"Generic parameters '{normalizedNames[identifier]}' and " +
                     $"'{parameter.Name}' at '{provenance}' normalize to the duplicate " +
                     $"C# name '{csharpName}'.",
                     $"{provenance}/typeParameter[{parameter.Ordinal}]");
             }
-            if (ancestorNames.Contains(csharpName))
+        }
+
+        var localNames = normalizedNames.Keys.ToHashSet(StringComparer.Ordinal);
+        foreach (var (parameter, preparedName) in preparedNames)
+        {
+            var csharpName = preparedName;
+            var identifier = LogicalIdentifier(csharpName);
+            if (ancestorNames.Contains(identifier))
             {
                 var suffix = 1;
                 var renamed = $"{csharpName}_{suffix}";
-                while (ancestorNames.Contains(renamed)
-                    || normalizedNames.ContainsKey(renamed))
+                while (ancestorNames.Contains(LogicalIdentifier(renamed))
+                    || localNames.Contains(LogicalIdentifier(renamed)))
                 {
                     renamed = $"{csharpName}_{++suffix}";
                 }
-                normalizedNames.Remove(csharpName);
-                normalizedNames.Add(renamed, parameter.Name);
                 csharpName = renamed;
             }
 
@@ -154,10 +163,13 @@ public sealed class GenericScope
     {
         if (!string.IsNullOrWhiteSpace(resolvedName))
         {
-            if (_byResolvedName.TryGetValue(resolvedName, out binding!))
+            if (_byResolvedName.TryGetValue(resolvedName, out binding!)
+                && string.Equals(
+                    sourceName,
+                    binding.SourceName,
+                    StringComparison.Ordinal))
                 return true;
-            if (resolvedName.Contains('.', StringComparison.Ordinal))
-                return Parent?.TryResolve(sourceName, resolvedName, out binding!) == true;
+            return Parent?.TryResolve(sourceName, resolvedName, out binding!) == true;
         }
         if (_bySourceName.TryGetValue(sourceName, out binding!))
             return true;
@@ -168,14 +180,17 @@ public sealed class GenericScope
         => _bySourceName.ContainsKey(sourceName)
             || Parent?.ContainsSourceName(sourceName) == true;
 
-    private HashSet<string> GetCSharpNames()
+    private HashSet<string> GetLogicalCSharpNames()
     {
-        var names = Parent?.GetCSharpNames()
+        var names = Parent?.GetLogicalCSharpNames()
             ?? new HashSet<string>(StringComparer.Ordinal);
         foreach (var parameter in Parameters)
-            names.Add(parameter.CSharpName);
+            names.Add(LogicalIdentifier(parameter.CSharpName));
         return names;
     }
+
+    private static string LogicalIdentifier(string csharpName)
+        => csharpName.StartsWith('@') ? csharpName[1..] : csharpName;
 }
 
 public sealed record GenericDeclaration(

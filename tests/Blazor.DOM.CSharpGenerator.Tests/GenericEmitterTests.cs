@@ -257,6 +257,23 @@ public sealed class GenericEmitterTests
             outer);
         Assert.Equal("T_1", sibling.Parameters[0].CSharpName);
         Assert.Equal("T_1", inner.Parameters[0].CSharpName);
+
+        var keywordOuter = GenericScope.Create(
+            [new TypeParameterModel(0, "value", null, null)],
+            "ShadowHost");
+        var keywordInner = GenericScope.Create(
+            [
+                new TypeParameterModel(0, "value", null, null),
+                new TypeParameterModel(1, "value_1", null, null),
+                new TypeParameterModel(2, "Value", null, null),
+                new TypeParameterModel(3, "value-2", null, null),
+            ],
+            "ShadowHost/Map",
+            keywordOuter);
+        Assert.Equal("@value", keywordOuter.Parameters[0].CSharpName);
+        Assert.Equal(
+            ["@value_3", "value_1", "Value", "value_2"],
+            keywordInner.Parameters.Select(parameter => parameter.CSharpName));
     }
 
     [Fact]
