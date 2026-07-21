@@ -33,6 +33,10 @@ jobs:
         - Blazor.SpeechRecognition
         - Blazor.DOM
         - Blazor.DOM.WebAssembly
+        - Blazor.Permissions
+        - Blazor.Permissions.WebAssembly
+        - Blazor.WakeLock
+        - Blazor.WakeLock.WebAssembly
     steps:
     - uses: actions/checkout@main
 
@@ -73,6 +77,10 @@ jobs:
     - name: Run DOM C# generator tests
       run: |
         dotnet test ./tests/Blazor.DOM.CSharpGenerator.Tests/Blazor.DOM.CSharpGenerator.Tests.csproj --configuration Release --verbosity normal
+
+    - name: Run Wake Lock focused package tests
+      run: |
+        dotnet test ./tests/Blazor.WakeLock.Tests/Blazor.WakeLock.Tests.csproj --configuration Release --verbosity normal
 
     - name: Restore DOM global namespace compilation tests
       run: |

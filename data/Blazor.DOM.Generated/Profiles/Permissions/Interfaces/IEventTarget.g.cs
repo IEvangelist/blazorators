@@ -14,39 +14,4 @@ namespace Blazor.DOM;
 /// </summary>
 public partial interface IEventTarget : global::Microsoft.JSInterop.IDomProxy
 {
-    /// <summary>
-/// The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target.
-///
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)
-/// </summary>
-[global::Microsoft.JSInterop.DomOperation("js:addEventListener`0<>(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject<>|NullKeyword:null):optional=False:rest=False,union(AddEventListenerOptions<>|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?]->void@transport:json-value:False:False:True:void", "addEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-void AddEventListener(string type, EventListenerOrEventListenerObject? callback);
-
-    [global::Microsoft.JSInterop.DomOperation("js:addEventListener`0<>(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject<>|NullKeyword:null):optional=False:rest=False,union(AddEventListenerOptions<>|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,bool]->void@transport:json-value:False:False:True:void", "addEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-void AddEventListener(string type, EventListenerOrEventListenerObject? callback, bool capture);
-
-    [global::Microsoft.JSInterop.DomOperation("js:addEventListener`0<>(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject<>|NullKeyword:null):optional=False:rest=False,union(AddEventListenerOptions<>|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,AddEventListenerOptions]->void@transport:json-value:False:False:True:void", "addEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-void AddEventListener(string type, EventListenerOrEventListenerObject? callback, AddEventListenerOptions? options);
-
-    /// <summary>
-/// The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order.
-///
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
-/// </summary>
-[global::Microsoft.JSInterop.DomOperation("js:dispatchEvent`0<>(Event<>:optional=False:rest=False)[clr:IEvent]->bool@transport:json-value:False:False:True:boolean", "dispatchEvent", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-bool DispatchEvent(IEvent @event);
-
-    /// <summary>
-/// The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target.
-///
-/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)
-/// </summary>
-[global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject<>|NullKeyword:null):optional=False:rest=False,union(EventListenerOptions<>|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-void RemoveEventListener(string type, EventListenerOrEventListenerObject? callback);
-
-    [global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject<>|NullKeyword:null):optional=False:rest=False,union(EventListenerOptions<>|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,bool]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-void RemoveEventListener(string type, EventListenerOrEventListenerObject? callback, bool capture);
-
-    [global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject<>|NullKeyword:null):optional=False:rest=False,union(EventListenerOptions<>|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,EventListenerOptions]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
-void RemoveEventListener(string type, EventListenerOrEventListenerObject? callback, EventListenerOptions? options);
 }

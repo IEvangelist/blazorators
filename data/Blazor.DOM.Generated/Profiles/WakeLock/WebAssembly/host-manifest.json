@@ -2,11 +2,9 @@
   "schemaVersion": 1,
   "generatorVersion": "1.0.0",
   "host": 1,
-  "sourceSymbolCount": 15,
+  "sourceSymbolCount": 12,
   "sharedSymbols": [
-    "AbortSignalEventMap",
     "AddEventListenerOptions",
-    "DOMHighResTimeStamp",
     "EventInit",
     "EventListener",
     "EventListenerOptions",
@@ -15,7 +13,6 @@
     "WakeLockType"
   ],
   "hostSymbols": [
-    "AbortSignal",
     "Event",
     "EventListenerObject",
     "EventTarget",
@@ -23,230 +20,6 @@
     "WakeLockSentinel"
   ],
   "operations": [
-    {
-      "logicalIdentity": "AbortSignal/aborted:get",
-      "symbol": "AbortSignal",
-      "kind": "property-get",
-      "javaScriptName": "aborted",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "AbortSignal/factory-method:AbortSignal:Create()",
-      "symbol": "AbortSignal",
-      "kind": "constructor",
-      "javaScriptName": "AbortSignal",
-      "promise": false,
-      "hostSignature": "IAbortSignal Create()"
-    },
-    {
-      "logicalIdentity": "AbortSignal/factory-method:abort:Abort(object? reason = default)",
-      "symbol": "AbortSignal",
-      "kind": "factory-method",
-      "javaScriptName": "abort",
-      "promise": false,
-      "hostSignature": "IAbortSignal Abort(object? reason = default)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/factory-method:any:Any(global::Microsoft.JSInterop.IBrowserArray\u003CIAbortSignal\u003E signals)",
-      "symbol": "AbortSignal",
-      "kind": "factory-method",
-      "javaScriptName": "any",
-      "promise": false,
-      "hostSignature": "IAbortSignal Any(global::Microsoft.JSInterop.IBrowserArray\u003CIAbortSignal\u003E signals)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/factory-method:timeout:Timeout(double milliseconds)",
-      "symbol": "AbortSignal",
-      "kind": "factory-method",
-      "javaScriptName": "timeout",
-      "promise": false,
-      "hostSignature": "IAbortSignal Timeout(double milliseconds)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/factory-property:prototype",
-      "symbol": "AbortSignal",
-      "kind": "factory-property",
-      "javaScriptName": "prototype",
-      "promise": false,
-      "hostSignature": "IAbortSignal Prototype"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,AddEventListenerOptions]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "addEventListener",
-      "promise": false,
-      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject listener, AddEventListenerOptions? options)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,bool]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "addEventListener",
-      "promise": false,
-      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject listener, bool capture)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "addEventListener",
-      "promise": false,
-      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject listener)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,EventListenerOptions]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "removeEventListener",
-      "promise": false,
-      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, EventListenerOptions? options)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,bool]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "removeEventListener",
-      "promise": false,
-      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, bool capture)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject\u003C\u003E:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions\u003C\u003E):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "removeEventListener",
-      "promise": false,
-      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/js:throwIfAborted\u00600\u003C\u003E()[clr:]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "AbortSignal",
-      "kind": "method",
-      "javaScriptName": "throwIfAborted",
-      "promise": false,
-      "hostSignature": "void ThrowIfAborted()"
-    },
-    {
-      "logicalIdentity": "AbortSignal/onabort:get",
-      "symbol": "AbortSignal",
-      "kind": "property-get",
-      "javaScriptName": "onabort",
-      "promise": false,
-      "hostSignature": "Func\u003CIEvent, object\u003E?"
-    },
-    {
-      "logicalIdentity": "AbortSignal/onabort:set",
-      "symbol": "AbortSignal",
-      "kind": "property-set",
-      "javaScriptName": "onabort",
-      "promise": false,
-      "hostSignature": "void(Func\u003CIEvent, object\u003E?)"
-    },
-    {
-      "logicalIdentity": "AbortSignal/reason:get",
-      "symbol": "AbortSignal",
-      "kind": "property-get",
-      "javaScriptName": "reason",
-      "promise": false,
-      "hostSignature": "object"
-    },
-    {
-      "logicalIdentity": "Event/AT_TARGET:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "AT_TARGET",
-      "promise": false,
-      "hostSignature": "double"
-    },
-    {
-      "logicalIdentity": "Event/BUBBLING_PHASE:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "BUBBLING_PHASE",
-      "promise": false,
-      "hostSignature": "double"
-    },
-    {
-      "logicalIdentity": "Event/CAPTURING_PHASE:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "CAPTURING_PHASE",
-      "promise": false,
-      "hostSignature": "double"
-    },
-    {
-      "logicalIdentity": "Event/NONE:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "NONE",
-      "promise": false,
-      "hostSignature": "double"
-    },
-    {
-      "logicalIdentity": "Event/bubbles:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "bubbles",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/cancelBubble:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "cancelBubble",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/cancelBubble:set",
-      "symbol": "Event",
-      "kind": "property-set",
-      "javaScriptName": "cancelBubble",
-      "promise": false,
-      "hostSignature": "void(bool)"
-    },
-    {
-      "logicalIdentity": "Event/cancelable:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "cancelable",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/composed:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "composed",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/currentTarget:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "currentTarget",
-      "promise": false,
-      "hostSignature": "IEventTarget?"
-    },
-    {
-      "logicalIdentity": "Event/defaultPrevented:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "defaultPrevented",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/eventPhase:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "eventPhase",
-      "promise": false,
-      "hostSignature": "double"
-    },
     {
       "logicalIdentity": "Event/factory-method:Event:Create(string type,EventInit? eventInitDict = default)",
       "symbol": "Event",
@@ -296,102 +69,6 @@
       "hostSignature": "IEvent Prototype"
     },
     {
-      "logicalIdentity": "Event/isTrusted:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "isTrusted",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/js:composedPath\u00600\u003C\u003E()[clr:]-\u003Eglobal::Microsoft.JSInterop.IBrowserArray\u003CIEventTarget\u003E@transport:js-reference:False:False:False:EventTarget[]",
-      "symbol": "Event",
-      "kind": "method",
-      "javaScriptName": "composedPath",
-      "promise": false,
-      "hostSignature": "global::Microsoft.JSInterop.IBrowserArray\u003CIEventTarget\u003E ComposedPath()"
-    },
-    {
-      "logicalIdentity": "Event/js:initEvent\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,BooleanKeyword:optional=True:rest=False,BooleanKeyword:optional=True:rest=False)[clr:string,bool,bool]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "Event",
-      "kind": "method",
-      "javaScriptName": "initEvent",
-      "promise": false,
-      "hostSignature": "void InitEvent(string type, bool bubbles = default, bool cancelable = default)"
-    },
-    {
-      "logicalIdentity": "Event/js:preventDefault\u00600\u003C\u003E()[clr:]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "Event",
-      "kind": "method",
-      "javaScriptName": "preventDefault",
-      "promise": false,
-      "hostSignature": "void PreventDefault()"
-    },
-    {
-      "logicalIdentity": "Event/js:stopImmediatePropagation\u00600\u003C\u003E()[clr:]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "Event",
-      "kind": "method",
-      "javaScriptName": "stopImmediatePropagation",
-      "promise": false,
-      "hostSignature": "void StopImmediatePropagation()"
-    },
-    {
-      "logicalIdentity": "Event/js:stopPropagation\u00600\u003C\u003E()[clr:]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "Event",
-      "kind": "method",
-      "javaScriptName": "stopPropagation",
-      "promise": false,
-      "hostSignature": "void StopPropagation()"
-    },
-    {
-      "logicalIdentity": "Event/returnValue:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "returnValue",
-      "promise": false,
-      "hostSignature": "bool"
-    },
-    {
-      "logicalIdentity": "Event/returnValue:set",
-      "symbol": "Event",
-      "kind": "property-set",
-      "javaScriptName": "returnValue",
-      "promise": false,
-      "hostSignature": "void(bool)"
-    },
-    {
-      "logicalIdentity": "Event/srcElement:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "srcElement",
-      "promise": false,
-      "hostSignature": "IEventTarget?"
-    },
-    {
-      "logicalIdentity": "Event/target:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "target",
-      "promise": false,
-      "hostSignature": "IEventTarget?"
-    },
-    {
-      "logicalIdentity": "Event/timeStamp:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "timeStamp",
-      "promise": false,
-      "hostSignature": "double"
-    },
-    {
-      "logicalIdentity": "Event/type:get",
-      "symbol": "Event",
-      "kind": "property-get",
-      "javaScriptName": "type",
-      "promise": false,
-      "hostSignature": "string"
-    },
-    {
       "logicalIdentity": "EventListenerObject/js:handleEvent\u00600\u003C\u003E(Event\u003C\u003E:optional=False:rest=False)[clr:IEvent]-\u003Evoid@transport:json-value:False:False:True:void",
       "symbol": "EventListenerObject",
       "kind": "method",
@@ -414,62 +91,6 @@
       "javaScriptName": "prototype",
       "promise": false,
       "hostSignature": "IEventTarget Prototype"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject\u003C\u003E|NullKeyword:null):optional=False:rest=False,union(AddEventListenerOptions\u003C\u003E|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,AddEventListenerOptions]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "addEventListener",
-      "promise": false,
-      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject? callback, AddEventListenerOptions? options)"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject\u003C\u003E|NullKeyword:null):optional=False:rest=False,union(AddEventListenerOptions\u003C\u003E|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,bool]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "addEventListener",
-      "promise": false,
-      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject? callback, bool capture)"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:addEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject\u003C\u003E|NullKeyword:null):optional=False:rest=False,union(AddEventListenerOptions\u003C\u003E|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "addEventListener",
-      "promise": false,
-      "hostSignature": "void AddEventListener(string type, EventListenerOrEventListenerObject? callback)"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:dispatchEvent\u00600\u003C\u003E(Event\u003C\u003E:optional=False:rest=False)[clr:IEvent]-\u003Ebool@transport:json-value:False:False:True:boolean",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "dispatchEvent",
-      "promise": false,
-      "hostSignature": "bool DispatchEvent(IEvent @event)"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject\u003C\u003E|NullKeyword:null):optional=False:rest=False,union(EventListenerOptions\u003C\u003E|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,EventListenerOptions]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "removeEventListener",
-      "promise": false,
-      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject? callback, EventListenerOptions? options)"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject\u003C\u003E|NullKeyword:null):optional=False:rest=False,union(EventListenerOptions\u003C\u003E|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?,bool]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "removeEventListener",
-      "promise": false,
-      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject? callback, bool capture)"
-    },
-    {
-      "logicalIdentity": "EventTarget/js:removeEventListener\u00600\u003C\u003E(StringKeyword:optional=False:rest=False,union(EventListenerOrEventListenerObject\u003C\u003E|NullKeyword:null):optional=False:rest=False,union(EventListenerOptions\u003C\u003E|BooleanKeyword):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject?]-\u003Evoid@transport:json-value:False:False:True:void",
-      "symbol": "EventTarget",
-      "kind": "method",
-      "javaScriptName": "removeEventListener",
-      "promise": false,
-      "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject? callback)"
     },
     {
       "logicalIdentity": "WakeLock/factory-method:WakeLock:Create()",
@@ -568,22 +189,6 @@
       "hostSignature": "void RemoveEventListener(string type, EventListenerOrEventListenerObject listener)"
     },
     {
-      "logicalIdentity": "WakeLockSentinel/onrelease:get",
-      "symbol": "WakeLockSentinel",
-      "kind": "property-get",
-      "javaScriptName": "onrelease",
-      "promise": false,
-      "hostSignature": "Func\u003CIEvent, object\u003E?"
-    },
-    {
-      "logicalIdentity": "WakeLockSentinel/onrelease:set",
-      "symbol": "WakeLockSentinel",
-      "kind": "property-set",
-      "javaScriptName": "onrelease",
-      "promise": false,
-      "hostSignature": "void(Func\u003CIEvent, object\u003E?)"
-    },
-    {
       "logicalIdentity": "WakeLockSentinel/released:get",
       "symbol": "WakeLockSentinel",
       "kind": "property-get",
@@ -609,13 +214,11 @@
     }
   ],
   "generatedFiles": [
-    "WebAssembly\\Factories\\IAbortSignalFactory.g.cs",
     "WebAssembly\\Factories\\IEventFactory.g.cs",
     "WebAssembly\\Factories\\IEventTargetFactory.g.cs",
     "WebAssembly\\Factories\\IWakeLockFactory.g.cs",
     "WebAssembly\\Factories\\IWakeLockSentinelFactory.g.cs",
     "WebAssembly\\GeneratedDomHost.g.cs",
-    "WebAssembly\\Interfaces\\IAbortSignal.g.cs",
     "WebAssembly\\Interfaces\\IEvent.g.cs",
     "WebAssembly\\Interfaces\\IEventListenerObject.g.cs",
     "WebAssembly\\Interfaces\\IEventTarget.g.cs",
@@ -639,10 +242,7 @@
     ]
   },
   "coveredSymbols": [
-    "AbortSignal",
-    "AbortSignalEventMap",
     "AddEventListenerOptions",
-    "DOMHighResTimeStamp",
     "Event",
     "EventInit",
     "EventListener",

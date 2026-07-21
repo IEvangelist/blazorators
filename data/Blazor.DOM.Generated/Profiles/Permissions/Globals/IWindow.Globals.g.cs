@@ -12,8 +12,6 @@ namespace Blazor.DOM;
 /// </summary>
 public partial interface IWindow
 {
-    IAbortSignalFactory AbortSignalConstructor { get; }
-
     IEventFactory EventConstructor { get; }
 
     IEventTargetFactory EventTargetConstructor { get; }

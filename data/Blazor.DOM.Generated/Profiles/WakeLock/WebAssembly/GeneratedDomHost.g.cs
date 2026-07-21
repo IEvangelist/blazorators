@@ -17,8 +17,6 @@ public static class GeneratedDomHost
     public static void RegisterProxies(IDomProxyFactory factory)
     {
         global::System.ArgumentNullException.ThrowIfNull(factory);
-        factory.Register<global::Blazor.DOM.IAbortSignal>((reference, runtime, owner) => new global::Blazor.DOM.AbortSignalDomProxy(reference, runtime, owner));
-        factory.Register<global::Blazor.DOM.IAbortSignalFactory>((reference, runtime, owner) => new global::Blazor.DOM.AbortSignalFactoryDomProxy(reference, runtime, owner));
         factory.Register<global::Blazor.DOM.IEvent>((reference, runtime, owner) => new global::Blazor.DOM.EventDomProxy(reference, runtime, owner));
         factory.Register<global::Blazor.DOM.IEventFactory>((reference, runtime, owner) => new global::Blazor.DOM.EventFactoryDomProxy(reference, runtime, owner));
         factory.Register<global::Blazor.DOM.IEventListenerObject>((reference, runtime, owner) => new global::Blazor.DOM.EventListenerObjectDomProxy(reference, runtime, owner));

@@ -11,6 +11,4 @@ namespace Blazor.DOM;
 
 public record EventListenerOptions
 {
-    [JsonPropertyName("capture")]
-    public bool? Capture { get; init; }
 }
