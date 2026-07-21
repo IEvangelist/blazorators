@@ -336,6 +336,7 @@ interface SupplementalFixture : EventTarget {
 dictionary SupplementalOptions {
   required DOMString name;
   boolean enabled = false;
+  record<DOMString, sequence<DOMString>> labels;
 };
 enum SupplementalMode { "one", "two" };
 callback SupplementalCallback = Promise<DOMString> (SupplementalOptions options);
@@ -358,6 +359,7 @@ namespace SupplementalConstants {
   assert.match(generated.input.text, /interface SupplementalFixture extends EventTarget/);
   assert.match(generated.input.text, /new\(name: string, values\?: Array<number>\)/);
   assert.match(generated.input.text, /run\(input\?: BufferSource\): Promise<string>/);
+  assert.match(generated.input.text, /labels\?: Record<string, Array<string>>/);
   assert.match(generated.input.text, /\[Symbol\.iterator\]\(\): MapIterator/);
   assert.match(generated.input.text, /type SupplementalCallback = \(options: SupplementalOptions\) => Promise<string>/);
   assert.match(generated.input.text, /declare namespace SupplementalConstants/);
@@ -456,14 +458,26 @@ test("pinned supplemental closure is Window-scoped and provenance-complete", asy
   const navigator = symbol(model.symbols, "Navigator");
   assert.equal(navigator.supplemental, false);
   assert.ok(navigator.declarations.some((item) => item.supplemental));
+  const window = symbol(model.symbols, "Window");
+  assert.equal(window.supplemental, false);
+  assert.deepEqual(
+    window.declarations
+      .filter((item) => item.supplemental)
+      .flatMap((item) => item.members)
+      .map((item) => item.name?.text)
+      .filter((name) => name?.startsWith("show"))
+      .sort(),
+    ["showDirectoryPicker", "showOpenFilePicker", "showSaveFilePicker"],
+  );
   assert.equal(
     model.symbols.some((item) => item.name === "WorkerNavigator"),
     false,
   );
-  assert.equal(inputs.supplementalSources.length, 7);
+  assert.equal(inputs.supplementalSources.length, 8);
   assert.deepEqual(
     inputs.supplementalSources.map((item) => item.family),
     [
+      "File System Access",
       "Presentation API",
       "Web Serial",
       "Web Bluetooth",

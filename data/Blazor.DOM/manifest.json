@@ -13,8 +13,8 @@
       "path": "typescript-symbols.jsonl",
       "format": "jsonl",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/typescript-symbol.schema.json",
-      "records": 2173,
-      "sha256": "1b118d7db3d79c7c2e6ede8faefabaacb44122b1cd5bece68e3b15c398443b2d"
+      "records": 2183,
+      "sha256": "c8ab6afc38bd7bd69917853ad62271ca3c774634f069894f02e4f7f96c8bdcbd"
     },
     "webIdlSymbols": {
       "path": "webidl-symbols.jsonl",
@@ -28,21 +28,21 @@
       "format": "json",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/coverage.schema.json",
       "records": 1,
-      "sha256": "a5642ce9a400357b5d343e7005f4b718d75bd388a8098114ab3851b64145a22a"
+      "sha256": "25c6377fb862bf0f9997c7ae843e31176de6ff8b48b72d59962c5d1ba4948a20"
     }
   },
   "counts": {
-    "typescriptSymbols": 2173,
-    "typescriptDeclarations": 3009,
-    "typescriptMembers": 12201,
+    "typescriptSymbols": 2183,
+    "typescriptDeclarations": 3022,
+    "typescriptMembers": 12221,
     "webIdlSpecifications": 325,
     "webIdlSymbols": 2750,
     "webIdlMembers": 11338,
     "webIdlArguments": 4306,
-    "reconciledSymbols": 2003,
-    "reconciledWebIdlSymbols": 1681,
+    "reconciledSymbols": 2013,
+    "reconciledWebIdlSymbols": 1691,
     "unmatchedTypeScriptSymbols": 167,
-    "unmatchedWebIdlSymbols": 1066,
+    "unmatchedWebIdlSymbols": 1056,
     "ambiguousSymbols": 3,
     "ambiguousWebIdlSymbols": 3,
     "unsupportedShapes": 0
@@ -1386,6 +1386,25 @@
       "license": "W3C"
     },
     "supplementalTypeScript": [
+      {
+        "family": "File System Access",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://fs.spec.whatwg.org/",
+        "inputs": [
+          {
+            "name": "file-system-access.idl",
+            "sha256": "d02a269b02c8fca2acd098bb99322f00e208c14479f4f5b42b148c20e4253cfb"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/file-system-access.d.ts",
+          "sha256": "f75f473cca8a49835020025b52404559122667bd03e2f3e83042aa89e73ec57a"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
       {
         "family": "Presentation API",
         "sourceKind": "webref-idl-generated",
