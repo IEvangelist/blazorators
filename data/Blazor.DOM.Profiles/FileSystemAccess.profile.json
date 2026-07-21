@@ -1,0 +1,111 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "FileSystemAccess",
+  "description": "File System Access API - user-activated file and directory pickers with live handle traversal and binary file reads.",
+  "rootSymbols": [
+    "Window",
+    "FileSystemHandle",
+    "FileSystemFileHandle",
+    "FileSystemDirectoryHandle"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": true,
+  "features": ["file-system-access", "local-file-system"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/FileSystemAccess",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Window": [
+      "showOpenFilePicker",
+      "showSaveFilePicker",
+      "showDirectoryPicker"
+    ],
+    "FileSystemHandle": [
+      "kind",
+      "name",
+      "isSameEntry",
+      "queryPermission",
+      "requestPermission"
+    ],
+    "FileSystemFileHandle": ["kind", "getFile"],
+    "FileSystemDirectoryHandle": [
+      "kind",
+      "getDirectoryHandle",
+      "getFileHandle",
+      "removeEntry",
+      "resolve",
+      "Symbol.asyncIterator",
+      "entries",
+      "keys",
+      "values"
+    ],
+    "File": ["lastModified", "name", "webkitRelativePath"],
+    "Blob": ["size", "type", "arrayBuffer", "bytes", "slice", "text"],
+    "FileSystemDirectoryHandleAsyncIterator": ["Symbol.asyncIterator"],
+    "FilePickerOptions": ["types", "excludeAcceptAllOption", "id"],
+    "FilePickerAcceptType": ["description", "accept"],
+    "OpenFilePickerOptions": ["multiple"],
+    "SaveFilePickerOptions": ["suggestedName"],
+    "DirectoryPickerOptions": ["id", "mode"],
+    "FileSystemHandlePermissionDescriptor": ["mode"],
+    "FileSystemGetDirectoryOptions": ["create"],
+    "FileSystemGetFileOptions": ["create"],
+    "FileSystemRemoveOptions": ["recursive"]
+  },
+  "transportOverrides": [
+    {
+      "symbol": "FileSystemDirectoryHandle",
+      "member": "Symbol.asyncIterator",
+      "kind": "js-reference",
+      "rationale": "The directory async iterator is a live JavaScript iterator object whose identity and next-state must be retained through the existing browser iterator proxy transport."
+    },
+    {
+      "symbol": "FileSystemDirectoryHandle",
+      "member": "entries",
+      "kind": "js-reference",
+      "rationale": "entries() returns a live FileSystemDirectoryHandleAsyncIterator over name/handle tuples and must retain iterator and yielded handle identity."
+    },
+    {
+      "symbol": "FileSystemDirectoryHandle",
+      "member": "keys",
+      "kind": "js-reference",
+      "rationale": "keys() returns a live FileSystemDirectoryHandleAsyncIterator and must retain its asynchronous iteration state."
+    },
+    {
+      "symbol": "FileSystemDirectoryHandle",
+      "member": "values",
+      "kind": "js-reference",
+      "rationale": "values() returns a live FileSystemDirectoryHandleAsyncIterator whose yielded FileSystemHandle values remain disposable proxies."
+    },
+    {
+      "symbol": "FileSystemDirectoryHandleAsyncIterator",
+      "member": "Symbol.asyncIterator",
+      "kind": "js-reference",
+      "rationale": "Symbol.asyncIterator returns the same live async iterator object and therefore preserves proxy identity rather than serializing iterator state."
+    }
+  ],
+  "reviewedExclusions": [
+    {
+      "symbol": "FilePickerOptions",
+      "member": "startIn",
+      "rationale": "StartInDirectory is a FileSystemHandle-or-WellKnownDirectory union inside a JSON option dictionary; the current transport cannot preserve live handle identity in structural dictionary serialization."
+    },
+    {
+      "symbol": "DirectoryPickerOptions",
+      "member": "startIn",
+      "rationale": "StartInDirectory is a FileSystemHandle-or-WellKnownDirectory union inside a JSON option dictionary; the current transport cannot preserve live handle identity in structural dictionary serialization."
+    },
+    {
+      "symbol": "FileSystemFileHandle",
+      "member": "createWritable",
+      "rationale": "FileSystemWritableFileStream extends WritableStream and accepts the recursive FileSystemWriteChunkType union; no reviewed writable-stream transport exists, so the member is excluded rather than widened to object."
+    }
+  ],
+  "entryPoints": [
+    {
+      "name": "Window",
+      "symbol": "Window",
+      "javaScriptPath": "window"
+    }
+  ]
+}
