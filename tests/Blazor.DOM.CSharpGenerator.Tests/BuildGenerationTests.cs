@@ -155,6 +155,10 @@ public sealed class BuildGenerationTests
                 "Blazor.Screen.WebAssembly",
                 "Blazor.OfflineStorage",
                 "Blazor.OfflineStorage.WebAssembly",
+                "Blazor.Credentials",
+                "Blazor.Credentials.WebAssembly",
+                "Blazor.WebCrypto",
+                "Blazor.WebCrypto.WebAssembly",
             ];
             foreach (var focusedPackageName in focusedPackages)
             {
@@ -213,8 +217,20 @@ public sealed class BuildGenerationTests
             .Select(entry => entry.FullName)
             .ToList();
 
-        Assert.Contains(entries, path => path.EndsWith(
-            $"/{assembly}",
+        var assemblies = entries
+            .Where(path => path.EndsWith(
+                $"/{assembly}",
+                StringComparison.Ordinal))
+            .ToList();
+        Assert.Equal(3, assemblies.Count);
+        Assert.Contains(assemblies, path => path.StartsWith(
+            "lib/net8.0/",
+            StringComparison.Ordinal));
+        Assert.Contains(assemblies, path => path.StartsWith(
+            "lib/net9.0/",
+            StringComparison.Ordinal));
+        Assert.Contains(assemblies, path => path.StartsWith(
+            "lib/net10.0/",
             StringComparison.Ordinal));
         Assert.Contains(entries, path => path.EndsWith(
             $"/{manifest}",

@@ -1,0 +1,66 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "WebCrypto",
+  "description": "Cryptographically strong randomness and SubtleCrypto operations.",
+  "rootSymbols": ["Crypto", "SubtleCrypto", "CryptoKey"],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["web-crypto"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/WebCrypto",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Crypto": ["subtle", "getRandomValues", "randomUUID"],
+    "SubtleCrypto": [
+      "decrypt@0/0",
+      "deriveBits@0/1",
+      "deriveKey@0/2",
+      "digest@0/3",
+      "encrypt@0/4",
+      "exportKey@0/5",
+      "exportKey@0/6",
+      "generateKey@0/10",
+      "importKey@0/12",
+      "importKey@0/13",
+      "sign@0/14",
+      "unwrapKey@0/15",
+      "verify@0/16",
+      "wrapKey@0/17"
+    ],
+    "CryptoKey": ["algorithm", "extractable", "type", "usages"],
+    "Algorithm": ["*"],
+    "AesCbcParams": ["*"],
+    "AesCtrParams": ["*"],
+    "AesDerivedKeyParams": ["*"],
+    "AesGcmParams": ["*"],
+    "AesKeyAlgorithm": ["*"],
+    "AesKeyGenParams": ["*"],
+    "EcKeyGenParams": ["*"],
+    "EcKeyImportParams": ["*"],
+    "EcdhKeyDeriveParams": ["*"],
+    "EcdsaParams": ["*"],
+    "HkdfParams": ["*"],
+    "HmacImportParams": ["*"],
+    "HmacKeyGenParams": ["*"],
+    "JsonWebKey": ["*"],
+    "KeyAlgorithm": ["*"],
+    "Pbkdf2Params": ["*"],
+    "RsaHashedImportParams": ["*"],
+    "RsaHashedKeyGenParams": ["*"],
+    "RsaOaepParams": ["*"],
+    "RsaOtherPrimesInfo": ["*"],
+    "RsaPssParams": ["*"]
+  },
+  "entryPoints": [
+    {
+      "name": "Crypto",
+      "symbol": "Crypto",
+      "javaScriptPath": "crypto"
+    },
+    {
+      "name": "SubtleCrypto",
+      "symbol": "SubtleCrypto",
+      "javaScriptPath": "crypto.subtle"
+    }
+  ]
+}
