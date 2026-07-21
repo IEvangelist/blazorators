@@ -38,6 +38,14 @@ jobs:
         - Blazor.Permissions.WebAssembly
         - Blazor.WakeLock
         - Blazor.WakeLock.WebAssembly
+        - Blazor.Clipboard
+        - Blazor.Clipboard.WebAssembly
+        - Blazor.Share
+        - Blazor.Share.WebAssembly
+        - Blazor.StorageManagement
+        - Blazor.StorageManagement.WebAssembly
+        - Blazor.Screen
+        - Blazor.Screen.WebAssembly
     steps:
     - uses: actions/checkout@main
 
@@ -82,6 +90,13 @@ jobs:
     - name: Run Wake Lock focused package tests
       run: |
         dotnet test ./tests/Blazor.WakeLock.Tests/Blazor.WakeLock.Tests.csproj --configuration Release --verbosity normal
+
+    - name: Run essential focused package tests
+      run: |
+        dotnet test ./tests/Blazor.Clipboard.Tests/Blazor.Clipboard.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.Share.Tests/Blazor.Share.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.StorageManagement.Tests/Blazor.StorageManagement.Tests.csproj --configuration Release --verbosity normal
+        dotnet test ./tests/Blazor.Screen.Tests/Blazor.Screen.Tests.csproj --configuration Release --verbosity normal
 
     - name: Restore DOM global namespace compilation tests
       run: |
