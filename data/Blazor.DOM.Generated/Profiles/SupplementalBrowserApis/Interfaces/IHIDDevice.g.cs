@@ -14,35 +14,11 @@ public partial interface IHIDDevice : IEventTarget, global::Microsoft.JSInterop.
 [global::Microsoft.JSInterop.DomAccessor("oninputreport", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: HIDDevice, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: HIDDevice, ev: Event) => any) | null' is unsupported: TypeScript '(this: HIDDevice, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Oninputreport { get; set; }
 
-    [global::Microsoft.JSInterop.DomAccessor("opened", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
-bool Opened { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("vendorId", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double VendorId { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("productId", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double ProductId { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("productName", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
-string ProductName { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("collections", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "readonly HIDCollectionInfo[]", Nullable = false, Streamable = false, StructuredClone = false)]
-global::Microsoft.JSInterop.IReadOnlyBrowserArray<HIDCollectionInfo> Collections { get; }
-
     [global::Microsoft.JSInterop.DomJavaScriptName("open")]
 ValueTask OpenAsync();
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("close")]
-ValueTask CloseAsync();
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("forget")]
-ValueTask ForgetAsync();
-
     [global::Microsoft.JSInterop.DomJavaScriptName("sendReport")]
 ValueTask SendReportAsync(double reportId, BufferSource data);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("sendFeatureReport")]
-ValueTask SendFeatureReportAsync(double reportId, BufferSource data);
 
     [global::Microsoft.JSInterop.DomJavaScriptName("receiveFeatureReport")]
 ValueTask<System.Memory<byte>> ReceiveFeatureReportAsync(double reportId);

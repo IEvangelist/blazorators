@@ -10,39 +10,15 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IBluetoothRemoteGATTCharacteristic : IEventTarget, ICharacteristicEventHandlers, global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("service", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "BluetoothRemoteGATTService", Nullable = false, Streamable = false, StructuredClone = false)]
-IBluetoothRemoteGATTService Service { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("uuid", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
-string Uuid { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("properties", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "BluetoothCharacteristicProperties", Nullable = false, Streamable = false, StructuredClone = false)]
-IBluetoothCharacteristicProperties Properties { get; }
-
     [global::Microsoft.JSInterop.DomAccessor("value", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Binary, "DataView<ArrayBufferLike> | null", Nullable = true, Streamable = false, StructuredClone = true)]
 System.Memory<byte>? Value { get; }
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("getDescriptor")]
-ValueTask<IBluetoothRemoteGATTDescriptor> GetDescriptorAsync(BluetoothDescriptorUUID descriptor);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("getDescriptors")]
-ValueTask<global::Microsoft.JSInterop.IBrowserArray<IBluetoothRemoteGATTDescriptor>> GetDescriptorsAsync(BluetoothDescriptorUUID descriptor = default);
 
     [global::Microsoft.JSInterop.DomJavaScriptName("readValue")]
 ValueTask<System.Memory<byte>> ReadValueAsync();
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("writeValue")]
-ValueTask WriteValueAsync(BufferSource @value);
-
     [global::Microsoft.JSInterop.DomJavaScriptName("writeValueWithResponse")]
 ValueTask WriteValueWithResponseAsync(BufferSource @value);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("writeValueWithoutResponse")]
-ValueTask WriteValueWithoutResponseAsync(BufferSource @value);
-
     [global::Microsoft.JSInterop.DomJavaScriptName("startNotifications")]
 ValueTask<IBluetoothRemoteGATTCharacteristic> StartNotificationsAsync();
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("stopNotifications")]
-ValueTask<IBluetoothRemoteGATTCharacteristic> StopNotificationsAsync();
 }

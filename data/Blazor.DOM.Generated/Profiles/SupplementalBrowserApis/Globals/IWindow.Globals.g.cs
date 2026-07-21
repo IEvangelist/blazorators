@@ -16,8 +16,6 @@ public partial interface IWindow
 
     IBluetoothFactory BluetoothConstructor { get; }
 
-    IBluetoothCharacteristicPropertiesFactory BluetoothCharacteristicPropertiesConstructor { get; }
-
     IBluetoothDeviceFactory BluetoothDeviceConstructor { get; }
 
     IBluetoothLEScanFactory BluetoothLEScanConstructor { get; }
@@ -26,13 +24,7 @@ public partial interface IWindow
 
     IBluetoothRemoteGATTCharacteristicFactory BluetoothRemoteGATTCharacteristicConstructor { get; }
 
-    IBluetoothRemoteGATTDescriptorFactory BluetoothRemoteGATTDescriptorConstructor { get; }
-
     IBluetoothRemoteGATTServerFactory BluetoothRemoteGATTServerConstructor { get; }
-
-    IBluetoothRemoteGATTServiceFactory BluetoothRemoteGATTServiceConstructor { get; }
-
-    IElementFactory ElementConstructor { get; }
 
     IEventFactory EventConstructor { get; }
 
@@ -44,19 +36,11 @@ public partial interface IWindow
 
     IGPUAdapterInfoFactory GPUAdapterInfoConstructor { get; }
 
-    IGPUBindGroupFactory GPUBindGroupConstructor { get; }
-
-    IGPUBindGroupLayoutFactory GPUBindGroupLayoutConstructor { get; }
-
     IGPUBufferFactory GPUBufferConstructor { get; }
 
     IGPUCanvasContextFactory GPUCanvasContextConstructor { get; }
 
     IGPUCommandBufferFactory GPUCommandBufferConstructor { get; }
-
-    IGPUCommandEncoderFactory GPUCommandEncoderConstructor { get; }
-
-    IGPUComputePipelineFactory GPUComputePipelineConstructor { get; }
 
     IGPUDeviceFactory GPUDeviceConstructor { get; }
 
@@ -64,21 +48,7 @@ public partial interface IWindow
 
     IGPUErrorFactory GPUErrorConstructor { get; }
 
-    IGPUExternalTextureFactory GPUExternalTextureConstructor { get; }
-
-    IGPUPipelineLayoutFactory GPUPipelineLayoutConstructor { get; }
-
-    IGPUQuerySetFactory GPUQuerySetConstructor { get; }
-
     IGPUQueueFactory GPUQueueConstructor { get; }
-
-    IGPURenderBundleEncoderFactory GPURenderBundleEncoderConstructor { get; }
-
-    IGPURenderPipelineFactory GPURenderPipelineConstructor { get; }
-
-    IGPUSamplerFactory GPUSamplerConstructor { get; }
-
-    IGPUShaderModuleFactory GPUShaderModuleConstructor { get; }
 
     IGPUSupportedLimitsFactory GPUSupportedLimitsConstructor { get; }
 
@@ -92,19 +62,9 @@ public partial interface IWindow
 
     IHIDInputReportEventFactory HIDInputReportEventConstructor { get; }
 
-    IHTMLCanvasElementFactory HTMLCanvasElementConstructor { get; }
-
-    IHTMLElementFactory HTMLElementConstructor { get; }
-
     INavigatorFactory NavigatorConstructor { get; }
 
-    INodeFactory NodeConstructor { get; }
-
-    IOffscreenCanvasFactory OffscreenCanvasConstructor { get; }
-
     IPresentationFactory PresentationConstructor { get; }
-
-    IPresentationAvailabilityFactory PresentationAvailabilityConstructor { get; }
 
     IPresentationConnectionFactory PresentationConnectionConstructor { get; }
 
@@ -127,14 +87,6 @@ public partial interface IWindow
     IUSBDeviceFactory USBDeviceConstructor { get; }
 
     IUSBInTransferResultFactory USBInTransferResultConstructor { get; }
-
-    IUSBIsochronousInTransferPacketFactory USBIsochronousInTransferPacketConstructor { get; }
-
-    IUSBIsochronousInTransferResultFactory USBIsochronousInTransferResultConstructor { get; }
-
-    IUSBIsochronousOutTransferPacketFactory USBIsochronousOutTransferPacketConstructor { get; }
-
-    IUSBIsochronousOutTransferResultFactory USBIsochronousOutTransferResultConstructor { get; }
 
     IUSBOutTransferResultFactory USBOutTransferResultConstructor { get; }
 

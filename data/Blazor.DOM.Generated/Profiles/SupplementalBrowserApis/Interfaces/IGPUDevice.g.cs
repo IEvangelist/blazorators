@@ -11,9 +11,6 @@ namespace Blazor.DOM;
 [global::Microsoft.JSInterop.DomEventTarget("GPUDevice", "__GPUDeviceEventMap")]
 public partial interface IGPUDevice : IEventTarget, IGPUObjectBase, global::Microsoft.JSInterop.IDomEventTargetProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("__brand", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"GPUDevice\"", Nullable = false, Streamable = false, StructuredClone = true)]
-global::Blazor.DOM.AdvancedTypes.GPUDeviceStringShape_711ff5fb90 Brand { get; }
-
     /// <summary>
 /// A set containing the {@link GPUFeatureName} values of the features
 /// supported by the device (i.e. the ones with which it was created).
@@ -27,15 +24,6 @@ GPUSupportedFeatures Features { get; }
 /// </summary>
 [global::Microsoft.JSInterop.DomAccessor("limits", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "GPUSupportedLimits", Nullable = false, Streamable = false, StructuredClone = false)]
 IGPUSupportedLimits Limits { get; }
-
-    /// <summary>
-/// Information about the physical adapter which created the device
-/// that this GPUDevice refers to.
-/// For a given GPUDevice, the GPUAdapterInfo values exposed are constant
-/// over time.
-/// </summary>
-[global::Microsoft.JSInterop.DomAccessor("adapterInfo", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "GPUAdapterInfo", Nullable = false, Streamable = false, StructuredClone = false)]
-IGPUAdapterInfo AdapterInfo { get; }
 
     /// <summary>
 /// The primary {@link GPUQueue} for this device.
@@ -71,108 +59,9 @@ Func<IGPUUncapturedErrorEvent, object>? Onuncapturederror { get; set; }
     void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, EventListenerOptions? options);
 
     /// <summary>
-/// Destroys the device, preventing further operations on it.
-/// Outstanding asynchronous operations will fail.
-/// Note: It is valid to destroy a device multiple times.
-/// Note: Since no further operations can be enqueued on this device, implementations can abort
-/// outstanding asynchronous operations immediately and free resource allocations, including
-/// mapped memory that was just unmapped.
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined Destroy();
-
-    /// <summary>
 /// Creates a {@link GPUBuffer}.
 /// </summary>
 IGPUBuffer CreateBuffer(GPUBufferDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUTexture}.
-/// </summary>
-IGPUTexture CreateTexture(GPUTextureDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUSampler}.
-/// </summary>
-IGPUSampler CreateSampler(GPUSamplerDescriptor? descriptor = default);
-
-    /// <summary>
-/// Creates a {@link GPUExternalTexture} wrapping the provided image source.
-/// </summary>
-IGPUExternalTexture ImportExternalTexture(GPUExternalTextureDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUBindGroupLayout}.
-/// </summary>
-IGPUBindGroupLayout CreateBindGroupLayout(GPUBindGroupLayoutDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUPipelineLayout}.
-/// </summary>
-IGPUPipelineLayout CreatePipelineLayout(GPUPipelineLayoutDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUBindGroup}.
-/// </summary>
-IGPUBindGroup CreateBindGroup(GPUBindGroupDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUShaderModule}.
-/// </summary>
-IGPUShaderModule CreateShaderModule(GPUShaderModuleDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUComputePipeline} using immediate pipeline creation.
-/// </summary>
-IGPUComputePipeline CreateComputePipeline(GPUComputePipelineDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPURenderPipeline} using immediate pipeline creation.
-/// </summary>
-IGPURenderPipeline CreateRenderPipeline(GPURenderPipelineDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUComputePipeline} using async pipeline creation.
-/// The returned Promise resolves when the created pipeline
-/// is ready to be used without additional delay.
-/// If pipeline creation fails, the returned Promise rejects with an {@link GPUPipelineError}.
-/// (A {@link GPUError} is not dispatched to the device.)
-/// Note: Use of this method is preferred whenever possible, as it prevents blocking the
-/// queue timeline work on pipeline compilation.
-/// </summary>
-[global::Microsoft.JSInterop.DomJavaScriptName("createComputePipelineAsync")]
-ValueTask<IGPUComputePipeline> CreateComputePipelineAsyncAsync(GPUComputePipelineDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPURenderPipeline} using async pipeline creation.
-/// The returned Promise resolves when the created pipeline
-/// is ready to be used without additional delay.
-/// If pipeline creation fails, the returned Promise rejects with an {@link GPUPipelineError}.
-/// (A {@link GPUError} is not dispatched to the device.)
-/// Note: Use of this method is preferred whenever possible, as it prevents blocking the
-/// queue timeline work on pipeline compilation.
-/// </summary>
-[global::Microsoft.JSInterop.DomJavaScriptName("createRenderPipelineAsync")]
-ValueTask<IGPURenderPipeline> CreateRenderPipelineAsyncAsync(GPURenderPipelineDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUCommandEncoder}.
-/// </summary>
-IGPUCommandEncoder CreateCommandEncoder(GPUCommandEncoderDescriptor? descriptor = default);
-
-    /// <summary>
-/// Creates a {@link GPURenderBundleEncoder}.
-/// </summary>
-IGPURenderBundleEncoder CreateRenderBundleEncoder(GPURenderBundleEncoderDescriptor descriptor);
-
-    /// <summary>
-/// Creates a {@link GPUQuerySet}.
-/// </summary>
-IGPUQuerySet CreateQuerySet(GPUQuerySetDescriptor descriptor);
-
-    /// <summary>
-/// Pushes a new GPU error scope onto the {@link GPUDevice}.`[[errorScopeStack]]` for `this`.
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined PushErrorScope(GPUErrorFilter filter);
 
     /// <summary>
 /// Pops a GPU error scope off the {@link GPUDevice}.`[[errorScopeStack]]` for `this`

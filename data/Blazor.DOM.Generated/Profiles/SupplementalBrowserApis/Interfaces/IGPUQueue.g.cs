@@ -10,9 +10,6 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IGPUQueue : IGPUObjectBase, global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("__brand", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"GPUQueue\"", Nullable = false, Streamable = false, StructuredClone = true)]
-global::Blazor.DOM.AdvancedTypes.GPUQueueStringShape_1857b37c80 Brand { get; }
-
     /// <summary>
 /// Schedules the execution of the command buffers by the GPU on this queue.
 /// Submitted command buffers cannot be used again.
@@ -34,22 +31,4 @@ ValueTask<global::Microsoft.JSInterop.BrowserUndefined> OnSubmittedWorkDoneAsync
 /// Issues a write operation of the provided data into a {@link GPUBuffer}.
 /// </summary>
 global::Microsoft.JSInterop.BrowserUndefined WriteBuffer(IGPUBuffer buffer, double bufferOffset, GPUAllowSharedBufferSource data, double dataOffset = default, double size = default);
-
-    /// <summary>
-/// Issues a write operation of the provided data into a {@link GPUTexture}.
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined WriteTexture(GPUTexelCopyTextureInfo destination, GPUAllowSharedBufferSource data, GPUTexelCopyBufferLayout dataLayout, GPUExtent3DStrict size);
-
-    /// <summary>
-/// Issues a copy operation of the contents of a platform image/canvas
-/// into the destination texture.
-/// This operation performs {@link https://www.w3.org/TR/webgpu/#color-space-conversions | color encoding} into the destination
-/// encoding according to the parameters of {@link GPUCopyExternalImageDestInfo}.
-/// Copying into a `-srgb` texture results in the same texture bytes, not the same decoded
-/// values, as copying into the corresponding non-`-srgb` format.
-/// Thus, after a copy operation, sampling the destination texture has
-/// different results depending on whether its format is `-srgb`, all else unchanged.
-/// &lt;!-- POSTV1(srgb-linear): If added, explain here how it interacts. --&gt;
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined CopyExternalImageToTexture(GPUCopyExternalImageSourceInfo source, GPUCopyExternalImageDestInfo destination, GPUExtent3DStrict copySize);
 }

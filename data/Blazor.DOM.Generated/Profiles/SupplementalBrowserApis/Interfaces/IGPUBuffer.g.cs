@@ -10,17 +10,11 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IGPUBuffer : IGPUObjectBase, global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("__brand", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"GPUBuffer\"", Nullable = false, Streamable = false, StructuredClone = true)]
-global::Blazor.DOM.AdvancedTypes.GPUBufferStringShape_d72977c001 Brand { get; }
-
     [global::Microsoft.JSInterop.DomAccessor("size", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
 double Size { get; }
 
     [global::Microsoft.JSInterop.DomAccessor("usage", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
 double Usage { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("mapState", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "GPUBufferMapState", Nullable = false, Streamable = false, StructuredClone = true)]
-GPUBufferMapState MapState { get; }
 
     /// <summary>
 /// Maps the given range of the {@link GPUBuffer} and resolves the returned Promise when the
@@ -42,18 +36,4 @@ ValueTask<global::Microsoft.JSInterop.BrowserUndefined> MapAsyncAsync(double mod
 /// Returns an ArrayBuffer with the contents of the {@link GPUBuffer} in the given mapped range.
 /// </summary>
 byte[] GetMappedRange(double offset = default, double size = default);
-
-    /// <summary>
-/// Unmaps the mapped range of the {@link GPUBuffer} and makes its contents available for use by the
-/// GPU again.
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined Unmap();
-
-    /// <summary>
-/// Destroys the {@link GPUBuffer}.
-/// Note: It is valid to destroy a buffer multiple times.
-/// Note: Since no further operations can be enqueued using this buffer, implementations can
-/// free resource allocations, including mapped memory that was just unmapped.
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined Destroy();
 }

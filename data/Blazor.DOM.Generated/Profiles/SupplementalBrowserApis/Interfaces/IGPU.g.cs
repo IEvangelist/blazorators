@@ -10,9 +10,6 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IGPU : global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("__brand", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"GPU\"", Nullable = false, Streamable = false, StructuredClone = true)]
-global::Blazor.DOM.AdvancedTypes.GPUStringShape_6f271277ac Brand { get; }
-
     [global::Microsoft.JSInterop.DomAccessor("wgslLanguageFeatures", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "WGSLLanguageFeatures", Nullable = false, Streamable = false, StructuredClone = false)]
 WGSLLanguageFeatures WgslLanguageFeatures { get; }
 
@@ -23,16 +20,4 @@ WGSLLanguageFeatures WgslLanguageFeatures { get; }
 /// </summary>
 [global::Microsoft.JSInterop.DomJavaScriptName("requestAdapter")]
 ValueTask<IGPUAdapter?> RequestAdapterAsync(GPURequestAdapterOptions? options = default);
-
-    /// <summary>
-/// Returns an optimal {@link GPUTextureFormat} for displaying 8-bit depth, standard dynamic range
-/// content on this system. Must only return {@link GPUTextureFormat} `"rgba8unorm"` or
-/// {@link GPUTextureFormat} `"bgra8unorm"`.
-/// The returned value can be passed as the {@link GPUCanvasConfiguration#format} to
-/// {@link GPUCanvasContext#configure} calls on a {@link GPUCanvasContext} to ensure the associated
-/// canvas is able to display its contents efficiently.
-/// Note: Canvases which are not displayed to the screen may or may not benefit from using this
-/// format.
-/// </summary>
-GPUTextureFormat GetPreferredCanvasFormat();
 }
