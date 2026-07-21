@@ -451,6 +451,101 @@ public sealed class FocusedPackageGenerationTests
         }
     }
 
+    [Fact]
+    public void GlobalConstructorEntryPoint_EmitsPermissionsAndFactoryContract()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "Notifications",
+                "Notifications.",
+                ["Notification"],
+                true,
+                true,
+                ["notifications"],
+                "Blazor.DOM",
+                "Profiles/Notifications",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["Notification"] =
+                    [
+                        "title",
+                        "close",
+                        "addEventListener",
+                        "removeEventListener",
+                    ],
+                    ["EventListener"] = ["*"],
+                    ["EventListenerObject"] = ["*"],
+                    ["NotificationEventMap"] = ["*"],
+                    ["NotificationPermissionCallback"] = ["*"],
+                },
+                true,
+                EntryPoints:
+                [
+                    new HostEntryPoint(
+                        "Notification",
+                        "Notification",
+                        "Notification"),
+                ],
+                Permissions: ["notifications"]);
+
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+
+            Assert.True(
+                result.PipelineResult.Errors.Count == 0,
+                string.Join(
+                    Environment.NewLine,
+                    result.PipelineResult.Errors.Select(error => error.Message)));
+            Assert.True(
+                result.PipelineResult.Validation.IsValid,
+                string.Join(
+                    Environment.NewLine,
+                    result.PipelineResult.Validation.Diagnostics));
+            var generated = Path.Combine(output, "Profiles", "Notifications");
+            var serverSource = File.ReadAllText(Path.Combine(
+                generated,
+                "Server",
+                "GeneratedDomHost.g.cs"));
+            var wasmSource = File.ReadAllText(Path.Combine(
+                generated,
+                "WebAssembly",
+                "GeneratedDomHost.g.cs"));
+
+            Assert.True(result.PipelineResult.HostPackages!.Parity.Exact);
+            Assert.Contains(
+                "ValueTask<global::Blazor.DOM.INotificationFactory> GetNotificationAsync",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "global::Blazor.DOM.INotificationFactory GetNotification()",
+                wasmSource,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "ValueTask<global::Blazor.DOM.INotification> GetNotificationAsync",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "IReadOnlyList<string> Permissions",
+                serverSource,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "[\"notifications\"]",
+                serverSource,
+                StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
     private static string CreateTempDir()
     {
         var directory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());

@@ -167,6 +167,7 @@ public sealed class ProfileSystemTests
                     "secureContext": true,
                     "requiresUserActivation": false,
                     "features": ["feature-x"],
+                    "permissions": ["permission-x"],
                     "outputNamespace": "Test.Namespace",
                     "outputSubdirectory": "Profiles/Test",
                     "minimalDependencyContracts": true,
@@ -185,6 +186,7 @@ public sealed class ProfileSystemTests
             Assert.Equal("Test.Namespace", profile.OutputNamespace);
             Assert.True(profile.MinimalDependencyContracts);
             Assert.Equal(["run@0/1"], profile.MemberIncludes!["TypeA"]);
+            Assert.Equal(["permission-x"], profile.Permissions);
         }
         finally { Directory.Delete(dir, true); }
     }
