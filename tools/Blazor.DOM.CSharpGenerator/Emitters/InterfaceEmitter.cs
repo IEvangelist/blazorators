@@ -60,7 +60,13 @@ public sealed class InterfaceEmitter(
         int DeclarationOrdinal,
         int OptionalParamCount = 0,
         bool HasRestParameter = false,
-        bool IsDefaultExpansion = false);
+        bool IsDefaultExpansion = false,
+        string JavaScriptName = "",
+        string SourceIdentity = "",
+        string ReturnTransport = "",
+        TypeProjection? ReturnProjection = null,
+        IReadOnlyList<TypeNode?>? ReturnSources = null,
+        GenericScope? Scope = null);
     private sealed record MethodBuildResult(
         IReadOnlyList<MethodSig> Outputs,
         IReadOnlyList<MemberOutcome> Outcomes,
@@ -170,6 +176,7 @@ public sealed class InterfaceEmitter(
         var emittedDeferredMethodOutputs = new HashSet<string>(StringComparer.Ordinal);
         var emittedMethodKeys = new Dictionary<string, MethodSig>(StringComparer.Ordinal);
         var emittedMethodOutputIndices = new Dictionary<string, int>(StringComparer.Ordinal);
+        var literalDispatchMethods = FindLiteralDispatchMethods(allDecls);
 
         var reconciledAccessors = new AccessorReconciler(typeResolver).Reconcile(
             symbol.Name,
@@ -264,7 +271,9 @@ public sealed class InterfaceEmitter(
                         methodRef.Member,
                         symbol.Name,
                         methodRef.DeclarationOrdinal,
-                        generic.Scope);
+                        generic.Scope,
+                        literalDispatchMethods.Contains(
+                            (methodRef.DeclarationOrdinal, methodRef.Member.Ordinal)));
                     foreach (var signature in build.Outputs)
                     {
                         var emittedName = MethodName(signature.CanonicalKey);
@@ -294,23 +303,81 @@ public sealed class InterfaceEmitter(
                     {
                         if (stagedMethodKeys.TryGetValue(sig.CanonicalKey, out var existing))
                         {
+                            if (!string.Equals(
+                                    existing.JavaScriptName,
+                                    sig.JavaScriptName,
+                                    StringComparison.Ordinal))
+                            {
+                                throw new TypeProjectionException(
+                                    $"JavaScript operations '{existing.JavaScriptName}' and " +
+                                    $"'{sig.JavaScriptName}' on '{symbol.Name}' normalize to " +
+                                    $"the same CLR signature '{sig.CanonicalKey}'.",
+                                    $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
+                                    $"{sig.JavaScriptName}/normalization");
+                            }
                             if (!string.Equals(existing.ReturnType, sig.ReturnType, StringComparison.Ordinal))
                             {
-                                var methodName = methodRef.Member.Name?.Text ?? "";
-                                if (existing.IsDefaultExpansion || sig.IsDefaultExpansion)
+                                if (!string.Equals(
+                                        existing.CanonicalConstraints,
+                                        sig.CanonicalConstraints,
+                                        StringComparison.Ordinal))
                                 {
-                                    throw new GenericDeferralException(
-                                        $"Default-expanded generic method " +
-                                        $"'{symbol.Name}.{methodName}' collides with an " +
-                                        "existing CLR signature with a different return type.",
+                                    throw new TypeProjectionException(
+                                        $"Method '{symbol.Name}.{sig.JavaScriptName}' cannot " +
+                                        "reconcile return-only overloads with incompatible " +
+                                        "generic constraints.",
                                         $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
-                                        $"{methodName}/generic-default",
-                                        "generic-method-defaults");
+                                        $"{sig.JavaScriptName}/constraints");
                                 }
+                                var returnSources = (existing.ReturnSources ?? [])
+                                    .Concat(sig.ReturnSources ?? [])
+                                    .ToList();
+                                TypeProjection unionReturn;
+                                try
+                                {
+                                    unionReturn = typeResolver.ProjectOverloadReturnUnion(
+                                        returnSources,
+                                        $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
+                                        $"{sig.JavaScriptName}/clr-collision",
+                                        sig.Scope);
+                                }
+                                catch (TypeProjectionException exception)
+                                {
+                                    throw new TypeProjectionException(
+                                        $"Method '{symbol.Name}.{sig.JavaScriptName}' in " +
+                                        $"decl[{methodRef.DeclarationOrdinal}] collides with " +
+                                        $"decl[{existing.DeclarationOrdinal}] for CLR signature " +
+                                        $"'{sig.CanonicalKey}' and its return-only overloads " +
+                                        $"cannot form a typed union: {exception.Message}",
+                                        exception.Provenance);
+                                }
+                                var reconciled = ReplaceReturnType(
+                                    existing,
+                                    unionReturn,
+                                    returnSources);
+                                if (stagedOutputIndices.TryGetValue(
+                                        sig.CanonicalKey,
+                                        out var unionOutputIndex))
+                                {
+                                    stagedOutputs[unionOutputIndex] =
+                                        reconciled.Rendered;
+                                }
+                                stagedMethodKeys[sig.CanonicalKey] = reconciled;
+                                dedupedFromDecl.Add(existing.DeclarationOrdinal);
+                                continue;
+                            }
+                            if (!string.Equals(
+                                    existing.ReturnTransport,
+                                    sig.ReturnTransport,
+                                    StringComparison.Ordinal))
+                            {
                                 throw new TypeProjectionException(
-                                    $"Method '{symbol.Name}.{methodName}' in decl[{methodRef.DeclarationOrdinal}] collides with decl[{existing.DeclarationOrdinal}] " +
-                                    $"for canonical signature '{sig.CanonicalKey}' but has incompatible return types '{existing.ReturnType}' and '{sig.ReturnType}'.",
-                                    $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/{methodName}/method[{methodRef.Member.Ordinal}]/return");
+                                    $"Method '{symbol.Name}.{sig.JavaScriptName}' has CLR-" +
+                                    $"identical return type '{sig.ReturnType}' but incompatible " +
+                                    $"return transports '{existing.ReturnTransport}' and " +
+                                    $"'{sig.ReturnTransport}'.",
+                                    $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
+                                    $"{sig.JavaScriptName}/return/transport");
                             }
                             if (!string.Equals(
                                     existing.CanonicalConstraints,
@@ -839,7 +906,8 @@ public sealed class InterfaceEmitter(
         MemberModel method,
         string symbolName,
         int declOrdinal,
-        GenericScope declarationScope)
+        GenericScope declarationScope,
+        bool preserveLiteralParameters = false)
     {
         var memberName = method.Name?.Text;
         if (memberName is null)
@@ -924,7 +992,8 @@ public sealed class InterfaceEmitter(
             declOrdinal,
             provenance,
             methodGeneric,
-            isDefaultExpansion: false));
+            isDefaultExpansion: false,
+            preserveLiteralParameters));
         foreach (var expansion in defaultExpansions)
         {
             try
@@ -935,7 +1004,8 @@ public sealed class InterfaceEmitter(
                     declOrdinal,
                     provenance,
                     expansion,
-                    isDefaultExpansion: true));
+                    isDefaultExpansion: true,
+                    preserveLiteralParameters));
             }
             catch (GenericDeferralException)
             {
@@ -972,7 +1042,8 @@ public sealed class InterfaceEmitter(
         int declOrdinal,
         string provenance,
         GenericDeclaration methodGeneric,
-        bool isDefaultExpansion)
+        bool isDefaultExpansion,
+        bool preserveLiteralParameters)
     {
         var memberName = method.Name?.Text
             ?? throw new InvalidOperationException("Method name is required.");
@@ -1008,8 +1079,9 @@ public sealed class InterfaceEmitter(
 
             var noOptionsOverload = BuildMethodSignature(
                 emittedName,
-                csReturn,
-                returnProj.CanonicalType,
+                returnProj,
+                method.ReturnType,
+                memberName,
                 paramList,
                 pi,
                 null,
@@ -1021,11 +1093,13 @@ public sealed class InterfaceEmitter(
                 provenance,
                 declOrdinal,
                 methodGeneric,
-                isDefaultExpansion);
+                isDefaultExpansion,
+                preserveLiteralParameters);
             var boolOverload = BuildMethodSignature(
                 emittedName,
-                csReturn,
-                returnProj.CanonicalType,
+                returnProj,
+                method.ReturnType,
+                memberName,
                 paramList,
                 pi,
                 "bool",
@@ -1037,11 +1111,13 @@ public sealed class InterfaceEmitter(
                 provenance,
                 declOrdinal,
                 methodGeneric,
-                isDefaultExpansion);
+                isDefaultExpansion,
+                preserveLiteralParameters);
             var optOverload = BuildMethodSignature(
                 emittedName,
-                csReturn,
-                returnProj.CanonicalType,
+                returnProj,
+                method.ReturnType,
+                memberName,
                 paramList,
                 pi,
                 optionsTypeName + "?",
@@ -1053,7 +1129,8 @@ public sealed class InterfaceEmitter(
                 provenance,
                 declOrdinal,
                 methodGeneric,
-                isDefaultExpansion);
+                isDefaultExpansion,
+                preserveLiteralParameters);
 
             return [noOptionsOverload, boolOverload, optOverload];
         }
@@ -1063,10 +1140,20 @@ public sealed class InterfaceEmitter(
         var hasRestParameter = false;
         foreach (var p in paramList)
         {
-            var pProj = typeResolver.Project(
-                p.Type,
-                ParameterProvenance(provenance, p, isDefaultExpansion),
-                methodGeneric.Scope);
+            var parameterProvenance =
+                ParameterProvenance(provenance, p, isDefaultExpansion);
+            var pProj = preserveLiteralParameters
+                && p.Type is LiteralTypeNode
+                {
+                    LiteralKind: "StringLiteral",
+                } literal
+                    ? typeResolver.ProjectLiteralStringParameter(
+                        literal,
+                        parameterProvenance)
+                    : typeResolver.Project(
+                        p.Type,
+                        parameterProvenance,
+                        methodGeneric.Scope);
             ValidateMethodParameter(
                 pProj,
                 p,
@@ -1122,14 +1209,26 @@ public sealed class InterfaceEmitter(
                 declOrdinal,
                 optionalParamCount,
                 hasRestParameter,
-                isDefaultExpansion)
+                isDefaultExpansion,
+                memberName,
+                BuildSourceIdentity(
+                    memberName,
+                    methodGeneric,
+                    paramList,
+                    canonicalParamTypes,
+                    returnProj),
+                TransportIdentity(returnProj.Transport),
+                returnProj,
+                [method.ReturnType],
+                methodGeneric.Scope)
         ];
     }
 
     private MethodSig BuildMethodSignature(
         string emittedName,
-        string csReturn,
-        string canonicalReturnType,
+        TypeProjection returnProjection,
+        TypeNode? returnSource,
+        string javaScriptName,
         IReadOnlyList<ParameterModel> paramList,
         int substituteIndex,
         string? substituteType,
@@ -1141,7 +1240,8 @@ public sealed class InterfaceEmitter(
         string provenance,
         int declOrdinal,
         GenericDeclaration methodGeneric,
-        bool isDefaultExpansion)
+        bool isDefaultExpansion,
+        bool preserveLiteralParameters)
     {
         var parts = new List<string>();
         var canonicalParamTypes = new List<string>();
@@ -1161,10 +1261,20 @@ public sealed class InterfaceEmitter(
             }
 
             var p = paramList[i];
-            var pProj = typeResolver.Project(
-                p.Type,
-                ParameterProvenance(provenance, p, isDefaultExpansion),
-                methodGeneric.Scope);
+            var parameterProvenance =
+                ParameterProvenance(provenance, p, isDefaultExpansion);
+            var pProj = preserveLiteralParameters
+                && p.Type is LiteralTypeNode
+                {
+                    LiteralKind: "StringLiteral",
+                } literal
+                    ? typeResolver.ProjectLiteralStringParameter(
+                        literal,
+                        parameterProvenance)
+                    : typeResolver.Project(
+                        p.Type,
+                        parameterProvenance,
+                        methodGeneric.Scope);
             ValidateMethodParameter(
                 pProj,
                 p,
@@ -1205,7 +1315,8 @@ public sealed class InterfaceEmitter(
         foreach (var defaultNote in methodGeneric.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
         w.AppendLine(
-            $"{csReturn} {emittedName}{methodGeneric.TypeParameterList}(" +
+            $"{returnProjection.RenderedType} {emittedName}" +
+            $"{methodGeneric.TypeParameterList}(" +
             $"{string.Join(", ", parts)}){methodGeneric.ConstraintSuffix};");
 
         return new MethodSig(
@@ -1214,13 +1325,124 @@ public sealed class InterfaceEmitter(
                 emittedName,
                 methodGeneric.EmittedArity,
                 canonicalParamTypes),
-            canonicalReturnType,
+            returnProjection.CanonicalType,
             methodGeneric.CanonicalConstraints,
             declOrdinal,
             optionalParamCount,
             hasRestParameter,
-            isDefaultExpansion);
+            isDefaultExpansion,
+            JavaScriptName: javaScriptName,
+            SourceIdentity: BuildSourceIdentity(
+                javaScriptName,
+                methodGeneric,
+                paramList,
+                canonicalParamTypes,
+                returnProjection),
+            ReturnTransport: TransportIdentity(returnProjection.Transport),
+            ReturnProjection: returnProjection,
+            ReturnSources: [returnSource],
+            Scope: methodGeneric.Scope);
     }
+
+    private static HashSet<(int DeclarationOrdinal, int MemberOrdinal)>
+        FindLiteralDispatchMethods(IReadOnlyList<DeclarationModel> declarations)
+    {
+        var result = new HashSet<(int, int)>();
+        var methods = declarations
+            .SelectMany(declaration => declaration.Members
+                .Where(member => member.Kind == "method" && member.Name is not null)
+                .Select(member => (Declaration: declaration, Member: member)))
+            .GroupBy(item => item.Member.Name!.Text, StringComparer.Ordinal);
+        foreach (var group in methods.Where(group => group.Count() > 1))
+        {
+            foreach (var item in group.Where(item =>
+                item.Member.Parameters.Any(parameter =>
+                    parameter.Type is LiteralTypeNode
+                    {
+                        LiteralKind: "StringLiteral",
+                    })))
+            {
+                result.Add((item.Declaration.Ordinal, item.Member.Ordinal));
+            }
+        }
+        return result;
+    }
+
+    private static MethodSig ReplaceReturnType(
+        MethodSig signature,
+        TypeProjection returnProjection,
+        IReadOnlyList<TypeNode?> returnSources)
+    {
+        var previous = signature.ReturnProjection
+            ?? throw new InvalidOperationException(
+                "A reconciled method signature requires its return projection.");
+        var marker = $"{previous.RenderedType} {MethodName(signature.CanonicalKey)}";
+        var markerIndex = signature.Rendered.LastIndexOf(
+            marker,
+            StringComparison.Ordinal);
+        if (markerIndex < 0)
+        {
+            throw new InvalidOperationException(
+                $"Cannot replace return type in '{signature.CanonicalKey}'.");
+        }
+        var rendered =
+            signature.Rendered[..markerIndex] +
+            returnProjection.RenderedType +
+            signature.Rendered[(markerIndex + previous.RenderedType.Length)..];
+        return signature with
+        {
+            Rendered = rendered,
+            ReturnType = returnProjection.CanonicalType,
+            ReturnProjection = returnProjection,
+            ReturnSources = returnSources,
+            ReturnTransport = TransportIdentity(returnProjection.Transport),
+            SourceIdentity =
+                $"{signature.SourceIdentity}|reconciled-return:" +
+                $"{returnProjection.CanonicalType}:" +
+                $"{TransportIdentity(returnProjection.Transport)}",
+        };
+    }
+
+    private static string BuildSourceIdentity(
+        string javaScriptName,
+        GenericDeclaration generic,
+        IReadOnlyList<ParameterModel> parameters,
+        IReadOnlyList<string> clrParameterTypes,
+        TypeProjection returnProjection)
+        => $"js:{javaScriptName}`{generic.EmittedArity}" +
+           $"<{generic.CanonicalConstraints}>(" +
+           $"{string.Join(",", parameters.OrderBy(parameter => parameter.Ordinal)
+               .Select(parameter =>
+                   $"{FormatSourceType(parameter.Type)}:" +
+                   $"optional={parameter.Optional}:rest={parameter.Rest}"))})" +
+           $"[clr:{string.Join(",", clrParameterTypes)}]" +
+           $"->{returnProjection.CanonicalType}" +
+           $"@{TransportIdentity(returnProjection.Transport)}";
+
+    private static string TransportIdentity(TransportModel? transport)
+        => transport is null
+            ? "transport:none"
+            : $"transport:{transport.Kind}:{transport.Nullable}:" +
+              $"{transport.Streamable}:{transport.StructuredClone}:" +
+              $"{transport.SourceType}";
+
+    private static string FormatSourceType(TypeNode? type)
+        => type switch
+        {
+            null => "void",
+            KeywordTypeNode keyword => keyword.Name,
+            LiteralTypeNode literal =>
+                $"{literal.LiteralKind}:{literal.Text}",
+            ReferenceTypeNode reference =>
+                $"{reference.ResolvedSymbol ?? reference.Name}<" +
+                $"{string.Join(",", reference.TypeArguments.Select(FormatSourceType))}>",
+            UnionTypeNode union =>
+                $"union({string.Join("|", union.Types.Select(FormatSourceType))})",
+            ArrayTypeNode array => $"{FormatSourceType(array.ElementType)}[]",
+            ParenthesizedTypeNode parenthesized =>
+                $"({FormatSourceType(parenthesized.InnerType)})",
+            _ => $"{type.Kind}:{type.CheckerType}",
+        };
 
     private static string BuildBaseClause(
         IReadOnlyList<DeclarationModel> allDecls,
