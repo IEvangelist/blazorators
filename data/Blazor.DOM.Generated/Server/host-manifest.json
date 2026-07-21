@@ -103720,7 +103720,7 @@
       "kind": "global",
       "javaScriptName": "window",
       "promise": false,
-      "hostSignature": "ValueTask\u003CIWindow\u003E GetWindowAsync(CancellationToken)"
+      "hostSignature": "ValueTask\u003CIWindow\u003E GetWindowProxyAsync(CancellationToken)"
     }
   ],
   "generatedFiles": [
