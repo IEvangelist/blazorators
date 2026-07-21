@@ -1249,7 +1249,7 @@ public sealed class HardeningRegressionTests
     }
 
     [Fact]
-    public void InterfaceEmitter_GetterSetterPair_Incompatible_FailsClosed()
+    public void InterfaceEmitter_GetterSetterPair_Asymmetric_LowersWithoutWidening()
     {
         var emitter = new InterfaceEmitter(WithInterfaces("DOMTokenList"), "1.0.0", "Blazor.DOM");
         var decl0 = MakeInterfaceDecl("AccessorHost",
@@ -1259,12 +1259,18 @@ public sealed class HardeningRegressionTests
             [MakeSetterMember("relList", [MakeParam("value", new KeywordTypeNode("StringKeyword"))], ordinal: 0)],
             ordinal: 2);
 
-        var ex = Assert.Throws<InterfaceEmitException>(() =>
-            emitter.Emit(MakeSymbol("AccessorHost", "interface", [decl0, decl1])));
+        var result = emitter.Emit(
+            MakeSymbol("AccessorHost", "interface", [decl0, decl1]));
 
-        Assert.Contains("relList", ex.Message);
-        Assert.Contains("decl[2]", ex.Message);
-        Assert.Contains("AccessorHost/relList/setter", ex.Provenance);
+        Assert.Contains("IDOMTokenList RelList { get; }", result.Source);
+        Assert.Contains("void SetRelList(string value);", result.Source);
+        Assert.DoesNotContain("IDOMTokenList RelList { get; set; }", result.Source);
+        Assert.Contains("DomAccessorOperation.Get", result.Source);
+        Assert.Contains("DomAccessorOperation.Set", result.Source);
+        Assert.Equal(
+            2,
+            result.MemberOutcomes.Count(outcome =>
+                outcome.Status == MemberOutcomeStatus.Projected));
     }
 
     [Fact]
@@ -1295,7 +1301,9 @@ public sealed class HardeningRegressionTests
 
         var ex = Assert.Throws<InterfaceEmitException>(() => emitter.Emit(symbol));
         Assert.Contains("exactly one value parameter", ex.Message);
-        Assert.Contains("SetterHost/name/setter", ex.Provenance);
+        Assert.Equal(
+            "SetterHost/decl[0]/member[1]/setter/name",
+            ex.Provenance);
     }
 
     [Fact]

@@ -1012,7 +1012,16 @@ internal sealed class GlobalNamespaceEmitter(
                     continue;
                 }
 
-                if (!string.Equals(
+                var ownerIdentity = AccessorTypeIdentity.Create(
+                    ownerProjection,
+                    member.Optional,
+                    member.Kind == "getter"
+                        ? member.ReturnType
+                        : member.Type);
+                if (globalProperty.TypeIdentity is not null
+                    ? !ownerIdentity.StructurallyEquals(
+                        globalProperty.TypeIdentity)
+                    : !string.Equals(
                         ownerProjection.CanonicalType,
                         globalProperty.CanonicalType,
                         StringComparison.Ordinal))
@@ -1031,24 +1040,6 @@ internal sealed class GlobalNamespaceEmitter(
                             declaration.Ordinal,
                             $"Window-profile setter '{owner.Name}.{name}' does " +
                             "not have exactly one parameter.");
-                    }
-                    var setterProjection = typeResolver.Project(
-                        setter.Parameters[0].Type,
-                        $"{owner.Name}/decl[{declaration.Ordinal}]/" +
-                        $"{name}/setter");
-                    if (!string.Equals(
-                            setterProjection.CanonicalType,
-                            globalProperty.CanonicalType,
-                            StringComparison.Ordinal))
-                    {
-                        return new OwnerPropertyMatch(
-                            owner,
-                            member,
-                            declaration.Ordinal,
-                            $"Global variable '{route.Symbol.Name}' collides with " +
-                            $"asymmetric accessor '{owner.Name}.{name}': global/getter " +
-                            $"type '{globalProperty.CanonicalType}' differs from setter " +
-                            $"type '{setterProjection.CanonicalType}'.");
                     }
                 }
 
@@ -1610,10 +1601,7 @@ internal sealed class GlobalNamespaceEmitter(
         {
             if (_entries.TryGetValue(property.CanonicalKey, out var existing))
             {
-                if (!string.Equals(
-                        existing.CanonicalType,
-                        property.CanonicalType,
-                        StringComparison.Ordinal)
+                if (!PropertyTypesEqual(existing, property)
                     || existing.Mutable != property.Mutable)
                 {
                     collisionReason =
@@ -1634,7 +1622,8 @@ internal sealed class GlobalNamespaceEmitter(
                     "",
                     property.Mutable,
                     OptionalParameterCount: 0,
-                    HasRestParameter: false));
+                    HasRestParameter: false,
+                    property.TypeIdentity));
             _order.Add(property.CanonicalKey);
             _contributors.Add(contributor);
             collisionReason = null;
@@ -1719,7 +1708,20 @@ internal sealed class GlobalNamespaceEmitter(
             string CanonicalConstraints,
             bool Mutable,
             int OptionalParameterCount,
-            bool HasRestParameter);
+            bool HasRestParameter,
+            AccessorTypeIdentity? TypeIdentity = null);
+
+        private static bool PropertyTypesEqual(
+            ContractEntry existing,
+            ContractPropertyResult property)
+            => existing.TypeIdentity is not null
+                && property.TypeIdentity is not null
+                    ? existing.TypeIdentity.StructurallyEquals(
+                        property.TypeIdentity)
+                    : string.Equals(
+                        existing.CanonicalType,
+                        property.CanonicalType,
+                        StringComparison.Ordinal);
     }
 
     private sealed class SupplementalBuilder(SymbolModel symbol)

@@ -24,6 +24,17 @@ public sealed record AccessorTypeIdentity(
     bool IncludesUndefined,
     TransportModel? Transport)
 {
+    public static AccessorTypeIdentity Create(
+        TypeProjection projection,
+        bool optional,
+        TypeNode? sourceType)
+        => new(
+            projection.Identity,
+            projection.IsNullable || optional,
+            optional,
+            ContainsUndefined(sourceType),
+            projection.Transport);
+
     public bool StructurallyEquals(AccessorTypeIdentity other)
         => IsNullable == other.IsNullable
             && IsOptional == other.IsOptional
@@ -60,6 +71,19 @@ public sealed record AccessorTypeIdentity(
                 && left.Streamable == right.Streamable
                 && left.StructuredClone == right.StructuredClone
                 && string.Equals(left.Reason, right.Reason, StringComparison.Ordinal);
+
+    private static bool ContainsUndefined(TypeNode? type)
+        => type switch
+        {
+            KeywordTypeNode keyword => keyword.Name is
+                "UndefinedKeyword" or "undefined",
+            LiteralTypeNode literal => literal.LiteralKind is
+                "UndefinedKeyword" or "UndefinedLiteral"
+                || string.Equals(literal.Text, "undefined", StringComparison.Ordinal),
+            OptionalTypeNode => true,
+            UnionTypeNode union => union.Types.Any(ContainsUndefined),
+            _ => false,
+        };
 }
 
 public sealed record AccessorEndpoint(
@@ -183,6 +207,7 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
                 case "property":
                 {
                     var candidate = TryProject(
+                        symbolName,
                         source,
                         source.Member.Type,
                         source.Member.Optional,
@@ -205,6 +230,7 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
                 case "getter":
                 {
                     var candidate = TryProject(
+                        symbolName,
                         source,
                         source.Member.ReturnType,
                         source.Member.Optional,
@@ -226,13 +252,14 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
                     {
                         throw new TypeProjectionException(
                             $"Setter '{symbolName}.{source.Name}' at " +
-                            $"'{source.Provenance}' must declare exactly one non-rest " +
-                            "value parameter.",
+                            $"'{source.Provenance}' must declare exactly one value " +
+                            "parameter (and it cannot be rest).",
                             source.Provenance);
                     }
 
                     var parameter = source.Member.Parameters[0];
                     var candidate = TryProject(
+                        symbolName,
                         source,
                         parameter.Type,
                         parameter.Optional,
@@ -286,6 +313,7 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
     }
 
     private AccessorCandidate? TryProject(
+        string symbolName,
         AccessorSource source,
         TypeNode? type,
         bool optional,
@@ -294,13 +322,29 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
         List<string> deferredOutputs,
         string provenanceSuffix = "")
     {
+        var projectedType = NormalizeThisType(
+            symbolName,
+            type,
+            declarationScope);
         TypeProjection projection;
         try
         {
             projection = typeResolver.Project(
-                type,
+                projectedType,
                 source.Provenance + provenanceSuffix,
                 declarationScope);
+        }
+        catch (GenericDeferralException exception)
+        {
+            AddDeferred(
+                source,
+                exception.Phase,
+                exception.Message,
+                $"// DEFERRED ({exception.Phase}): {source.Name} — " +
+                exception.Message,
+                deferredOutcomes,
+                deferredOutputs);
+            return null;
         }
         catch (TypeProjectionException exception) when (
             exception.Message.Contains(
@@ -336,13 +380,42 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
         return new AccessorCandidate(
             source,
             effectiveProjection,
-            new AccessorTypeIdentity(
-                effectiveProjection.Identity,
-                effectiveProjection.IsNullable,
+            AccessorTypeIdentity.Create(
+                effectiveProjection,
                 optional,
-                IncludesUndefined(type),
-                effectiveProjection.Transport),
+                type),
             type!);
+    }
+
+    private static TypeNode? NormalizeThisType(
+        string symbolName,
+        TypeNode? type,
+        GenericScope declarationScope)
+    {
+        if (type is not ReferenceTypeNode { Name: "this" }
+            && !string.Equals(
+                type?.CheckerType,
+                "this",
+                StringComparison.Ordinal))
+        {
+            return type;
+        }
+
+        var original = type!;
+        return new ReferenceTypeNode(
+            symbolName,
+            symbolName,
+            declarationScope.Parameters
+                .Select(parameter => (TypeNode)new ReferenceTypeNode(
+                    parameter.SourceName,
+                    parameter.SourceName,
+                    []))
+                .ToList())
+        {
+            CheckerType = original.CheckerType,
+            SyntaxKind = original.SyntaxKind,
+            Transport = original.Transport,
+        };
     }
 
     private static AccessorEndpoint? ReconcileDirection(
@@ -401,19 +474,6 @@ public sealed class AccessorReconciler(TypeResolver typeResolver)
         if (!outputs.Contains(output, StringComparer.Ordinal))
             outputs.Add(output);
     }
-
-    private static bool IncludesUndefined(TypeNode? type)
-        => type switch
-        {
-            KeywordTypeNode keyword => keyword.Name is
-                "UndefinedKeyword" or "undefined",
-            LiteralTypeNode literal => literal.LiteralKind is
-                "UndefinedKeyword" or "UndefinedLiteral"
-                || string.Equals(literal.Text, "undefined", StringComparison.Ordinal),
-            OptionalTypeNode => true,
-            UnionTypeNode union => union.Types.Any(IncludesUndefined),
-            _ => false,
-        };
 
     private static string SourceProvenance(
         string symbolName,
