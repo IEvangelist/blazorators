@@ -19,6 +19,7 @@ public partial interface IHeaders : global::Microsoft.JSInterop.IDomProxy
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/append)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:append`0<>(StringKeyword:optional=False:rest=False,StringKeyword:optional=False:rest=False)[clr:string,string]->void@transport:json-value:False:False:True:void", "append", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void Append(string name, string @value);
 
     /// <summary>
@@ -26,6 +27,7 @@ void Append(string name, string @value);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/delete)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:delete`0<>(StringKeyword:optional=False:rest=False)[clr:string]->void@transport:json-value:False:False:True:void", "delete", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void Delete(string name);
 
     /// <summary>
@@ -33,6 +35,7 @@ void Delete(string name);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:get`0<>(StringKeyword:optional=False:rest=False)[clr:string]->string@transport:json-value:True:False:True:string | null", "get", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = true)]
 string? Get(string name);
 
     /// <summary>
@@ -40,6 +43,7 @@ string? Get(string name);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/getSetCookie)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getSetCookie`0<>()[clr:]->string[]@transport:json-value:False:False:True:string[]", "getSetCookie", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string[]", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 string[] GetSetCookie();
 
     /// <summary>
@@ -47,6 +51,7 @@ string[] GetSetCookie();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:has`0<>(StringKeyword:optional=False:rest=False)[clr:string]->bool@transport:json-value:False:False:True:boolean", "has", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 bool Has(string name);
 
     /// <summary>
@@ -54,25 +59,31 @@ bool Has(string name);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:set`0<>(StringKeyword:optional=False:rest=False,StringKeyword:optional=False:rest=False)[clr:string,string]->void@transport:json-value:False:False:True:void", "set", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void Set(string name, string @value);
 
-    void ForEach(Action<string, string, IHeaders> callbackfn, object? thisArg = default);
+    [global::Microsoft.JSInterop.DomOperation("js:forEach`0<>(function:(value: string, key: string, parent: Headers) => void:optional=False:rest=False,AnyKeyword:optional=True:rest=False)[clr:Action<string, string, IHeaders>,object]->void@transport:json-value:False:False:True:void", "forEach", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void ForEach(Action<string, string, IHeaders> callbackfn, object? thisArg = default);
 
-    [global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.Iterator)]
+    [global::Microsoft.JSInterop.DomOperation("js:Symbol.iterator`0<>()[clr:]->IHeadersIterator<global::Blazor.DOM.AdvancedTypes.HeadersTupleShape_9c3a98fd4b>@transport:unsupported:False:False:False:HeadersIterator<[string, string]>", "Symbol.iterator", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "HeadersIterator<[string, string]>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'HeadersIterator' has no reviewed DOM transport classification.")]
+[global::Microsoft.JSInterop.DomSymbol(global::Microsoft.JSInterop.DomWellKnownSymbol.Iterator)]
 IHeadersIterator<global::Blazor.DOM.AdvancedTypes.HeadersTupleShape_9c3a98fd4b> SymbolIterator();
 
     /// <summary>
 /// Returns an iterator allowing to go through all key/value pairs contained in this object.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:entries`0<>()[clr:]->IHeadersIterator<global::Blazor.DOM.AdvancedTypes.HeadersTupleShape_37fceffa8a>@transport:unsupported:False:False:False:HeadersIterator<[string, string]>", "entries", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "HeadersIterator<[string, string]>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'HeadersIterator' has no reviewed DOM transport classification.")]
 IHeadersIterator<global::Blazor.DOM.AdvancedTypes.HeadersTupleShape_37fceffa8a> Entries();
 
     /// <summary>
 /// Returns an iterator allowing to go through all keys of the key/value pairs contained in this object.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:keys`0<>()[clr:]->IHeadersIterator<string>@transport:unsupported:False:False:False:HeadersIterator<string>", "keys", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "HeadersIterator<string>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'HeadersIterator' has no reviewed DOM transport classification.")]
 IHeadersIterator<string> Keys();
 
     /// <summary>
 /// Returns an iterator allowing to go through all values of the key/value pairs contained in this object.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:values`0<>()[clr:]->IHeadersIterator<string>@transport:unsupported:False:False:False:HeadersIterator<string>", "values", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "HeadersIterator<string>", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Named TypeScript type 'HeadersIterator' has no reviewed DOM transport classification.")]
 IHeadersIterator<string> Values();
 }

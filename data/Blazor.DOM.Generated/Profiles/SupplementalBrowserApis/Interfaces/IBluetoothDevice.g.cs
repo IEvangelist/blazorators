@@ -13,6 +13,7 @@ public partial interface IBluetoothDevice : IEventTarget, IBluetoothDeviceEventH
     [global::Microsoft.JSInterop.DomAccessor("gatt", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "BluetoothRemoteGATTServer | null", Nullable = true, Streamable = false, StructuredClone = false)]
 IBluetoothRemoteGATTServer? Gatt { get; }
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("watchAdvertisements")]
+    [global::Microsoft.JSInterop.DomOperation("js:watchAdvertisements`0<>(WatchAdvertisementsOptions<>:optional=True:rest=False)[clr:WatchAdvertisementsOptions]->ValueTask@transport:json-value:False:False:True:Promise<void>", "watchAdvertisements", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("watchAdvertisements")]
 ValueTask WatchAdvertisementsAsync(WatchAdvertisementsOptions? options = default);
 }

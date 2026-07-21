@@ -9,5 +9,6 @@ namespace Blazor.DOM;
 
 public partial interface IEventListenerObject : global::Microsoft.JSInterop.IDomProxy
 {
-    void HandleEvent(IEvent @object);
+    [global::Microsoft.JSInterop.DomOperation("js:handleEvent`0<>(Event<>:optional=False:rest=False)[clr:IEvent]->void@transport:json-value:False:False:True:void", "handleEvent", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void HandleEvent(IEvent @object);
 }

@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator)
 /// </summary>
-public partial interface INavigator : INavigatorAutomationInformation, INavigatorBadge, INavigatorConcurrentHardware, INavigatorContentUtils, INavigatorCookies, INavigatorID, INavigatorLanguage, INavigatorLocks, INavigatorOnLine, INavigatorPlugins, INavigatorStorage, global::Microsoft.JSInterop.IDomProxy
+public partial interface INavigator : INavigatorAutomationInformation, INavigatorBadge, INavigatorConcurrentHardware, INavigatorContentUtils, INavigatorCookies, INavigatorID, INavigatorLanguage, INavigatorLocks, INavigatorOnLine, INavigatorPlugins, INavigatorStorage, INavigatorGPU, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`clipboard`** read-only property of the Navigator interface returns a Clipboard object used to read and write the clipboard's contents.
@@ -117,6 +117,21 @@ IUserActivation UserActivation { get; }
 /// </summary>
 [global::Microsoft.JSInterop.DomAccessor("wakeLock", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "WakeLock", Nullable = false, Streamable = false, StructuredClone = false)]
 IWakeLock WakeLock { get; }
+
+    [global::Microsoft.JSInterop.DomAccessor("presentation", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Presentation", Nullable = false, Streamable = false, StructuredClone = false)]
+IPresentation Presentation { get; }
+
+    [global::Microsoft.JSInterop.DomAccessor("serial", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Serial", Nullable = false, Streamable = false, StructuredClone = false)]
+ISerial Serial { get; }
+
+    [global::Microsoft.JSInterop.DomAccessor("bluetooth", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "Bluetooth", Nullable = false, Streamable = false, StructuredClone = false)]
+IBluetooth Bluetooth { get; }
+
+    [global::Microsoft.JSInterop.DomAccessor("hid", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "HID", Nullable = false, Streamable = false, StructuredClone = false)]
+IHID Hid { get; }
+
+    [global::Microsoft.JSInterop.DomAccessor("usb", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "USB", Nullable = false, Streamable = false, StructuredClone = false)]
+IUSB Usb { get; }
 
     /// <summary>
 /// The **`canShare()`** method of the Navigator interface returns `true` if the equivalent call to navigator.share() would succeed.

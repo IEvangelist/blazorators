@@ -13,12 +13,15 @@ public partial interface IBluetoothRemoteGATTCharacteristic : IEventTarget, ICha
     [global::Microsoft.JSInterop.DomAccessor("value", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Binary, "DataView<ArrayBufferLike> | null", Nullable = true, Streamable = false, StructuredClone = true)]
 System.Memory<byte>? Value { get; }
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("readValue")]
+    [global::Microsoft.JSInterop.DomOperation("js:readValue`0<>()[clr:]->ValueTask<System.Memory<byte>>@transport:binary:False:False:True:Promise<DataView<ArrayBufferLike>>", "readValue", global::Microsoft.JSInterop.DomTransportKind.Binary, "Promise<DataView<ArrayBufferLike>>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("readValue")]
 ValueTask<System.Memory<byte>> ReadValueAsync();
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("writeValueWithResponse")]
+    [global::Microsoft.JSInterop.DomOperation("js:writeValueWithResponse`0<>(BufferSource<>:optional=False:rest=False)[clr:BufferSource]->ValueTask@transport:json-value:False:False:True:Promise<void>", "writeValueWithResponse", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("writeValueWithResponse")]
 ValueTask WriteValueWithResponseAsync(BufferSource @value);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("startNotifications")]
+    [global::Microsoft.JSInterop.DomOperation("js:startNotifications`0<>()[clr:]->ValueTask<IBluetoothRemoteGATTCharacteristic>@transport:js-reference:False:False:False:Promise<BluetoothRemoteGATTCharacteristic>", "startNotifications", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<BluetoothRemoteGATTCharacteristic>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("startNotifications")]
 ValueTask<IBluetoothRemoteGATTCharacteristic> StartNotificationsAsync();
 }

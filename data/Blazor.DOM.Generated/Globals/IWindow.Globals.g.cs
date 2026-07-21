@@ -83,6 +83,42 @@ public partial interface IWindow
 
     IBlobEventFactory BlobEventConstructor { get; }
 
+    IBluetoothStatics BluetoothStatics { get; }
+
+    IBluetoothAdvertisingEventFactory BluetoothAdvertisingEventConstructor { get; }
+
+    IBluetoothCharacteristicPropertiesStatics BluetoothCharacteristicPropertiesStatics { get; }
+
+    IBluetoothDataFilterFactory BluetoothDataFilterConstructor { get; }
+
+    IBluetoothDeviceStatics BluetoothDeviceStatics { get; }
+
+    IBluetoothLEScanStatics BluetoothLEScanStatics { get; }
+
+    IBluetoothLEScanFilterFactory BluetoothLEScanFilterConstructor { get; }
+
+    IBluetoothLEScanPermissionResultStatics BluetoothLEScanPermissionResultStatics { get; }
+
+    IBluetoothManufacturerDataFilterFactory BluetoothManufacturerDataFilterConstructor { get; }
+
+    IBluetoothManufacturerDataMapStatics BluetoothManufacturerDataMapStatics { get; }
+
+    IBluetoothPermissionResultStatics BluetoothPermissionResultStatics { get; }
+
+    IBluetoothRemoteGATTCharacteristicStatics BluetoothRemoteGATTCharacteristicStatics { get; }
+
+    IBluetoothRemoteGATTDescriptorStatics BluetoothRemoteGATTDescriptorStatics { get; }
+
+    IBluetoothRemoteGATTServerStatics BluetoothRemoteGATTServerStatics { get; }
+
+    IBluetoothRemoteGATTServiceStatics BluetoothRemoteGATTServiceStatics { get; }
+
+    IBluetoothServiceDataFilterFactory BluetoothServiceDataFilterConstructor { get; }
+
+    IBluetoothServiceDataMapStatics BluetoothServiceDataMapStatics { get; }
+
+    IBluetoothUUIDStatics BluetoothUUIDStatics { get; }
+
     IBroadcastChannelFactory BroadcastChannelConstructor { get; }
 
     IByteLengthQueuingStrategyFactory ByteLengthQueuingStrategyConstructor { get; }
@@ -374,6 +410,74 @@ public partial interface IWindow
 
     IFragmentDirectiveFactory FragmentDirectiveConstructor { get; }
 
+    IGPUStatics GPUStatics { get; }
+
+    IGPUAdapterStatics GPUAdapterStatics { get; }
+
+    IGPUAdapterInfoStatics GPUAdapterInfoStatics { get; }
+
+    IGPUBindGroupStatics GPUBindGroupStatics { get; }
+
+    IGPUBindGroupLayoutStatics GPUBindGroupLayoutStatics { get; }
+
+    IGPUBufferStatics GPUBufferStatics { get; }
+
+    IGPUCanvasContextStatics GPUCanvasContextStatics { get; }
+
+    IGPUCommandBufferStatics GPUCommandBufferStatics { get; }
+
+    IGPUCommandEncoderStatics GPUCommandEncoderStatics { get; }
+
+    IGPUCompilationInfoStatics GPUCompilationInfoStatics { get; }
+
+    IGPUCompilationMessageStatics GPUCompilationMessageStatics { get; }
+
+    IGPUComputePassEncoderStatics GPUComputePassEncoderStatics { get; }
+
+    IGPUComputePipelineStatics GPUComputePipelineStatics { get; }
+
+    IGPUDeviceStatics GPUDeviceStatics { get; }
+
+    IGPUDeviceLostInfoStatics GPUDeviceLostInfoStatics { get; }
+
+    IGPUErrorStatics GPUErrorStatics { get; }
+
+    IGPUExternalTextureStatics GPUExternalTextureStatics { get; }
+
+    IGPUInternalErrorFactory GPUInternalErrorConstructor { get; }
+
+    IGPUOutOfMemoryErrorFactory GPUOutOfMemoryErrorConstructor { get; }
+
+    IGPUPipelineErrorFactory GPUPipelineErrorConstructor { get; }
+
+    IGPUPipelineLayoutStatics GPUPipelineLayoutStatics { get; }
+
+    IGPUQuerySetStatics GPUQuerySetStatics { get; }
+
+    IGPUQueueStatics GPUQueueStatics { get; }
+
+    IGPURenderBundleStatics GPURenderBundleStatics { get; }
+
+    IGPURenderBundleEncoderStatics GPURenderBundleEncoderStatics { get; }
+
+    IGPURenderPassEncoderStatics GPURenderPassEncoderStatics { get; }
+
+    IGPURenderPipelineStatics GPURenderPipelineStatics { get; }
+
+    IGPUSamplerStatics GPUSamplerStatics { get; }
+
+    IGPUShaderModuleStatics GPUShaderModuleStatics { get; }
+
+    IGPUSupportedLimitsStatics GPUSupportedLimitsStatics { get; }
+
+    IGPUTextureStatics GPUTextureStatics { get; }
+
+    IGPUTextureViewStatics GPUTextureViewStatics { get; }
+
+    IGPUUncapturedErrorEventFactory GPUUncapturedErrorEventConstructor { get; }
+
+    IGPUValidationErrorFactory GPUValidationErrorConstructor { get; }
+
     IGainNodeFactory GainNodeConstructor { get; }
 
     IGamepadFactory GamepadConstructor { get; }
@@ -391,6 +495,14 @@ public partial interface IWindow
     IGeolocationPositionFactory GeolocationPositionConstructor { get; }
 
     IGeolocationPositionErrorFactory GeolocationPositionErrorConstructor { get; }
+
+    IHIDStatics HIDStatics { get; }
+
+    IHIDConnectionEventFactory HIDConnectionEventConstructor { get; }
+
+    IHIDDeviceStatics HIDDeviceStatics { get; }
+
+    IHIDInputReportEventFactory HIDInputReportEventConstructor { get; }
 
     IHTMLAllCollectionFactory HTMLAllCollectionConstructor { get; }
 
@@ -810,6 +922,22 @@ public partial interface IWindow
 
     IPopStateEventFactory PopStateEventConstructor { get; }
 
+    IPresentationStatics PresentationStatics { get; }
+
+    IPresentationAvailabilityStatics PresentationAvailabilityStatics { get; }
+
+    IPresentationConnectionStatics PresentationConnectionStatics { get; }
+
+    IPresentationConnectionAvailableEventFactory PresentationConnectionAvailableEventConstructor { get; }
+
+    IPresentationConnectionCloseEventFactory PresentationConnectionCloseEventConstructor { get; }
+
+    IPresentationConnectionListStatics PresentationConnectionListStatics { get; }
+
+    IPresentationReceiverStatics PresentationReceiverStatics { get; }
+
+    IPresentationRequestFactory PresentationRequestConstructor { get; }
+
     IProcessingInstructionFactory ProcessingInstructionConstructor { get; }
 
     IProgressEventFactory ProgressEventConstructor { get; }
@@ -1112,6 +1240,10 @@ public partial interface IWindow
 
     ISelectionFactory SelectionConstructor { get; }
 
+    ISerialStatics SerialStatics { get; }
+
+    ISerialPortStatics SerialPortStatics { get; }
+
     IServiceWorkerFactory ServiceWorkerConstructor { get; }
 
     IServiceWorkerContainerFactory ServiceWorkerContainerConstructor { get; }
@@ -1213,6 +1345,34 @@ public partial interface IWindow
 
     IURLSearchParamsFactory URLSearchParamsConstructor { get; }
 
+    IUSBStatics USBStatics { get; }
+
+    IUSBAlternateInterfaceFactory USBAlternateInterfaceConstructor { get; }
+
+    IUSBConfigurationFactory USBConfigurationConstructor { get; }
+
+    IUSBConnectionEventFactory USBConnectionEventConstructor { get; }
+
+    IUSBDeviceStatics USBDeviceStatics { get; }
+
+    IUSBEndpointFactory USBEndpointConstructor { get; }
+
+    IUSBInTransferResultFactory USBInTransferResultConstructor { get; }
+
+    IUSBInterfaceFactory USBInterfaceConstructor { get; }
+
+    IUSBIsochronousInTransferPacketFactory USBIsochronousInTransferPacketConstructor { get; }
+
+    IUSBIsochronousInTransferResultFactory USBIsochronousInTransferResultConstructor { get; }
+
+    IUSBIsochronousOutTransferPacketFactory USBIsochronousOutTransferPacketConstructor { get; }
+
+    IUSBIsochronousOutTransferResultFactory USBIsochronousOutTransferResultConstructor { get; }
+
+    IUSBOutTransferResultFactory USBOutTransferResultConstructor { get; }
+
+    IUSBPermissionResultStatics USBPermissionResultStatics { get; }
+
     IUserActivationFactory UserActivationConstructor { get; }
 
     IVTTCueFactory VTTCueConstructor { get; }
@@ -1220,6 +1380,8 @@ public partial interface IWindow
     IVTTRegionFactory VTTRegionConstructor { get; }
 
     IValidityStateFactory ValidityStateConstructor { get; }
+
+    IValueEventFactory ValueEventConstructor { get; }
 
     IVideoColorSpaceFactory VideoColorSpaceConstructor { get; }
 
@@ -1349,6 +1511,16 @@ public partial interface IWindow
     /// The **`CSS`** interface holds useful CSS-related methods.
     /// </summary>
     global::Blazor.DOM.Namespaces.CSS.ICSSNamespace CSS { get; }
+
+    global::Blazor.DOM.Namespaces.GPUBufferUsage.IGPUBufferUsageNamespace GPUBufferUsage { get; }
+
+    global::Blazor.DOM.Namespaces.GPUColorWrite.IGPUColorWriteNamespace GPUColorWrite { get; }
+
+    global::Blazor.DOM.Namespaces.GPUMapMode.IGPUMapModeNamespace GPUMapMode { get; }
+
+    global::Blazor.DOM.Namespaces.GPUShaderStage.IGPUShaderStageNamespace GPUShaderStage { get; }
+
+    global::Blazor.DOM.Namespaces.GPUTextureUsage.IGPUTextureUsageNamespace GPUTextureUsage { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.IWebAssemblyNamespace WebAssembly { get; }
 }

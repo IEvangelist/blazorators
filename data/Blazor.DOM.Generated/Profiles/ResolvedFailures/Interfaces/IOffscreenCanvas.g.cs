@@ -20,7 +20,9 @@ public partial interface IOffscreenCanvas : IEventTarget, global::Microsoft.JSIn
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/getContext)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getContext`0<>(StringLiteral:\"2d\":optional=False:rest=False,AnyKeyword:optional=True:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_d9f5dc2874,object]->IOffscreenCanvasRenderingContext2D@transport:js-reference:True:False:False:OffscreenCanvasRenderingContext2D | null", "getContext", global::Microsoft.JSInterop.DomTransportKind.JsReference, "OffscreenCanvasRenderingContext2D | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
 IOffscreenCanvasRenderingContext2D? GetContext(global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_d9f5dc2874 contextId, object? options = default);
 
-    IImageBitmapRenderingContext? GetContext(global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_5d083f429b contextId, object? options = default);
+    [global::Microsoft.JSInterop.DomOperation("js:getContext`0<>(StringLiteral:\"bitmaprenderer\":optional=False:rest=False,AnyKeyword:optional=True:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_5d083f429b,object]->IImageBitmapRenderingContext@transport:js-reference:True:False:False:ImageBitmapRenderingContext | null", "getContext", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ImageBitmapRenderingContext | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
+IImageBitmapRenderingContext? GetContext(global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_5d083f429b contextId, object? options = default);
 }

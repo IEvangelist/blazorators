@@ -594,6 +594,7 @@ public sealed class TypeResolver
         return projection with
         {
             Transport = reducedTransport
+                || projection.ProviderNote == "declaration-shape-dictionary"
                 ? projection.Transport
                 : typeNode.Transport ?? projection.Transport,
         };
@@ -1176,7 +1177,8 @@ public sealed class TypeResolver
 
         if (sym is not null)
         {
-            var classification = EffectiveClassificationPolicy.Classify(sym, _overrides).Name;
+            var effective = EffectiveClassificationPolicy.Classify(sym, _overrides);
+            var classification = effective.Name;
             var csharpName = Naming.ToCSharpTypeReference(
                 _generatedNamespace,
                 sym.Name,
@@ -1211,8 +1213,22 @@ public sealed class TypeResolver
                     typeArguments: arguments.Select(argument => argument.Identity).ToList())
                 : ReferenceType(
                     csharpName,
+                    providerNote: classification == "dictionary"
+                        && effective.Source == EffectiveClassificationSource.DeclarationShape
+                            ? "declaration-shape-dictionary"
+                            : "",
                     canonicalType: canonicalName,
-                    typeArguments: arguments.Select(argument => argument.Identity).ToList());
+                    typeArguments: arguments.Select(argument => argument.Identity).ToList(),
+                    transport: classification == "dictionary"
+                        && effective.Source == EffectiveClassificationSource.DeclarationShape
+                            ? new TransportModel(
+                                "json-value",
+                                rf.Transport?.Nullable ?? false,
+                                rf.CheckerType ?? sym.Name,
+                                false,
+                                true,
+                                null)
+                            : null);
         }
 
         if (!string.IsNullOrWhiteSpace(rf.ResolvedSymbol)

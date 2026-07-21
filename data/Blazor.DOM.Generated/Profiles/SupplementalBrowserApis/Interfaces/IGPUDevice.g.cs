@@ -46,21 +46,28 @@ global::Microsoft.JSInterop.IBrowserPromise<IGPUDeviceLostInfo> Lost { get; }
 [global::Microsoft.JSInterop.DomAccessor("onuncapturederror", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: GPUDevice, ev: GPUUncapturedErrorEvent) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: GPUDevice, ev: GPUUncapturedErrorEvent) => any) | null' is unsupported: TypeScript '(this: GPUDevice, ev: GPUUncapturedErrorEvent) => any' has an ambiguous function shape.")]
 Func<IGPUUncapturedErrorEvent, object>? Onuncapturederror { get; set; }
 
-    void AddEventListener(string type, EventListenerOrEventListenerObject listener);
+    [global::Microsoft.JSInterop.DomOperation("js:addEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject]->void@transport:json-value:False:False:True:void", "addEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void AddEventListener(string type, EventListenerOrEventListenerObject listener);
 
-    void AddEventListener(string type, EventListenerOrEventListenerObject listener, bool capture);
+    [global::Microsoft.JSInterop.DomOperation("js:addEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,bool]->void@transport:json-value:False:False:True:void", "addEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void AddEventListener(string type, EventListenerOrEventListenerObject listener, bool capture);
 
-    void AddEventListener(string type, EventListenerOrEventListenerObject listener, AddEventListenerOptions? options);
+    [global::Microsoft.JSInterop.DomOperation("js:addEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|AddEventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,AddEventListenerOptions]->void@transport:json-value:False:False:True:void", "addEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void AddEventListener(string type, EventListenerOrEventListenerObject listener, AddEventListenerOptions? options);
 
-    void RemoveEventListener(string type, EventListenerOrEventListenerObject listener);
+    [global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void RemoveEventListener(string type, EventListenerOrEventListenerObject listener);
 
-    void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, bool capture);
+    [global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,bool]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, bool capture);
 
-    void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, EventListenerOptions? options);
+    [global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,EventListenerOptions]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, EventListenerOptions? options);
 
     /// <summary>
 /// Creates a {@link GPUBuffer}.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:createBuffer`0<>(GPUBufferDescriptor<>:optional=False:rest=False)[clr:GPUBufferDescriptor]->IGPUBuffer@transport:js-reference:False:False:False:GPUBuffer", "createBuffer", global::Microsoft.JSInterop.DomTransportKind.JsReference, "GPUBuffer", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 IGPUBuffer CreateBuffer(GPUBufferDescriptor descriptor);
 
     /// <summary>
@@ -68,6 +75,7 @@ IGPUBuffer CreateBuffer(GPUBufferDescriptor descriptor);
 /// and resolves to **any** {@link GPUError} observed by the error scope, or `null` if none.
 /// There is no guarantee of the ordering of promise resolution.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:popErrorScope`0<>()[clr:]->ValueTask<IGPUError>@transport:js-reference:True:False:False:Promise<GPUError | null>", "popErrorScope", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<GPUError | null>", Nullable = true, Promise = true, Streamable = false, StructuredClone = false)]
 [global::Microsoft.JSInterop.DomJavaScriptName("popErrorScope")]
 ValueTask<IGPUError?> PopErrorScopeAsync();
 }

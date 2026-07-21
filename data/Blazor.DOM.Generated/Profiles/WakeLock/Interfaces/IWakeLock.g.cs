@@ -21,6 +21,7 @@ public partial interface IWakeLock : global::Microsoft.JSInterop.IDomProxy
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLock/request)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:request`0<>(WakeLockType<>:optional=True:rest=False)[clr:WakeLockType]->ValueTask<IWakeLockSentinel>@transport:js-reference:False:False:False:Promise<WakeLockSentinel>", "request", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<WakeLockSentinel>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
 [global::Microsoft.JSInterop.DomJavaScriptName("request")]
 ValueTask<IWakeLockSentinel> RequestAsync(WakeLockType type = default);
 }

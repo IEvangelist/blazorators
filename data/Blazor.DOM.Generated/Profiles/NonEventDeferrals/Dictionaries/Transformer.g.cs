@@ -16,15 +16,9 @@ public record Transformer<I, O>
     [JsonPropertyName("flush")]
     public TransformerFlushCallback<O>? Flush { get; init; }
 
-    [JsonPropertyName("readableType")]
-    public global::Microsoft.JSInterop.BrowserUndefined? ReadableType { get; init; }
-
     [JsonPropertyName("start")]
     public TransformerStartCallback<O>? Start { get; init; }
 
     [JsonPropertyName("transform")]
     public TransformerTransformCallback<I, O>? Transform { get; init; }
-
-    [JsonPropertyName("writableType")]
-    public global::Microsoft.JSInterop.BrowserUndefined? WritableType { get; init; }
 }

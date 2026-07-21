@@ -20,6 +20,20 @@ public partial interface IGPUError : global::Microsoft.JSInterop.IDomDispatchPro
 /// The **`message`** read-only property of the A string.
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/GPUError/message)
+///
+/// A human-readable, localizable text message providing information about the error that
+/// occurred.
+/// Note: This message is generally intended for application developers to debug their
+/// applications and capture information for debug reports, not to be surfaced to end-users.
+/// Note: User agents should not include potentially machine-parsable details in this message,
+/// such as free system memory on {@link GPUErrorFilter} `"out-of-memory"` or other details about the
+/// conditions under which memory was exhausted.
+/// Note: The {@link GPUError#message} should follow the best practices for language and
+/// direction information. This includes making use of any future standards which may emerge
+/// regarding the reporting of string language and direction metadata.
+/// &lt;p class="note editorial"&gt;&lt;span class=marker&gt;Editorial note:&lt;/span&gt;
+/// At the time of this writing, no language/direction recommendation is available that provides
+/// compatibility and consistency with legacy APIs, but when there is, adopt it formally.
 /// </summary>
 [global::Microsoft.JSInterop.DomAccessor("message", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
     string Message

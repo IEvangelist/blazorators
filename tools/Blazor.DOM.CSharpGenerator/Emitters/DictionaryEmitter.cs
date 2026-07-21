@@ -168,6 +168,19 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                         continue;
                     }
 
+                    if (IsOptionalUndefined(member))
+                    {
+                        memberOutcomes.Add(new MemberOutcome(
+                            member.Ordinal,
+                            memberName,
+                            member.Kind,
+                            MemberOutcomeStatus.Projected,
+                            null,
+                            "Optional undefined member is represented by property absence.",
+                            decl.Ordinal));
+                        continue;
+                    }
+
                     var entry = BuildProperty(
                         member,
                         symbol.Name,
@@ -384,6 +397,12 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
             hasJsonAttr,
             jsonAttr);
     }
+
+    private static bool IsOptionalUndefined(MemberModel member)
+        => member.Optional
+            && member.Type is KeywordTypeNode keyword
+            && (keyword.Name == "UndefinedKeyword"
+                || keyword.CheckerType == "undefined");
 
     /// <summary>
     /// Builds the C# record inheritance clause for a dictionary.

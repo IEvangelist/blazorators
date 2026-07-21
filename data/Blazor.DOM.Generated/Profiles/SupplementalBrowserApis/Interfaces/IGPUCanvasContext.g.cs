@@ -15,6 +15,7 @@ public partial interface IGPUCanvasContext : global::Microsoft.JSInterop.IDomPro
 /// This clears the drawing buffer to transparent black (in [$Replace the drawing buffer$]).
 /// See {@link GPUCanvasContext#getConfiguration} for information on feature detection.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:configure`0<>(GPUCanvasConfiguration<>:optional=False:rest=False)[clr:GPUCanvasConfiguration]->global::Microsoft.JSInterop.BrowserUndefined@transport:none", "configure", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "global::Microsoft.JSInterop.BrowserUndefined", Nullable = false, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Source IR does not provide reviewed transport metadata.")]
 global::Microsoft.JSInterop.BrowserUndefined Configure(GPUCanvasConfiguration configuration);
 
     /// <summary>
@@ -24,6 +25,7 @@ global::Microsoft.JSInterop.BrowserUndefined Configure(GPUCanvasConfiguration co
 /// {@link GPUCanvasConfiguration}; see those members for details.
 /// For supported members, it returns the originally-supplied values.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getConfiguration`0<>()[clr:]->IGPUCanvasConfigurationOut@transport:unsupported:True:False:False:GPUCanvasConfigurationOut | null", "getConfiguration", global::Microsoft.JSInterop.DomTransportKind.Unsupported, "GPUCanvasConfigurationOut | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'GPUCanvasConfigurationOut | null' is unsupported: Named TypeScript type 'GPUCanvasConfigurationOut' has no reviewed DOM transport classification.")]
 IGPUCanvasConfigurationOut? GetConfiguration();
 
     /// <summary>
@@ -33,5 +35,6 @@ IGPUCanvasConfigurationOut? GetConfiguration();
 /// call to {@link GPUCanvasContext#getCurrentTexture} until "[$Expire the current texture$]"
 /// runs, even if that {@link GPUTexture} is destroyed, failed validation, or failed to allocate.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getCurrentTexture`0<>()[clr:]->IGPUTexture@transport:js-reference:False:False:False:GPUTexture", "getCurrentTexture", global::Microsoft.JSInterop.DomTransportKind.JsReference, "GPUTexture", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 IGPUTexture GetCurrentTexture();
 }

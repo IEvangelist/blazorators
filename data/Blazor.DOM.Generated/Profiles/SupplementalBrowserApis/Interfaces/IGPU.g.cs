@@ -18,6 +18,7 @@ WGSLLanguageFeatures WgslLanguageFeatures { get; }
 /// The user agent chooses whether to return an adapter, and, if so,
 /// chooses according to the provided options.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:requestAdapter`0<>(GPURequestAdapterOptions<>:optional=True:rest=False)[clr:GPURequestAdapterOptions]->ValueTask<IGPUAdapter>@transport:js-reference:True:False:False:Promise<GPUAdapter | null>", "requestAdapter", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<GPUAdapter | null>", Nullable = true, Promise = true, Streamable = false, StructuredClone = false)]
 [global::Microsoft.JSInterop.DomJavaScriptName("requestAdapter")]
 ValueTask<IGPUAdapter?> RequestAdapterAsync(GPURequestAdapterOptions? options = default);
 }

@@ -14,5 +14,6 @@ namespace Blazor.DOM;
 /// </summary>
 public partial interface ICSSStyleValue : global::Microsoft.JSInterop.IDomProxy
 {
-    string ToString();
+    [global::Microsoft.JSInterop.DomOperation("js:toString`0<>()[clr:]->string@transport:json-value:False:False:True:string", "toString", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+string ToString();
 }

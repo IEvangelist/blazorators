@@ -43,6 +43,7 @@ IGPUAdapterInfo Info { get; }
 /// This is a one-time action: if a device is returned successfully,
 /// the adapter becomes {@link adapter# [[state]]#"consumed"}.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:requestDevice`0<>(GPUDeviceDescriptor<>:optional=True:rest=False)[clr:GPUDeviceDescriptor]->ValueTask<IGPUDevice>@transport:js-reference:False:False:False:Promise<GPUDevice>", "requestDevice", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<GPUDevice>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
 [global::Microsoft.JSInterop.DomJavaScriptName("requestDevice")]
 ValueTask<IGPUDevice> RequestDeviceAsync(GPUDeviceDescriptor? descriptor = default);
 }

@@ -24,9 +24,11 @@ IReadableStream<object>? Readable { get; }
     [global::Microsoft.JSInterop.DomAccessor("writable", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Transferable, "WritableStream<any> | null", Nullable = true, Streamable = false, StructuredClone = true)]
 IWritableStream<object>? Writable { get; }
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("open")]
+    [global::Microsoft.JSInterop.DomOperation("js:open`0<>(SerialOptions<>:optional=False:rest=False)[clr:SerialOptions]->ValueTask@transport:json-value:False:False:True:Promise<void>", "open", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("open")]
 ValueTask OpenAsync(SerialOptions options);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("getSignals")]
+    [global::Microsoft.JSInterop.DomOperation("js:getSignals`0<>()[clr:]->ValueTask<SerialInputSignals>@transport:json-value:False:False:True:Promise<SerialInputSignals>", "getSignals", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<SerialInputSignals>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("getSignals")]
 ValueTask<SerialInputSignals> GetSignalsAsync();
 }

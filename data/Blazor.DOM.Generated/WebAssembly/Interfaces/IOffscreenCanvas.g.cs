@@ -118,6 +118,9 @@ public partial interface IOffscreenCanvas : IEventTarget, global::Microsoft.JSIn
 
     [global::Microsoft.JSInterop.DomOperation("js:removeEventListener`0<>(StringKeyword:optional=False:rest=False,EventListenerOrEventListenerObject<>:optional=False:rest=False,union(BooleanKeyword|EventListenerOptions<>):optional=True:rest=False)[clr:string,EventListenerOrEventListenerObject,EventListenerOptions]->void@transport:json-value:False:False:True:void", "removeEventListener", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
     void RemoveEventListener(string type, EventListenerOrEventListenerObject listener, EventListenerOptions? options) => global::Microsoft.JSInterop.WasmDomDispatch.InvokeVoid((global::Microsoft.JSInterop.IDomDispatchProxy)this, "removeEventListener", [type, listener, options]);
+
+    [global::Microsoft.JSInterop.DomOperation("js:getContext`0<>(union(StringLiteral:\"webgpu\"):optional=False:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_c25938731a]->IGPUCanvasContext@transport:js-reference:True:False:False:GPUCanvasContext | null", "getContext", global::Microsoft.JSInterop.DomTransportKind.JsReference, "GPUCanvasContext | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
+    IGPUCanvasContext? GetContext(global::Blazor.DOM.AdvancedTypes.OffscreenCanvasStringShape_c25938731a contextId) => global::Microsoft.JSInterop.WasmDomDispatch.Invoke<IGPUCanvasContext?>((global::Microsoft.JSInterop.IDomDispatchProxy)this, "getContext", [contextId], global::Microsoft.JSInterop.DomTransportDescriptor.JsReference("GPUCanvasContext | null", nullable: true, streamable: false, structuredClone: false));
 }
 
 

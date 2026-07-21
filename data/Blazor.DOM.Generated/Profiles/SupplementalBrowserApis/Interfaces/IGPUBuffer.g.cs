@@ -29,11 +29,13 @@ double Usage { get; }
 /// {@link GPUBuffer#mapAsync} calls made prior to that call,
 /// on {@link GPUBuffer}s last used exclusively on that queue.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:mapAsync`0<>(GPUMapModeFlags<>:optional=False:rest=False,GPUSize64<>:optional=True:rest=False,GPUSize64<>:optional=True:rest=False)[clr:double,double,double]->ValueTask<global::Microsoft.JSInterop.BrowserUndefined>@transport:json-value:True:False:True:Promise<undefined>", "mapAsync", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<undefined>", Nullable = true, Promise = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomJavaScriptName("mapAsync")]
 ValueTask<global::Microsoft.JSInterop.BrowserUndefined> MapAsyncAsync(double mode, double offset = default, double size = default);
 
     /// <summary>
 /// Returns an ArrayBuffer with the contents of the {@link GPUBuffer} in the given mapped range.
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getMappedRange`0<>(GPUSize64<>:optional=True:rest=False,GPUSize64<>:optional=True:rest=False)[clr:double,double]->byte[]@transport:binary:False:True:True:ArrayBuffer", "getMappedRange", global::Microsoft.JSInterop.DomTransportKind.Binary, "ArrayBuffer", Nullable = false, Promise = false, Streamable = true, StructuredClone = true)]
 byte[] GetMappedRange(double offset = default, double size = default);
 }

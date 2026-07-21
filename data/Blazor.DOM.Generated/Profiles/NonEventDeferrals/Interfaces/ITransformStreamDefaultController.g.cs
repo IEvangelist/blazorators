@@ -28,6 +28,7 @@ double? DesiredSize { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:enqueue`0<>(TransformStreamDefaultController.O<>:optional=True:rest=False)[clr:!0]->void@transport:json-value:False:False:True:void", "enqueue", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void Enqueue(O? chunk = default);
 
     /// <summary>
@@ -35,6 +36,7 @@ void Enqueue(O? chunk = default);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/error)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:error`0<>(AnyKeyword:optional=True:rest=False)[clr:object]->void@transport:json-value:False:False:True:void", "error", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void Error(object? reason = default);
 
     /// <summary>
@@ -42,5 +44,6 @@ void Error(object? reason = default);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/terminate)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:terminate`0<>()[clr:]->void@transport:json-value:False:False:True:void", "terminate", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void Terminate();
 }

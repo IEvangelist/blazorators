@@ -13,12 +13,15 @@ public partial interface IUSBDevice : global::Microsoft.JSInterop.IDomProxy
     [global::Microsoft.JSInterop.DomAccessor("configurations", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "readonly USBConfiguration[]", Nullable = false, Streamable = false, StructuredClone = false)]
 global::Microsoft.JSInterop.IReadOnlyBrowserArray<IUSBConfiguration> Configurations { get; }
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("open")]
+    [global::Microsoft.JSInterop.DomOperation("js:open`0<>()[clr:]->ValueTask@transport:json-value:False:False:True:Promise<void>", "open", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "Promise<void>", Nullable = false, Promise = true, Streamable = false, StructuredClone = true)]
+[global::Microsoft.JSInterop.DomJavaScriptName("open")]
 ValueTask OpenAsync();
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("transferIn")]
+    [global::Microsoft.JSInterop.DomOperation("js:transferIn`0<>(NumberKeyword:optional=False:rest=False,NumberKeyword:optional=False:rest=False)[clr:double,double]->ValueTask<IUSBInTransferResult>@transport:js-reference:False:False:False:Promise<USBInTransferResult>", "transferIn", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<USBInTransferResult>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("transferIn")]
 ValueTask<IUSBInTransferResult> TransferInAsync(double endpointNumber, double length);
 
-    [global::Microsoft.JSInterop.DomJavaScriptName("transferOut")]
+    [global::Microsoft.JSInterop.DomOperation("js:transferOut`0<>(NumberKeyword:optional=False:rest=False,BufferSource<>:optional=False:rest=False)[clr:double,BufferSource]->ValueTask<IUSBOutTransferResult>@transport:js-reference:False:False:False:Promise<USBOutTransferResult>", "transferOut", global::Microsoft.JSInterop.DomTransportKind.JsReference, "Promise<USBOutTransferResult>", Nullable = false, Promise = true, Streamable = false, StructuredClone = false)]
+[global::Microsoft.JSInterop.DomJavaScriptName("transferOut")]
 ValueTask<IUSBOutTransferResult> TransferOutAsync(double endpointNumber, BufferSource data);
 }

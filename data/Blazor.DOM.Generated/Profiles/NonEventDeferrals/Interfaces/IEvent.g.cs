@@ -134,12 +134,14 @@ double BUBBLINGPHASE { get; }
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composedPath)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:composedPath`0<>()[clr:]->global::Microsoft.JSInterop.IBrowserArray<IEventTarget>@transport:js-reference:False:False:False:EventTarget[]", "composedPath", global::Microsoft.JSInterop.DomTransportKind.JsReference, "EventTarget[]", Nullable = false, Promise = false, Streamable = false, StructuredClone = false)]
 global::Microsoft.JSInterop.IBrowserArray<IEventTarget> ComposedPath();
 
     /// <summary>
 /// The **`Event.initEvent()`** method is used to initialize the value of an event created using Document.createEvent().
 /// </summary>
 [Obsolete]
+[global::Microsoft.JSInterop.DomOperation("js:initEvent`0<>(StringKeyword:optional=False:rest=False,BooleanKeyword:optional=True:rest=False,BooleanKeyword:optional=True:rest=False)[clr:string,bool,bool]->void@transport:json-value:False:False:True:void", "initEvent", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void InitEvent(string type, bool bubbles = default, bool cancelable = default);
 
     /// <summary>
@@ -147,6 +149,7 @@ void InitEvent(string type, bool bubbles = default, bool cancelable = default);
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/preventDefault)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:preventDefault`0<>()[clr:]->void@transport:json-value:False:False:True:void", "preventDefault", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void PreventDefault();
 
     /// <summary>
@@ -154,6 +157,7 @@ void PreventDefault();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopImmediatePropagation)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:stopImmediatePropagation`0<>()[clr:]->void@transport:json-value:False:False:True:void", "stopImmediatePropagation", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void StopImmediatePropagation();
 
     /// <summary>
@@ -161,5 +165,6 @@ void StopImmediatePropagation();
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopPropagation)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:stopPropagation`0<>()[clr:]->void@transport:json-value:False:False:True:void", "stopPropagation", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
 void StopPropagation();
 }

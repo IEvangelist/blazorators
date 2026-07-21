@@ -19,7 +19,9 @@ public partial interface IHTMLCanvasElement : IHTMLElement, global::Microsoft.JS
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/getContext)
 /// </summary>
+[global::Microsoft.JSInterop.DomOperation("js:getContext`0<>(StringLiteral:\"2d\":optional=False:rest=False,CanvasRenderingContext2DSettings<>:optional=True:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.HTMLCanvasElementStringShape_54c6689cf0,CanvasRenderingContext2DSettings]->ICanvasRenderingContext2D@transport:js-reference:True:False:False:CanvasRenderingContext2D | null", "getContext", global::Microsoft.JSInterop.DomTransportKind.JsReference, "CanvasRenderingContext2D | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
 ICanvasRenderingContext2D? GetContext(global::Blazor.DOM.AdvancedTypes.HTMLCanvasElementStringShape_54c6689cf0 contextId, CanvasRenderingContext2DSettings? options = default);
 
-    IImageBitmapRenderingContext? GetContext(global::Blazor.DOM.AdvancedTypes.HTMLCanvasElementStringShape_40f4b23e72 contextId, ImageBitmapRenderingContextSettings? options = default);
+    [global::Microsoft.JSInterop.DomOperation("js:getContext`0<>(StringLiteral:\"bitmaprenderer\":optional=False:rest=False,ImageBitmapRenderingContextSettings<>:optional=True:rest=False)[clr:global::Blazor.DOM.AdvancedTypes.HTMLCanvasElementStringShape_40f4b23e72,ImageBitmapRenderingContextSettings]->IImageBitmapRenderingContext@transport:js-reference:True:False:False:ImageBitmapRenderingContext | null", "getContext", global::Microsoft.JSInterop.DomTransportKind.JsReference, "ImageBitmapRenderingContext | null", Nullable = true, Promise = false, Streamable = false, StructuredClone = false)]
+IImageBitmapRenderingContext? GetContext(global::Blazor.DOM.AdvancedTypes.HTMLCanvasElementStringShape_40f4b23e72 contextId, ImageBitmapRenderingContextSettings? options = default);
 }

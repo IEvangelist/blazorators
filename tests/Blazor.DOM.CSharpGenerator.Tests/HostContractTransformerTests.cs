@@ -27,7 +27,11 @@ public sealed class HostContractTransformerTests
         Assert.Contains("ValueTask<string> ReadAsync(", result.Source);
         Assert.Contains("CancellationToken cancellationToken = default", result.Source);
         Assert.Contains("sealed class HostDomProxy", result.Source);
-        Assert.Equal(4, result.Operations.Count);
+        Assert.Collection(
+            result.Operations,
+            operation => Assert.Equal("property-get", operation.Kind),
+            operation => Assert.Equal("method", operation.Kind),
+            operation => Assert.Equal("method", operation.Kind));
     }
 
     [Fact]

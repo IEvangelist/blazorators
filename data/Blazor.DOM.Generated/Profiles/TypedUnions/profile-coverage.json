@@ -2585,7 +2585,7 @@
         "memberKind": "property",
         "status": "Projected",
         "phase": null,
-        "reason": "",
+        "reason": "Optional undefined member is represented by property absence.",
         "provenance": "UnderlyingSink/decl[0]/member[3]/property/type",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2332:5",
         "qualifiedKey": "UnderlyingSink/decl[0]/member[3]"

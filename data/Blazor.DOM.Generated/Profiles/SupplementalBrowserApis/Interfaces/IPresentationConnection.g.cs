@@ -17,9 +17,12 @@ PresentationConnectionState State { get; }
 [global::Microsoft.JSInterop.DomAccessor("onmessage", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: PresentationConnection, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: PresentationConnection, ev: Event) => any) | null' is unsupported: TypeScript '(this: PresentationConnection, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Onmessage { get; set; }
 
-    void Send(string message);
+    [global::Microsoft.JSInterop.DomOperation("js:send`0<>(StringKeyword:optional=False:rest=False)[clr:string]->void@transport:json-value:False:False:True:void", "send", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void Send(string message);
 
-    void Send(IBlob data);
+    [global::Microsoft.JSInterop.DomOperation("js:send`0<>(Blob<>:optional=False:rest=False)[clr:IBlob]->void@transport:json-value:False:False:True:void", "send", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void Send(IBlob data);
 
-    void Send(byte[] data);
+    [global::Microsoft.JSInterop.DomOperation("js:send`0<>(ArrayBuffer<>:optional=False:rest=False)[clr:byte[]]->void@transport:json-value:False:False:True:void", "send", global::Microsoft.JSInterop.DomTransportKind.JsonValue, "void", Nullable = false, Promise = false, Streamable = false, StructuredClone = true)]
+void Send(byte[] data);
 }
