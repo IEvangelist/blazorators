@@ -8,7 +8,7 @@ namespace Microsoft.JSInterop;
 
 public static class GeneratedDomHost
 {
-    public static global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IWindow> GetWindowAsync(
+    public static global::System.Threading.Tasks.ValueTask<global::Blazor.DOM.IWindow> GetWindowProxyAsync(
         this IBrowser browser, global::System.Threading.CancellationToken cancellationToken = default) =>
         browser.GetGlobalAsync<global::Blazor.DOM.IWindow>("window", cancellationToken);
 

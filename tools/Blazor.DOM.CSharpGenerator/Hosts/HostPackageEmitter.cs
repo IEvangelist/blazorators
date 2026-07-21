@@ -256,7 +256,7 @@ public static class HostPackageEmitter
             {
                 writer.AppendLine(
                     "public static global::System.Threading.Tasks.ValueTask<" +
-                    "global::Blazor.DOM.IWindow> GetWindowAsync(");
+                    "global::Blazor.DOM.IWindow> GetWindowProxyAsync(");
                 writer.AppendLine(
                     "    this IBrowser browser, global::System.Threading." +
                     "CancellationToken cancellationToken = default) =>");
@@ -306,7 +306,7 @@ public static class HostPackageEmitter
                 "global",
                 "window",
                 false,
-                "ValueTask<IWindow> GetWindowAsync(CancellationToken)"),
+                "ValueTask<IWindow> GetWindowProxyAsync(CancellationToken)"),
             new HostApiOperation(
                 "global:document",
                 "Document",
