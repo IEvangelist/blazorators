@@ -85,6 +85,33 @@ public static class ProfileLoader
             }
         }
 
+        var duplicateExclusion = (profile.ReviewedExclusions ?? [])
+            .GroupBy(item => (item.Symbol, item.Member))
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateExclusion is not null)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' has duplicate reviewed exclusion " +
+                $"'{duplicateExclusion.Key.Symbol}.{duplicateExclusion.Key.Member}'.");
+        }
+        foreach (var exclusion in profile.ReviewedExclusions ?? [])
+        {
+            if (string.IsNullOrWhiteSpace(exclusion.Symbol)
+                || string.IsNullOrWhiteSpace(exclusion.Member))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' has an incomplete reviewed " +
+                    "exclusion.");
+            }
+            if (string.IsNullOrWhiteSpace(exclusion.Rationale))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' reviewed exclusion " +
+                    $"'{exclusion.Symbol}.{exclusion.Member}' requires a non-empty " +
+                    "rationale.");
+            }
+        }
+
         if (profile.EntryPoints is null)
             return;
         if (profile.EntryPoints.Count == 0)

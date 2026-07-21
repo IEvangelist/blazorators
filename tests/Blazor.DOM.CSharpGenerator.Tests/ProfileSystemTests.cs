@@ -214,6 +214,42 @@ public sealed class ProfileSystemTests
                             "kind": "runtime-inferred",
                             "rationale": ""
                         }
+
+                        [Fact]
+                        public void Load_ReviewedExclusion_RequiresRationale()
+                        {
+                            var dir = CreateTempDir();
+                            try
+                            {
+                                var json = """
+                                    {
+                                        "name": "Invalid",
+                                        "description": "Invalid reviewed exclusion",
+                                        "rootSymbols": ["Root"],
+                                        "secureContext": false,
+                                        "requiresUserActivation": false,
+                                        "features": [],
+                                        "outputNamespace": "Blazor.DOM",
+                                        "outputSubdirectory": "Profiles/Invalid",
+                                        "reviewedExclusions": [
+                                            {
+                                                "symbol": "Root",
+                                                "member": "unsupported",
+                                                "rationale": ""
+                                            }
+                                        ]
+                                    }
+                                    """;
+                                var path = Path.Combine(dir, "invalid.profile.json");
+                                File.WriteAllText(path, json);
+
+                                var exception = Assert.Throws<InvalidDataException>(
+                                    () => ProfileLoader.Load(path));
+
+                                Assert.Contains("non-empty rationale", exception.Message);
+                            }
+                            finally { Directory.Delete(dir, true); }
+                        }
                     ]
                 }
                 """;

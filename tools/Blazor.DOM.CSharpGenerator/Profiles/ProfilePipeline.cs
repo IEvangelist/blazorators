@@ -51,6 +51,7 @@ public static class ProfilePipeline
                     profile),
                 StringComparer.Ordinal)
             : sourceIndex;
+        ValidateReviewedExclusions(profile, sourceIndex, generationIndex);
 
         var closure = TransitiveDependencyResolver.Resolve(
             profile.RootSymbols,
@@ -383,6 +384,59 @@ public static class ProfilePipeline
                     $"Entry point '{entryPoint.Name}' is outside the resolved closure.");
             }
         }
+
+        private static void ValidateReviewedExclusions(
+            ProfileDefinition profile,
+            IReadOnlyDictionary<string, SymbolModel> sourceIndex,
+            IReadOnlyDictionary<string, SymbolModel> generationIndex)
+        {
+            foreach (var exclusion in profile.ReviewedExclusions ?? [])
+            {
+                if (!sourceIndex.TryGetValue(exclusion.Symbol, out var source))
+                {
+                    throw new InvalidDataException(
+                        $"Package profile '{profile.Name}' reviewed exclusion references " +
+                        $"missing symbol '{exclusion.Symbol}'.");
+                }
+
+                var sourceMatches = MatchingMembers(source, exclusion.Member).ToList();
+                if (sourceMatches.Count == 0)
+                {
+                    throw new InvalidDataException(
+                        $"Package profile '{profile.Name}' reviewed exclusion did not match " +
+                        $"'{exclusion.Symbol}.{exclusion.Member}'.");
+                }
+
+                if (generationIndex.TryGetValue(exclusion.Symbol, out var selected)
+                    && MatchingMembers(selected, exclusion.Member).Any())
+                {
+                    throw new InvalidDataException(
+                        $"Package profile '{profile.Name}' reviewed exclusion " +
+                        $"'{exclusion.Symbol}.{exclusion.Member}' is still selected.");
+                }
+            }
+
+            static IEnumerable<MemberModel> MatchingMembers(
+                SymbolModel symbol,
+                string memberIdentity)
+            {
+                foreach (var declaration in symbol.Declarations)
+                {
+                    foreach (var member in declaration.Members)
+                    {
+                        var name = member.Name?.Text ?? $"${member.Kind}";
+                        if (string.Equals(memberIdentity, name, StringComparison.Ordinal)
+                            || string.Equals(
+                                memberIdentity,
+                                $"{name}@{declaration.Ordinal}/{member.Ordinal}",
+                                StringComparison.Ordinal))
+                        {
+                            yield return member;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static void ValidateSupportedTransports(
@@ -445,7 +499,8 @@ public static class ProfilePipeline
             TransportOverrides: profile.TransportOverrides ?? [],
             Errors: pipelineResult.Errors.Select(e => new ProfileErrorEntry(
                 e.SymbolName, e.ExceptionType, e.Message)).ToList(),
-            ByteIdentityVerified: byteIdentityVerified
+            ByteIdentityVerified: byteIdentityVerified,
+            ReviewedExclusions: profile.ReviewedExclusions ?? []
         );
     }
 
@@ -482,7 +537,8 @@ public sealed record ProfileCoverageReport(
     AccountingSummary Accounting,
     IReadOnlyList<ProfileTransportOverride> TransportOverrides,
     IReadOnlyList<ProfileErrorEntry> Errors,
-    bool ByteIdentityVerified);
+    bool ByteIdentityVerified,
+    IReadOnlyList<ProfileReviewedExclusion> ReviewedExclusions);
 
 public sealed record ProfileErrorEntry(
     string SymbolName,
