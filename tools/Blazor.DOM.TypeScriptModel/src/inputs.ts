@@ -78,6 +78,11 @@ const webIdlSupplementalSources: ReadonlyArray<
   Omit<WebIdlSupplementalSource, "text" | "sha256">
 > = [
   {
+    family: "File System Access",
+    specification: "file-system-access",
+    sourceUrl: "https://fs.spec.whatwg.org/",
+  },
+  {
     family: "Presentation API",
     specification: "presentation-api",
     sourceUrl: "https://www.w3.org/TR/presentation-api/",

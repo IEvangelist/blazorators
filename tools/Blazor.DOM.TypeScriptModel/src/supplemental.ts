@@ -757,6 +757,13 @@ function renderType(type: WebIdlTypeModel, owner: string): string {
         if (args.length !== 1) throw new Error(`FrozenArray in '${owner}' must have one argument.`);
         rendered = `ReadonlyArray<${args[0]}>`;
         break;
+      case "record":
+        if (args.length !== 2) throw new Error(`record in '${owner}' must have two arguments.`);
+        if (args[0] !== "string") {
+          throw new Error(`record key in '${owner}' must project to string.`);
+        }
+        rendered = `Record<string, ${args[1]}>`;
+        break;
       default:
         throw new Error(`Unsupported Web IDL generic '${type.generic}' in '${owner}'.`);
     }
