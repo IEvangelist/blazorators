@@ -93,7 +93,7 @@ public static partial class InteropAnchorLoader
                 $"[JSAutoInterop] anchors in '{scope}'.");
         }
 
-        return profile with { EntryPoints = profileAnchors };
+        return profile;
     }
 
     private static InteropAnchor Parse(string anchorsDirectory, string path)
