@@ -291,6 +291,138 @@ public sealed class AdvancedTypeProjectionTests
         Assert.Equal("intersection-member-collision", collisionError.Phase);
     }
 
+    [Fact]
+    public void TemplateLiteral_ExpandsFiniteDomainWithoutWidening()
+    {
+        var resolver = new TypeResolver([]);
+        var finite = new TemplateLiteralTypeNode(
+            "prefix-",
+            [
+                new TemplateLiteralSpanModel(
+                    new UnionTypeNode(
+                    [
+                        new LiteralTypeNode("StringLiteral", "\"alpha\""),
+                        new LiteralTypeNode("StringLiteral", "\"beta\""),
+                    ]),
+                    "-suffix"),
+            ])
+        {
+            Transport = JsonTransport(
+                "`prefix-${\"alpha\" | \"beta\"}-suffix`"),
+        };
+
+        var projection = resolver.Project(finite, "Fixture/template");
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+
+        Assert.Equal("finite-template-string", projection.ProviderNote);
+        Assert.Equal(ClrTypeKind.Value, projection.Identity.Kind);
+        Assert.Contains("public enum FixtureStringShape_", definition.Source);
+        Assert.Contains(
+            "[EnumMember(Value = \"prefix-alpha-suffix\")]",
+            definition.Source);
+        Assert.Contains(
+            "[EnumMember(Value = \"prefix-beta-suffix\")]",
+            definition.Source);
+        Assert.NotEqual("string", projection.RenderedType);
+    }
+
+    [Fact]
+    public void TemplateLiteral_MapsOnlyUnrestrictedStringAndDefersPatterns()
+    {
+        var resolver = new TypeResolver([]);
+        var unrestricted = new TemplateLiteralTypeNode(
+            "",
+            [new TemplateLiteralSpanModel(Json(String()), "")])
+        {
+            CheckerType = "string",
+            Transport = JsonTransport("`${string}`"),
+        };
+        Assert.Equal(
+            "string",
+            resolver.Project(unrestricted, "Fixture/unrestricted").RenderedType);
+
+        var constrained = new TemplateLiteralTypeNode(
+            "section-",
+            [new TemplateLiteralSpanModel(Json(String()), "")])
+        {
+            CheckerType = "`section-${string}`",
+            Transport = JsonTransport("`section-${string}`"),
+        };
+        var error = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(constrained, "Fixture/constrained"));
+        Assert.Equal("template-literal-pattern", error.Phase);
+    }
+
+    [Fact]
+    public void FiniteTemplateAlias_ReusesStringEnumPolicy()
+    {
+        var template = new TemplateLiteralTypeNode(
+            "mode-",
+            [
+                new TemplateLiteralSpanModel(
+                    new UnionTypeNode(
+                    [
+                        new LiteralTypeNode("StringLiteral", "\"one\""),
+                        new LiteralTypeNode("StringLiteral", "\"two\""),
+                    ]),
+                    ""),
+            ])
+        {
+            Transport = JsonTransport("`mode-${\"one\" | \"two\"}`"),
+        };
+        var symbol = Alias("TemplateMode", template);
+        var source = new AliasEmitter(
+            new TypeResolver([symbol]),
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+
+        Assert.Contains("public enum TemplateMode", source);
+        Assert.Contains("[EnumMember(Value = \"mode-one\")]", source);
+        Assert.Contains("[EnumMember(Value = \"mode-two\")]", source);
+        Assert.DoesNotContain("string Value", source);
+    }
+
+    [Fact]
+    public void ImportQueryParenthesizedAndPrefixUnaryFormsReduceExactly()
+    {
+        var target = Interface("Module.Target", []);
+        var resolver = new TypeResolver([target]);
+        var import = new ImportTypeNode(
+            new LiteralTypeNode("StringLiteral", "\"module\""),
+            "Module.Target",
+            [],
+            false,
+            null)
+        {
+            Transport = UnsupportedTransport(
+                "import(\"module\").Target",
+                "Import syntax requires symbol resolution."),
+        };
+
+        var imported = resolver.Project(import, "Fixture/import");
+        Assert.Equal(
+            "global::Blazor.DOM.Namespaces.Module.ITarget",
+            imported.RenderedType);
+        Assert.Equal("resolved-import-type", imported.ProviderNote);
+
+        var parenthesizedQuery = new ParenthesizedTypeNode(
+            new QueryTypeNode(Json(String())));
+        Assert.Equal(
+            "string",
+            resolver.Project(parenthesizedQuery, "Fixture/query").RenderedType);
+
+        var negative = resolver.Project(
+            new LiteralTypeNode("PrefixUnaryExpression", "-1"),
+            "Fixture/negative");
+        Assert.Equal("double", negative.RenderedType);
+        Assert.Equal("literal-number:-1", negative.ProviderNote);
+
+        var typeOfImport = import with { IsTypeOf = true };
+        var error = Assert.Throws<GenericDeferralException>(
+            () => resolver.Project(typeOfImport, "Fixture/typeof-import"));
+        Assert.Equal("import-type-factory", error.Phase);
+    }
+
     private static SymbolModel Interface(
         string name,
         IReadOnlyList<MemberModel> members,

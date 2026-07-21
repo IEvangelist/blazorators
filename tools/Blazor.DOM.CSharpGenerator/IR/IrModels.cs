@@ -284,9 +284,22 @@ public sealed record TypeLiteralTypeNode(IReadOnlyList<MemberModel> Members) : T
     public override string Kind => "typeLiteral";
 }
 
-public sealed record TemplateLiteralTypeNode(IReadOnlyList<TypeNode> Parts) : TypeNode
+public sealed record TemplateLiteralSpanModel(TypeNode Type, string Literal);
+
+public sealed record TemplateLiteralTypeNode(
+    string Head,
+    IReadOnlyList<TemplateLiteralSpanModel> Spans) : TypeNode
 {
     public override string Kind => "templateLiteral";
+
+    public TemplateLiteralTypeNode(IReadOnlyList<TypeNode> parts)
+        : this(
+            "",
+            parts.Select(part => new TemplateLiteralSpanModel(part, "")).ToList())
+    {
+    }
+
+    public IReadOnlyList<TypeNode> Parts => Spans.Select(span => span.Type).ToList();
 }
 
 public sealed record QueryTypeNode(
@@ -319,6 +332,16 @@ public sealed record HeritageReferenceTypeNode(
 public sealed record ParenthesizedTypeNode(TypeNode InnerType) : TypeNode
 {
     public override string Kind => "parenthesized";
+}
+
+public sealed record ImportTypeNode(
+    TypeNode Argument,
+    string? Qualifier,
+    IReadOnlyList<TypeNode> TypeArguments,
+    bool IsTypeOf,
+    string? Attributes) : TypeNode
+{
+    public override string Kind => "import";
 }
 
 public sealed record UnknownTypeNode(string RawKind) : TypeNode
@@ -409,9 +432,17 @@ public sealed class TypeNodeConverter : JsonConverter<TypeNode>
                     ? tlm.Deserialize<IReadOnlyList<MemberModel>>(options) ?? []
                     : []),
             "templateLiteral" => new TemplateLiteralTypeNode(
-                root.TryGetProperty("parts", out var tlp)
-                    ? tlp.Deserialize<IReadOnlyList<TypeNode>>(options) ?? []
-                    : []),
+                root.TryGetProperty("head", out var tlh)
+                    ? tlh.GetString() ?? ""
+                    : "",
+                root.TryGetProperty("spans", out var tls)
+                    ? tls.Deserialize<IReadOnlyList<TemplateLiteralSpanModel>>(options)
+                        ?? []
+                    : root.TryGetProperty("parts", out var tlp)
+                        ? (tlp.Deserialize<IReadOnlyList<TypeNode>>(options) ?? [])
+                            .Select(part => new TemplateLiteralSpanModel(part, ""))
+                            .ToList()
+                        : []),
             "query" => new QueryTypeNode(
                 root.TryGetProperty("exprType", out var qt)
                     ? qt.Deserialize<TypeNode>(options)
@@ -448,6 +479,24 @@ public sealed class TypeNodeConverter : JsonConverter<TypeNode>
                 root.TryGetProperty("type", out var pt)
                     ? pt.Deserialize<TypeNode>(options) ?? new UnknownTypeNode("parenthesized/unknown")
                     : new UnknownTypeNode("parenthesized/missing")),
+            "import" => new ImportTypeNode(
+                root.TryGetProperty("argument", out var ita)
+                    ? ita.Deserialize<TypeNode>(options)
+                        ?? new UnknownTypeNode("import/argument")
+                    : new UnknownTypeNode("import/missingArgument"),
+                root.TryGetProperty("qualifier", out var itq)
+                    && itq.ValueKind != JsonValueKind.Null
+                        ? itq.GetString()
+                        : null,
+                root.TryGetProperty("typeArguments", out var itta)
+                    ? itta.Deserialize<IReadOnlyList<TypeNode>>(options) ?? []
+                    : [],
+                root.TryGetProperty("isTypeOf", out var itto)
+                    && itto.GetBoolean(),
+                root.TryGetProperty("attributes", out var itat)
+                    && itat.ValueKind != JsonValueKind.Null
+                        ? itat.GetString()
+                        : null),
             _ => new UnknownTypeNode(kind),
         };
 

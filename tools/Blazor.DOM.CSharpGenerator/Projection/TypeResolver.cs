@@ -382,10 +382,14 @@ public sealed class TypeResolver
                 provenance,
                 scope,
                 depth),
-            TemplateLiteralTypeNode => Fail(typeNode, provenance,
-                "template literal types are not supported for C# projection"),
-            QueryTypeNode => Fail(typeNode, provenance,
-                "typeof query types are not supported for C# projection"),
+            TemplateLiteralTypeNode template => ProjectTemplateLiteral(
+                template,
+                provenance),
+            QueryTypeNode query => ProjectQuery(
+                query,
+                provenance,
+                scope,
+                depth),
             IndexedAccessTypeNode indexed => ProjectIndexedAccess(
                 indexed,
                 provenance,
@@ -416,13 +420,31 @@ public sealed class TypeResolver
                 $"{provenance}/rest",
                 scope,
                 depth + 1),
+            ImportTypeNode import => ProjectImport(
+                import,
+                provenance,
+                scope,
+                depth),
             UnknownTypeNode u => Fail(typeNode, provenance,
                 $"unknown type node kind '{u.RawKind}' cannot be projected"),
             _ => Fail(typeNode, provenance,
                 $"unhandled TypeNode subtype '{typeNode.GetType().Name}'"),
         };
         ValidateJsonGenericTransport(typeNode, provenance);
-        return projection with { Transport = typeNode.Transport ?? projection.Transport };
+        var reducedTransport = projection.ProviderNote is
+            "statically-reduced-indexed-access" or
+            "readonly-operator" or
+            "readonly-array" or
+            "resolved-import-type"
+            || projection.ProviderNote.StartsWith(
+                "Window & typeof globalThis",
+                StringComparison.Ordinal);
+        return projection with
+        {
+            Transport = reducedTransport
+                ? projection.Transport
+                : typeNode.Transport ?? projection.Transport,
+        };
     }
 
     private TypeProjection ProjectKeyword(KeywordTypeNode kw, string provenance)
@@ -924,6 +946,25 @@ public sealed class TypeResolver
                 providerNote: $"literal-string:{lit.Text}"),
             "NumericLiteral" => ValueType("double",
                 providerNote: $"literal-number:{lit.Text}"),
+            "PrefixUnaryExpression"
+                when double.TryParse(
+                    lit.Text,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out _)
+                => ValueType(
+                    "double",
+                    providerNote: $"literal-number:{lit.Text}"),
+            "BigIntLiteral"
+                when lit.Text.EndsWith("n", StringComparison.Ordinal)
+                    && long.TryParse(
+                        lit.Text[..^1],
+                        System.Globalization.NumberStyles.Integer,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out _)
+                => ValueType(
+                    "long",
+                    providerNote: $"literal-bigint:{lit.Text}"),
             "TrueLiteral" or "FalseLiteral" or "TrueKeyword" or "FalseKeyword"
                 => ValueType("bool", providerNote: $"literal-bool:{lit.Text}"),
             // The IR emits null/undefined literals with LiteralKind="NullKeyword"/"UndefinedKeyword"
@@ -1441,29 +1482,294 @@ public sealed class TypeResolver
                 out values);
         }
 
-        var result = new SortedSet<string>(StringComparer.Ordinal);
-        var success = type switch
+        return TryResolveFiniteStringDomain(
+            type,
+            provenance,
+            new HashSet<string>(StringComparer.Ordinal),
+            new Dictionary<string, TypeNode>(StringComparer.Ordinal),
+            out values);
+    }
+
+    private bool TryResolveFiniteStringDomain(
+        TypeNode type,
+        string provenance,
+        ISet<string> visiting,
+        IReadOnlyDictionary<string, TypeNode> substitutions,
+        out IReadOnlyList<string> values)
+    {
+        if (type is ParenthesizedTypeNode parenthesized)
         {
-            OperatorTypeNode { Operator: "KeyOfKeyword" } operation
-                => TryCollectFiniteKeys(
+            return TryResolveFiniteStringDomain(
+                parenthesized.InnerType,
+                $"{provenance}/parenthesized",
+                visiting,
+                substitutions,
+                out values);
+        }
+
+        var result = new SortedSet<string>(StringComparer.Ordinal);
+        var success = false;
+        switch (type)
+        {
+            case OperatorTypeNode { Operator: "KeyOfKeyword" } operation:
+                success = TryCollectFiniteKeys(
                     operation.OperandType,
                     provenance,
                     result,
-                    new HashSet<string>(StringComparer.Ordinal)),
-            LiteralTypeNode { LiteralKind: "StringLiteral" } literal
-                => result.Add(Unquote(literal.Text)),
-            UnionTypeNode union => union.Types
-                .Select((item, index) => (item, index))
-                .All(item =>
-                    TryResolveFiniteStringDomain(
-                        item.item,
-                        $"{provenance}/union[{item.index}]",
-                        out var itemValues)
-                    && AddAll(result, itemValues)),
-            _ => false,
-        };
+                    new HashSet<string>(StringComparer.Ordinal));
+                break;
+            case LiteralTypeNode { LiteralKind: "StringLiteral" } literal:
+                success = result.Add(Unquote(literal.Text));
+                break;
+            case UnionTypeNode union:
+                success = union.Types
+                    .Select((item, index) => (item, index))
+                    .All(item =>
+                        TryResolveFiniteStringDomain(
+                            item.item,
+                            $"{provenance}/union[{item.index}]",
+                            visiting,
+                            substitutions,
+                            out var itemValues)
+                        && AddAll(result, itemValues));
+                break;
+            case ReferenceTypeNode reference:
+                if (substitutions.TryGetValue(reference.Name, out var substitution))
+                {
+                    success = TryResolveFiniteStringDomain(
+                        substitution,
+                        $"{provenance}/substitution[{reference.Name}]",
+                        visiting,
+                        substitutions,
+                        out var substitutionValues)
+                        && AddAll(result, substitutionValues);
+                    break;
+                }
+                var symbolName = reference.ResolvedSymbol ?? reference.Name;
+                if (_symbolIndex.TryGetValue(symbolName, out var symbol)
+                    && visiting.Add(symbolName))
+                {
+                    try
+                    {
+                        var aliases = symbol.Declarations
+                            .Where(declaration =>
+                                declaration.Kind == "typeAlias"
+                                && declaration.Type is not null)
+                            .Select(declaration => declaration.Type!)
+                            .ToList();
+                        var parameters = symbol.Declarations
+                            .Where(declaration => declaration.Kind == "typeAlias")
+                            .Select(declaration => declaration.TypeParameters)
+                            .FirstOrDefault(parameters => parameters.Count > 0)
+                            ?? [];
+                        var aliasSubstitutions =
+                            substitutions.ToDictionary(
+                                pair => pair.Key,
+                                pair => pair.Value,
+                                StringComparer.Ordinal);
+                        if (reference.TypeArguments.Count > parameters.Count)
+                        {
+                            success = false;
+                            break;
+                        }
+                        var validArguments = true;
+                        for (var index = 0; index < parameters.Count; index++)
+                        {
+                            var argument = index < reference.TypeArguments.Count
+                                ? reference.TypeArguments[index]
+                                : parameters[index].Default;
+                            if (argument is null)
+                            {
+                                validArguments = false;
+                                break;
+                            }
+                            aliasSubstitutions[parameters[index].Name] = argument;
+                        }
+                        if (!validArguments)
+                        {
+                            break;
+                        }
+                        success = aliases.Count > 0
+                            && aliases.All(alias =>
+                                TryResolveFiniteStringDomain(
+                                    alias,
+                                    $"{provenance}/{symbolName}",
+                                    visiting,
+                                    aliasSubstitutions,
+                                    out var aliasValues)
+                                && AddAll(result, aliasValues));
+                    }
+                    finally
+                    {
+                        visiting.Remove(symbolName);
+                    }
+                }
+                break;
+            case TemplateLiteralTypeNode template:
+                success = TryExpandTemplateLiteral(
+                    template,
+                    provenance,
+                    visiting,
+                    substitutions,
+                    result);
+                break;
+        }
         values = result.ToList();
         return success && values.Count > 0;
+    }
+
+    private bool TryExpandTemplateLiteral(
+        TemplateLiteralTypeNode template,
+        string provenance,
+        ISet<string> visiting,
+        IReadOnlyDictionary<string, TypeNode> substitutions,
+        ISet<string> values)
+    {
+        const int expansionLimit = 4096;
+        var prefixes = new List<string> { template.Head };
+        for (var index = 0; index < template.Spans.Count; index++)
+        {
+            var span = template.Spans[index];
+            if (!TryResolveFiniteStringDomain(
+                    span.Type,
+                    $"{provenance}/span[{index}]",
+                    visiting,
+                    substitutions,
+                    out var spanValues))
+            {
+                return false;
+            }
+            if ((long)prefixes.Count * spanValues.Count > expansionLimit)
+                return false;
+            prefixes = prefixes
+                .SelectMany(prefix => spanValues.Select(value =>
+                    $"{prefix}{value}{span.Literal}"))
+                .ToList();
+        }
+        return AddAll(values, prefixes);
+    }
+
+    private TypeProjection ProjectTemplateLiteral(
+        TemplateLiteralTypeNode template,
+        string provenance)
+    {
+        if (template.Transport?.Kind is not (null or "json-value"))
+        {
+            throw new GenericDeferralException(
+                $"Template literal at '{provenance}' has unsupported transport " +
+                $"'{template.Transport.Kind}'.",
+                $"{provenance}/transport",
+                "template-literal-transport");
+        }
+        if (IsUnrestrictedStringTemplate(template))
+        {
+            return ReferenceType(
+                "string",
+                providerNote: "unrestricted-template-string");
+        }
+        if (TryResolveFiniteStringDomain(template, provenance, out var values))
+        {
+            var typeName = _synthesizedTypes.RegisterStringDomain(
+                provenance,
+                values);
+            return ValueType(
+                typeName,
+                providerNote: "finite-template-string",
+                canonicalType: typeName);
+        }
+        throw new GenericDeferralException(
+            $"Template literal at '{provenance}' is a constrained or dynamic string " +
+            "pattern and cannot be widened to string.",
+            provenance,
+            "template-literal-pattern");
+    }
+
+    private static bool IsUnrestrictedStringTemplate(
+        TemplateLiteralTypeNode template)
+        => string.Equals(template.CheckerType, "string", StringComparison.Ordinal)
+            || template.Head.Length == 0
+                && template.Spans.Count == 1
+                && template.Spans[0].Literal.Length == 0
+                && template.Spans[0].Type is KeywordTypeNode
+                {
+                    Name: "StringKeyword" or "string",
+                };
+
+    private TypeProjection ProjectQuery(
+        QueryTypeNode query,
+        string provenance,
+        GenericScope? scope,
+        int depth)
+    {
+        if (query.ExprType is not null)
+        {
+            return Project(
+                query.ExprType,
+                $"{provenance}/query",
+                scope,
+                depth + 1);
+        }
+        if (query.CheckerType is { } checker
+            && double.TryParse(
+                checker,
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out _))
+        {
+            return ValueType(
+                "double",
+                providerNote: $"literal-number:{checker}");
+        }
+        throw new GenericDeferralException(
+            $"typeof query '{query.ExpressionName ?? query.CheckerType ?? "(unknown)"}' " +
+            $"at '{provenance}' requires a logical factory or constant-domain projection.",
+            provenance,
+            "type-query-factory");
+    }
+
+    private TypeProjection ProjectImport(
+        ImportTypeNode import,
+        string provenance,
+        GenericScope? scope,
+        int depth)
+    {
+        if (import.IsTypeOf)
+        {
+            throw new GenericDeferralException(
+                $"typeof import at '{provenance}' denotes a module value/factory rather " +
+                "than an instance type.",
+                provenance,
+                "import-type-factory");
+        }
+        if (string.IsNullOrWhiteSpace(import.Qualifier))
+        {
+            throw new GenericDeferralException(
+                $"Import type at '{provenance}' has no resolved qualified symbol.",
+                provenance,
+                "import-type-resolution");
+        }
+        var qualifier = import.Qualifier;
+        if (!_symbolIndex.ContainsKey(qualifier))
+        {
+            throw new GenericDeferralException(
+                $"Import type qualifier '{qualifier}' at '{provenance}' is not present " +
+                "in the pinned symbol index.",
+                provenance,
+                "import-type-resolution");
+        }
+        var simpleName = qualifier[
+            (qualifier.LastIndexOf('.') + 1)..];
+        return ProjectReference(
+            new ReferenceTypeNode(
+                simpleName,
+                qualifier,
+                import.TypeArguments),
+            $"{provenance}/import",
+            scope,
+            depth + 1) with
+        {
+            ProviderNote = "resolved-import-type",
+        };
     }
 
             private TypeProjection ProjectOperator(
@@ -2261,6 +2567,13 @@ public sealed class TypeResolver
             IndexedAccessTypeNode indexed =>
                 $"indexed({TypeFingerprint(indexed.ObjectType)}," +
                 $"{TypeFingerprint(indexed.IndexType)})",
+            TemplateLiteralTypeNode template =>
+                $"template:{template.Head}(" +
+                $"{string.Join(",", template.Spans.Select(span =>
+                    $"{TypeFingerprint(span.Type)}:{span.Literal}"))})",
+            ImportTypeNode import =>
+                $"import:{import.Qualifier}:{import.IsTypeOf}<" +
+                $"{string.Join(",", import.TypeArguments.Select(TypeFingerprint))}>",
             _ => $"{type.Kind}:{type.CheckerType}",
         };
 

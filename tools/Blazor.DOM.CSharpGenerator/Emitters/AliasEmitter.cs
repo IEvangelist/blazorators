@@ -48,10 +48,10 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             return EnumEmitter.Emit(symbol, generatorVersion, ns);
         }
 
-        if (typeNode is OperatorTypeNode { Operator: "KeyOfKeyword" } keyOf
+        if (IsFiniteStringDomainCandidate(typeNode)
             && typeResolver.TryResolveFiniteStringDomain(
-                keyOf,
-                $"{symbol.Name}/keyof",
+                typeNode,
+                $"{symbol.Name}/finiteStringDomain",
                 out var keys))
         {
             if (generic.Scope.Parameters.Count > 0)
@@ -59,7 +59,7 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
                 throw new GenericDeferralException(
                     $"Generic finite-key alias '{symbol.Name}' cannot be emitted as a " +
                     "non-generic C# enum without losing its type parameters.",
-                    $"{symbol.Name}/keyof",
+                    $"{symbol.Name}/finiteStringDomain",
                     "finite-key-domain");
             }
             return EnumEmitter.EmitStringValues(
@@ -283,4 +283,15 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             _ => false,
         };
     }
+
+    private static bool IsFiniteStringDomainCandidate(TypeNode typeNode)
+        => typeNode switch
+        {
+            OperatorTypeNode { Operator: "KeyOfKeyword" } => true,
+            TemplateLiteralTypeNode => true,
+            ParenthesizedTypeNode parenthesized
+                => IsFiniteStringDomainCandidate(parenthesized.InnerType),
+            UnionTypeNode union => union.Types.Any(IsFiniteStringDomainCandidate),
+            _ => false,
+        };
 }
