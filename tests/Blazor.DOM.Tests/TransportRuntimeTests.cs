@@ -322,6 +322,72 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Persistent_reference_pair_callback_is_owned_by_constructed_proxy(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var factory = CreateFactory(host.Runtime);
+        var callbackFirst = new FakeJSObjectReference();
+        var callbackSecond = new FakeJSObjectReference();
+        var constructedReference = new FakeJSObjectReference();
+        DomReferencePairCallbackHandler<FixtureBlobProxy, FixtureBlobProxy>? handler =
+            null;
+        host.Module.InvocationHandlers["constructReferencePairCallback"] =
+            async (args, _) =>
+            {
+                var handlerReference = Assert.IsType<DotNetObjectReference<
+                    DomReferencePairCallbackHandler<
+                        FixtureBlobProxy,
+                        FixtureBlobProxy>>>(args![3]);
+                handler = handlerReference.Value;
+                Assert.True(await handler.HandleReferencePairAsync(
+                    callbackFirst,
+                    callbackSecond));
+                return constructedReference;
+            };
+        var owner = new FixtureBlobProxy(
+            new FakeJSObjectReference(),
+            host.Runtime,
+            factory);
+        var callbackCount = 0;
+
+        var result = await DomDispatch
+            .ConstructReferencePairCallbackAsync<
+                FixtureBlobProxy,
+                FixtureBlobProxy,
+                FixtureBlobProxy>(
+                owner,
+                "FixtureObserver",
+                0,
+                null,
+                DomTransportDescriptor.JsReference("FixtureEntries"),
+                DomTransportDescriptor.JsReference("FixtureObserver"),
+                (first, second) =>
+                {
+                    callbackCount++;
+                    Assert.NotNull(first.Proxy);
+                    Assert.NotNull(second.Proxy);
+                    return Task.CompletedTask;
+                });
+
+        Assert.Equal(1, callbackCount);
+        Assert.True(callbackFirst.IsDisposed);
+        Assert.True(callbackSecond.IsDisposed);
+        await result.DisposeAsync();
+        Assert.True(constructedReference.IsDisposed);
+        Assert.NotNull(handler);
+        var rejectedFirst = new FakeJSObjectReference();
+        var rejectedSecond = new FakeJSObjectReference();
+        Assert.False(await handler.HandleReferencePairAsync(
+            rejectedFirst,
+            rejectedSecond));
+        Assert.True(rejectedFirst.IsDisposed);
+        Assert.True(rejectedSecond.IsDisposed);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Unsupported_transport_fails_before_JS_invocation(bool wasm)
     {
         var host = CreateHost(wasm);
