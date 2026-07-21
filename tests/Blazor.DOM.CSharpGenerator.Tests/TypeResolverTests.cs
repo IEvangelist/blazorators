@@ -41,6 +41,189 @@ public sealed class TypeResolverTests
         Assert.Throws<TypeProjectionException>(() => resolver.Project(node, "test"));
     }
 
+    [Fact]
+    public void Project_StandardError_UsesExactLiveContract()
+    {
+        var resolver = EmptyResolver();
+
+        var projection = resolver.Project(
+            new ReferenceTypeNode("Error", "Error", []),
+            "fixture/error");
+
+        Assert.Equal(
+            "global::Blazor.DOM.StandardTypes.ITypeScriptError",
+            projection.CSharpType);
+        Assert.Equal("js-reference", projection.Transport?.Kind);
+        Assert.DoesNotContain("object", projection.CSharpType);
+        var definition = Assert.Single(resolver.SynthesizedTypes);
+        Assert.Equal("Standard", definition.Kind);
+        Assert.Contains("string Name { get; }", definition.Source);
+        Assert.Contains("string Message { get; }", definition.Source);
+        Assert.Contains("string? Stack { get; }", definition.Source);
+    }
+
+    [Fact]
+    public void Project_QualifiedUserError_RemainsDistinct()
+    {
+        var symbol = new SymbolModel(
+            0,
+            "Fixture.Error",
+            0,
+            [],
+            false,
+            new SemanticModel(
+                "matched",
+                "Fixture.Error",
+                "definition",
+                null,
+                ["interface"],
+                [],
+                [],
+                false,
+                false,
+                [],
+                false,
+                false,
+                false,
+                [],
+                []));
+        var resolver = new TypeResolver([symbol]);
+
+        var projection = resolver.Project(
+            new ReferenceTypeNode("Error", "Fixture.Error", []),
+            "fixture/qualified-error");
+
+        Assert.Equal(
+            "global::Blazor.DOM.Namespaces.Fixture.IError",
+            projection.CSharpType);
+        Assert.Empty(resolver.SynthesizedTypes);
+    }
+
+    [Fact]
+    public void Project_StandardExclude_EvaluatesFiniteDomainExactly()
+    {
+        var keyFormat = new SymbolModel(
+            0,
+            "KeyFormat",
+            0,
+            [
+                new DeclarationModel(
+                    0,
+                    "typeAlias",
+                    "KeyFormat",
+                    [],
+                    [],
+                    [],
+                    [],
+                    new UnionTypeNode([
+                        new LiteralTypeNode("StringLiteral", "\"jwk\""),
+                        new LiteralTypeNode("StringLiteral", "\"pkcs8\""),
+                        new LiteralTypeNode("StringLiteral", "\"raw\""),
+                        new LiteralTypeNode("StringLiteral", "\"spki\""),
+                    ]),
+                    [],
+                    null,
+                    new DocumentationModel("", [], false),
+                    new LocationModel("test", new(0, 0, 0), new(0, 0, 0)),
+                    null,
+                    false,
+                    new EventMapModel(false, []),
+                    [])
+            ],
+            false,
+            new SemanticModel(
+                "matched",
+                "KeyFormat",
+                "typedef",
+                null,
+                ["typedef"],
+                [],
+                [],
+                false,
+                false,
+                [],
+                false,
+                false,
+                false,
+                [],
+                []));
+        var resolver = new TypeResolver([keyFormat]);
+
+        var projection = resolver.Project(
+            new ReferenceTypeNode(
+                "Exclude",
+                "Exclude",
+                [
+                    new ReferenceTypeNode("KeyFormat", "KeyFormat", []),
+                    new LiteralTypeNode("StringLiteral", "\"jwk\""),
+                ]),
+            "fixture/exclude");
+
+        Assert.Equal("json-value", projection.Transport?.Kind);
+        var source = Assert.Single(resolver.SynthesizedTypes).Source;
+        Assert.DoesNotContain("Value = \"jwk\"", source);
+        Assert.Contains("Value = \"pkcs8\"", source);
+        Assert.Contains("Value = \"raw\"", source);
+        Assert.Contains("Value = \"spki\"", source);
+    }
+
+    [Fact]
+    public void Project_QualifiedUserExclude_RemainsDistinct()
+    {
+        var declaration = new DeclarationModel(
+            0,
+            "interface",
+            "Exclude",
+            [],
+            [new TypeParameterModel(0, "T", null, null), new TypeParameterModel(1, "U", null, null)],
+            [],
+            [],
+            null,
+            [],
+            null,
+            new DocumentationModel("", [], false),
+            new LocationModel("test", new(0, 0, 0), new(0, 0, 0)),
+            null,
+            false,
+            new EventMapModel(false, []),
+            []);
+        var symbol = new SymbolModel(
+            0,
+            "Fixture.Exclude",
+            0,
+            [declaration],
+            false,
+            new SemanticModel(
+                "matched",
+                "Fixture.Exclude",
+                "definition",
+                null,
+                ["interface"],
+                [],
+                [],
+                false,
+                false,
+                [],
+                false,
+                false,
+                false,
+                [],
+                []));
+        var resolver = new TypeResolver([symbol]);
+
+        var projection = resolver.Project(
+            new ReferenceTypeNode(
+                "Exclude",
+                "Fixture.Exclude",
+                [new KeywordTypeNode("StringKeyword"), new KeywordTypeNode("NumberKeyword")]),
+            "fixture/qualified-exclude");
+
+        Assert.Equal(
+            "global::Blazor.DOM.Namespaces.Fixture.IExclude<string, double>",
+            projection.CSharpType);
+        Assert.Empty(resolver.SynthesizedTypes);
+    }
+
     // ── Primitives must NOT degrade to object ──────────────────────────────────
 
     [Fact]

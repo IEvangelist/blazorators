@@ -528,6 +528,82 @@ public sealed class TypeResolver
                 "mapped-from-ArrayBufferView");
         }
 
+        // TypeScript 5.9.3 lib.es5.d.ts defines Error structurally as
+        // { name: string; message: string; stack?: string }. It is a live
+        // JavaScript object, not a JSON/object fallback. A qualified user type
+        // named Error is deliberately excluded by IsGlobalBuiltInReference.
+        if (isGlobalBuiltIn
+            && name == "Error"
+            && !_symbolIndex.ContainsKey(rf.ResolvedSymbol ?? rf.Name))
+        {
+            if (rf.TypeArguments.Count != 0)
+                throw ArityError(name, 0, rf.TypeArguments.Count, provenance);
+            var errorType = _synthesizedTypes.RegisterTypeScriptError();
+            return ReferenceType(
+                errorType,
+                providerNote: "TypeScript lib.es5 Error",
+                transport: new TransportModel(
+                    "js-reference",
+                    false,
+                    "Error",
+                    false,
+                    false,
+                    "Standard Error is transported as its live JavaScript object identity."));
+        }
+
+        // TypeScript 5.9.3 lib.es5.d.ts:
+        // type Exclude<T, U> = T extends U ? never : T.
+        // Evaluate the utility only for finite string domains, preserving the
+        // exact set difference rather than widening to string.
+        if (isGlobalBuiltIn
+            && name == "Exclude"
+            && !_symbolIndex.ContainsKey(rf.ResolvedSymbol ?? rf.Name))
+        {
+            if (rf.TypeArguments.Count != 2)
+                throw ArityError(name, 2, rf.TypeArguments.Count, provenance);
+            if (!TryResolveFiniteStringDomain(
+                    rf.TypeArguments[0],
+                    $"{provenance}/Exclude<T>",
+                    out var candidates)
+                || !TryResolveFiniteStringDomain(
+                    rf.TypeArguments[1],
+                    $"{provenance}/Exclude<U>",
+                    out var exclusions))
+            {
+                throw new GenericDeferralException(
+                    $"Standard Exclude<T, U> at '{provenance}' requires finite " +
+                    "string domains for an exact CLR projection.",
+                    provenance,
+                    "standard-utility-types");
+            }
+            var excluded = exclusions.ToHashSet(StringComparer.Ordinal);
+            var remaining = candidates
+                .Where(value => !excluded.Contains(value))
+                .Order(StringComparer.Ordinal)
+                .ToList();
+            if (remaining.Count == 0)
+            {
+                throw new GenericDeferralException(
+                    $"Standard Exclude<T, U> at '{provenance}' evaluates to never.",
+                    provenance,
+                    "standard-utility-types");
+            }
+            var domain = _synthesizedTypes.RegisterStringDomain(
+                $"{provenance}/Exclude",
+                remaining);
+            return ValueType(
+                domain,
+                providerNote: "TypeScript lib.es5 Exclude finite string domain",
+                canonicalType: domain,
+                transport: new TransportModel(
+                    "json-value",
+                    false,
+                    rf.CheckerType ?? "Exclude",
+                    false,
+                    true,
+                    null));
+        }
+
         // Promise<T> -> ValueTask<T>
         if (isGlobalBuiltIn && name == "Promise")
         {
@@ -2964,7 +3040,8 @@ public sealed class TypeResolver
         string providerNote = "",
         string? canonicalType = null,
         bool isAwaitable = false,
-        IReadOnlyList<ClrTypeIdentity>? typeArguments = null)
+        IReadOnlyList<ClrTypeIdentity>? typeArguments = null,
+        TransportModel? transport = null)
         => new(
             csharpType,
             false,
@@ -2975,14 +3052,16 @@ public sealed class TypeResolver
                 isAwaitable,
                 typeArguments?.Count ?? 0,
                 typeArguments),
-            providerNote);
+            providerNote,
+            transport);
 
     private static TypeProjection ReferenceType(
         string csharpType,
         bool isCollection = false,
         string providerNote = "",
         string? canonicalType = null,
-        IReadOnlyList<ClrTypeIdentity>? typeArguments = null)
+        IReadOnlyList<ClrTypeIdentity>? typeArguments = null,
+        TransportModel? transport = null)
         => new(
             csharpType,
             false,
@@ -2992,7 +3071,8 @@ public sealed class TypeResolver
                 ClrTypeKind.Reference,
                 GenericArity: typeArguments?.Count ?? 0,
                 TypeArguments: typeArguments),
-            providerNote);
+            providerNote,
+            transport);
 
     private static TypeProjection TypeParameter(GenericParameterBinding parameter)
         => new(
