@@ -176,13 +176,13 @@ public sealed class FinalEmitterAuditTests
 
             Assert.True(result.Validation.IsValid);
             Assert.Equal(1866, accounting.TotalSymbols);
-            Assert.Equal(1494, accounting.Projected);
-            Assert.Equal(1170, accounting.ProjectedClean);
-            Assert.Equal(324, accounting.ProjectedWithDeferredMembers);
+            Assert.Equal(1503, accounting.Projected);
+            Assert.Equal(1174, accounting.ProjectedClean);
+            Assert.Equal(329, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
-            Assert.Equal(244, accounting.Deferred);
-            Assert.Equal(128, accounting.GenerationFailed);
-            Assert.Equal(1899, result.WrittenFiles.Count);
+            Assert.Equal(248, accounting.Deferred);
+            Assert.Equal(115, accounting.GenerationFailed);
+            Assert.Equal(1921, result.WrittenFiles.Count);
             Assert.Equal((2598, 2598), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
@@ -191,9 +191,9 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceMembers));
             Assert.Equal(11310, accounting.TotalMembers);
             Assert.Equal(11310, accounting.ExpectedMembers);
-            Assert.Equal(9534, accounting.ProjectedMembers);
-            Assert.Equal(1367, accounting.DeferredMembers);
-            Assert.Equal(409, accounting.FailedMembers);
+            Assert.Equal(9555, accounting.ProjectedMembers);
+            Assert.Equal(1363, accounting.DeferredMembers);
+            Assert.Equal(392, accounting.FailedMembers);
             Assert.Equal((3666, 3666), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
@@ -202,8 +202,29 @@ public sealed class FinalEmitterAuditTests
                 accounting.SourceParameters));
             Assert.True(accounting.ParameterReconciliationValid);
             Assert.True(result.Validation.ParameterReconciliationValid);
-            Assert.Equal(128, result.Errors.Count);
-            Assert.Equal(128, result.Manifest.Diagnostics.Count);
+            Assert.Equal(115, result.Errors.Count);
+            Assert.Equal(115, result.Manifest.Diagnostics.Count);
+            Assert.Equal(6, result.Manifest.SynthesizedTypes?.Count);
+            Assert.Equal(
+                (5, 1),
+                (
+                    result.Manifest.SynthesizedTypes?.Count(type =>
+                        type.Kind == "Tuple"),
+                    result.Manifest.SynthesizedTypes?.Count(type =>
+                        type.Kind == "Record")));
+            var failureCategories = accounting.FailedSymbols
+                .GroupBy(entry => StrictFailureCategory(entry.Reason))
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Count(),
+                    StringComparer.Ordinal);
+            Assert.Equal(71, failureCategories["typed-union"]);
+            Assert.Equal(21, failureCategories["accessor"]);
+            Assert.Equal(12, failureCategories["unresolved-standard-type"]);
+            Assert.Equal(6, failureCategories["heritage"]);
+            Assert.Equal(3, failureCategories["override"]);
+            Assert.Equal(2, failureCategories["overload-collision"]);
+            Assert.Equal(6, failureCategories.Count);
             Assert.All(result.Manifest.Diagnostics, diagnostic =>
             {
                 Assert.Equal("GENERATION_FAILED", diagnostic.Code);
@@ -264,8 +285,8 @@ public sealed class FinalEmitterAuditTests
                     deferredTypeLiteralDeclarations++;
                 }
             }
-            Assert.Equal(535, projectedTypeLiteralDeclarations);
-            Assert.Equal(114, deferredTypeLiteralDeclarations);
+            Assert.Equal(542, projectedTypeLiteralDeclarations);
+            Assert.Equal(107, deferredTypeLiteralDeclarations);
 
             var factoryMembers = (accounting.SourceMemberEntries ?? [])
                 .Where(entry => entry.QualifiedKey.Contains(
@@ -431,7 +452,7 @@ public sealed class FinalEmitterAuditTests
                         StringComparison.Ordinal));
             Assert.Equal(2463, factoryMembers.Count);
             Assert.Equal(
-                2212,
+                2228,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Projected)));
             Assert.Equal(
@@ -445,7 +466,7 @@ public sealed class FinalEmitterAuditTests
                 entry => entry.Status == nameof(MemberOutcomeStatus.Deferred)
                     && entry.Phase == "advanced-generic-constraints"));
             Assert.Equal(
-                196,
+                180,
                 factoryMembers.Count(entry =>
                 entry.Status == nameof(MemberOutcomeStatus.Deferred)
                 && entry.Phase == "primary-contract"));
@@ -2205,9 +2226,43 @@ public sealed class FinalEmitterAuditTests
 
     private static string CreateTempDirectory()
     {
-        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        var path = Path.Combine(
+            FindRepositoryRoot(),
+            "artifacts",
+            "test-output",
+            Path.GetRandomFileName());
         Directory.CreateDirectory(path);
         return path;
+    }
+
+    private static string StrictFailureCategory(string reason)
+    {
+        if (reason.Contains("Ambiguous symbol", StringComparison.Ordinal))
+            return "override";
+        if (reason.Contains("Unsupported union type", StringComparison.Ordinal))
+            return "typed-union";
+        if (reason.Contains("getter", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("setter", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("accessor", StringComparison.OrdinalIgnoreCase))
+        {
+            return "accessor";
+        }
+        if (reason.Contains("extends", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("heritage", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("base type", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("not interface/mixin", StringComparison.OrdinalIgnoreCase))
+        {
+            return "heritage";
+        }
+        if (reason.Contains("collides", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("collision", StringComparison.OrdinalIgnoreCase)
+            || reason.Contains("incompatible return types", StringComparison.OrdinalIgnoreCase))
+        {
+            return "overload-collision";
+        }
+        if (reason.Contains("Unresolved type reference", StringComparison.Ordinal))
+            return "unresolved-standard-type";
+        return "advanced-leaf";
     }
 
     private static string FindRepositoryRoot()
