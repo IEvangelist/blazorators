@@ -612,7 +612,9 @@ public sealed class TypeResolver
                     providerNote: "TypeScript never (uninhabited)");
             }
             if (mapped == "null")
-                return NullType();
+                return name is "UndefinedKeyword" or "undefined"
+                    ? BrowserUndefinedType()
+                    : BrowserNullType();
             return ProjectMappedPrimitive(mapped);
         }
         // Try checkerType as a fallback
@@ -1235,12 +1237,15 @@ public sealed class TypeResolver
             provenance);
     }
 
-    private static TypeProjection ProjectLiteral(LiteralTypeNode lit, string provenance)
+    private TypeProjection ProjectLiteral(LiteralTypeNode lit, string provenance)
     {
         return lit.LiteralKind switch
         {
-            "StringLiteral" => ReferenceType("string",
-                providerNote: $"literal-string:{lit.Text}"),
+            "StringLiteral" => ValueType(
+                _synthesizedTypes.RegisterStringDomain(
+                    provenance,
+                    [lit.Text.Trim('"')]),
+                providerNote: $"literal-string-domain:{lit.Text}"),
             "NumericLiteral" => ValueType("double",
                 providerNote: $"literal-number:{lit.Text}"),
             "PrefixUnaryExpression"
@@ -1265,8 +1270,8 @@ public sealed class TypeResolver
             "TrueLiteral" or "FalseLiteral" or "TrueKeyword" or "FalseKeyword"
                 => ValueType("bool", providerNote: $"literal-bool:{lit.Text}"),
             // The IR emits null/undefined literals with LiteralKind="NullKeyword"/"UndefinedKeyword"
-            "NullKeyword" or "NullLiteral" => NullType(),
-            "UndefinedKeyword" => NullType(),
+            "NullKeyword" or "NullLiteral" => BrowserNullType(),
+            "UndefinedKeyword" => BrowserUndefinedType(),
             _ => throw new TypeProjectionException(
                 $"Unsupported literal kind '{lit.LiteralKind}' at '{provenance}'.", provenance),
         };
@@ -1507,15 +1512,7 @@ public sealed class TypeResolver
         GenericScope? scope,
         int depth)
     {
-        if (tuple.Transport?.Kind is not (null or "json-value"))
-        {
-            throw new GenericDeferralException(
-                $"Tuple at '{provenance}' has authoritative transport " +
-                $"'{tuple.Transport.Kind}': " +
-                $"{tuple.Transport.Reason ?? "no faithful JSON array transport"}",
-                $"{provenance}/transport",
-                "tuple-transport");
-        }
+        var liveReference = tuple.Transport?.Kind is "unsupported" or "js-reference";
         if (tuple.Elements.Count == 0)
         {
             throw new GenericDeferralException(
@@ -1579,10 +1576,13 @@ public sealed class TypeResolver
                     provenance,
                     "a required element follows an optional element");
             optionalSeen |= optional;
-            EnsureRecursiveJsonTransport(
-                elementType,
-                $"{provenance}/element[{index}]",
-                "tuple-transport");
+            if (!liveReference)
+            {
+                EnsureRecursiveJsonTransport(
+                    elementType,
+                    $"{provenance}/element[{index}]",
+                    "tuple-transport");
+            }
             var projection = Project(
                 elementType,
                 $"{provenance}/element[{index}]",
@@ -1606,15 +1606,22 @@ public sealed class TypeResolver
                 rest));
         }
 
-        var typeName = _synthesizedTypes.RegisterTuple(provenance, elements);
+        var typeName = liveReference
+            ? _synthesizedTypes.RegisterReferenceTuple(provenance, elements)
+            : _synthesizedTypes.RegisterTuple(provenance, elements);
         return ReferenceType(
             typeName,
             isCollection: true,
-            providerNote: "json-array-tuple",
+            providerNote: liveReference
+                ? "browser-reference-tuple"
+                : "json-array-tuple",
             canonicalType: typeName,
             typeArguments: elements
                 .Select(element => element.Projection.Identity)
-                .ToList());
+                .ToList(),
+            transport: liveReference
+                ? BrowserReferenceTransport(tuple)
+                : null);
     }
 
     private TypeProjection ProjectTypeLiteral(
@@ -1664,14 +1671,6 @@ public sealed class TypeResolver
                     "does not have a stable string property identity and value type.",
                     $"{provenance}/member[{member.Ordinal}]",
                     "anonymous-structural-members");
-            }
-            if (ContainsConstrainedLiteral(member.Type))
-            {
-                throw new GenericDeferralException(
-                    $"Anonymous structural member '{member.Name.Text}' at '{provenance}' " +
-                    "contains a constrained literal value that cannot be widened.",
-                    $"{provenance}/member[{member.Ordinal}]",
-                    "literal-value-domain");
             }
             EnsureRecursiveJsonTransport(
                 member.Type,
@@ -3252,6 +3251,12 @@ public sealed class TypeResolver
             "global::Microsoft.JSInterop.BrowserUndefined",
             providerNote: "browser-undefined",
             canonicalType: "global::Microsoft.JSInterop.BrowserUndefined");
+
+    private static TypeProjection BrowserNullType()
+        => ValueType(
+            "global::Microsoft.JSInterop.BrowserNull",
+            providerNote: "browser-null",
+            canonicalType: "global::Microsoft.JSInterop.BrowserNull");
 
     private static void ValidateJsonGenericTransport(
         TypeNode typeNode,

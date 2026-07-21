@@ -31,11 +31,6 @@ public sealed class CallbackEmitException(
 
 public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorVersion, string ns)
 {
-    private const string CallbackObjectPhase = "callback-object-form";
-    private const string CallbackObjectReason =
-        "Type-literal callback object arms are deferred because a C# delegate " +
-        "represents only a direct function signature.";
-
     private static readonly IReadOnlySet<string> EmittedDeclarationKinds =
         new HashSet<string>(["interface", "typeAlias"], StringComparer.Ordinal);
 
@@ -128,46 +123,26 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
             symbol,
             symbol.Name);
 
-        foreach (var objectMember in sourceMembers
-            .Where(member => member.CallbackObjectForm))
-        {
-            memberOutcomes.Add(CreateMemberOutcome(
-                objectMember,
-                MemberOutcomeStatus.Deferred,
-                CallbackObjectPhase,
-                CallbackObjectReason));
-        }
-
-        foreach (var objectOverload in sourceOverloads
-            .Where(overload => overload.SourceMember?.CallbackObjectForm == true))
-        {
-            overloadOutcomes.Add(CreateOverloadOutcome(
-                objectOverload,
-                MemberOutcomeStatus.Deferred,
-                CallbackObjectPhase,
-                CallbackObjectReason,
-                CreateParameterOutcomes(
-                    objectOverload,
-                    MemberOutcomeStatus.Deferred,
-                    CallbackObjectPhase,
-                    CallbackObjectReason)));
-        }
+        var objectOverloads = sourceOverloads
+            .Where(overload => overload.SourceMember?.CallbackObjectForm == true)
+            .ToList();
 
         var directOverloads = sourceOverloads
             .Where(IsDirectCallbackSignature)
             .ToList();
-        if (directOverloads.Count == 0)
+        if (directOverloads.Count == 0 && objectOverloads.Count == 0)
         {
             throw new CallbackEmitException(
                 $"CallbackEmitter: '{symbol.Name}' has no direct call, construct, or function signature. " +
-                "Type-literal object forms cannot be represented by a C# delegate.",
+                "No callable function or callback-object signature was found.",
                 $"{symbol.Name}/callback-signature",
                 memberOutcomes,
                 partialOverloadOutcomes: overloadOutcomes);
         }
 
-        var primary = directOverloads[0];
-        if (primary.TypeParameters.Count > 0)
+        var hasFunction = directOverloads.Count > 0;
+        var primary = directOverloads.FirstOrDefault();
+        if (primary?.TypeParameters.Count > 0)
         {
             throw new GenericDeferralException(
                 $"Callback signature at '{primary.Provenance}' declares its own " +
@@ -175,38 +150,41 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                 primary.Provenance,
                 "generic-callback-signature");
         }
-        string returnType;
-        string parameterList;
-        try
+        string returnType = "";
+        string parameterList = "";
+        if (primary is not null)
         {
-            (returnType, parameterList, var outcome) = ProjectSignature(
-                primary,
-                generic.Scope);
-            overloadOutcomes.Add(outcome);
-            if (primary.SourceMember is not null)
-                memberOutcomes.Add(CreateMemberOutcome(
-                    primary.SourceMember,
-                    MemberOutcomeStatus.Projected,
-                    null,
-                    null));
-        }
-        catch (CallbackSignatureProjectionException exception)
-        {
-            overloadOutcomes.Add(exception.Outcome);
-            if (primary.SourceMember is not null)
+            try
             {
-                memberOutcomes.Add(CreateMemberOutcome(
-                    primary.SourceMember,
-                    MemberOutcomeStatus.Failed,
-                    null,
-                    exception.Message));
+                (returnType, parameterList, var outcome) = ProjectSignature(
+                    primary,
+                    generic.Scope);
+                overloadOutcomes.Add(outcome);
+                if (primary.SourceMember is not null)
+                    memberOutcomes.Add(CreateMemberOutcome(
+                        primary.SourceMember,
+                        MemberOutcomeStatus.Projected,
+                        null,
+                        null));
             }
+            catch (CallbackSignatureProjectionException exception)
+            {
+                overloadOutcomes.Add(exception.Outcome);
+                if (primary.SourceMember is not null)
+                {
+                    memberOutcomes.Add(CreateMemberOutcome(
+                        primary.SourceMember,
+                        MemberOutcomeStatus.Failed,
+                        null,
+                        exception.Message));
+                }
 
-            throw new CallbackEmitException(
-                exception.Message,
-                exception.Provenance,
-                memberOutcomes,
-                partialOverloadOutcomes: overloadOutcomes);
+                throw new CallbackEmitException(
+                    exception.Message,
+                    exception.Provenance,
+                    memberOutcomes,
+                    partialOverloadOutcomes: overloadOutcomes);
+            }
         }
 
         foreach (var additional in directOverloads.Skip(1))
@@ -231,6 +209,42 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
                     MemberOutcomeStatus.Deferred,
                     phase,
                     reason));
+            }
+        }
+
+        var objectMethods = new List<CallbackObjectMethod>();
+        foreach (var objectOverload in objectOverloads)
+        {
+            try
+            {
+                var (objectReturn, objectParameters, objectOutcome) =
+                    ProjectSignature(objectOverload, generic.Scope);
+                overloadOutcomes.Add(objectOutcome);
+                var sourceMember = objectOverload.SourceMember!;
+                memberOutcomes.Add(CreateMemberOutcome(
+                    sourceMember,
+                    MemberOutcomeStatus.Projected,
+                    null,
+                    "Emitted as a typed callback-object interface arm."));
+                objectMethods.Add(new CallbackObjectMethod(
+                    Naming.ToCSharpMemberName(objectOverload.Name),
+                    objectReturn,
+                    objectParameters));
+            }
+            catch (CallbackSignatureProjectionException exception)
+            {
+                overloadOutcomes.Add(exception.Outcome);
+                var sourceMember = objectOverload.SourceMember!;
+                memberOutcomes.Add(CreateMemberOutcome(
+                    sourceMember,
+                    MemberOutcomeStatus.Failed,
+                    null,
+                    exception.Message));
+                throw new CallbackEmitException(
+                    exception.Message,
+                    exception.Provenance,
+                    memberOutcomes,
+                    partialOverloadOutcomes: overloadOutcomes);
             }
         }
 
@@ -275,14 +289,88 @@ public sealed class CallbackEmitter(TypeResolver typeResolver, string generatorV
             writer.AppendLine($"// TypeScript generic default: {defaultNote}.");
 
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
-        writer.AppendLine(
-            $"public delegate {returnType} {csName}{generic.TypeParameterList}(" +
-            $"{parameterList}){generic.ConstraintSuffix};");
+        if (objectMethods.Count == 0)
+        {
+            writer.AppendLine(
+                $"public delegate {returnType} {csName}{generic.TypeParameterList}(" +
+                $"{parameterList}){generic.ConstraintSuffix};");
+        }
+        else
+        {
+            var functionName = $"{csName}Function";
+            var objectName = $"I{csName}CallbackObject";
+            if (hasFunction)
+            {
+                writer.AppendLine(
+                    $"public delegate {returnType} {functionName}{generic.TypeParameterList}(" +
+                    $"{parameterList}){generic.ConstraintSuffix};");
+                writer.AppendLine();
+            }
+            writer.Block(
+                $"public interface {objectName}{generic.TypeParameterList}{generic.ConstraintSuffix}",
+                () =>
+                {
+                    foreach (var method in objectMethods)
+                    {
+                        writer.AppendLine(
+                            $"{method.ReturnType} {method.Name}({method.Parameters});");
+                    }
+                });
+            writer.AppendLine();
+            writer.Block(
+                $"public readonly struct {csName}{generic.TypeParameterList}" +
+                $"{generic.ConstraintSuffix}",
+                () =>
+                {
+                    if (hasFunction)
+                        writer.AppendLine($"private readonly {functionName}{generic.TypeParameterList}? _function;");
+                    writer.AppendLine($"private readonly {objectName}{generic.TypeParameterList}? _callbackObject;");
+                    writer.AppendLine();
+                    if (hasFunction)
+                    {
+                        writer.AppendLine($"private {csName}({functionName}{generic.TypeParameterList} function)");
+                        writer.OpenBrace();
+                        writer.AppendLine("_function = function ?? throw new ArgumentNullException(nameof(function));");
+                        writer.AppendLine("_callbackObject = null;");
+                        writer.CloseBrace();
+                        writer.AppendLine();
+                    }
+                    writer.AppendLine($"private {csName}({objectName}{generic.TypeParameterList} callbackObject)");
+                    writer.OpenBrace();
+                    if (hasFunction)
+                        writer.AppendLine("_function = null;");
+                    writer.AppendLine("_callbackObject = callbackObject ?? throw new ArgumentNullException(nameof(callbackObject));");
+                    writer.CloseBrace();
+                    writer.AppendLine();
+                    if (hasFunction)
+                    {
+                        writer.AppendLine($"public static {csName}{generic.TypeParameterList} FromFunction(" +
+                            $"{functionName}{generic.TypeParameterList} function) => new(function);");
+                    }
+                    writer.AppendLine($"public static {csName}{generic.TypeParameterList} FromCallbackObject(" +
+                        $"{objectName}{generic.TypeParameterList} callbackObject) => new(callbackObject);");
+                    if (hasFunction)
+                        writer.AppendLine("public bool IsFunction => _function is not null;");
+                    writer.AppendLine("public bool IsCallbackObject => _callbackObject is not null;");
+                    if (hasFunction)
+                    {
+                        writer.AppendLine($"public {functionName}{generic.TypeParameterList} GetFunction() => _function " +
+                            "?? throw new InvalidOperationException(\"The callback contains an object arm.\");");
+                    }
+                    writer.AppendLine($"public {objectName}{generic.TypeParameterList} GetCallbackObject() => _callbackObject " +
+                        "?? throw new InvalidOperationException(\"The callback contains a function arm.\");");
+                });
+        }
         return new CallbackEmitResult(
             writer.ToString(),
             memberOutcomes,
             OverloadOutcomes: overloadOutcomes);
     }
+
+    private sealed record CallbackObjectMethod(
+        string Name,
+        string ReturnType,
+        string Parameters);
 
     private static bool IsDirectCallbackSignature(SourceOverloadShape source)
         => source.Kind == "function"

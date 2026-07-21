@@ -57,6 +57,21 @@ internal sealed class SynthesizedTypeRegistry(
             name => EmitTuple(name, elements));
     }
 
+    public string RegisterReferenceTuple(
+        string provenance,
+        IReadOnlyList<SynthesizedTupleElement> elements)
+    {
+        var fingerprint =
+            $"reference-tuple({string.Join(",", elements.Select(element =>
+                $"{element.SourceName}:{element.Projection.CanonicalType}:" +
+                $"{element.Optional}:{element.Rest}"))})";
+        return Register(
+            "ReferenceTuple",
+            provenance,
+            fingerprint,
+            name => EmitReferenceTuple(name, elements));
+    }
+
     public string RegisterJsonRecord(
         string provenance,
         IReadOnlyList<SynthesizedProperty> properties)
@@ -323,6 +338,7 @@ internal sealed class SynthesizedTypeRegistry(
                 writer.AppendLine(
                     $"public {required}{type} {element.CSharpName} {{ get; init; }}{initializer}");
             }
+
         });
         writer.AppendLine();
         writer.Block(
@@ -332,6 +348,46 @@ internal sealed class SynthesizedTypeRegistry(
             EmitTupleRead(writer, name, elements);
             writer.AppendLine();
             EmitTupleWrite(writer, name, elements);
+        });
+        return writer.ToString();
+    }
+
+    private string EmitReferenceTuple(
+        string name,
+        IReadOnlyList<SynthesizedTupleElement> elements)
+    {
+        var writer = Header();
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
+        writer.AppendLine();
+        writer.Block($"public partial interface {name} : global::Microsoft.JSInterop.IDomProxy", () =>
+        {
+            for (var index = 0; index < elements.Count; index++)
+            {
+                var element = elements[index];
+                var transport = element.Projection.Transport;
+                var transportKind = transport?.Kind switch
+                {
+                    "js-reference" => "JsReference",
+                    "js-stream" => "JsStream",
+                    "binary" => "Binary",
+                    "transferable" => "Transferable",
+                    _ => "JsonValue",
+                };
+                writer.AppendLine(
+                    "[global::Microsoft.JSInterop.DomIndexAccessor(" +
+                    "global::Microsoft.JSInterop.DomAccessorOperation.Get, " +
+                    "global::Microsoft.JSInterop.DomIndexKeyKind.Number, \"number\", " +
+                    $"global::Microsoft.JSInterop.DomTransportKind.{transportKind}, " +
+                    $"\"{EscapeString(transport?.SourceType ?? element.Projection.CSharpType)}\", " +
+                    $"Nullable = {(element.Optional || element.Projection.IsNullable).ToString().ToLowerInvariant()}, " +
+                    $"Streamable = {(transport?.Streamable == true).ToString().ToLowerInvariant()}, " +
+                    $"StructuredClone = {(transport?.StructuredClone == true).ToString().ToLowerInvariant()})]");
+                writer.AppendLine(
+                    $"{element.Projection.RenderedType} GetItem{index + 1}();");
+                if (index < elements.Count - 1)
+                    writer.AppendLine();
+            }
         });
         return writer.ToString();
     }
