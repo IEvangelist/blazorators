@@ -51,7 +51,6 @@ public sealed class InterfaceEmitter(
     private static readonly IReadOnlySet<string> EmittedDeclarationKinds =
         new HashSet<string>(["interface"], StringComparer.Ordinal);
 
-    private sealed record AccessorRef(MemberModel Member, int DeclarationOrdinal);
     private sealed record MethodRef(MemberModel Member, int DeclarationOrdinal);
     private sealed record MethodSig(
         string Rendered,
@@ -66,6 +65,19 @@ public sealed class InterfaceEmitter(
         IReadOnlyList<MethodSig> Outputs,
         IReadOnlyList<MemberOutcome> Outcomes,
         string? DeferredOutput = null);
+    private sealed record AccessorBuildResult(
+        string? Property,
+        string? GetterMethod,
+        string? SetterMethod,
+        string? PropertyMemberName,
+        string? GetterMemberName,
+        string? SetterMemberName);
+    private sealed record AccessorEmissionPlan(
+        ReconciledAccessor Accessor,
+        bool GetterAsMethod);
+    private sealed record InheritedContract(
+        IReadOnlyList<ReconciledAccessor> Accessors,
+        IReadOnlyDictionary<string, string> MemberNames);
 
     /// <summary>
     /// Emits a C# partial interface for a symbol classified as WebIDL interface or mixin.
@@ -159,79 +171,83 @@ public sealed class InterfaceEmitter(
         var emittedMethodKeys = new Dictionary<string, MethodSig>(StringComparer.Ordinal);
         var emittedMethodOutputIndices = new Dictionary<string, int>(StringComparer.Ordinal);
 
-        var accessorGroups = allDecls
-            .SelectMany(d => d.Members
-                .Where(m => m.Kind is "property" or "getter" or "setter" && m.Name is not null)
-                .Select(m => new AccessorRef(m, d.Ordinal)))
-            .GroupBy(m => m.Member.Name!.Text, StringComparer.Ordinal)
-            .Select(g => g.OrderBy(m => m.DeclarationOrdinal).ThenBy(m => m.Member.Ordinal).ToList())
-            .OrderBy(g => g[0].DeclarationOrdinal)
-            .ThenBy(g => g[0].Member.Ordinal)
-            .ToList();
+        var reconciledAccessors = new AccessorReconciler(typeResolver).Reconcile(
+            symbol.Name,
+            allDecls,
+            generic.Scope,
+            (memberName, projection) =>
+                IsGloballyMutable(symbol.Name, memberName, projection));
+        memberOutcomes.AddRange(reconciledAccessors.DeferredOutcomes);
+        propertyOutputs.AddRange(reconciledAccessors.DeferredOutputs);
 
-        foreach (var group in accessorGroups)
+        var inherited = CollectInheritedContract(
+            allDecls,
+            generic.Scope,
+            new HashSet<string>(StringComparer.Ordinal) { symbol.Name });
+        var reservedAccessorNames = inherited.MemberNames.ToDictionary(
+            pair => pair.Key,
+            pair => pair.Value,
+            StringComparer.Ordinal);
+        foreach (var accessor in reconciledAccessors.Accessors)
         {
-            var canonical = group.FirstOrDefault(m => m.Member.Kind != "setter");
-            if (canonical is null)
+            var plan = ReconcileInheritedAccessor(
+                symbol.Name,
+                accessor,
+                inherited.Accessors);
+            var build = BuildAccessor(
+                plan.Accessor,
+                symbol.Name,
+                plan.GetterAsMethod);
+            ReserveAccessorName(
+                reservedAccessorNames,
+                build.PropertyMemberName,
+                accessor.Sources[0].Provenance,
+                symbol.Name);
+            ReserveAccessorName(
+                reservedAccessorNames,
+                build.GetterMemberName,
+                accessor.Sources[0].Provenance,
+                symbol.Name);
+            ReserveAccessorName(
+                reservedAccessorNames,
+                build.SetterMemberName,
+                accessor.Sources[0].Provenance,
+                symbol.Name);
+
+            if (build.Property is not null
+                && emittedPropertyKeys.Add(
+                    $"prop:{accessor.IsStatic}:{accessor.JavaScriptName}"))
             {
-                var setter = group[0];
-                var setterName = setter.Member.Name?.Text ?? "";
-                var failure = new TypeProjectionException(
-                    $"Setter '{symbol.Name}.{setterName}' in decl[{setter.DeclarationOrdinal}] has no paired getter. " +
-                    "Standalone setter accessors are not representable in C# interfaces without a getter.",
-                    $"{symbol.Name}/{setterName}/setter");
-                memberFailures.Add(failure);
-                memberOutcomes.AddRange(group.Select(accessor => new MemberOutcome(
-                    accessor.Member.Ordinal,
-                    accessor.Member.Name?.Text ?? "",
-                    accessor.Member.Kind,
-                    MemberOutcomeStatus.Failed,
+                propertyOutputs.Add(build.Property);
+            }
+            if (build.GetterMethod is not null)
+                methodOutputs.Add(build.GetterMethod);
+            if (build.SetterMethod is not null)
+                methodOutputs.Add(build.SetterMethod);
+
+            foreach (var source in accessor.Sources)
+            {
+                var read = accessor.Getter?.Sources.Contains(source) == true;
+                var write = accessor.Setter?.Sources.Contains(source) == true;
+                var directions = (read, write) switch
+                {
+                    (true, true) => "get/set",
+                    (true, false) => "get",
+                    (false, true) => "set",
+                    _ => "none",
+                };
+                memberOutcomes.Add(new MemberOutcome(
+                    source.Member.Ordinal,
+                    source.Name,
+                    source.Member.Kind,
+                    MemberOutcomeStatus.Projected,
                     null,
-                    failure.Message,
-                    accessor.DeclarationOrdinal)));
-                continue;
-            }
-
-            try
-            {
-                var (output, outcomes) = BuildProperty(
-                    canonical.Member,
-                    symbol.Name,
-                    allDecls,
-                    canonical.DeclarationOrdinal,
-                    generic.Scope);
-
-                memberOutcomes.AddRange(outcomes);
-
-                var propKey = $"prop:{canonical.Member.Name!.Text}";
-                if (output is not null && emittedPropertyKeys.Add(propKey))
-                    propertyOutputs.Add(output);
-            }
-            catch (GenericDeferralException exception)
-            {
-                memberOutcomes.AddRange(group.Select(accessor => new MemberOutcome(
-                    accessor.Member.Ordinal,
-                    accessor.Member.Name?.Text ?? "",
-                    accessor.Member.Kind,
-                    MemberOutcomeStatus.Deferred,
-                    exception.Phase,
-                    exception.Message,
-                    accessor.DeclarationOrdinal)));
-                propertyOutputs.Add(
-                    $"// DEFERRED ({exception.Phase}): " +
-                    $"{canonical.Member.Name?.Text} — {exception.Message}");
-            }
-            catch (TypeProjectionException ex)
-            {
-                memberFailures.Add(ex);
-                memberOutcomes.AddRange(group.Select(accessor => new MemberOutcome(
-                    accessor.Member.Ordinal,
-                    accessor.Member.Name?.Text ?? "",
-                    accessor.Member.Kind,
-                    MemberOutcomeStatus.Failed,
-                    null,
-                    ex.Message,
-                    accessor.DeclarationOrdinal)));
+                    $"Reconciled into canonical '{accessor.JavaScriptName}' " +
+                    $"{directions} accessor from " +
+                    $"{accessor.Getter?.Sources.Count ?? 0} getter source(s) and " +
+                    $"{accessor.Setter?.Sources.Count ?? 0} setter source(s).",
+                    source.DeclarationOrdinal,
+                    Provenance: source.Provenance));
             }
         }
 
@@ -249,6 +265,22 @@ public sealed class InterfaceEmitter(
                         symbol.Name,
                         methodRef.DeclarationOrdinal,
                         generic.Scope);
+                    foreach (var signature in build.Outputs)
+                    {
+                        var emittedName = MethodName(signature.CanonicalKey);
+                        if (reservedAccessorNames.TryGetValue(
+                                emittedName,
+                                out var accessorProvenance))
+                        {
+                            throw new TypeProjectionException(
+                                $"Method '{symbol.Name}.{methodRef.Member.Name?.Text}' " +
+                                $"normalizes to C# member '{emittedName}', which collides " +
+                                $"with accessor source '{accessorProvenance}'.",
+                                $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
+                                $"member[{methodRef.Member.Ordinal}]/method/" +
+                                $"{methodRef.Member.Name?.Text}");
+                        }
+                    }
                     var outcomes = build.Outcomes.ToList();
                     var stagedOutputs = methodOutputs.ToList();
                     var stagedMethodKeys = new Dictionary<string, MethodSig>(
@@ -474,299 +506,334 @@ public sealed class InterfaceEmitter(
     /// <summary>Emits and returns source only (for test compatibility).</summary>
     public string EmitSource(SymbolModel symbol) => Emit(symbol).Source;
 
-    private (string? Output, IReadOnlyList<MemberOutcome> Outcomes) BuildProperty(
-        MemberModel member,
-        string symbolName,
-        IReadOnlyList<DeclarationModel> allDecls,
-        int declOrdinal,
-        GenericScope declarationScope)
+    private InheritedContract CollectInheritedContract(
+        IReadOnlyList<DeclarationModel> declarations,
+        GenericScope derivedScope,
+        HashSet<string> visited)
     {
-        var memberName = member.Name?.Text;
-        if (memberName is null)
+        var accessors = new List<ReconciledAccessor>();
+        var memberNames = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var heritage in declarations
+            .SelectMany(declaration => declaration.Heritage)
+            .Where(clause => clause.Token == "extends")
+            .SelectMany(clause => clause.Types)
+            .OfType<HeritageReferenceTypeNode>())
         {
-            return (null, [
-                new MemberOutcome(
-                    member.Ordinal,
-                    "",
-                    member.Kind,
-                    MemberOutcomeStatus.Deferred,
-                    "unknown",
-                    "Member has no name.",
-                    declOrdinal)
-            ]);
-        }
-
-        var related = allDecls
-            .SelectMany(d => d.Members
-                .Where(m => m.Name?.Text == memberName && m.Kind is "property" or "getter" or "setter")
-                .Select(m => new AccessorRef(m, d.Ordinal)))
-            .OrderBy(m => m.DeclarationOrdinal)
-            .ThenBy(m => m.Member.Ordinal)
-            .ToList();
-
-        if (member.Kind == "setter")
-            throw new TypeProjectionException(
-                $"Setter '{symbolName}.{memberName}' in decl[{declOrdinal}] has no paired getter. " +
-                "Standalone setter accessors are not representable in C# interfaces without a getter.",
-                $"{symbolName}/{memberName}/setter");
-
-        var (docText, deprecated) = MergeGlobalDocumentation(
-            symbolName,
-            memberName,
-            member.Documentation,
-            DeclarationRouteKind.GlobalVariable);
-        var csName = Naming.ToCSharpMemberName(memberName);
-        var outcomes = new List<MemberOutcome>();
-
-        if (member.Kind == "property")
-        {
-            var propertyRefs = related.Where(r => r.Member.Kind == "property").ToList();
-            var accessorRefs = related.Where(r => r.Member.Kind is "getter" or "setter").ToList();
-            if (accessorRefs.Count > 0)
-                throw new TypeProjectionException(
-                    $"Property '{symbolName}.{memberName}' in decl[{declOrdinal}] is declaration-merged with accessor members. " +
-                    "Mixed property/accessor shapes are not representable deterministically.",
-                    $"{symbolName}/{memberName}/property");
-
-            TypeProjection? canonicalProjection = null;
-            string? deferredOutput = null;
-            foreach (var propertyRef in propertyRefs)
+            var baseName = heritage.ResolvedSymbol ?? heritage.Expression;
+            if (!visited.Add(baseName)
+                || !typeResolver.TryGetSymbol(baseName, out var baseSymbol)
+                || !typeResolver.IsInterfaceOrMixin(baseName))
             {
-                TypeProjection projection;
-                try
-                {
-                    projection = typeResolver.Project(
-                        propertyRef.Member.Type,
-                        $"{symbolName}/decl[{propertyRef.DeclarationOrdinal}]/{memberName}/property",
-                        declarationScope);
-                }
-                catch (TypeProjectionException ex) when (ex.Message.Contains("deferred to the events phase", StringComparison.Ordinal))
-                {
-                    outcomes.Add(new MemberOutcome(
-                        propertyRef.Member.Ordinal,
-                        memberName,
-                        propertyRef.Member.Kind,
-                        MemberOutcomeStatus.Deferred,
-                        "event-subscription",
-                        "Event handler property deferred to event-subscription phase.",
-                        propertyRef.DeclarationOrdinal));
-                    deferredOutput ??= $"// DEFERRED (events): {memberName} — {ex.Provenance}";
-                    continue;
-                }
-
-                if (projection.CSharpType is "null" or "void")
-                {
-                    outcomes.Add(new MemberOutcome(
-                        propertyRef.Member.Ordinal,
-                        memberName,
-                        propertyRef.Member.Kind,
-                        MemberOutcomeStatus.Deferred,
-                        "undefined-type",
-                        $"Type resolves to '{projection.CSharpType}' (undefined/void in TypeScript).",
-                        propertyRef.DeclarationOrdinal));
-                    continue;
-                }
-
-                if (canonicalProjection is null)
-                {
-                    canonicalProjection = projection;
-                    outcomes.Add(new MemberOutcome(
-                        propertyRef.Member.Ordinal,
-                        memberName,
-                        propertyRef.Member.Kind,
-                        MemberOutcomeStatus.Projected,
-                        null,
-                        null,
-                        propertyRef.DeclarationOrdinal));
-                    continue;
-                }
-
-                if (!string.Equals(
-                        canonicalProjection.CanonicalType,
-                        projection.CanonicalType,
-                        StringComparison.Ordinal)
-                    || propertyRef.Member.Readonly != propertyRefs[0].Member.Readonly)
-                {
-                    throw new TypeProjectionException(
-                        $"Property '{symbolName}.{memberName}' has incompatible merged declarations between decl[{propertyRefs[0].DeclarationOrdinal}] and decl[{propertyRef.DeclarationOrdinal}].",
-                        $"{symbolName}/{memberName}/property");
-                }
-
-                outcomes.Add(new MemberOutcome(
-                    propertyRef.Member.Ordinal,
-                    memberName,
-                    propertyRef.Member.Kind,
-                    MemberOutcomeStatus.Projected,
-                    null,
-                    $"Deduplicated from declaration ordinal {propertyRefs[0].DeclarationOrdinal}.",
-                    propertyRef.DeclarationOrdinal));
+                continue;
             }
 
-            if (canonicalProjection is null)
-                return (deferredOutput, outcomes);
+            var baseDeclarations = baseSymbol.Declarations
+                .Where(declaration => declaration.Kind == "interface")
+                .OrderBy(declaration => declaration.Ordinal)
+                .ToList();
+            var baseGeneric = typeResolver.CreateGenericDeclaration(
+                baseSymbol,
+                $"{baseName}/inherited-accessors");
+            var baseScope = baseGeneric.Scope;
+            if (heritage.TypeArguments.Count > 0)
+            {
+                var substitutions = heritage.TypeArguments
+                    .Select((argument, index) => typeResolver.Project(
+                        argument,
+                        $"{baseName}/inherited-accessors/typeArgument[{index}]",
+                        derivedScope))
+                    .ToList();
+                baseScope = baseScope.WithSubstitutions(substitutions);
+            }
 
-            var globallyMutable = IsGloballyMutable(
-                symbolName,
-                memberName,
-                canonicalProjection);
-            var csType = ApplyPropertyNullability(
-                canonicalProjection,
-                member.Optional || canonicalProjection.IsNullable);
-            var w = new CSharpWriter();
-            w.XmlDoc(docText, deprecated);
-            w.AppendLine(member.Readonly && !globallyMutable
-                ? $"{csType} {csName} {{ get; }}"
-                : $"{csType} {csName} {{ get; set; }}");
-            return (w.ToString().TrimEnd(), outcomes);
-        }
-
-        var getterRefs = related.Where(r => r.Member.Kind == "getter").ToList();
-        var setterRefs = related.Where(r => r.Member.Kind == "setter").ToList();
-        var propertyLikeRefs = related.Where(r => r.Member.Kind == "property").ToList();
-        if (propertyLikeRefs.Count > 0)
-            throw new TypeProjectionException(
-                $"Getter '{symbolName}.{memberName}' in decl[{declOrdinal}] is declaration-merged with property members. " +
-                "Mixed property/accessor shapes are not representable deterministically.",
-                $"{symbolName}/{memberName}/getter");
-
-        var canonicalGetter = getterRefs[0];
-        TypeProjection? getterProjection = null;
-        string? deferredGetterOutput = null;
-        foreach (var getterRef in getterRefs)
-        {
-            TypeProjection projection;
+            AccessorReconciliationResult reconciled;
             try
             {
-                projection = typeResolver.Project(
-                    getterRef.Member.ReturnType,
-                    $"{symbolName}/decl[{getterRef.DeclarationOrdinal}]/{memberName}/getter",
-                    declarationScope);
+                reconciled = new AccessorReconciler(typeResolver).Reconcile(
+                    baseName,
+                    baseDeclarations,
+                    baseScope,
+                    (memberName, projection) =>
+                        IsGloballyMutable(baseName, memberName, projection));
             }
-            catch (TypeProjectionException ex) when (ex.Message.Contains("deferred to the events phase", StringComparison.Ordinal))
+            catch (TypeProjectionException)
             {
-                outcomes.Add(new MemberOutcome(
-                    getterRef.Member.Ordinal,
-                    memberName,
-                    getterRef.Member.Kind,
-                    MemberOutcomeStatus.Deferred,
-                    "event-subscription",
-                    "Event handler property deferred to event-subscription phase.",
-                    getterRef.DeclarationOrdinal));
-                deferredGetterOutput ??= $"// DEFERRED (events): {memberName} — {ex.Provenance}";
                 continue;
             }
-
-            if (projection.CSharpType is "null" or "void")
+            foreach (var accessor in reconciled.Accessors)
             {
-                outcomes.Add(new MemberOutcome(
-                    getterRef.Member.Ordinal,
-                    memberName,
-                    getterRef.Member.Kind,
-                    MemberOutcomeStatus.Deferred,
-                    "undefined-type",
-                    $"Type resolves to '{projection.CSharpType}' (undefined/void in TypeScript).",
-                    getterRef.DeclarationOrdinal));
-                continue;
+                accessors.Add(accessor);
+                var hasExplicitAccessor = accessor.Sources.Any(source =>
+                    source.Member.Kind is "getter" or "setter");
+                if (hasExplicitAccessor && accessor.Getter is not null)
+                {
+                    AddInheritedMemberName(
+                        memberNames,
+                        accessor.CSharpName,
+                        accessor.Sources[0].Provenance);
+                }
+                if (hasExplicitAccessor
+                    && accessor.Setter is not null
+                    && !accessor.IsSymmetric)
+                {
+                    AddInheritedMemberName(
+                        memberNames,
+                        $"Set{accessor.CSharpName}",
+                        accessor.Sources[0].Provenance);
+                }
             }
 
-            if (getterProjection is null)
-            {
-                getterProjection = projection;
-                outcomes.Add(new MemberOutcome(
-                    getterRef.Member.Ordinal,
-                    memberName,
-                    getterRef.Member.Kind,
-                    MemberOutcomeStatus.Projected,
-                    null,
-                    getterRef.DeclarationOrdinal == canonicalGetter.DeclarationOrdinal && getterRef.Member.Ordinal == canonicalGetter.Member.Ordinal
-                        ? null
-                        : $"Deduplicated from declaration ordinal {canonicalGetter.DeclarationOrdinal}.",
-                    getterRef.DeclarationOrdinal));
-                continue;
-            }
-
-            if (!string.Equals(
-                    getterProjection.CanonicalType,
-                    projection.CanonicalType,
-                    StringComparison.Ordinal))
-            {
-                throw new TypeProjectionException(
-                    $"Getter '{symbolName}.{memberName}' has incompatible merged declarations between decl[{canonicalGetter.DeclarationOrdinal}] and decl[{getterRef.DeclarationOrdinal}].",
-                    $"{symbolName}/{memberName}/getter");
-            }
-
-            outcomes.Add(new MemberOutcome(
-                getterRef.Member.Ordinal,
-                memberName,
-                getterRef.Member.Kind,
-                MemberOutcomeStatus.Projected,
-                null,
-                $"Deduplicated from declaration ordinal {canonicalGetter.DeclarationOrdinal}.",
-                getterRef.DeclarationOrdinal));
+            var ancestors = CollectInheritedContract(
+                baseDeclarations,
+                baseScope,
+                visited);
+            accessors.AddRange(ancestors.Accessors);
+            foreach (var pair in ancestors.MemberNames)
+                AddInheritedMemberName(memberNames, pair.Key, pair.Value);
         }
 
-        if (getterProjection is null)
-            return (deferredGetterOutput, outcomes);
-
-        var effectiveGetterProjection = getterProjection with
-        {
-            IsNullable = member.Optional || getterProjection.IsNullable
-        };
-        var getterType = effectiveGetterProjection.RenderedType;
-        var normalizedGetterType = effectiveGetterProjection.CanonicalType;
-        var hasSetter = setterRefs.Count > 0;
-        var globallyMutableAccessor = IsGloballyMutable(
-            symbolName,
-            memberName,
-            getterProjection);
-        AccessorRef? canonicalSetter = setterRefs.Count > 0 ? setterRefs[0] : null;
-
-        foreach (var setterRef in setterRefs)
-        {
-            if (setterRef.Member.Parameters.Count != 1)
-            {
-                throw new TypeProjectionException(
-                    $"Setter '{symbolName}.{memberName}' in decl[{setterRef.DeclarationOrdinal}] must declare exactly one value parameter.",
-                    $"{symbolName}/{memberName}/setter");
-            }
-
-            var setterParam = setterRef.Member.Parameters[0];
-            var setterProjection = typeResolver.Project(
-                setterParam.Type,
-                $"{symbolName}/decl[{setterRef.DeclarationOrdinal}]/{memberName}/setter/{setterParam.Name}",
-                declarationScope);
-            var effectiveSetterProjection = setterProjection with
-            {
-                IsNullable = setterParam.Optional || setterProjection.IsNullable
-            };
-            var setterType = effectiveSetterProjection.RenderedType;
-            if (!string.Equals(normalizedGetterType, effectiveSetterProjection.CanonicalType, StringComparison.Ordinal))
-            {
-                throw new TypeProjectionException(
-                    $"Getter/setter pair '{symbolName}.{memberName}' is incompatible: getter projects to '{getterType}' " +
-                    $"but setter in decl[{setterRef.DeclarationOrdinal}] projects to '{setterType}'.",
-                    $"{symbolName}/{memberName}/setter");
-            }
-
-            outcomes.Add(new MemberOutcome(
-                setterRef.Member.Ordinal,
-                memberName,
-                setterRef.Member.Kind,
-                MemberOutcomeStatus.Projected,
-                null,
-                setterRef.DeclarationOrdinal == canonicalSetter!.DeclarationOrdinal && setterRef.Member.Ordinal == canonicalSetter.Member.Ordinal
-                    ? $"Paired with getter member ordinal {canonicalGetter.Member.Ordinal}."
-                    : $"Paired with getter member ordinal {canonicalGetter.Member.Ordinal}; deduplicated from declaration ordinal {canonicalSetter.DeclarationOrdinal}.",
-                setterRef.DeclarationOrdinal));
-        }
-
-        var w2 = new CSharpWriter();
-        w2.XmlDoc(docText, deprecated);
-        w2.AppendLine(hasSetter || globallyMutableAccessor
-            ? $"{getterType} {csName} {{ get; set; }}"
-            : $"{getterType} {csName} {{ get; }}");
-        return (w2.ToString().TrimEnd(), outcomes);
+        return new InheritedContract(accessors, memberNames);
     }
+
+    private static AccessorEmissionPlan ReconcileInheritedAccessor(
+        string symbolName,
+        ReconciledAccessor accessor,
+        IReadOnlyList<ReconciledAccessor> inheritedAccessors)
+    {
+        if (accessor.Sources.All(source => source.Member.Kind == "property"))
+            return new AccessorEmissionPlan(accessor, GetterAsMethod: false);
+
+        var inherited = inheritedAccessors.FirstOrDefault(candidate =>
+            candidate.IsStatic == accessor.IsStatic
+            && string.Equals(
+                candidate.CSharpName,
+                accessor.CSharpName,
+                StringComparison.Ordinal));
+        if (inherited is null)
+            return new AccessorEmissionPlan(accessor, GetterAsMethod: false);
+
+        if (!string.Equals(
+                inherited.JavaScriptName,
+                accessor.JavaScriptName,
+                StringComparison.Ordinal))
+        {
+            throw new TypeProjectionException(
+                $"Accessor '{symbolName}.{accessor.JavaScriptName}' normalizes to " +
+                $"inherited C# member '{accessor.CSharpName}' from JavaScript property " +
+                $"'{inherited.JavaScriptName}'. Sources: " +
+                $"{inherited.Sources[0].Provenance}; " +
+                $"{accessor.Sources[0].Provenance}.",
+                accessor.Sources[0].Provenance);
+        }
+
+        var getterAsMethod = accessor.Getter is not null
+            && inherited.Getter is not null
+            && !accessor.Getter.Identity.StructurallyEquals(
+                inherited.Getter.Identity);
+        var getter = inherited.Getter is not null
+            && !getterAsMethod
+            ? null
+            : accessor.Getter;
+        var setter = inherited.Setter is not null
+            && accessor.Setter is not null
+            && accessor.Setter.Identity.StructurallyEquals(
+                inherited.Setter.Identity)
+                ? null
+                : accessor.Setter;
+        return new AccessorEmissionPlan(accessor with
+        {
+            Getter = getter,
+            Setter = setter,
+        }, getterAsMethod);
+    }
+
+    private static void AddInheritedMemberName(
+        Dictionary<string, string> names,
+        string memberName,
+        string provenance)
+    {
+        names.TryAdd(memberName, provenance);
+    }
+
+    private AccessorBuildResult BuildAccessor(
+        ReconciledAccessor accessor,
+        string symbolName,
+        bool getterAsMethod)
+    {
+        var globalDocumentation = MergeGlobalDocumentation(
+            symbolName,
+            accessor.JavaScriptName,
+            new DocumentationModel(
+                accessor.Documentation,
+                [],
+                accessor.Deprecated),
+            DeclarationRouteKind.GlobalVariable);
+        var getter = accessor.Getter;
+        var setter = accessor.Setter;
+        var symmetric = accessor.IsSymmetric;
+        string? property = null;
+        string? getterMethod = null;
+        string? setterMethod = null;
+        string? propertyMemberName = null;
+        string? getterMemberName = null;
+        string? setterMemberName = null;
+        var modifier = accessor.IsStatic ? "static abstract " : "";
+
+        if (getter is not null && !getterAsMethod)
+        {
+            var writer = new CSharpWriter();
+            writer.XmlDoc(
+                globalDocumentation.Text,
+                globalDocumentation.Deprecated);
+            writer.AppendLine(RenderAccessorMetadata(
+                accessor.JavaScriptName,
+                getter));
+            if (symmetric)
+            {
+                writer.AppendLine(RenderAccessorMetadata(
+                    accessor.JavaScriptName,
+                    setter!));
+            }
+            writer.AppendLine(
+                $"{modifier}{getter.Projection.RenderedType} " +
+                $"{accessor.CSharpName} " +
+                (symmetric ? "{ get; set; }" : "{ get; }"));
+            property = writer.ToString().TrimEnd();
+            propertyMemberName = accessor.CSharpName;
+        }
+
+        if (getter is not null && getterAsMethod)
+        {
+            var writer = new CSharpWriter();
+            writer.AppendLine(
+                "/// <summary>Gets the JavaScript property " +
+                $"<c>{EscapeXml(accessor.JavaScriptName)}</c> using its exact " +
+                "TypeScript getter type.</summary>");
+            writer.AppendLine(RenderAccessorMetadata(
+                accessor.JavaScriptName,
+                getter));
+            getterMemberName = $"Get{accessor.CSharpName}";
+            writer.AppendLine(
+                $"{modifier}{getter.Projection.RenderedType} " +
+                $"{getterMemberName}();");
+            getterMethod = writer.ToString().TrimEnd();
+        }
+
+        if (setter is not null && (!symmetric || getterAsMethod))
+        {
+            var writer = new CSharpWriter();
+            writer.AppendLine(
+                "/// <summary>Sets the JavaScript property " +
+                $"<c>{EscapeXml(accessor.JavaScriptName)}</c> using its exact " +
+                "TypeScript setter type.</summary>");
+            writer.AppendLine(
+                "/// <param name=\"value\">The value assigned to the " +
+                "JavaScript property.</param>");
+            writer.AppendLine(RenderAccessorMetadata(
+                accessor.JavaScriptName,
+                setter));
+            setterMemberName = $"Set{accessor.CSharpName}";
+            writer.AppendLine(
+                $"{modifier}void {setterMemberName}" +
+                $"({setter.Projection.RenderedType} value);");
+            setterMethod = writer.ToString().TrimEnd();
+        }
+
+        return new AccessorBuildResult(
+            property,
+            getterMethod,
+            setterMethod,
+            propertyMemberName,
+            getterMemberName,
+            setterMemberName);
+    }
+
+    private static string RenderAccessorMetadata(
+        string javaScriptName,
+        AccessorEndpoint endpoint)
+    {
+        var transport = endpoint.Projection.Transport;
+        var transportKind = transport?.Kind switch
+        {
+            "json-value" => "JsonValue",
+            "js-reference" => "JsReference",
+            "js-stream" => "JsStream",
+            "binary" => "Binary",
+            "transferable" => "Transferable",
+            _ => "Unsupported",
+        };
+        var operation = endpoint.Direction == AccessorDirection.Get
+            ? "Get"
+            : "Set";
+        var sourceType = transport?.SourceType
+            ?? endpoint.SourceType.CheckerType
+            ?? endpoint.SourceType.SyntaxKind
+            ?? endpoint.Projection.CSharpType;
+        var namedArguments = new List<string>
+        {
+            $"Nullable = {(endpoint.Identity.IsNullable || transport?.Nullable == true).ToString().ToLowerInvariant()}",
+            $"Streamable = {(transport?.Streamable == true).ToString().ToLowerInvariant()}",
+            $"StructuredClone = {(transport?.StructuredClone == true).ToString().ToLowerInvariant()}",
+        };
+        var unsupportedReason = transport?.Reason
+            ?? (transport is null
+                ? "Source IR does not provide reviewed transport metadata."
+                : null);
+        if (unsupportedReason is not null)
+        {
+            namedArguments.Add(
+                $"UnsupportedReason = \"{EscapeCSharp(unsupportedReason)}\"");
+        }
+
+        return
+            $"[global::Microsoft.JSInterop.DomAccessor(" +
+            $"\"{EscapeCSharp(javaScriptName)}\", " +
+            $"global::Microsoft.JSInterop.DomAccessorOperation.{operation}, " +
+            $"global::Microsoft.JSInterop.DomTransportKind.{transportKind}, " +
+            $"\"{EscapeCSharp(sourceType)}\", " +
+            $"{string.Join(", ", namedArguments)})]";
+    }
+
+    private static void ReserveAccessorName(
+        Dictionary<string, string> reservations,
+        string? memberName,
+        string provenance,
+        string symbolName)
+    {
+        if (memberName is null)
+            return;
+        if (reservations.TryGetValue(memberName, out var existing))
+        {
+            throw new TypeProjectionException(
+                $"Accessor lowering on '{symbolName}' produces duplicate C# member " +
+                $"name '{memberName}' from '{existing}' and '{provenance}'.",
+                provenance);
+        }
+        reservations.Add(memberName, provenance);
+    }
+
+    private static string MethodName(string canonicalKey)
+    {
+        var generic = canonicalKey.IndexOf('`');
+        var parameters = canonicalKey.IndexOf('(');
+        var end = generic >= 0 && (parameters < 0 || generic < parameters)
+            ? generic
+            : parameters;
+        return end < 0 ? canonicalKey : canonicalKey[..end];
+    }
+
+    private static string EscapeCSharp(string value)
+        => value
+            .Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("\"", "\\\"", StringComparison.Ordinal)
+            .Replace("\r", "\\r", StringComparison.Ordinal)
+            .Replace("\n", "\\n", StringComparison.Ordinal);
+
+    private static string EscapeXml(string value)
+        => value
+            .Replace("&", "&amp;", StringComparison.Ordinal)
+            .Replace("<", "&lt;", StringComparison.Ordinal)
+            .Replace(">", "&gt;", StringComparison.Ordinal);
 
     private MethodBuildResult BuildMethod(
         MemberModel method,
@@ -1247,11 +1314,6 @@ public sealed class InterfaceEmitter(
         int arity,
         IReadOnlyList<string> canonicalParamTypes)
         => $"{csName}`{arity}({string.Join(",", canonicalParamTypes)})";
-
-    private static string ApplyPropertyNullability(
-        TypeProjection projection,
-        bool nullable)
-        => (projection with { IsNullable = projection.IsNullable || nullable }).RenderedType;
 
     private List<ParameterModel> MergeGlobalParameterForms(
         string ownerSymbol,

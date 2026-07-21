@@ -147,7 +147,7 @@ public sealed class P1P9RegressionTests
     }
 
     [Fact]
-    public void InterfaceEmitter_AsymmetricAccessor_HasFailedOutcome()
+    public void InterfaceEmitter_AsymmetricAccessor_ProjectsBothSourceOutcomes()
     {
         var emitter = new InterfaceEmitter(WithInterfaces("DOMTokenList"), "1.0.0", "Blazor.DOM");
         var decl0 = MakeInterfaceDecl("AccessorHost",
@@ -157,10 +157,16 @@ public sealed class P1P9RegressionTests
             [MakeSetterMember("relList", [MakeParam("value", new KeywordTypeNode("StringKeyword"))], ordinal: 0)],
             ordinal: 2);
 
-        var ex = Assert.Throws<InterfaceEmitException>(() => emitter.Emit(MakeSymbol("AccessorHost", "interface", [decl0, decl1])));
+        var result = emitter.Emit(
+            MakeSymbol("AccessorHost", "interface", [decl0, decl1]));
 
-        Assert.Equal(2, ex.PartialOutcomes.Count(o => o.Name == "relList" && o.Status == MemberOutcomeStatus.Failed));
-        Assert.All(ex.PartialOutcomes.Where(o => o.Name == "relList"), o => Assert.Equal(MemberOutcomeStatus.Failed, o.Status));
+        Assert.Contains("IDOMTokenList RelList { get; }", result.Source);
+        Assert.Contains("void SetRelList(string value);", result.Source);
+        Assert.Equal(
+            2,
+            result.MemberOutcomes.Count(outcome =>
+                outcome.Name == "relList"
+                && outcome.Status == MemberOutcomeStatus.Projected));
     }
 
     [Fact]

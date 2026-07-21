@@ -180,7 +180,7 @@ public sealed class AccessorReconcilerTests
         var exception = Assert.Throws<TypeProjectionException>(() =>
             Reconcile([Declaration(6, badSetter)]));
 
-        Assert.Contains("exactly one non-rest value parameter", exception.Message);
+        Assert.Contains("exactly one value parameter", exception.Message);
         Assert.Equal(
             "Host/decl[6]/member[0]/setter/value",
             exception.Provenance);

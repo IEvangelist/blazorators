@@ -25,7 +25,8 @@ internal sealed record ContractPropertyResult(
     string Rendered,
     string CanonicalKey,
     string CanonicalType,
-    bool Mutable);
+    bool Mutable,
+    AccessorTypeIdentity? TypeIdentity = null);
 
 internal sealed class ContractCallableException(
     string message,
@@ -512,7 +513,8 @@ internal sealed class ContractMemberEmitter(TypeResolver typeResolver)
             writer.ToString().TrimEnd(),
             $"property:{csharpName}",
             effective.CanonicalType,
-            mutable);
+            mutable,
+            AccessorTypeIdentity.Create(effective, optional, type));
     }
 
     private static ContractSignature BuildSignature(

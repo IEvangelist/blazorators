@@ -135,6 +135,10 @@ public sealed class TypeResolver
     /// <summary>Returns true if the named symbol is in the TypeScript IR symbol index.</summary>
     public bool IsKnownSymbol(string name) => _symbolIndex.ContainsKey(name);
 
+    /// <summary>Gets a symbol from the TypeScript IR index without rendering its CLR name.</summary>
+    public bool TryGetSymbol(string name, out SymbolModel symbol)
+        => _symbolIndex.TryGetValue(name, out symbol!);
+
     public bool IsInterfaceOrMixin(string name)
         => _symbolIndex.TryGetValue(name, out var sym)
            && EffectiveClassificationPolicy.Classify(sym, _overrides).Name is "interface" or "mixin";
