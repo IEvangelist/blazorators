@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFrameworks>$(DefaultTargetFrameworks)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>NU5125;NU5039;CS0108;CS0612;CS8766</NoWarn>
+    <AssemblyName>Blazor.BrowserCoordination</AssemblyName>
+    <RootNamespace>Blazor.BrowserCoordination</RootNamespace>
+    <PackageId>Blazor.BrowserCoordination</PackageId>
+    <Title>Blazor Browser Coordination - Server and hosting-neutral DOM interop</Title>
+    <Description>Generated Broadcast Channel, Web Locks, and page visibility bindings for Blazor Server and hosting-neutral asynchronous JavaScript interop.</Description>
+    <PackageTags>dotnet;blazor;server;dom;interop;broadcast-channel;web-locks;page-visibility</PackageTags>
+    <PackageProjectUrl>https://github.com/IEvangelist/blazorators</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/IEvangelist/blazorators</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>David Pine</Authors>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+    <DomProfileName>BrowserCoordination</DomProfileName>
+    <DomProfileHost>Server</DomProfileHost>
+  </PropertyGroup>
+
+  <ItemGroup Label="Package files">
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <Import Project="..\Blazor.DOM.FocusedPackage.props" />
+</Project>
