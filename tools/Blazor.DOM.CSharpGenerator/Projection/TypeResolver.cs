@@ -333,8 +333,7 @@ public sealed class TypeResolver
         int depth)
     {
         var name = rf.Name;
-        var isGlobalBuiltIn = string.IsNullOrWhiteSpace(rf.ResolvedSymbol)
-            || string.Equals(rf.ResolvedSymbol, name, StringComparison.Ordinal);
+        var isGlobalBuiltIn = IsGlobalBuiltInReference(rf);
 
         if (scope?.TryResolve(name, rf.ResolvedSymbol, out var parameter) == true)
         {
@@ -372,6 +371,7 @@ public sealed class TypeResolver
         // Promise<T> -> ValueTask<T>
         if (isGlobalBuiltIn && name == "Promise")
         {
+            EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
             var inner = Project(
@@ -379,6 +379,8 @@ public sealed class TypeResolver
                 $"{provenance}/Promise<T>",
                 scope,
                 depth + 1);
+            if (inner.Identity.Kind == ClrTypeKind.Null)
+                throw IllegalGenericArgument(name, inner, provenance, 0);
             var promiseType = inner.Identity.Kind == ClrTypeKind.Void
                 ? "ValueTask"
                 : $"ValueTask<{inner.RenderedType}>";
@@ -465,6 +467,10 @@ public sealed class TypeResolver
         // Generic collections
         if (isGlobalBuiltIn && name is "Array" or "ReadonlyArray")
         {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "standard-container-transport");
             if (rf.TypeArguments.Count == 1)
             {
                 var elem = Project(
@@ -472,6 +478,7 @@ public sealed class TypeResolver
                     $"{provenance}/Array<T>",
                     scope,
                     depth + 1);
+                ValidateGenericArgument(name, elem, provenance, 0);
                 return ReferenceType(
                     $"{elem.RenderedType}[]",
                     isCollection: true,
@@ -489,6 +496,10 @@ public sealed class TypeResolver
             "Iterator" or
             "AsyncIterator")
         {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "iterator-transport");
             if (rf.TypeArguments.Count is not (1 or 3))
             {
                 throw new TypeProjectionException(
@@ -511,6 +522,7 @@ public sealed class TypeResolver
                 $"{provenance}/{name}<T>",
                 scope,
                 depth + 1);
+            ValidateGenericArgument(name, item, provenance, 0);
             var clrName = name is "AsyncIteratorObject" or "AsyncIterator"
                 ? "IAsyncEnumerable"
                 : "IEnumerable";
@@ -528,6 +540,10 @@ public sealed class TypeResolver
             "MapIterator" or
             "SetIterator")
         {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "iterator-transport");
             if (rf.TypeArguments.Count == 1)
             {
                 var elem = Project(
@@ -535,6 +551,7 @@ public sealed class TypeResolver
                     $"{provenance}/{name}<T>",
                     scope,
                     depth + 1);
+                ValidateGenericArgument(name, elem, provenance, 0);
                 return ReferenceType(
                     $"IEnumerable<{elem.RenderedType}>",
                     isCollection: true,
@@ -548,6 +565,10 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name is "AsyncIterable" or "AsyncIterableIterator")
         {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "iterator-transport");
             if (rf.TypeArguments.Count == 1)
             {
                 var elem = Project(
@@ -555,6 +576,7 @@ public sealed class TypeResolver
                     $"{provenance}/AsyncIterable<T>",
                     scope,
                     depth + 1);
+                ValidateGenericArgument(name, elem, provenance, 0);
                 return ReferenceType(
                     $"IAsyncEnumerable<{elem.RenderedType}>",
                     isCollection: true,
@@ -568,6 +590,10 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name == "Record")
         {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "standard-container-transport");
             if (rf.TypeArguments.Count != 2)
                 throw ArityError(name, 2, rf.TypeArguments.Count, provenance);
             var key = Project(
@@ -575,11 +601,13 @@ public sealed class TypeResolver
                 $"{provenance}/Record<K>",
                 scope,
                 depth + 1);
+            ValidateGenericArgument(name, key, provenance, 0);
             var val = Project(
                 rf.TypeArguments[1],
                 $"{provenance}/Record<V>",
                 scope,
                 depth + 1);
+            ValidateGenericArgument(name, val, provenance, 1);
             return ReferenceType(
                 $"IReadOnlyDictionary<{key.RenderedType},{val.RenderedType}>",
                 canonicalType: $"IReadOnlyDictionary<{key.CanonicalType},{val.CanonicalType}>",
@@ -587,10 +615,22 @@ public sealed class TypeResolver
         }
 
         if (isGlobalBuiltIn && name is "Map" or "ReadonlyMap")
+        {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "standard-container-transport");
             return ProjectDictionaryContainer(rf, provenance, scope, depth, name);
+        }
 
         if (isGlobalBuiltIn && name is "Set" or "ReadonlySet")
+        {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "standard-container-transport");
             return ProjectSetContainer(rf, provenance, scope, depth, name);
+        }
 
         if (isGlobalBuiltIn && name is "WeakMap" or "WeakSet")
         {
@@ -603,6 +643,7 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name == "PromiseLike")
         {
+            EnsureSupportedStandardContainerTransport(rf, provenance, "promise-transport");
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
             var inner = Project(
@@ -610,6 +651,8 @@ public sealed class TypeResolver
                 $"{provenance}/PromiseLike<T>",
                 scope,
                 depth + 1);
+            if (inner.Identity.Kind == ClrTypeKind.Null)
+                throw IllegalGenericArgument(name, inner, provenance, 0);
             var promiseLikeType = inner.Identity.Kind == ClrTypeKind.Void
                 ? "ValueTask"
                 : $"ValueTask<{inner.RenderedType}>";
@@ -628,15 +671,29 @@ public sealed class TypeResolver
 
         if (isGlobalBuiltIn && name == "Readonly")
         {
+            EnsureSupportedStandardContainerTransport(
+                rf,
+                provenance,
+                "standard-container-transport");
             if (rf.TypeArguments.Count != 1)
                 throw ArityError(name, 1, rf.TypeArguments.Count, provenance);
-            return Project(
+            var target = Project(
                 rf.TypeArguments[0],
                 $"{provenance}/Readonly<T>",
                 scope,
-                depth + 1) with
+                depth + 1);
+            ValidateGenericArgument(name, target, provenance, 0);
+            if (!IsProvablyImmutable(target))
             {
-                ProviderNote = "Readonly<T> preserves the projected CLR type",
+                throw new GenericDeferralException(
+                    $"Readonly<T> at '{provenance}' targets mutable or unproven CLR " +
+                    $"type '{target.RenderedType}' and cannot be weakened to that type.",
+                    provenance,
+                    "readonly-mapped-types");
+            }
+            return target with
+            {
+                ProviderNote = "Readonly<T> preserves a proven immutable CLR type",
             };
         }
 
@@ -695,6 +752,8 @@ public sealed class TypeResolver
                 provenance,
                 scope,
                 depth);
+            for (var index = 0; index < arguments.Count; index++)
+                ValidateGenericArgument(sym.Name, arguments[index], provenance, index);
             if (arguments.Count > 0)
                 csharpName += $"<{string.Join(", ", arguments.Select(
                     argument => argument.RenderedType))}>";
@@ -830,11 +889,20 @@ public sealed class TypeResolver
         GenericScope? scope,
         int depth)
     {
+        if (arr.Transport?.Kind == "unsupported")
+        {
+            throw new GenericDeferralException(
+                $"Array at '{provenance}' has authoritative unsupported transport " +
+                $"metadata: {arr.Transport.Reason ?? "no reviewed transport"}",
+                $"{provenance}/transport",
+                "standard-container-transport");
+        }
         var elem = Project(
             arr.ElementType,
             $"{provenance}[]",
             scope,
             depth + 1);
+        ValidateGenericArgument("array", elem, provenance, 0);
         return ReferenceType(
             $"{elem.RenderedType}[]",
             isCollection: true,
@@ -918,6 +986,8 @@ public sealed class TypeResolver
                     scope,
                     depth + 1))
             .ToList();
+        for (var index = 0; index < paramTypes.Count; index++)
+            ValidateGenericArgument("delegate", paramTypes[index], provenance, index);
 
         if (ret.Identity.Kind == ClrTypeKind.Void)
         {
@@ -931,6 +1001,7 @@ public sealed class TypeResolver
         }
         else
         {
+            ValidateGenericArgument("delegate", ret, $"{provenance}/return", paramTypes.Count);
             var delegateType = paramTypes.Count == 0
                 ? $"Func<{ret.RenderedType}>"
                 : $"Func<{string.Join(", ", paramTypes.Select(p => p.RenderedType))}, {ret.RenderedType}>";
@@ -999,14 +1070,21 @@ public sealed class TypeResolver
                 constraintProvenance,
                 "advanced-generic-constraints");
         }
-        if (constraintNode is ReferenceTypeNode reference
-            && scope.TryResolve(
+        if (constraintNode is not ReferenceTypeNode reference)
+        {
+            throw new GenericDeferralException(
+                $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
+                $"uses non-nominal TypeScript shape '{constraintNode.Kind}'.",
+                constraintProvenance,
+                "advanced-generic-constraints");
+        }
+        if (scope.TryResolve(
                 reference.Name,
                 reference.ResolvedSymbol,
                 out _) == false)
         {
             var target = reference.ResolvedSymbol ?? reference.Name;
-            if (!IsInterfaceOrMixin(target) && !IsDictionarySymbol(target))
+            if (!IsInterfaceOrMixin(target))
             {
                 throw new GenericDeferralException(
                     $"Generic constraint for '{binding.SourceName}' at '{provenance}' " +
@@ -1233,6 +1311,8 @@ public sealed class TypeResolver
             $"{provenance}/{name}<V>",
             scope,
             depth + 1);
+        ValidateGenericArgument(name, key, provenance, 0);
+        ValidateGenericArgument(name, value, provenance, 1);
         return ReferenceType(
             $"IReadOnlyDictionary<{key.RenderedType}, {value.RenderedType}>",
             isCollection: true,
@@ -1255,6 +1335,7 @@ public sealed class TypeResolver
             $"{provenance}/{name}<T>",
             scope,
             depth + 1);
+        ValidateGenericArgument(name, item, provenance, 0);
         return ReferenceType(
             $"IReadOnlySet<{item.RenderedType}>",
             isCollection: true,
@@ -1271,6 +1352,64 @@ public sealed class TypeResolver
             $"Generic type '{name}' at '{provenance}' requires exactly {expected} " +
             $"type argument(s), but received {actual}.",
             provenance);
+
+    private static void ValidateGenericArgument(
+        string owner,
+        TypeProjection argument,
+        string provenance,
+        int index)
+    {
+        if (argument.Identity.Kind is ClrTypeKind.Null or ClrTypeKind.Void)
+            throw IllegalGenericArgument(owner, argument, provenance, index);
+    }
+
+    private static GenericDeferralException IllegalGenericArgument(
+        string owner,
+        TypeProjection argument,
+        string provenance,
+        int index)
+        => new(
+            $"'{owner}' at '{provenance}' projects type argument {index} to illegal " +
+            $"CLR generic argument '{argument.RenderedType}'.",
+            $"{provenance}/typeArgument[{index}]",
+            "illegal-clr-generic-arguments");
+
+    private static bool IsGlobalBuiltInReference(ReferenceTypeNode reference)
+    {
+        if (string.IsNullOrWhiteSpace(reference.ResolvedSymbol)
+            || string.Equals(
+                reference.ResolvedSymbol,
+                reference.Name,
+                StringComparison.Ordinal))
+        {
+            return true;
+        }
+        return reference.ResolvedSymbol.StartsWith(
+                $"{reference.Name}<",
+                StringComparison.Ordinal)
+            && reference.ResolvedSymbol.EndsWith('>');
+    }
+
+    private static void EnsureSupportedStandardContainerTransport(
+        ReferenceTypeNode reference,
+        string provenance,
+        string phase)
+    {
+        if (reference.Transport?.Kind != "unsupported")
+            return;
+        throw new GenericDeferralException(
+            $"Standard generic '{reference.Name}' at '{provenance}' has authoritative " +
+            $"unsupported transport metadata: {reference.Transport.Reason ?? "no reviewed transport"}",
+            $"{provenance}/transport",
+            phase);
+    }
+
+    private static bool IsProvablyImmutable(TypeProjection projection)
+        => projection.Identity.Kind == ClrTypeKind.Value
+            || string.Equals(
+                projection.Identity.CanonicalName,
+                "string",
+                StringComparison.Ordinal);
 
     private static void ValidateOptionalBufferArgument(
         ReferenceTypeNode reference,
