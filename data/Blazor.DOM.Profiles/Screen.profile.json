@@ -1,0 +1,32 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Screen",
+  "description": "Screen API - inspect display dimensions and monitor screen orientation.",
+  "rootSymbols": ["Screen", "ScreenOrientation"],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["screen", "screen-orientation"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Screen",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Screen": ["*"],
+    "ScreenOrientation": [
+      "angle",
+      "type",
+      "unlock",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "ScreenOrientationEventMap": ["*"],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"]
+  },
+  "entryPoints": [
+    {
+      "name": "Screen",
+      "symbol": "Screen",
+      "javaScriptPath": "window.screen"
+    }
+  ]
+}

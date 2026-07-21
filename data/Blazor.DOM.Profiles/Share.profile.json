@@ -1,0 +1,23 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Share",
+  "description": "Web Share API - invoke the platform sharing mechanism with text, title, or URL data.",
+  "rootSymbols": ["Navigator", "ShareData"],
+  "secureContext": true,
+  "requiresUserActivation": true,
+  "features": ["web-share"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Share",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Navigator": ["canShare", "share"],
+    "ShareData": ["text", "title", "url"]
+  },
+  "entryPoints": [
+    {
+      "name": "Navigator",
+      "symbol": "Navigator",
+      "javaScriptPath": "navigator"
+    }
+  ]
+}

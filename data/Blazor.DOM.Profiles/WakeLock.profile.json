@@ -18,10 +18,6 @@
       "addEventListener",
       "removeEventListener"
     ],
-    "EventTarget": [
-      "addEventListener",
-      "removeEventListener"
-    ],
     "EventListener": ["*"],
     "EventListenerObject": ["*"],
     "WakeLockSentinelEventMap": ["*"]

@@ -41,6 +41,24 @@ public sealed class InteropAnchorTests
 
         var entryPoint = Assert.Single(applied.EntryPoints!);
         Assert.Equal("navigator.permissions", entryPoint.JavaScriptPath);
+
+        var screen = new ProfileDefinition(
+            "Screen",
+            "Screen",
+            ["Screen"],
+            false,
+            false,
+            [],
+            "Blazor.DOM",
+            "Profiles/Screen",
+            EntryPoints:
+            [
+                new HostEntryPoint("Screen", "Screen", "window.screen"),
+            ]);
+        var appliedScreen = InteropAnchorLoader.Apply(screen, anchors);
+        Assert.Equal(
+            "window.screen",
+            Assert.Single(appliedScreen.EntryPoints!).JavaScriptPath);
     }
 
     [Fact]

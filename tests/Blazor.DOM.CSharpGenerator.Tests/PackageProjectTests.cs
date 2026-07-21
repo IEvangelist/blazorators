@@ -1,4 +1,8 @@
 using System.Xml.Linq;
+using Blazor.DOM.CSharpGenerator.Anchors;
+using Blazor.DOM.CSharpGenerator.Hosts;
+using Blazor.DOM.CSharpGenerator.IR;
+using Blazor.DOM.CSharpGenerator.Profiles;
 using Xunit;
 
 namespace Blazor.DOM.CSharpGenerator.Tests;
@@ -78,6 +82,14 @@ public sealed class PackageProjectTests
     [InlineData("Blazor.WakeLock.WebAssembly", "WakeLock", "WebAssembly")]
     [InlineData("Blazor.Permissions", "Permissions", "Server")]
     [InlineData("Blazor.Permissions.WebAssembly", "Permissions", "WebAssembly")]
+    [InlineData("Blazor.Clipboard", "Clipboard", "Server")]
+    [InlineData("Blazor.Clipboard.WebAssembly", "Clipboard", "WebAssembly")]
+    [InlineData("Blazor.Share", "Share", "Server")]
+    [InlineData("Blazor.Share.WebAssembly", "Share", "WebAssembly")]
+    [InlineData("Blazor.StorageManagement", "StorageManagement", "Server")]
+    [InlineData("Blazor.StorageManagement.WebAssembly", "StorageManagement", "WebAssembly")]
+    [InlineData("Blazor.Screen", "Screen", "Server")]
+    [InlineData("Blazor.Screen.WebAssembly", "Screen", "WebAssembly")]
     public void FocusedPackage_UsesGeneratedProfileAssets(
         string projectName,
         string profileName,
@@ -113,6 +125,57 @@ public sealed class PackageProjectTests
                 .SelectMany(element => element.Attributes())
                 .Select(attribute => attribute.Value),
             value => value.Contains("data\\Blazor.DOM.Generated", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData("WakeLock", 24)]
+    [InlineData("Permissions", 23)]
+    [InlineData("Clipboard", 7)]
+    [InlineData("Share", 5)]
+    [InlineData("StorageManagement", 11)]
+    [InlineData("Screen", 30)]
+    public void FocusedPackage_HostPairsHaveExpectedExactParity(
+        string profileName,
+        int operationCount)
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = Path.Combine(
+            Path.GetTempPath(),
+            Path.GetRandomFileName());
+        Directory.CreateDirectory(output);
+        try
+        {
+            var anchors = InteropAnchorLoader.Load(Path.Combine(
+                root,
+                "src",
+                "Blazor.DOM.Anchors"));
+            var profile = InteropAnchorLoader.Apply(
+                ProfileLoader.Load(Path.Combine(
+                    root,
+                    "data",
+                    "Blazor.DOM.Profiles",
+                    $"{profileName}.profile.json")),
+                anchors);
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+
+            Assert.True(hosts.Parity.Exact);
+            Assert.Equal(operationCount, hosts.Server.Operations.Count);
+            Assert.Equal(operationCount, hosts.WebAssembly.Operations.Count);
+            Assert.Equal(
+                hosts.Server.Operations.Select(operation => operation.LogicalIdentity),
+                hosts.WebAssembly.Operations.Select(operation => operation.LogicalIdentity));
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
     }
 
     [Fact]
