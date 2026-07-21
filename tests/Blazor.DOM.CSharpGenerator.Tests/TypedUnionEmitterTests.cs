@@ -137,7 +137,10 @@ public sealed class TypedUnionEmitterTests
             },
             "ClipboardItemData");
 
-        Assert.StartsWith("ValueTask<global::Blazor.DOM.AdvancedTypes.", projection.RenderedType);
+        Assert.StartsWith(
+            "global::Microsoft.JSInterop.IBrowserPromise<" +
+            "global::Blazor.DOM.AdvancedTypes.",
+            projection.RenderedType);
         var synthesized = Assert.Single(
             resolver.SynthesizedTypes,
             type => type.Kind == "Union");
@@ -188,7 +191,7 @@ public sealed class TypedUnionEmitterTests
 
         Assert.Equal("bool", boolean.RenderedType);
         Assert.NotEqual("double", numeric.RenderedType);
-        Assert.Contains("UnionShape_", numeric.RenderedType);
+        Assert.Contains("NumericShape_", numeric.RenderedType);
     }
 
     [Fact]
@@ -222,12 +225,12 @@ public sealed class TypedUnionEmitterTests
     }
 
     [Fact]
-    public void InterfaceOnlyUnion_DefersWithoutAuthoritativeBrand()
+    public void InterfaceOnlyUnion_EmitsHonestUnclassifiedReferenceState()
     {
         var first = MakeSymbol("First", "interface", null);
         var second = MakeSymbol("Second", "interface", null);
         var resolver = new TypeResolver([first, second]);
-        var error = Assert.Throws<GenericDeferralException>(() => resolver.Project(
+        var projection = resolver.Project(
             new UnionTypeNode(
             [
                 new ReferenceTypeNode("First", "First", [])
@@ -239,10 +242,15 @@ public sealed class TypedUnionEmitterTests
                     Transport = ReferenceTransport("Second"),
                 },
             ]),
-            "Owner/member"));
+            "Owner/member");
+        var source = Assert.Single(resolver.SynthesizedTypes).Source;
 
-        Assert.Equal("typed-union-interface-discriminator", error.Phase);
-        Assert.Contains("arm[1]", error.Provenance);
+        Assert.NotEqual("object", projection.RenderedType);
+        Assert.Contains("UnclassifiedReference", source);
+        Assert.Contains("TakeUnclassifiedAsFirst", source);
+        Assert.Contains("TakeUnclassifiedAsSecond", source);
+        Assert.Contains("FromFirst", source);
+        Assert.Contains("FromSecond", source);
     }
 
     private static SymbolModel MakeSymbol(

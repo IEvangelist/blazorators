@@ -51,14 +51,22 @@ internal static class UnionWrapperEmitter
         string declaredName,
         IReadOnlyList<ProjectedUnionArm> arms)
     {
+        var hasUnclassifiedReference = arms.Count(arm =>
+            arm.Source.Type is ReferenceTypeNode
+            && arm.Projection?.Identity.Kind == ClrTypeKind.Reference
+            && arm.Source.Type.Transport?.Kind is "js-reference" or "transferable") > 1;
         writer.Block("public enum ArmKind : byte", () =>
         {
             writer.AppendLine("Uninitialized = 0,");
             for (var index = 0; index < arms.Count; index++)
             {
-                var suffix = index == arms.Count - 1 ? "" : ",";
+                var suffix = index == arms.Count - 1 && !hasUnclassifiedReference
+                    ? ""
+                    : ",";
                 writer.AppendLine($"{arms[index].Name} = {index + 1}{suffix}");
             }
+            if (hasUnclassifiedReference)
+                writer.AppendLine($"UnclassifiedReference = {arms.Count + 1}");
         });
         writer.AppendLine();
         writer.AppendLine("private readonly object? _value;");
@@ -69,6 +77,12 @@ internal static class UnionWrapperEmitter
         writer.OpenBrace();
         foreach (var arm in arms)
             writer.AppendLine($"ArmKind.{arm.Name} => {arm.TransportExpression},");
+        if (hasUnclassifiedReference)
+        {
+            writer.AppendLine(
+                "ArmKind.UnclassifiedReference => DomTransportDescriptor.JsReference(" +
+                "\"unclassified union reference\"),");
+        }
         writer.AppendLine(
             "_ => DomTransportDescriptor.Unsupported(\"uninitialized union\", " +
             "\"A default union value has no selected arm.\"),");
@@ -112,6 +126,34 @@ internal static class UnionWrapperEmitter
             writer.AppendLine();
         }
 
+        if (hasUnclassifiedReference)
+        {
+            writer.AppendLine(
+                $"public static {declaredName} FromUnclassifiedReference(" +
+                "DomUnclassifiedReference value) => new(" +
+                "ArmKind.UnclassifiedReference, value ?? throw new " +
+                "ArgumentNullException(nameof(value)));");
+            writer.AppendLine(
+                "public bool IsUnclassifiedReference => " +
+                "Kind == ArmKind.UnclassifiedReference;");
+            writer.AppendLine(
+                "public DomUnclassifiedReference GetUnclassifiedReference() => " +
+                "IsUnclassifiedReference ? (DomUnclassifiedReference)_value! : throw new " +
+                "InvalidOperationException(\"The union contains a classified arm.\");");
+            foreach (var candidate in arms.Where(candidate =>
+                candidate.Source.Type is ReferenceTypeNode
+                && candidate.Projection?.Identity.Kind == ClrTypeKind.Reference
+                && candidate.Source.Type.Transport?.Kind is "js-reference" or "transferable"))
+            {
+                writer.AppendLine(
+                    $"public {candidate.Projection!.RenderedType} " +
+                    $"TakeUnclassifiedAs{candidate.Name}(" +
+                    "IDomProxyFactory proxyFactory) => GetUnclassifiedReference().TakeAs<" +
+                    $"{candidate.Projection.RenderedType}>(proxyFactory);");
+            }
+            writer.AppendLine();
+        }
+
         writer.AppendLine(
             $"public bool Equals({declaredName} other) => Kind == other.Kind " +
             "&& EqualityComparer<object?>.Default.Equals(_value, other._value);");
@@ -140,6 +182,8 @@ internal static class UnionWrapperEmitter
             };
             writer.AppendLine($"ArmKind.{arm.Name} => {text},");
         }
+        if (hasUnclassifiedReference)
+            writer.AppendLine("ArmKind.UnclassifiedReference => \"(unclassified reference)\",");
         writer.AppendLine("_ => \"(invalid)\",");
         writer.CloseBrace(";");
         writer.AppendLine(
@@ -205,19 +249,6 @@ internal static class UnionWrapperEmitter
                 "typed-union-arm-discriminator");
         }
 
-        var interfaceArms = arms.Where(arm =>
-            arm.Source.Type is ReferenceTypeNode
-            && arm.Projection?.Identity.Kind == ClrTypeKind.Reference
-            && arm.Source.Type.Transport?.Kind is "js-reference" or "transferable").ToList();
-        if (interfaceArms.Count > 1)
-        {
-            throw new GenericDeferralException(
-                $"Union '{unionName}' contains multiple live interface arms " +
-                $"[{string.Join(", ", interfaceArms.Select(arm => arm.Name))}] with no " +
-                "authoritative inbound brand discriminator.",
-                interfaceArms[1].Source.Provenances[0],
-                "typed-union-interface-discriminator");
-        }
     }
 
     private static string GetBaseName(TypeNode type, UnionSpecialArm special)

@@ -103,6 +103,21 @@ internal sealed class SynthesizedTypeRegistry(
             name => EmitStringDomain(name, ordered));
     }
 
+    public string RegisterNumericDomain(
+        string provenance,
+        IReadOnlyList<double> values)
+    {
+        var ordered = values.Distinct().Order().ToList();
+        var fingerprint =
+            $"numeric-domain({string.Join("|", ordered.Select(value =>
+                value.ToString(System.Globalization.CultureInfo.InvariantCulture)))})";
+        return Register(
+            "Numeric",
+            provenance,
+            fingerprint,
+            name => EmitNumericDomain(name, ordered));
+    }
+
     public string RegisterConstraint(string provenance, string sourceShape)
     {
         var fingerprint = $"constraint({sourceShape})";
@@ -464,6 +479,46 @@ internal sealed class SynthesizedTypeRegistry(
                     writer.AppendLine();
             }
         });
+        return writer.ToString();
+    }
+
+    private string EmitNumericDomain(string name, IReadOnlyList<double> values)
+    {
+        var writer = Header();
+        writer.AppendLine("using System.Text.Json;");
+        writer.AppendLine("using System.Text.Json.Serialization;");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {generatedNamespace}.AdvancedTypes;");
+        writer.AppendLine();
+        writer.AppendLine($"[JsonConverter(typeof({name}JsonConverter))]");
+        writer.Block($"public readonly record struct {name}", () =>
+        {
+            writer.AppendLine("public double Value { get; }");
+            writer.AppendLine();
+            writer.Block($"public {name}(double value)", () =>
+            {
+                writer.AppendLine(
+                    $"if (value is not ({string.Join(" or ", values.Select(value =>
+                        value.ToString(System.Globalization.CultureInfo.InvariantCulture))) }))");
+                writer.AppendLine(
+                    "    throw new ArgumentOutOfRangeException(nameof(value));");
+                writer.AppendLine("Value = value;");
+            });
+            writer.AppendLine(
+                $"public static implicit operator double({name} value) => value.Value;");
+        });
+        writer.AppendLine();
+        writer.Block(
+            $"internal sealed class {name}JsonConverter : JsonConverter<{name}>",
+            () =>
+            {
+                writer.AppendLine(
+                    $"public override {name} Read(ref Utf8JsonReader reader, Type typeToConvert, " +
+                    $"JsonSerializerOptions options) => new(reader.GetDouble());");
+                writer.AppendLine(
+                    $"public override void Write(Utf8JsonWriter writer, {name} value, " +
+                    "JsonSerializerOptions options) => writer.WriteNumberValue(value.Value);");
+            });
         return writer.ToString();
     }
 
