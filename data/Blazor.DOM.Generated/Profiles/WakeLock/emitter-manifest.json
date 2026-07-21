@@ -8,8 +8,8 @@
   "accounting": {
     "totalSymbols": 15,
     "projected": 13,
-    "projectedClean": 11,
-    "projectedWithDeferredMembers": 2,
+    "projectedClean": 10,
+    "projectedWithDeferredMembers": 3,
     "excluded": 0,
     "deferred": 2,
     "generationFailed": 0,
@@ -66,6 +66,28 @@
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2769:5"
       },
       {
+        "symbolName": "AbortSignal",
+        "memberName": "any",
+        "memberKind": "method",
+        "phase": "standard-container-transport",
+        "reason": "Array at \u0027AbortSignal/decl[1]/typeLiteral/member[3]/method/any/parameter[0]/signals\u0027 has authoritative unsupported transport metadata: Collection \u0027AbortSignal[]\u0027 contains a non-JSON transport.",
+        "declarationOrdinal": 1,
+        "memberOrdinal": 3,
+        "provenance": "AbortSignal/decl[1]/typeLiteral/member[3]/method/any",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:2787:5"
+      },
+      {
+        "symbolName": "Event",
+        "memberName": "composedPath",
+        "memberKind": "method",
+        "phase": "standard-container-transport",
+        "reason": "Array at \u0027Event/decl[0]/composedPath/return\u0027 has authoritative unsupported transport metadata: Collection \u0027EventTarget[]\u0027 contains a non-JSON transport.",
+        "declarationOrdinal": 0,
+        "memberOrdinal": 13,
+        "provenance": "Event/decl[0]/member[13]/method/composedPath",
+        "sourceLocation": "typescript/lib/lib.dom.d.ts:11434:5"
+      },
+      {
         "symbolName": "WakeLockSentinel",
         "memberName": "addEventListener",
         "memberKind": "method",
@@ -90,8 +112,8 @@
     ],
     "failedMemberEntries": [],
     "totalMembers": 70,
-    "projectedMembers": 64,
-    "deferredMembers": 6,
+    "projectedMembers": 62,
+    "deferredMembers": 8,
     "failedMembers": 0,
     "expectedMembers": 70,
     "memberReconciliationValid": true,
@@ -123,9 +145,9 @@
         "symbolName": "AbortSignal",
         "declarationOrdinal": 1,
         "kind": "globalVariable",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Logical factory contract emitted.",
+        "status": "Deferred",
+        "phase": "standard-container-transport",
+        "reason": "Logical factory contract emitted; unsupported members remain deferred to factory-constructor.",
         "provenance": "AbortSignal/decl[1]/globalVariable",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2773:13"
       },
@@ -163,9 +185,9 @@
         "symbolName": "Event",
         "declarationOrdinal": 0,
         "kind": "interface",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
+        "status": "Deferred",
+        "phase": "standard-container-transport",
+        "reason": "Declaration contains explicitly deferred members or overloads.",
         "provenance": "Event/decl[0]/interface",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11347:1"
       },
@@ -384,7 +406,7 @@
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "provenance": "AbortSignal/decl[0]/member[5]/method/addEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2768:5",
         "qualifiedKey": "AbortSignal/decl[0]/member[5]"
@@ -410,7 +432,7 @@
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "provenance": "AbortSignal/decl[0]/member[7]/method/removeEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2770:5",
         "qualifiedKey": "AbortSignal/decl[0]/member[7]"
@@ -460,9 +482,9 @@
         "memberOrdinal": 3,
         "memberName": "any",
         "memberKind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "Emitted in the logical factory contract.",
+        "status": "Deferred",
+        "phase": "standard-container-transport",
+        "reason": "Array at \u0027AbortSignal/decl[1]/typeLiteral/member[3]/method/any/parameter[0]/signals\u0027 has authoritative unsupported transport metadata: Collection \u0027AbortSignal[]\u0027 contains a non-JSON transport.",
         "provenance": "AbortSignal/decl[1]/typeLiteral/member[3]/method/any",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2787:5",
         "qualifiedKey": "AbortSignal/decl[1]/typeLiteral/member[3]"
@@ -707,9 +729,9 @@
         "memberOrdinal": 13,
         "memberName": "composedPath",
         "memberKind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "",
+        "status": "Deferred",
+        "phase": "standard-container-transport",
+        "reason": "Array at \u0027Event/decl[0]/composedPath/return\u0027 has authoritative unsupported transport metadata: Collection \u0027EventTarget[]\u0027 contains a non-JSON transport.",
         "provenance": "Event/decl[0]/member[13]/method/composedPath",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11434:5",
         "qualifiedKey": "Event/decl[0]/member[13]"
@@ -982,7 +1004,7 @@
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "provenance": "EventTarget/decl[0]/member[0]/method/addEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11569:5",
         "qualifiedKey": "EventTarget/decl[0]/member[0]"
@@ -1008,7 +1030,7 @@
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "provenance": "EventTarget/decl[0]/member[2]/method/removeEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11581:5",
         "qualifiedKey": "EventTarget/decl[0]/member[2]"
@@ -1151,7 +1173,7 @@
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:5",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[5]"
@@ -1177,7 +1199,7 @@
         "memberKind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:5",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[7]"
@@ -1287,7 +1309,7 @@
         "kind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "qualifiedKey": "AbortSignal/decl[0]/member[5]/overload",
         "provenance": "AbortSignal/decl[0]/member[5]/method/addEventListener/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2768:5",
@@ -1297,7 +1319,7 @@
             "name": "type",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "AbortSignal/decl[0]/member[5]/method/addEventListener/overload/parameter[0]/type",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2768:22"
           },
@@ -1306,7 +1328,7 @@
             "name": "listener",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "AbortSignal/decl[0]/member[5]/method/addEventListener/overload/parameter[1]/listener",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2768:36"
           },
@@ -1315,7 +1337,7 @@
             "name": "options",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "AbortSignal/decl[0]/member[5]/method/addEventListener/overload/parameter[2]/options",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2768:82"
           }
@@ -1371,7 +1393,7 @@
         "kind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "qualifiedKey": "AbortSignal/decl[0]/member[7]/overload",
         "provenance": "AbortSignal/decl[0]/member[7]/method/removeEventListener/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2770:5",
@@ -1381,7 +1403,7 @@
             "name": "type",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "AbortSignal/decl[0]/member[7]/method/removeEventListener/overload/parameter[0]/type",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2770:25"
           },
@@ -1390,7 +1412,7 @@
             "name": "listener",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "AbortSignal/decl[0]/member[7]/method/removeEventListener/overload/parameter[1]/listener",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2770:39"
           },
@@ -1399,7 +1421,7 @@
             "name": "options",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "AbortSignal/decl[0]/member[7]/method/removeEventListener/overload/parameter[2]/options",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2770:85"
           }
@@ -1449,9 +1471,9 @@
         "memberOrdinal": 3,
         "name": "any",
         "kind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "emitted",
+        "status": "Deferred",
+        "phase": "standard-container-transport",
+        "reason": "Array at \u0027AbortSignal/decl[1]/typeLiteral/member[3]/method/any/parameter[0]/signals\u0027 has authoritative unsupported transport metadata: Collection \u0027AbortSignal[]\u0027 contains a non-JSON transport.",
         "qualifiedKey": "AbortSignal/decl[1]/typeLiteral/member[3]/overload",
         "provenance": "AbortSignal/decl[1]/typeLiteral/member[3]/method/any/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:2787:5",
@@ -1459,9 +1481,9 @@
           {
             "ordinal": 0,
             "name": "signals",
-            "status": "Projected",
-            "phase": null,
-            "reason": "emitted",
+            "status": "Deferred",
+            "phase": "standard-container-transport",
+            "reason": "Array at \u0027AbortSignal/decl[1]/typeLiteral/member[3]/method/any/parameter[0]/signals\u0027 has authoritative unsupported transport metadata: Collection \u0027AbortSignal[]\u0027 contains a non-JSON transport.",
             "provenance": "AbortSignal/decl[1]/typeLiteral/member[3]/method/any/overload/parameter[0]/signals",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:2787:9"
           }
@@ -1497,9 +1519,9 @@
         "memberOrdinal": 13,
         "name": "composedPath",
         "kind": "method",
-        "status": "Projected",
-        "phase": null,
-        "reason": "",
+        "status": "Deferred",
+        "phase": "standard-container-transport",
+        "reason": "Array at \u0027Event/decl[0]/composedPath/return\u0027 has authoritative unsupported transport metadata: Collection \u0027EventTarget[]\u0027 contains a non-JSON transport.",
         "qualifiedKey": "Event/decl[0]/member[13]/overload",
         "provenance": "Event/decl[0]/member[13]/method/composedPath/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11434:5",
@@ -1678,7 +1700,7 @@
         "kind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "qualifiedKey": "EventTarget/decl[0]/member[0]/overload",
         "provenance": "EventTarget/decl[0]/member[0]/method/addEventListener/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11569:5",
@@ -1688,7 +1710,7 @@
             "name": "type",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "EventTarget/decl[0]/member[0]/method/addEventListener/overload/parameter[0]/type",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:11569:22"
           },
@@ -1697,7 +1719,7 @@
             "name": "callback",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "EventTarget/decl[0]/member[0]/method/addEventListener/overload/parameter[1]/callback",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:11569:36"
           },
@@ -1706,7 +1728,7 @@
             "name": "options",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "EventTarget/decl[0]/member[0]/method/addEventListener/overload/parameter[2]/options",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:11569:89"
           }
@@ -1744,7 +1766,7 @@
         "kind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "qualifiedKey": "EventTarget/decl[0]/member[2]/overload",
         "provenance": "EventTarget/decl[0]/member[2]/method/removeEventListener/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:11581:5",
@@ -1754,7 +1776,7 @@
             "name": "type",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "EventTarget/decl[0]/member[2]/method/removeEventListener/overload/parameter[0]/type",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:11581:25"
           },
@@ -1763,7 +1785,7 @@
             "name": "callback",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "EventTarget/decl[0]/member[2]/method/removeEventListener/overload/parameter[1]/callback",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:11581:39"
           },
@@ -1772,7 +1794,7 @@
             "name": "options",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "EventTarget/decl[0]/member[2]/method/removeEventListener/overload/parameter[2]/options",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:11581:92"
           }
@@ -1894,7 +1916,7 @@
         "kind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[5]/overload",
         "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:5",
@@ -1904,7 +1926,7 @@
             "name": "type",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload/parameter[0]/type",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:22"
           },
@@ -1913,7 +1935,7 @@
             "name": "listener",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload/parameter[1]/listener",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:36"
           },
@@ -1922,7 +1944,7 @@
             "name": "options",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|AddEventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "WakeLockSentinel/decl[0]/member[5]/method/addEventListener/overload/parameter[2]/options",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:33764:82"
           }
@@ -1978,7 +2000,7 @@
         "kind": "method",
         "status": "Projected",
         "phase": null,
-        "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+        "reason": "",
         "qualifiedKey": "WakeLockSentinel/decl[0]/member[7]/overload",
         "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload",
         "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:5",
@@ -1988,7 +2010,7 @@
             "name": "type",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload/parameter[0]/type",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:25"
           },
@@ -1997,7 +2019,7 @@
             "name": "listener",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload/parameter[1]/listener",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:39"
           },
@@ -2006,7 +2028,7 @@
             "name": "options",
             "status": "Projected",
             "phase": null,
-            "reason": "Expanded bool|EventListenerOptions optional param into three unambiguous overloads (no-arg, bool, options).",
+            "reason": "",
             "provenance": "WakeLockSentinel/decl[0]/member[7]/method/removeEventListener/overload/parameter[2]/options",
             "sourceLocation": "typescript/lib/lib.dom.d.ts:33766:85"
           }

@@ -19,9 +19,7 @@ internal static class GeneratedContractUsage
         _ = css.Px(1);
         _ = webAssembly.Validate(bytes);
         _ = webAssembly.CompileAsync(bytes);
-        _ = webAssembly.InstantiateAsync(bytes);
-        _ = moduleFactory.CustomSections(module, "name");
-        _ = moduleFactory.Exports(module);
-        _ = moduleFactory.Imports(module);
+        _ = webAssembly.InstantiateAsync(module);
+        _ = moduleFactory.Create(bytes);
     }
 }

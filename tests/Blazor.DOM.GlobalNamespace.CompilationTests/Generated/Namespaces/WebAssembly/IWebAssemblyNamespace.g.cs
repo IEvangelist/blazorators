@@ -12,19 +12,11 @@ namespace Blazor.DOM.Namespaces.WebAssembly;
 /// </summary>
 public partial interface IWebAssemblyNamespace
 {
-    global::Blazor.DOM.Namespaces.WebAssembly.ICompileErrorFactory CompileErrorConstructor { get; }
-
-    global::Blazor.DOM.Namespaces.WebAssembly.IGlobalFactory GlobalConstructor { get; }
-
     global::Blazor.DOM.Namespaces.WebAssembly.IInstanceFactory InstanceConstructor { get; }
-
-    global::Blazor.DOM.Namespaces.WebAssembly.ILinkErrorFactory LinkErrorConstructor { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.IMemoryFactory MemoryConstructor { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.IModuleFactory ModuleConstructor { get; }
-
-    global::Blazor.DOM.Namespaces.WebAssembly.IRuntimeErrorFactory RuntimeErrorConstructor { get; }
 
     global::Blazor.DOM.Namespaces.WebAssembly.ITableFactory TableConstructor { get; }
 
@@ -32,11 +24,6 @@ public partial interface IWebAssemblyNamespace
     /// [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/compile_static)
     /// </summary>
     ValueTask<global::Blazor.DOM.Namespaces.WebAssembly.IModule> CompileAsync(BufferSource bytes);
-
-    /// <summary>
-    /// [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/instantiate_static)
-    /// </summary>
-    ValueTask<global::Blazor.DOM.Namespaces.WebAssembly.IWebAssemblyInstantiatedSource> InstantiateAsync(BufferSource bytes, global::Blazor.DOM.Namespaces.WebAssembly.Imports importObject = default);
 
     ValueTask<global::Blazor.DOM.Namespaces.WebAssembly.IInstance> InstantiateAsync(global::Blazor.DOM.Namespaces.WebAssembly.IModule moduleObject, global::Blazor.DOM.Namespaces.WebAssembly.Imports importObject = default);
 
