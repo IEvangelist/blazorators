@@ -175,15 +175,15 @@ public sealed class FinalEmitterAuditTests
             var accounting = result.Manifest.Accounting;
 
             Assert.True(result.Validation.IsValid);
-            Assert.Equal(1866, accounting.TotalSymbols);
-            Assert.Equal(1866, accounting.Projected);
-            Assert.Equal(1866, accounting.ProjectedClean);
+            Assert.Equal(2173, accounting.TotalSymbols);
+            Assert.Equal(2173, accounting.Projected);
+            Assert.Equal(2173, accounting.ProjectedClean);
             Assert.Equal(0, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
             Assert.Equal(0, accounting.Deferred);
             Assert.Equal(0, accounting.GenerationFailed);
-            Assert.Equal(2509, result.WrittenFiles.Count);
-            Assert.Equal((2598, 2598), (
+            Assert.Equal(2930, result.WrittenFiles.Count);
+            Assert.Equal((3009, 3009), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
             Assert.All(
@@ -191,27 +191,27 @@ public sealed class FinalEmitterAuditTests
                 entry => Assert.Equal(
                     nameof(MemberOutcomeStatus.Projected),
                     entry.Status));
-            Assert.Equal((11310, 11310), (
+            Assert.Equal((12251, 12251), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
-            Assert.Equal(11310, accounting.TotalMembers);
-            Assert.Equal(11310, accounting.ExpectedMembers);
-            Assert.Equal(11310, accounting.ProjectedMembers);
+            Assert.Equal(12251, accounting.TotalMembers);
+            Assert.Equal(12251, accounting.ExpectedMembers);
+            Assert.Equal(12251, accounting.ProjectedMembers);
             Assert.Equal(0, accounting.DeferredMembers);
             Assert.Equal(0, accounting.FailedMembers);
-            Assert.Equal((3666, 3666), (
+            Assert.Equal((3928, 3928), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
-            Assert.Equal((6262, 6262), (
+            Assert.Equal((6517, 6517), (
                 accounting.AccountedSourceParameters,
                 accounting.SourceParameters));
             Assert.True(accounting.ParameterReconciliationValid);
             Assert.True(result.Validation.ParameterReconciliationValid);
             Assert.Empty(result.Errors);
             Assert.Empty(result.Manifest.Diagnostics);
-            Assert.Equal(285, result.Manifest.SynthesizedTypes?.Count);
+            Assert.Equal(344, result.Manifest.SynthesizedTypes?.Count);
             Assert.Equal(
-                (6, 4, 153, 95, 1, 1),
+                (6, 4, 188, 111, 1, 1),
                 (
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Tuple"),
@@ -229,7 +229,7 @@ public sealed class FinalEmitterAuditTests
             Assert.Empty(accounting.DeferredMemberEntries ?? []);
             Assert.Empty(accounting.FailedSymbols);
             Assert.Equal(
-                (3666, 0, 0),
+                (3928, 0, 0),
                 (
                     (accounting.SourceOverloadEntries ?? []).Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Projected)),
@@ -244,7 +244,7 @@ public sealed class FinalEmitterAuditTests
                 .SelectMany(entry => entry.ParameterOutcomes)
                 .ToList();
             Assert.Equal(
-                (6262, 0, 0),
+                (6517, 0, 0),
                 (
                     allParameters.Count(entry =>
                         entry.Status == MemberOutcomeStatus.Projected),
@@ -413,7 +413,7 @@ public sealed class FinalEmitterAuditTests
                         && declaration.Type is TypeLiteralTypeNode)
                     .Select(declaration => (symbol.Name, declaration.Ordinal)))
                 .ToList();
-            Assert.Equal(649, typeLiteralDeclarations.Count);
+            Assert.Equal(730, typeLiteralDeclarations.Count);
             var declarationEntries = accounting.SourceDeclarationEntries ?? [];
             var projectedTypeLiteralDeclarations = 0;
             var deferredTypeLiteralDeclarations = 0;
@@ -448,7 +448,7 @@ public sealed class FinalEmitterAuditTests
                     deferredTypeLiteralDeclarations++;
                 }
             }
-            Assert.Equal(649, projectedTypeLiteralDeclarations);
+            Assert.Equal(730, projectedTypeLiteralDeclarations);
             Assert.Equal(0, deferredTypeLiteralDeclarations);
 
             var factoryMembers = (accounting.SourceMemberEntries ?? [])
@@ -613,9 +613,9 @@ public sealed class FinalEmitterAuditTests
                     && entry.QualifiedKey.StartsWith(
                         "WebAssembly.Global/decl[",
                         StringComparison.Ordinal));
-            Assert.Equal(2463, factoryMembers.Count);
+            Assert.Equal(2630, factoryMembers.Count);
             Assert.Equal(
-                2463,
+                2630,
                 factoryMembers.Count(entry =>
                     entry.Status == nameof(MemberOutcomeStatus.Projected)));
             Assert.Equal(
