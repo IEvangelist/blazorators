@@ -571,6 +571,152 @@ public sealed class GenericEmitterTests
     }
 
     [Fact]
+    public void Readonly_RequiresRecursiveSemanticImmutability()
+    {
+        var mutable = MakeInterfaceSymbol("Mutable", []);
+        var primitiveAlias = MakeGenericAliasSymbol(
+            "PrimitiveAlias",
+            [],
+            new KeywordTypeNode("NumberKeyword"));
+        var nestedAlias = MakeGenericAliasSymbol(
+            "NestedAlias",
+            [],
+            new ReferenceTypeNode(
+                "PrimitiveAlias",
+                "PrimitiveAlias",
+                []));
+        var qualifiedAlias = MakeGenericAliasSymbol(
+            "Namespace.Token",
+            [],
+            new KeywordTypeNode("StringKeyword"));
+        var immutableEnum = MakeGenericAliasSymbol(
+            "ImmutableEnum",
+            [],
+            new UnionTypeNode(
+            [
+                new LiteralTypeNode("StringLiteral", "\"first\""),
+                new LiteralTypeNode("StringLiteral", "\"second\""),
+            ]));
+        var mutableAlias = MakeGenericAliasSymbol(
+            "MutableAlias",
+            [],
+            new ReferenceTypeNode("Mutable", "Mutable", []));
+        var nestedMutableAlias = MakeGenericAliasSymbol(
+            "NestedMutableAlias",
+            [],
+            new ReferenceTypeNode("MutableAlias", "MutableAlias", []));
+        var arrayAlias = MakeGenericAliasSymbol(
+            "ArrayAlias",
+            [],
+            new ArrayTypeNode(new KeywordTypeNode("StringKeyword")));
+        var dictionaryAlias = MakeGenericAliasSymbol(
+            "DictionaryAlias",
+            [],
+            new ReferenceTypeNode(
+                "Record",
+                "Record",
+                [
+                    new KeywordTypeNode("StringKeyword"),
+                    new KeywordTypeNode("StringKeyword"),
+                ]));
+        var cycleA = MakeGenericAliasSymbol(
+            "CycleA",
+            [],
+            new ReferenceTypeNode("CycleB", "CycleB", []));
+        var cycleB = MakeGenericAliasSymbol(
+            "CycleB",
+            [],
+            new ReferenceTypeNode("CycleA", "CycleA", []));
+        var resolver = new TypeResolver(
+        [
+            mutable,
+            primitiveAlias,
+            nestedAlias,
+            qualifiedAlias,
+            immutableEnum,
+            mutableAlias,
+            nestedMutableAlias,
+            arrayAlias,
+            dictionaryAlias,
+            cycleA,
+            cycleB,
+        ]);
+
+        TypeProjection ProjectReadonly(TypeNode target, string name)
+            => resolver.Project(
+                new ReferenceTypeNode("Readonly", "Readonly", [target]),
+                $"fixture/readonly/{name}");
+
+        Assert.Equal(
+            "double",
+            ProjectReadonly(
+                new KeywordTypeNode("NumberKeyword"),
+                "number").RenderedType);
+        Assert.Equal(
+            "string",
+            ProjectReadonly(
+                new KeywordTypeNode("StringKeyword"),
+                "string").RenderedType);
+        Assert.Equal(
+            "PrimitiveAlias",
+            ProjectReadonly(
+                new ReferenceTypeNode(
+                    "PrimitiveAlias",
+                    "PrimitiveAlias",
+                    []),
+                "primitive-alias").RenderedType);
+        Assert.Equal(
+            "NestedAlias",
+            ProjectReadonly(
+                new ReferenceTypeNode("NestedAlias", "NestedAlias", []),
+                "nested-alias").RenderedType);
+        Assert.Equal(
+            "global::Blazor.DOM.Namespaces.Namespace.Token",
+            ProjectReadonly(
+                new ReferenceTypeNode(
+                    "Token",
+                    "Namespace.Token",
+                    []),
+                "qualified-alias").RenderedType);
+        Assert.Equal(
+            "ImmutableEnum",
+            ProjectReadonly(
+                new ReferenceTypeNode(
+                    "ImmutableEnum",
+                    "ImmutableEnum",
+                    []),
+                "enum").RenderedType);
+
+        var mutableTargets = new (string Name, TypeNode Type)[]
+        {
+            ("interface", new ReferenceTypeNode("Mutable", "Mutable", [])),
+            ("mutable-alias", new ReferenceTypeNode(
+                "MutableAlias",
+                "MutableAlias",
+                [])),
+            ("nested-mutable-alias", new ReferenceTypeNode(
+                "NestedMutableAlias",
+                "NestedMutableAlias",
+                [])),
+            ("array", new ArrayTypeNode(new KeywordTypeNode("StringKeyword"))),
+            ("array-alias", new ReferenceTypeNode("ArrayAlias", "ArrayAlias", [])),
+            ("dictionary-alias", new ReferenceTypeNode(
+                "DictionaryAlias",
+                "DictionaryAlias",
+                [])),
+            ("cycle", new ReferenceTypeNode("CycleA", "CycleA", [])),
+            ("object", new KeywordTypeNode("ObjectKeyword")),
+        };
+        foreach (var (name, type) in mutableTargets)
+        {
+            var error = Assert.Throws<GenericDeferralException>(() =>
+                ProjectReadonly(type, name));
+            Assert.Equal("readonly-mapped-types", error.Phase);
+            Assert.Equal($"fixture/readonly/{name}", error.Provenance);
+        }
+    }
+
+    [Fact]
     public void GenericMethodDefaults_EmitDeterministicExpandedOverloads()
     {
         var method = MakeMethod(

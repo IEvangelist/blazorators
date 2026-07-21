@@ -771,7 +771,11 @@ public sealed class TypeResolver
                 scope,
                 depth + 1);
             ValidateGenericArgument(name, target, provenance, 0);
-            if (!IsProvablyImmutable(target))
+            if (!IsSemanticallyImmutable(
+                    rf.TypeArguments[0],
+                    scope,
+                    new HashSet<string>(StringComparer.Ordinal),
+                    new Dictionary<string, TypeNode>(StringComparer.Ordinal)))
             {
                 throw new GenericDeferralException(
                     $"Readonly<T> at '{provenance}' targets mutable or unproven CLR " +
@@ -1492,12 +1496,165 @@ public sealed class TypeResolver
             phase);
     }
 
-    private static bool IsProvablyImmutable(TypeProjection projection)
-        => projection.Identity.Kind == ClrTypeKind.Value
-            || string.Equals(
-                projection.Identity.CanonicalName,
-                "string",
-                StringComparison.Ordinal);
+    private bool IsSemanticallyImmutable(
+        TypeNode node,
+        GenericScope? scope,
+        HashSet<string> visitingSymbols,
+        IReadOnlyDictionary<string, TypeNode> substitutions)
+    {
+        switch (node)
+        {
+            case KeywordTypeNode keyword:
+                var keywordName = keyword.Name ?? keyword.CheckerType ?? "";
+                return keywordName is
+                    "BooleanKeyword" or "NumberKeyword" or "StringKeyword" or
+                    "BigIntKeyword" or "boolean" or "number" or "string" or "bigint" or
+                    "NullKeyword" or "UndefinedKeyword" or "null" or "undefined";
+
+            case LiteralTypeNode literal:
+                return literal.LiteralKind is
+                    "StringLiteral" or "NumericLiteral" or "TrueKeyword" or
+                    "FalseKeyword" or "BooleanLiteral" or "NullLiteral" or
+                    "NullKeyword" or "UndefinedKeyword";
+
+            case ParenthesizedTypeNode parenthesized:
+                return IsSemanticallyImmutable(
+                    parenthesized.InnerType,
+                    scope,
+                    visitingSymbols,
+                    substitutions);
+
+            case UnionTypeNode union:
+                return union.Types.All(arm => IsSemanticallyImmutable(
+                    arm,
+                    scope,
+                    visitingSymbols,
+                    substitutions));
+
+            case ReferenceTypeNode reference:
+                return IsImmutableReference(
+                    reference,
+                    scope,
+                    visitingSymbols,
+                    substitutions);
+
+            default:
+                return false;
+        }
+    }
+
+    private bool IsImmutableReference(
+        ReferenceTypeNode reference,
+        GenericScope? scope,
+        HashSet<string> visitingSymbols,
+        IReadOnlyDictionary<string, TypeNode> substitutions)
+    {
+        if (!string.IsNullOrWhiteSpace(reference.ResolvedSymbol)
+            && substitutions.TryGetValue(reference.ResolvedSymbol, out var resolved))
+        {
+            if (ReferenceEquals(resolved, reference))
+                return false;
+            return IsSemanticallyImmutable(
+                resolved,
+                scope,
+                visitingSymbols,
+                substitutions);
+        }
+        if (substitutions.TryGetValue(reference.Name, out var source))
+        {
+            if (ReferenceEquals(source, reference))
+                return false;
+            return IsSemanticallyImmutable(
+                source,
+                scope,
+                visitingSymbols,
+                substitutions);
+        }
+        if (scope?.TryResolve(
+                reference.Name,
+                reference.ResolvedSymbol,
+                out var parameter) == true)
+        {
+            return parameter.Substitution is not null
+                && IsImmutableSubstitution(parameter.Substitution);
+        }
+
+        if (GlTypeAliases.ContainsKey(reference.Name)
+            || reference.Name is
+                "DOMString" or "USVString" or "ByteString" or
+                "DOMHighResTimeStamp" or "EpochTimeStamp" or "DOMTimeStamp")
+        {
+            return true;
+        }
+
+        SymbolModel? symbol = null;
+        if (!string.IsNullOrWhiteSpace(reference.ResolvedSymbol))
+        {
+            _symbolIndex.TryGetValue(reference.ResolvedSymbol, out symbol);
+            if (symbol is null
+                && !string.Equals(
+                    reference.ResolvedSymbol,
+                    reference.Name,
+                    StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+        if (symbol is null)
+            _symbolIndex.TryGetValue(reference.Name, out symbol);
+        if (symbol is null)
+            return false;
+
+        var classification =
+            EffectiveClassificationPolicy.Classify(symbol, _overrides).Name;
+        if (classification == "enum")
+            return true;
+        if (classification != "typedef" || !visitingSymbols.Add(symbol.Name))
+            return false;
+
+        try
+        {
+            var declaration = symbol.Declarations
+                .Where(candidate => candidate.Kind == "typeAlias")
+                .OrderBy(candidate => candidate.Ordinal)
+                .FirstOrDefault();
+            if (declaration?.Type is null)
+                return false;
+            var parameters = GetSymbolTypeParameters(
+                symbol,
+                $"{symbol.Name}/readonly/typeParameters");
+            if (reference.TypeArguments.Count > parameters.Count)
+                return false;
+            var aliasSubstitutions = new Dictionary<string, TypeNode>(
+                substitutions,
+                StringComparer.Ordinal);
+            for (var index = 0; index < parameters.Count; index++)
+            {
+                var aliasParameter = parameters[index];
+                var argument = index < reference.TypeArguments.Count
+                    ? reference.TypeArguments[index]
+                    : aliasParameter.Default;
+                if (argument is null)
+                    return false;
+                aliasSubstitutions[aliasParameter.Name] = argument;
+                aliasSubstitutions[$"{symbol.Name}.{aliasParameter.Name}"] = argument;
+            }
+            return IsSemanticallyImmutable(
+                declaration.Type,
+                scope,
+                visitingSymbols,
+                aliasSubstitutions);
+        }
+        finally
+        {
+            visitingSymbols.Remove(symbol.Name);
+        }
+    }
+
+    private static bool IsImmutableSubstitution(TypeProjection projection)
+        => projection.Identity.CanonicalName is
+            "bool" or "byte" or "sbyte" or "short" or "ushort" or "int" or "uint" or
+            "long" or "ulong" or "float" or "double" or "decimal" or "char" or "string";
 
     private static void ValidateOptionalBufferArgument(
         ReferenceTypeNode reference,
