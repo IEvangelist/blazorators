@@ -322,6 +322,34 @@ public sealed class TypeResolverTests
         Assert.Equal("string", result.CSharpType);
     }
 
+    [Fact]
+    public void Project_LiveReferenceOrUndefinedUnion_ReturnsNullableReference()
+    {
+        var resolver = WithSymbol("Response");
+        var node = new UnionTypeNode([
+            new ReferenceTypeNode(
+                "Response",
+                "Response",
+                [])
+            {
+                Transport = new TransportModel(
+                    "js-reference",
+                    false,
+                    "Response",
+                    false,
+                    false,
+                    null),
+            },
+            new KeywordTypeNode("UndefinedKeyword"),
+        ]);
+
+        var result = resolver.Project(node, "Cache/match/return");
+
+        Assert.True(result.IsNullable);
+        Assert.Equal("IResponse", result.CSharpType);
+        Assert.Equal("js-reference", result.Transport?.Kind);
+    }
+
     // ── Hard errors on unsupported shapes ─────────────────────────────────────
 
     [Fact]

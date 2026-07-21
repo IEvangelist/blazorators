@@ -1295,8 +1295,7 @@ public sealed class TypeResolver
         int depth)
     {
         var normalized = UnionNormalization.Normalize(un, provenance);
-        if (normalized.HasNull
-            && !normalized.HasUndefined
+        if ((normalized.HasNull || normalized.HasUndefined)
             && normalized.ValueArms.Count == 1)
         {
             var inner = Project(
