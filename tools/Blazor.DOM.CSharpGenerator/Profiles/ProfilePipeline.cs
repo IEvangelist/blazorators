@@ -25,6 +25,7 @@ public static class ProfilePipeline
             "Iterable",
             "Promise",
             "ReadonlyArray",
+            "ReadonlyMap",
             "Record",
             "Uint8Array",
         ],

@@ -593,7 +593,7 @@ public sealed class FocusedPackageGenerationTests
             var profile = new ProfileDefinition(
                 "WebMIDI",
                 "Web MIDI.",
-                ["MIDIAccess", "MIDIOptions"],
+                ["MIDIAccess", "MIDIInputMap", "MIDIInput", "MIDIOptions"],
                 true,
                 false,
                 ["web-midi"],
@@ -601,7 +601,9 @@ public sealed class FocusedPackageGenerationTests
                 "Profiles/WebMIDI",
                 new Dictionary<string, IReadOnlyList<string>>
                 {
-                    ["MIDIAccess"] = ["sysexEnabled"],
+                    ["MIDIAccess"] = ["inputs", "sysexEnabled"],
+                    ["MIDIInputMap"] = [],
+                    ["MIDIInput"] = ["id"],
                     ["MIDIOptions"] = ["*"],
                 },
                 true,
