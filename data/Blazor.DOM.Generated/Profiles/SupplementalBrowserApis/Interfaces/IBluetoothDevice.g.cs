@@ -10,20 +10,8 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IBluetoothDevice : IEventTarget, IBluetoothDeviceEventHandlers, ICharacteristicEventHandlers, IServiceEventHandlers, global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("id", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string", Nullable = false, Streamable = false, StructuredClone = true)]
-string Id { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("name", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string | null", Nullable = true, Streamable = false, StructuredClone = true)]
-string? Name { get; }
-
     [global::Microsoft.JSInterop.DomAccessor("gatt", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "BluetoothRemoteGATTServer | null", Nullable = true, Streamable = false, StructuredClone = false)]
 IBluetoothRemoteGATTServer? Gatt { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("watchingAdvertisements", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
-bool WatchingAdvertisements { get; }
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("forget")]
-ValueTask ForgetAsync();
 
     [global::Microsoft.JSInterop.DomJavaScriptName("watchAdvertisements")]
 ValueTask WatchAdvertisementsAsync(WatchAdvertisementsOptions? options = default);

@@ -10,99 +10,15 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IUSBDevice : global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("usbVersionMajor", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double UsbVersionMajor { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("usbVersionMinor", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double UsbVersionMinor { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("usbVersionSubminor", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double UsbVersionSubminor { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("deviceClass", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double DeviceClass { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("deviceSubclass", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double DeviceSubclass { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("deviceProtocol", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double DeviceProtocol { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("vendorId", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double VendorId { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("productId", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double ProductId { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("deviceVersionMajor", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double DeviceVersionMajor { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("deviceVersionMinor", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double DeviceVersionMinor { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("deviceVersionSubminor", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = false, Streamable = false, StructuredClone = true)]
-double DeviceVersionSubminor { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("manufacturerName", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string | null", Nullable = true, Streamable = false, StructuredClone = true)]
-string? ManufacturerName { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("productName", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string | null", Nullable = true, Streamable = false, StructuredClone = true)]
-string? ProductName { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("serialNumber", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "string | null", Nullable = true, Streamable = false, StructuredClone = true)]
-string? SerialNumber { get; }
-
-    [global::Microsoft.JSInterop.DomAccessor("configuration", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "USBConfiguration | null", Nullable = true, Streamable = false, StructuredClone = false)]
-IUSBConfiguration? Configuration { get; }
-
     [global::Microsoft.JSInterop.DomAccessor("configurations", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "readonly USBConfiguration[]", Nullable = false, Streamable = false, StructuredClone = false)]
 global::Microsoft.JSInterop.IReadOnlyBrowserArray<IUSBConfiguration> Configurations { get; }
 
-    [global::Microsoft.JSInterop.DomAccessor("opened", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "boolean", Nullable = false, Streamable = false, StructuredClone = true)]
-bool Opened { get; }
-
     [global::Microsoft.JSInterop.DomJavaScriptName("open")]
 ValueTask OpenAsync();
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("close")]
-ValueTask CloseAsync();
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("forget")]
-ValueTask ForgetAsync();
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("selectConfiguration")]
-ValueTask SelectConfigurationAsync(double configurationValue);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("claimInterface")]
-ValueTask ClaimInterfaceAsync(double interfaceNumber);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("releaseInterface")]
-ValueTask ReleaseInterfaceAsync(double interfaceNumber);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("selectAlternateInterface")]
-ValueTask SelectAlternateInterfaceAsync(double interfaceNumber, double alternateSetting);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("controlTransferIn")]
-ValueTask<IUSBInTransferResult> ControlTransferInAsync(USBControlTransferParameters setup, double length);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("controlTransferOut")]
-ValueTask<IUSBOutTransferResult> ControlTransferOutAsync(USBControlTransferParameters setup, BufferSource data = default);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("clearHalt")]
-ValueTask ClearHaltAsync(USBDirection direction, double endpointNumber);
 
     [global::Microsoft.JSInterop.DomJavaScriptName("transferIn")]
 ValueTask<IUSBInTransferResult> TransferInAsync(double endpointNumber, double length);
 
     [global::Microsoft.JSInterop.DomJavaScriptName("transferOut")]
 ValueTask<IUSBOutTransferResult> TransferOutAsync(double endpointNumber, BufferSource data);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("isochronousTransferIn")]
-ValueTask<IUSBIsochronousInTransferResult> IsochronousTransferInAsync(double endpointNumber, double[] packetLengths);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("isochronousTransferOut")]
-ValueTask<IUSBIsochronousOutTransferResult> IsochronousTransferOutAsync(double endpointNumber, BufferSource data, double[] packetLengths);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("reset")]
-ValueTask ResetAsync();
 }

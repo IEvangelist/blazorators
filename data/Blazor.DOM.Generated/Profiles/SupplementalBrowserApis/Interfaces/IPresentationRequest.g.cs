@@ -19,7 +19,4 @@ ValueTask<IPresentationConnection> StartAsync();
 
     [global::Microsoft.JSInterop.DomJavaScriptName("reconnect")]
 ValueTask<IPresentationConnection> ReconnectAsync(string presentationId);
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("getAvailability")]
-ValueTask<IPresentationAvailability> GetAvailabilityAsync();
 }

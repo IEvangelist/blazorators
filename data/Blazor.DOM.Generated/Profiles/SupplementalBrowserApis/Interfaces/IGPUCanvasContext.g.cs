@@ -10,26 +10,12 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IGPUCanvasContext : global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("__brand", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"GPUCanvasContext\"", Nullable = false, Streamable = false, StructuredClone = true)]
-global::Blazor.DOM.AdvancedTypes.GPUCanvasContextStringShape_64658274ae Brand { get; }
-
-    /// <summary>
-/// The canvas this context was created from.
-/// </summary>
-[global::Microsoft.JSInterop.DomAccessor("canvas", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "OffscreenCanvas | HTMLCanvasElement", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "Union 'OffscreenCanvas | HTMLCanvasElement' has incompatible transports: js-reference, transferable.")]
-global::Blazor.DOM.AdvancedTypes.GPUCanvasContextUnionShape_b90c3a7581 Canvas { get; }
-
     /// <summary>
 /// Configures the context for this canvas.
 /// This clears the drawing buffer to transparent black (in [$Replace the drawing buffer$]).
 /// See {@link GPUCanvasContext#getConfiguration} for information on feature detection.
 /// </summary>
 global::Microsoft.JSInterop.BrowserUndefined Configure(GPUCanvasConfiguration configuration);
-
-    /// <summary>
-/// Removes the context configuration. Destroys any textures produced while configured.
-/// </summary>
-global::Microsoft.JSInterop.BrowserUndefined Unconfigure();
 
     /// <summary>
 /// Returns the context configuration, or `null` if the context is not configured.

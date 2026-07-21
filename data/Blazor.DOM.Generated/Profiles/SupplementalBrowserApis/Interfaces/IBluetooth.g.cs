@@ -14,15 +14,6 @@ public partial interface IBluetooth : IEventTarget, IBluetoothDeviceEventHandler
 [global::Microsoft.JSInterop.DomAccessor("onavailabilitychanged", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "((this: Bluetooth, ev: Event) => any) | null", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Union '((this: Bluetooth, ev: Event) => any) | null' is unsupported: TypeScript '(this: Bluetooth, ev: Event) => any' has an ambiguous function shape.")]
 Func<IEvent, object>? Onavailabilitychanged { get; set; }
 
-    [global::Microsoft.JSInterop.DomAccessor("referringDevice", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsReference, "BluetoothDevice | null", Nullable = true, Streamable = false, StructuredClone = false)]
-IBluetoothDevice? ReferringDevice { get; }
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("getAvailability")]
-ValueTask<bool> GetAvailabilityAsync();
-
-    [global::Microsoft.JSInterop.DomJavaScriptName("getDevices")]
-ValueTask<global::Microsoft.JSInterop.IBrowserArray<IBluetoothDevice>> GetDevicesAsync();
-
     [global::Microsoft.JSInterop.DomJavaScriptName("requestDevice")]
 ValueTask<IBluetoothDevice> RequestDeviceAsync(RequestDeviceOptions? options = default);
 

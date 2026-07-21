@@ -49,6 +49,110 @@
   "outputSubdirectory": "Profiles/SupplementalBrowserApis",
   "minimalDependencyContracts": true,
   "memberIncludes": {
+    "Bluetooth": [
+      "onavailabilitychanged",
+      "requestDevice",
+      "requestLEScan"
+    ],
+    "BluetoothDevice": [
+      "gatt",
+      "watchAdvertisements"
+    ],
+    "BluetoothRemoteGATTCharacteristic": [
+      "value",
+      "readValue",
+      "writeValueWithResponse",
+      "startNotifications"
+    ],
+    "USB": [
+      "onconnect",
+      "ondisconnect",
+      "getDevices",
+      "requestDevice"
+    ],
+    "USBDevice": [
+      "configurations",
+      "open",
+      "transferIn",
+      "transferOut"
+    ],
+    "HID": [
+      "onconnect",
+      "ondisconnect",
+      "getDevices",
+      "requestDevice"
+    ],
+    "HIDDevice": [
+      "oninputreport",
+      "open",
+      "sendReport",
+      "receiveFeatureReport"
+    ],
+    "Serial": [
+      "onconnect",
+      "ondisconnect",
+      "getPorts",
+      "requestPort"
+    ],
+    "SerialPort": [
+      "onconnect",
+      "ondisconnect",
+      "readable",
+      "writable",
+      "open",
+      "getSignals"
+    ],
+    "Presentation": [
+      "defaultRequest",
+      "receiver"
+    ],
+    "PresentationRequest": [
+      "onconnectionavailable",
+      "start",
+      "reconnect"
+    ],
+    "PresentationConnection": [
+      "onmessage",
+      "state",
+      "send"
+    ],
+    "GPU": [
+      "wgslLanguageFeatures",
+      "requestAdapter"
+    ],
+    "GPUAdapter": [
+      "features",
+      "limits",
+      "info",
+      "requestDevice"
+    ],
+    "GPUDevice": [
+      "features",
+      "limits",
+      "queue",
+      "lost",
+      "onuncapturederror",
+      "addEventListener",
+      "removeEventListener",
+      "createBuffer",
+      "popErrorScope"
+    ],
+    "GPUBuffer": [
+      "size",
+      "usage",
+      "mapAsync",
+      "getMappedRange"
+    ],
+    "GPUCanvasContext": [
+      "configure",
+      "getConfiguration",
+      "getCurrentTexture"
+    ],
+    "GPUQueue": [
+      "submit",
+      "writeBuffer",
+      "onSubmittedWorkDone"
+    ],
     "Navigator": [
       "bluetooth",
       "usb",

@@ -10,9 +10,6 @@ namespace Blazor.DOM;
 // Requires secure context (HTTPS).
 public partial interface IGPUAdapter : global::Microsoft.JSInterop.IDomProxy
 {
-    [global::Microsoft.JSInterop.DomAccessor("__brand", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "\"GPUAdapter\"", Nullable = false, Streamable = false, StructuredClone = true)]
-global::Blazor.DOM.AdvancedTypes.GPUAdapterStringShape_543a484e37 Brand { get; }
-
     /// <summary>
 /// The set of values in `this`.{@link GPUAdapter# [[adapter]]}.{@link adapter# [[features]]}.
 /// </summary>
