@@ -378,10 +378,16 @@ public sealed class TypeResolver
                 "template literal types are not supported for C# projection"),
             QueryTypeNode => Fail(typeNode, provenance,
                 "typeof query types are not supported for C# projection"),
-            IndexedAccessTypeNode => Fail(typeNode, provenance,
-                "indexed access types are not supported for C# projection"),
-            OperatorTypeNode => Fail(typeNode, provenance,
-                "type operator (keyof/readonly) is not supported for C# projection"),
+            IndexedAccessTypeNode indexed => ProjectIndexedAccess(
+                indexed,
+                provenance,
+                scope,
+                depth),
+            OperatorTypeNode operation => ProjectOperator(
+                operation,
+                provenance,
+                scope,
+                depth),
             TupleTypeNode => Fail(typeNode, provenance,
                 "tuple types are not supported for C# projection"),
             UnknownTypeNode u => Fail(typeNode, provenance,
@@ -1047,6 +1053,499 @@ public sealed class TypeResolver
             provenance,
             "intersection types are not supported for C# projection");
     }
+
+    public bool TryResolveFiniteStringDomain(
+        TypeNode type,
+        string provenance,
+        out IReadOnlyList<string> values)
+    {
+        if (type is ParenthesizedTypeNode parenthesized)
+        {
+            return TryResolveFiniteStringDomain(
+                parenthesized.InnerType,
+                $"{provenance}/parenthesized",
+                out values);
+        }
+
+        var result = new SortedSet<string>(StringComparer.Ordinal);
+        var success = type switch
+        {
+            OperatorTypeNode { Operator: "KeyOfKeyword" } operation
+                => TryCollectFiniteKeys(
+                    operation.OperandType,
+                    provenance,
+                    result,
+                    new HashSet<string>(StringComparer.Ordinal)),
+            LiteralTypeNode { LiteralKind: "StringLiteral" } literal
+                => result.Add(Unquote(literal.Text)),
+            UnionTypeNode union => union.Types
+                .Select((item, index) => (item, index))
+                .All(item =>
+                    TryResolveFiniteStringDomain(
+                        item.item,
+                        $"{provenance}/union[{item.index}]",
+                        out var itemValues)
+                    && AddAll(result, itemValues)),
+            _ => false,
+        };
+        values = result.ToList();
+        return success && values.Count > 0;
+    }
+
+            private TypeProjection ProjectOperator(
+                OperatorTypeNode operation,
+                string provenance,
+                GenericScope? scope,
+                int depth)
+            {
+                switch (operation.Operator)
+                {
+                    case "KeyOfKeyword":
+                        if (!TryResolveFiniteStringDomain(
+                                operation,
+                                provenance,
+                                out var keys))
+                        {
+                            throw new GenericDeferralException(
+                                $"keyof at '{provenance}' has a dynamic or unresolvable property " +
+                                "domain and cannot be widened to string.",
+                                provenance,
+                                "dynamic-key-domain");
+                        }
+                        throw new GenericDeferralException(
+                            $"keyof at '{provenance}' resolves to the finite domain " +
+                            $"[{string.Join(", ", keys.Select(key => $"'{key}'"))}], which requires " +
+                            "a named generated value type rather than string.",
+                            provenance,
+                            "finite-key-domain");
+
+                    case "ReadonlyKeyword":
+                        if (operation.OperandType is ArrayTypeNode array)
+                        {
+                            var element = Project(
+                                array.ElementType,
+                                $"{provenance}/readonly/element",
+                                scope,
+                                depth + 1);
+                            ValidateGenericArgument("readonly array", element, provenance, 0);
+                            return ReferenceType(
+                                $"IReadOnlyList<{element.RenderedType}>",
+                                isCollection: true,
+                                providerNote: "readonly-array",
+                                canonicalType: $"IReadOnlyList<{element.CanonicalType}>",
+                                typeArguments: [element.Identity]);
+                        }
+                        var operand = Project(
+                            operation.OperandType,
+                            $"{provenance}/readonly",
+                            scope,
+                            depth + 1);
+                        if (!IsProvablyImmutable(operand))
+                        {
+                            throw new GenericDeferralException(
+                                $"readonly operator at '{provenance}' targets mutable or unproven " +
+                                $"CLR type '{operand.RenderedType}'.",
+                                provenance,
+                                "readonly-type-operator");
+                        }
+                        return operand with { ProviderNote = "readonly-operator" };
+
+                    case "UniqueKeyword":
+                        throw new GenericDeferralException(
+                            $"unique symbol type at '{provenance}' has no supported CLR identity " +
+                            "or JavaScript symbol-key transport.",
+                            provenance,
+                            "unique-symbol-types");
+
+                    default:
+                        throw new GenericDeferralException(
+                            $"Type operator '{operation.Operator}' at '{provenance}' has no " +
+                            "reviewed exact CLR reduction.",
+                            provenance,
+                            "advanced-type-operators");
+                }
+            }
+
+            private TypeProjection ProjectIndexedAccess(
+                IndexedAccessTypeNode indexed,
+                string provenance,
+                GenericScope? scope,
+                int depth)
+            {
+                if (!TryResolveIndexedMembers(
+                        indexed.ObjectType,
+                        indexed.IndexType,
+                        provenance,
+                        scope,
+                        out var selected,
+                        out var dynamicReason))
+                {
+                    throw new GenericDeferralException(
+                        $"Indexed access at '{provenance}' cannot be reduced exactly: " +
+                        dynamicReason,
+                        provenance,
+                        "dependent-indexed-access");
+                }
+
+                var projections = selected.Select((member, index) =>
+                {
+                    var projection = Project(
+                        member.Type,
+                        $"{provenance}/selected[{index}]",
+                        scope,
+                        depth + 1);
+                    return member.Optional
+                        ? projection with { IsNullable = true }
+                        : projection;
+                }).ToList();
+                if (projections.Count == 0)
+                {
+                    throw new GenericDeferralException(
+                        $"Indexed access at '{provenance}' selected no members.",
+                        provenance,
+                        "dependent-indexed-access");
+                }
+
+                var canonical = projections[0].CanonicalType;
+                if (projections.Any(projection =>
+                        !string.Equals(
+                            projection.CanonicalType,
+                            canonical,
+                            StringComparison.Ordinal)))
+                {
+                    throw new GenericDeferralException(
+                        $"Indexed access at '{provenance}' selects incompatible CLR value types " +
+                        $"[{string.Join(", ", projections.Select(p => p.RenderedType).Distinct())}].",
+                        provenance,
+                        "dependent-indexed-access");
+                }
+                return projections[0] with
+                {
+                    IsNullable = projections.Any(projection => projection.IsNullable),
+                    ProviderNote = "statically-reduced-indexed-access",
+                };
+            }
+
+            private bool TryResolveIndexedMembers(
+                TypeNode objectType,
+                TypeNode indexType,
+                string provenance,
+                GenericScope? scope,
+                out IReadOnlyList<IndexedMember> selected,
+                out string reason)
+            {
+                selected = [];
+                reason = "the target is not a finite structural property domain.";
+                if (!TryGetStructuralMembers(
+                        objectType,
+                        provenance,
+                        out var members,
+                        out var hasDynamicIndex,
+                        new HashSet<string>(StringComparer.Ordinal)))
+                {
+                    return false;
+                }
+
+                var keys = new SortedSet<string>(StringComparer.Ordinal);
+                if (!TryCollectIndexKeys(indexType, scope, provenance, keys))
+                {
+                    if (hasDynamicIndex)
+                        reason = "the index is dynamic and the target has an index signature.";
+                    else
+                        reason = "the index domain is dynamic or not provably finite.";
+                    return false;
+                }
+
+                var byName = members
+                    .GroupBy(member => member.Name, StringComparer.Ordinal)
+                    .ToDictionary(group => group.Key, group => group.ToList(), StringComparer.Ordinal);
+                var result = new List<IndexedMember>();
+                foreach (var key in keys)
+                {
+                    if (!byName.TryGetValue(key, out var matches))
+                    {
+                        if (!byName.TryGetValue("*", out matches))
+                        {
+                            reason = $"property '{key}' is not present across the resolved target.";
+                            return false;
+                        }
+                    }
+                    var fingerprints = matches
+                        .Select(member => TypeFingerprint(member.Type))
+                        .Distinct(StringComparer.Ordinal)
+                        .ToList();
+                    if (fingerprints.Count != 1)
+                    {
+                        reason = $"merged property '{key}' has incompatible declarations.";
+                        return false;
+                    }
+                    result.Add(new IndexedMember(
+                        key,
+                        matches[0].Type,
+                        matches.Any(member => member.Optional)));
+                }
+                selected = result;
+                reason = "";
+                return true;
+            }
+
+            private bool TryCollectIndexKeys(
+                TypeNode indexType,
+                GenericScope? scope,
+                string provenance,
+                ISet<string> keys)
+            {
+                switch (indexType)
+                {
+                    case LiteralTypeNode { LiteralKind: "StringLiteral" } literal:
+                        keys.Add(Unquote(literal.Text));
+                        return true;
+                    case LiteralTypeNode { LiteralKind: "NumericLiteral" } literal:
+                        keys.Add(literal.Text);
+                        return true;
+                    case UnionTypeNode union:
+                        return union.Types
+                            .Select((item, index) => (item, index))
+                            .All(item => TryCollectIndexKeys(
+                                item.item,
+                                scope,
+                                $"{provenance}/index[{item.index}]",
+                                keys));
+                    case ParenthesizedTypeNode parenthesized:
+                        return TryCollectIndexKeys(
+                            parenthesized.InnerType,
+                            scope,
+                            $"{provenance}/index/parenthesized",
+                            keys);
+                    case ReferenceTypeNode reference
+                        when scope?.TryResolve(
+                            reference.Name,
+                            reference.ResolvedSymbol,
+                            out var binding) == true
+                            && binding.Model.Constraint is not null:
+                        return TryResolveFiniteStringDomain(
+                                binding.Model.Constraint,
+                                $"{provenance}/index/constraint",
+                                out var values)
+                            && AddAll(keys, values);
+                    default:
+                        return false;
+                }
+            }
+
+            private bool TryCollectFiniteKeys(
+                TypeNode operand,
+                string provenance,
+                ISet<string> keys,
+                ISet<string> visiting)
+            {
+                if (!TryGetStructuralMembers(
+                        operand,
+                        provenance,
+                        out var members,
+                        out var hasDynamicIndex,
+                        visiting)
+                    || hasDynamicIndex)
+                {
+                    return false;
+                }
+                foreach (var member in members)
+                {
+                    if (member.Name != "*")
+                        keys.Add(member.Name);
+                }
+                return keys.Count > 0;
+            }
+
+            private bool TryGetStructuralMembers(
+                TypeNode type,
+                string provenance,
+                out IReadOnlyList<IndexedMember> members,
+                out bool hasDynamicIndex,
+                ISet<string> visiting)
+            {
+                switch (type)
+                {
+                    case ParenthesizedTypeNode parenthesized:
+                        return TryGetStructuralMembers(
+                            parenthesized.InnerType,
+                            provenance,
+                            out members,
+                            out hasDynamicIndex,
+                            visiting);
+            case HeritageReferenceTypeNode heritage:
+                return TryGetStructuralMembers(
+                            new ReferenceTypeNode(
+                                heritage.Expression,
+                                heritage.ResolvedSymbol,
+                                heritage.TypeArguments),
+                            provenance,
+                            out members,
+                            out hasDynamicIndex,
+                            visiting);
+                    case TypeLiteralTypeNode literal:
+                        return TryGetMembersFromDeclarations(
+                            [new DeclarationModel(
+                                0,
+                                "typeAlias",
+                                "anonymous",
+                                [],
+                                [],
+                                [],
+                                literal.Members,
+                                literal,
+                                [],
+                                null,
+                                new DocumentationModel("", [], false),
+                                new LocationModel(
+                                    provenance,
+                                    new PositionModel(1, 1, 0),
+                                    new PositionModel(1, 1, 0)),
+                                null,
+                                false,
+                                new EventMapModel(false, []),
+                                [])],
+                            provenance,
+                            out members,
+                            out hasDynamicIndex,
+                            visiting);
+                    case ReferenceTypeNode reference:
+                        var symbolName = reference.ResolvedSymbol ?? reference.Name;
+                        if (!_symbolIndex.TryGetValue(symbolName, out var symbol)
+                            || !visiting.Add(symbolName))
+                        {
+                            members = [];
+                            hasDynamicIndex = false;
+                            return false;
+                        }
+                        try
+                        {
+                            if (symbol.Declarations
+                                .Where(declaration => declaration.Kind == "typeAlias")
+                                .Select(declaration => declaration.Type)
+                                .FirstOrDefault(node => node is not null) is { } aliasType)
+                            {
+                                return TryGetStructuralMembers(
+                                    aliasType,
+                                    $"{provenance}/{symbolName}",
+                                    out members,
+                                    out hasDynamicIndex,
+                                    visiting);
+                            }
+                            return TryGetMembersFromDeclarations(
+                                symbol.Declarations,
+                                provenance,
+                                out members,
+                                out hasDynamicIndex,
+                                visiting);
+                        }
+                        finally
+                        {
+                            visiting.Remove(symbolName);
+                        }
+                    default:
+                        members = [];
+                        hasDynamicIndex = false;
+                        return false;
+                }
+            }
+
+            private bool TryGetMembersFromDeclarations(
+                IReadOnlyList<DeclarationModel> declarations,
+                string provenance,
+                out IReadOnlyList<IndexedMember> members,
+                out bool hasDynamicIndex,
+                ISet<string> visiting)
+            {
+                var result = new List<IndexedMember>();
+                hasDynamicIndex = false;
+                foreach (var declaration in declarations)
+                {
+                    foreach (var member in declaration.Members)
+                    {
+                        if (member.Kind == "indexSignature")
+                        {
+                            hasDynamicIndex = true;
+                            if (member.Type is not null)
+                            {
+                                result.Add(new IndexedMember(
+                                    "*",
+                                    member.Type,
+                                    member.Optional));
+                            }
+                            continue;
+                        }
+                        if (member.Kind is not (
+                                "property" or "getter" or "setter" or "method")
+                            || member.Name is null
+                            || member.Name.Kind is "computed" or "private"
+                            || GetMemberValueType(member) is not { } memberType)
+                        {
+                            continue;
+                        }
+                        result.Add(new IndexedMember(
+                            Unquote(member.Name.Text),
+                            memberType,
+                            member.Optional));
+                    }
+                    foreach (var heritage in declaration.Heritage
+                        .Where(clause => clause.Token == "extends")
+                        .SelectMany(clause => clause.Types))
+                    {
+                        if (!TryGetStructuralMembers(
+                                heritage,
+                                $"{provenance}/heritage",
+                                out var inherited,
+                                out var inheritedDynamic,
+                                visiting))
+                        {
+                            members = [];
+                            return false;
+                        }
+                        result.AddRange(inherited);
+                        hasDynamicIndex |= inheritedDynamic;
+                    }
+                }
+                members = result;
+                return result.Count > 0 || hasDynamicIndex;
+            }
+
+            private static TypeNode? GetMemberValueType(MemberModel member)
+            {
+                if (member.Type is not null)
+                    return member.Type;
+                if (member.Kind == "getter")
+                    return member.ReturnType;
+                if (member.Kind == "setter")
+                    return member.Parameters.SingleOrDefault()?.Type;
+                if (member.Kind == "method" && member.ReturnType is not null)
+                {
+                    return new FunctionTypeNode(
+                        member.TypeParameters,
+                        member.Parameters,
+                        member.ReturnType)
+                    {
+                        Transport = member.ReturnType.Transport,
+                    };
+                }
+                return null;
+            }
+
+            private static bool AddAll(ISet<string> target, IEnumerable<string> values)
+            {
+                foreach (var value in values)
+                    target.Add(value);
+                return true;
+            }
+
+            private static string Unquote(string value)
+                => value.Length >= 2
+                    && ((value[0] == '"' && value[^1] == '"')
+                        || (value[0] == '\'' && value[^1] == '\''))
+                    ? value[1..^1]
+                    : value;
+
+    private sealed record IndexedMember(string Name, TypeNode Type, bool Optional);
 
     private TypeProjection ProjectFunction(
         FunctionTypeNode fn,

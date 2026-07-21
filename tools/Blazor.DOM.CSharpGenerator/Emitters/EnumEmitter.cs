@@ -24,6 +24,45 @@ public static class EnumEmitter
                 $"EnumEmitter: symbol '{symbol.Name}' typeAlias has null type.");
 
         var members = ExtractStringLiteralMembers(symbol.Name, typeNode);
+        return Emit(symbol, decl, members, generatorVersion, ns);
+    }
+
+    public static string EmitStringValues(
+        SymbolModel symbol,
+        IReadOnlyList<string> values,
+        string generatorVersion,
+        string ns)
+    {
+        var decl = symbol.Declarations.FirstOrDefault(d => d.Kind == "typeAlias")
+            ?? throw new InvalidOperationException(
+                $"EnumEmitter: symbol '{symbol.Name}' has no typeAlias declaration.");
+        if (values.Count == 0)
+            throw new InvalidOperationException(
+                $"EnumEmitter: symbol '{symbol.Name}' has an empty finite string domain.");
+
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var members = values.Select(value =>
+        {
+            var memberName = Naming.ToEnumMemberName(value);
+            if (!seen.Add(memberName))
+            {
+                var suffix = 1;
+                while (!seen.Add($"{memberName}_{suffix}"))
+                    suffix++;
+                memberName = $"{memberName}_{suffix}";
+            }
+            return (value, memberName);
+        }).ToList();
+        return Emit(symbol, decl, members, generatorVersion, ns);
+    }
+
+    private static string Emit(
+        SymbolModel symbol,
+        DeclarationModel decl,
+        IReadOnlyList<(string Raw, string MemberName)> members,
+        string generatorVersion,
+        string ns)
+    {
 
         var w = new CSharpWriter();
         w.AppendLine("#nullable enable");

@@ -48,6 +48,27 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             return EnumEmitter.Emit(symbol, generatorVersion, ns);
         }
 
+        if (typeNode is OperatorTypeNode { Operator: "KeyOfKeyword" } keyOf
+            && typeResolver.TryResolveFiniteStringDomain(
+                keyOf,
+                $"{symbol.Name}/keyof",
+                out var keys))
+        {
+            if (generic.Scope.Parameters.Count > 0)
+            {
+                throw new GenericDeferralException(
+                    $"Generic finite-key alias '{symbol.Name}' cannot be emitted as a " +
+                    "non-generic C# enum without losing its type parameters.",
+                    $"{symbol.Name}/keyof",
+                    "finite-key-domain");
+            }
+            return EnumEmitter.EmitStringValues(
+                symbol,
+                keys,
+                generatorVersion,
+                ns);
+        }
+
         // If T | null/undefined union -> simple nullable alias
         if (typeNode is UnionTypeNode un)
         {
