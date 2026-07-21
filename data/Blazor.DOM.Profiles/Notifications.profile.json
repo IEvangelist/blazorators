@@ -1,0 +1,50 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Notifications",
+  "description": "Notifications API - request permission and create lifecycle-aware desktop notifications.",
+  "rootSymbols": ["Notification"],
+  "secureContext": true,
+  "requiresUserActivation": true,
+  "features": ["notifications"],
+  "permissions": ["notifications"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Notifications",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Notification": [
+      "badge",
+      "body",
+      "dir",
+      "icon",
+      "lang",
+      "requireInteraction",
+      "silent",
+      "tag",
+      "title",
+      "close",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "NotificationOptions": [
+      "badge",
+      "body",
+      "dir",
+      "icon",
+      "lang",
+      "requireInteraction",
+      "silent",
+      "tag"
+    ],
+    "NotificationPermissionCallback": ["*"],
+    "NotificationEventMap": ["*"],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"]
+  },
+  "entryPoints": [
+    {
+      "name": "Notification",
+      "symbol": "Notification",
+      "javaScriptPath": "Notification"
+    }
+  ]
+}

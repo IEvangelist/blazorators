@@ -1,0 +1,83 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "MediaDevices",
+  "description": "Media Capture and Streams API - enumerate media devices and acquire user or display media.",
+  "rootSymbols": [
+    "MediaDevices",
+    "MediaStream",
+    "MediaStreamTrack",
+    "MediaDeviceInfo",
+    "InputDeviceInfo"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": true,
+  "features": ["media-devices", "display-capture"],
+  "permissions": ["camera", "microphone", "display-capture"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/MediaDevices",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "MediaDevices": [
+      "enumerateDevices",
+      "getDisplayMedia",
+      "getSupportedConstraints",
+      "getUserMedia",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MediaStream": [
+      "active",
+      "id",
+      "addTrack",
+      "clone",
+      "getAudioTracks",
+      "getTrackById",
+      "getTracks",
+      "getVideoTracks",
+      "removeTrack",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MediaStreamTrack": [
+      "contentHint",
+      "enabled",
+      "id",
+      "kind",
+      "label",
+      "muted",
+      "readyState",
+      "applyConstraints",
+      "clone",
+      "getCapabilities",
+      "getConstraints",
+      "getSettings",
+      "stop",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MediaDeviceInfo": ["deviceId", "groupId", "kind", "label"],
+    "InputDeviceInfo": ["*"],
+    "DisplayMediaStreamOptions": ["*"],
+    "MediaStreamConstraints": ["*"],
+    "MediaTrackCapabilities": ["*"],
+    "MediaTrackConstraints": ["*"],
+    "MediaTrackConstraintSet": ["*"],
+    "MediaTrackSettings": ["*"],
+    "MediaTrackSupportedConstraints": ["*"],
+    "DoubleRange": ["*"],
+    "ULongRange": ["*"],
+    "MediaDevicesEventMap": ["*"],
+    "MediaStreamEventMap": ["*"],
+    "MediaStreamTrackEventMap": ["*"],
+    "MediaStreamTrackEvent": ["*"],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"]
+  },
+  "entryPoints": [
+    {
+      "name": "MediaDevices",
+      "symbol": "MediaDevices",
+      "javaScriptPath": "navigator.mediaDevices"
+    }
+  ]
+}
