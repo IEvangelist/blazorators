@@ -60,11 +60,17 @@ public sealed class PackageProjectTests
                 @"Blazor.DOM\Abstractions\**\*.cs",
                 StringComparison.Ordinal) == true);
         Assert.Contains(
-            project.Descendants("Content")
-                .Select(element => element.Attribute("Include")?.Value),
-            value => value?.EndsWith(
+            project.Descendants("_SharedDomStaticAssetSource")
+                .Select(element => element.Value),
+            value => value?.Contains(
                 @"Blazor.DOM\wwwroot\blazorators.dom.js",
                 StringComparison.Ordinal) == true);
+        Assert.Contains(
+            project.Descendants("Content"),
+            element => string.Equals(
+                element.Attribute("Link")?.Value,
+                @"wwwroot\blazorators.dom.js",
+                StringComparison.Ordinal));
     }
 
     [Theory]

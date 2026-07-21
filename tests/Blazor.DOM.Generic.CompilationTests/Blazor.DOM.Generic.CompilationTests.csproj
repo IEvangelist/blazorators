@@ -7,11 +7,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
+    <DomGenerationProfile>GenericContracts</DomGenerationProfile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\data\Blazor.DOM.Generated\Profiles\GenericContracts\**\*.g.cs" />
     <ProjectReference Include="..\Blazor.DOM.ProfileRuntime\Blazor.DOM.ProfileRuntime.csproj" />
   </ItemGroup>
 
+  <Import Project="..\..\src\Blazor.DOM.Generation.targets" />
 </Project>

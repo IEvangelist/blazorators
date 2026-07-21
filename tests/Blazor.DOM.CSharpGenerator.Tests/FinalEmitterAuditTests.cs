@@ -910,39 +910,43 @@ public sealed class FinalEmitterAuditTests
     }
 
     [Fact]
-    public void Corpus_WakeLockProfile_TrueTwoPassMatchesProductionBytesRecursively()
+    public void Corpus_WakeLockProfile_IndependentRunsMatchRecursively()
     {
         var root = FindRepositoryRoot();
         var data = Path.Combine(root, "data", "Blazor.DOM");
-        var production = Path.Combine(
-            root,
-            "data",
-            "Blazor.DOM.Generated",
-            "Profiles",
-            "WakeLock");
         var profile = ProfileLoader.Load(Path.Combine(
             root,
             "data",
             "Blazor.DOM.Profiles",
             "WakeLock.profile.json"));
-        var output = CreateTempDirectory();
+        var output1 = CreateTempDirectory();
+        var output2 = CreateTempDirectory();
         try
         {
-            var result = ProfilePipeline.Run(
+            var result1 = ProfilePipeline.Run(
                 profile,
                 IrLoader.Load(data),
-                output,
+                output1,
                 EmitterOverridesLoader.Load(data));
-            var accounting = result.PipelineResult.Manifest.Accounting;
+            var result2 = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output2,
+                EmitterOverridesLoader.Load(data));
+            var accounting = result1.PipelineResult.Manifest.Accounting;
 
-            Assert.True(result.Coverage.ByteIdentityVerified);
-            Assert.True(result.PipelineResult.Validation.IsValid);
-            Assert.Empty(result.PipelineResult.Errors);
-            Assert.Empty(result.PipelineResult.Manifest.Diagnostics);
+            Assert.True(result1.Coverage.ByteIdentityVerified);
+            Assert.True(result2.Coverage.ByteIdentityVerified);
+            Assert.True(result1.PipelineResult.Validation.IsValid);
+            Assert.True(result2.PipelineResult.Validation.IsValid);
+            Assert.Empty(result1.PipelineResult.Errors);
+            Assert.Empty(result2.PipelineResult.Errors);
+            Assert.Empty(result1.PipelineResult.Manifest.Diagnostics);
+            Assert.Empty(result2.PipelineResult.Manifest.Diagnostics);
             Assert.Equal((13, 12, 1), (
-                result.ClosureSize,
-                result.IncludedSymbolCount,
-                result.ExternalReferenceCount));
+                result1.ClosureSize,
+                result1.IncludedSymbolCount,
+                result1.ExternalReferenceCount));
             Assert.Equal((12, 12, 0), (
                 accounting.Projected,
                 accounting.ProjectedClean,
@@ -950,28 +954,34 @@ public sealed class FinalEmitterAuditTests
             Assert.Equal((16, 16), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
-            Assert.Equal((23, 23), (
+            Assert.Equal((25, 25), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
-            Assert.Equal((12, 12), (
+            Assert.Equal((14, 14), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
-            Assert.Equal((17, 17), (
+            Assert.Equal((23, 23), (
                 accounting.AccountedSourceParameters,
                 accounting.SourceParameters));
 
-            var generated = Path.Combine(output, "Profiles", "WakeLock");
-            var productionBytes = SnapshotTree(production);
-            var generatedBytes = SnapshotTree(generated);
-            Assert.Equal(42, generatedBytes.Count);
-            AssertTreesEqual(productionBytes, generatedBytes);
+            var generated1 = SnapshotTree(Path.Combine(
+                output1,
+                "Profiles",
+                "WakeLock"));
+            var generated2 = SnapshotTree(Path.Combine(
+                output2,
+                "Profiles",
+                "WakeLock"));
+            Assert.Equal(42, generated1.Count);
+            AssertTreesEqual(generated1, generated2);
             Assert.All(
-                generatedBytes.Values,
+                generated1.Values,
                 bytes => Assert.DoesNotContain((byte)'\r', bytes));
         }
         finally
         {
-            Directory.Delete(output, recursive: true);
+            Directory.Delete(output1, recursive: true);
+            Directory.Delete(output2, recursive: true);
         }
     }
 
