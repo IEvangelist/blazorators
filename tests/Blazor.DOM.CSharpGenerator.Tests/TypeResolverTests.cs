@@ -304,7 +304,44 @@ public sealed class TypeResolverTests
             "ValueTask<global::Microsoft.JSInterop.IReadOnlyBrowserArray<IRequest>>",
             result.CSharpType);
         Assert.Equal("js-reference", result.Transport?.Kind);
-        Assert.Equal("Promise<readonly Request[]>", result.Transport?.SourceType);
+        Assert.Equal("readonly Request[]", result.Transport?.SourceType);
+    }
+
+    [Fact]
+    public void Project_PromiseOfReferenceArray_PreservesBrowserArrayTransport()
+    {
+        var resolver = WithSymbol("MediaDeviceInfo");
+        var array = new ArrayTypeNode(
+            new ReferenceTypeNode("MediaDeviceInfo", "MediaDeviceInfo", []))
+        {
+            CheckerType = "MediaDeviceInfo[]",
+            Transport = new TransportModel(
+                "unsupported",
+                false,
+                "MediaDeviceInfo[]",
+                false,
+                false,
+                "Collection contains a non-JSON transport."),
+        };
+        var node = new ReferenceTypeNode("Promise", "Promise", [array])
+        {
+            CheckerType = "Promise<MediaDeviceInfo[]>",
+            Transport = new TransportModel(
+                "unsupported",
+                false,
+                "Promise<MediaDeviceInfo[]>",
+                false,
+                false,
+                "Collection contains a non-JSON transport."),
+        };
+
+        var result = resolver.Project(node, "test/return");
+
+        Assert.Equal(
+            "ValueTask<global::Microsoft.JSInterop.IBrowserArray<IMediaDeviceInfo>>",
+            result.CSharpType);
+        Assert.Equal("js-reference", result.Transport?.Kind);
+        Assert.Equal("MediaDeviceInfo[]", result.Transport?.SourceType);
     }
 
     // ── Nullable unions ────────────────────────────────────────────────────────
