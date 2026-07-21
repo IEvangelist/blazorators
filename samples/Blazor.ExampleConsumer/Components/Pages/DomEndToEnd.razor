@@ -1,0 +1,215 @@
+@page "/dom-e2e"
+@implements IAsyncDisposable
+@using Blazor.DOM
+@using Blazor.DOM.AdvancedTypes
+@inject IBrowser Browser
+@inject IDomSyncRuntime SyncRuntime
+@inject IServiceProvider Services
+
+<PageTitle>DOM end-to-end</PageTitle>
+
+<h1>DOM end-to-end</h1>
+
+<main id="dom-e2e"
+      data-host="webassembly"
+      data-phase="@_phase">
+    @foreach (var result in _results)
+    {
+        <output data-result="@result.Key">@result.Value</output>
+    }
+
+    <button id="dom-event-target" type="button">Dispatch typed event</button>
+    <button id="dom-dispose" type="button" @onclick="DisposeOwnedReferencesAsync">Dispose DOM references</button>
+    <output data-result="event-count">@_eventCount</output>
+    <output data-result="event-type">@_eventType</output>
+    <output data-result="borrowed-release">@_borrowedRelease</output>
+    <output data-result="proxy-release">@_proxyRelease</output>
+
+    @if (_error is not null)
+    {
+        <pre data-result="error">@_error</pre>
+    }
+</main>
+
+@code {
+    readonly SortedDictionary<string, string> _results = [];
+    string _phase = "booting";
+    string? _error;
+    string _eventType = "";
+    string _borrowedRelease = "pending";
+    string _proxyRelease = "pending";
+    int _eventCount;
+    IWindow? _window;
+    IDocument? _document;
+    INavigator? _navigator;
+    IHTMLElement? _eventTarget;
+    IResponse? _ownedResponse;
+    IPointerEvent? _borrowedEvent;
+    DomReferenceEventSubscription<IPointerEvent>? _subscription;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            await RunAsync();
+            _phase = "ready";
+        }
+        catch (Exception ex)
+        {
+            _error = ex.ToString();
+            _phase = "failed";
+        }
+
+        StateHasChanged();
+    }
+
+    async Task RunAsync()
+    {
+        _results["di-root"] = ReferenceEquals(Browser, Services.GetRequiredService<IBrowser>())
+            ? "resolved"
+            : "mismatch";
+
+        try
+        {
+            using var unexpected = SyncRuntime.GetGlobalRef("window");
+            _results["sync-before-init"] = "unexpected-success";
+        }
+        catch (InvalidOperationException)
+        {
+            _results["sync-before-init"] = "blocked";
+        }
+
+        _window = await Browser.GetWindowProxyAsync();
+        _document = _window.Document;
+        _navigator = _window.Navigator;
+
+        _results["window"] = _window.InnerWidth > 0 ? "read" : "invalid";
+        _results["document"] = _document.Title.Contains("DOM end-to-end", StringComparison.Ordinal)
+            ? "read"
+            : _document.Title;
+        _results["navigator"] =
+            !string.IsNullOrWhiteSpace(_navigator.UserAgent) &&
+            !string.IsNullOrWhiteSpace(_navigator.Language)
+                ? "read"
+                : "invalid";
+        _results["sync-after-init"] = _window.Document.URL.Contains("/dom-e2e", StringComparison.Ordinal)
+            ? "read"
+            : "invalid";
+
+        await using var urlFactory = await Browser.GetGlobalAsync<IURLFactory>("URL");
+        await using var url = urlFactory.Create(
+            DocumentUnionShape_3847f64189.FromString("data:text/plain,dom-e2e"),
+            DocumentUnionShape_3847f64189.FromString("http://localhost/"));
+        url.Hash = "mutated";
+        _results["mutable-property"] = url.Hash == "#mutated" ? "written" : url.Hash;
+
+        await using var response = await _window.FetchAsync(CacheUnionShape_c53da6bcf4.FromURL(url));
+        _ownedResponse = response.Clone();
+        _results["promise-union"] = await response.TextAsync() == "dom-e2e" ? "fulfilled" : "invalid";
+        _results["returned-proxy"] = _ownedResponse.Ok ? "read" : "invalid";
+
+        await using var clipboard = _navigator.Clipboard;
+        _results["feature-detection"] = clipboard is not null ? "available" : "missing";
+
+        try
+        {
+            await using var invalid = urlFactory.Create(
+                DocumentUnionShape_3847f64189.FromString("http://["),
+                DocumentUnionShape_3847f64189.FromString("http://localhost/"));
+            _results["js-error"] = "unexpected-success";
+        }
+        catch (JSException)
+        {
+            _results["js-error"] = "propagated";
+        }
+
+        _eventTarget = _document.GetElementById("dom-event-target")
+            ?? throw new InvalidOperationException("The DOM event target was not found.");
+        _subscription = await _eventTarget.SubscribeAsync(
+            DocumentEventMap.Click,
+            OnClickAsync);
+        _results["typed-event"] = "subscribed";
+    }
+
+    async Task OnClickAsync(DomBorrowedReference<IPointerEvent> borrowed)
+    {
+        _borrowedEvent = borrowed.Proxy;
+        _eventType = _borrowedEvent.Type;
+        _eventCount++;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task DisposeOwnedReferencesAsync()
+    {
+        if (_subscription is not null)
+        {
+            await _subscription.DisposeAsync();
+            await _subscription.DisposeAsync();
+        }
+
+        _borrowedRelease = IsReleased(_borrowedEvent, static value => _ = value.Type)
+            ? "released-once"
+            : "still-live";
+
+        if (_ownedResponse is not null)
+        {
+            await _ownedResponse.DisposeAsync();
+            await _ownedResponse.DisposeAsync();
+        }
+
+        _proxyRelease = IsReleased(_ownedResponse, static value => _ = value.Status)
+            ? "released-once"
+            : "still-live";
+    }
+
+    static bool IsReleased<T>(T? proxy, Action<T> access) where T : class
+    {
+        if (proxy is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            access(proxy);
+            return false;
+        }
+        catch (Exception ex) when (ex is JSException or ObjectDisposedException)
+        {
+            return true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_subscription is not null)
+        {
+            await _subscription.DisposeAsync();
+        }
+        if (_ownedResponse is not null)
+        {
+            await _ownedResponse.DisposeAsync();
+        }
+        if (_eventTarget is not null)
+        {
+            await _eventTarget.DisposeAsync();
+        }
+        if (_navigator is not null)
+        {
+            await _navigator.DisposeAsync();
+        }
+        if (_document is not null)
+        {
+            await _document.DisposeAsync();
+        }
+        if (_window is not null)
+        {
+            await _window.DisposeAsync();
+        }
+    }
+}
