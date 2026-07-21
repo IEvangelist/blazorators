@@ -125,7 +125,16 @@ public sealed class TypedUnionEmitterTests
         ]);
 
         var projection = resolver.Project(
-            new ReferenceTypeNode("Promise", "Promise", [union]),
+            new ReferenceTypeNode("Promise", "Promise", [union])
+            {
+                Transport = new TransportModel(
+                    "unsupported",
+                    false,
+                    "Promise<string | Blob>",
+                    false,
+                    false,
+                    "Union has incompatible transports."),
+            },
             "ClipboardItemData");
 
         Assert.StartsWith("ValueTask<global::Blazor.DOM.AdvancedTypes.", projection.RenderedType);

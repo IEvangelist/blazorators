@@ -117,7 +117,9 @@ internal static class UnionNormalization
         => type switch
         {
             KeywordTypeNode keyword when keyword.Name == "UndefinedKeyword"
-                || keyword.CheckerType == "undefined" => UnionSpecialArm.Undefined,
+                || keyword.CheckerType == "undefined"
+                || keyword.Name == "VoidKeyword"
+                || keyword.CheckerType == "void" => UnionSpecialArm.Undefined,
             LiteralTypeNode literal when literal.LiteralKind == "UndefinedKeyword"
                 => UnionSpecialArm.Undefined,
             KeywordTypeNode keyword when keyword.Name == "NullKeyword"

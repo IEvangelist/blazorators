@@ -236,6 +236,10 @@ internal static class DomTransportValidator
             }
             return null;
         }
+        if (value is IDomUnionValue nested)
+        {
+            return PrepareUnion(nested, path);
+        }
         return descriptor.Kind switch
         {
             DomTransportKind.JsonValue => NormalizeJsonValue(value, path),

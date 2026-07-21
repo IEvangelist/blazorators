@@ -97,7 +97,7 @@ internal static class UnionWrapperEmitter
             writer.AppendLine(
                 $"public {type} Get{arm.Name}() => Kind == ArmKind.{arm.Name}" +
                 $" ? ({type})_value! : throw new InvalidOperationException(" +
-                $"\"The union contains '{{Kind}}', not '{arm.Name}'.\");");
+                $"$\"The union contains '{{Kind}}', not '{arm.Name}'.\");");
             writer.AppendLine(
                 $"public bool TryGet{arm.Name}([MaybeNullWhen(false)] out {type} value)");
             writer.OpenBrace();
