@@ -91,7 +91,7 @@ public sealed class ProfileClosureRoutingTests
         Assert.Equal(
             webAssembly.OrderBy(name => name, StringComparer.Ordinal),
             instantiate.OrderBy(name => name, StringComparer.Ordinal));
-        Assert.Equal(1195, instantiate.Count);
+        Assert.Equal(1433, instantiate.Count);
         Assert.Contains("WebAssembly.CompileError", webAssembly);
         Assert.Contains("WebAssembly.Imports", instantiate);
         Assert.Contains("WebAssembly.Module", instantiate);
@@ -99,22 +99,22 @@ public sealed class ProfileClosureRoutingTests
         Assert.DoesNotContain("Imports", instantiate);
         Assert.DoesNotContain("Module", instantiate);
         Assert.DoesNotContain("Instance", instantiate);
-        Assert.Equal(25, CountExternal(instantiate, index));
+        Assert.Equal(30, CountExternal(instantiate, index));
 
         var cssEscape = TransitiveDependencyResolver.Resolve(
             ["CSS.escape"],
             index);
         Assert.Contains("CSS", cssEscape);
         Assert.Contains("CSS.supports", cssEscape);
-        Assert.Equal(1238, cssEscape.Count);
-        Assert.Equal(26, CountExternal(cssEscape, index));
+        Assert.Equal(1476, cssEscape.Count);
+        Assert.Equal(31, CountExternal(cssEscape, index));
 
         var innerWidth = TransitiveDependencyResolver.Resolve(
             ["innerWidth"],
             index);
         Assert.Contains("Window", innerWidth);
-        Assert.Equal(1167, innerWidth.Count);
-        Assert.Equal(25, CountExternal(innerWidth, index));
+        Assert.Equal(1405, innerWidth.Count);
+        Assert.Equal(30, CountExternal(innerWidth, index));
     }
 
     [Fact]
