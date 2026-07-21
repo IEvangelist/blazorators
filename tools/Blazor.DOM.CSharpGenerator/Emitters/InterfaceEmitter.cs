@@ -1092,6 +1092,18 @@ public sealed class InterfaceEmitter(
         var emittedName = returnProj.Identity.IsAwaitable
             ? $"{csBaseName}Async"
             : csBaseName;
+        var keyDomain = method.TypeParameters
+            .Select(parameter => parameter.Constraint)
+            .OfType<OperatorTypeNode>()
+            .FirstOrDefault(operation =>
+                operation.Operator is "keyof" or "KeyOfKeyword")
+            ?.OperandType as ReferenceTypeNode;
+        if (keyDomain is not null)
+        {
+            emittedName += "For" +
+                Naming.ToCSharpSimpleTypeName(
+                    keyDomain.ResolvedSymbol ?? keyDomain.Name);
+        }
         var csReturn = returnProj.RenderedType;
         var paramList = MergeGlobalParameterForms(
             symbolName,
@@ -1221,6 +1233,14 @@ public sealed class InterfaceEmitter(
         w.XmlDoc(docText, deprecated);
         foreach (var defaultNote in methodGeneric.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        if (!string.Equals(
+                emittedName,
+                Naming.ToCSharpMemberName(memberName),
+                StringComparison.Ordinal))
+        {
+            w.AppendLine(
+                $"[global::Microsoft.JSInterop.DomJavaScriptName(\"{EscapeCSharp(memberName)}\")]");
+        }
         if (memberName is "Symbol.iterator" or "Symbol.asyncIterator")
         {
             var symbol = memberName == "Symbol.iterator"
@@ -1352,6 +1372,14 @@ public sealed class InterfaceEmitter(
             w.XmlDoc(docText, deprecated);
         foreach (var defaultNote in methodGeneric.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
+        if (!string.Equals(
+                emittedName,
+                Naming.ToCSharpMemberName(javaScriptName),
+                StringComparison.Ordinal))
+        {
+            w.AppendLine(
+                $"[global::Microsoft.JSInterop.DomJavaScriptName(\"{EscapeCSharp(javaScriptName)}\")]");
+        }
         w.AppendLine(
             $"{returnProjection.RenderedType} {emittedName}" +
             $"{methodGeneric.TypeParameterList}(" +

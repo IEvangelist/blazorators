@@ -71,32 +71,30 @@ public sealed class GenericEmitterTests
                 error => error.Message.Contains(
                     "generic C# emission is deferred",
                     StringComparison.Ordinal));
-            var genericConstraintDeferral = Assert.Single(
-                result.Manifest.Accounting.DeferredSymbols,
-                entry => entry.Symbol == "WebAssembly.GlobalDescriptor");
-            Assert.Equal(
-                "advanced-generic-constraints",
-                genericConstraintDeferral.Phase);
             Assert.All(
-                new[] { "OptionalPrefixToken", "OptionalPostfixToken" },
-                symbolName => Assert.Contains(
+                new[]
+                {
+                    "WebAssembly.GlobalDescriptor",
+                    "OptionalPrefixToken",
+                    "OptionalPostfixToken",
+                    "WebAssembly.Global",
+                },
+                symbolName => Assert.DoesNotContain(
                     result.Manifest.Accounting.DeferredSymbols,
-                    entry => entry.Symbol == symbolName
-                        && entry.Phase == "advanced-generic-constraints"));
+                    entry => entry.Symbol == symbolName));
             Assert.Contains(
-                result.Manifest.Accounting.DeferredSymbols,
-                entry => entry.Symbol == "WebAssembly.Global"
-                    && entry.Phase == "advanced-generic-constraints");
-            Assert.DoesNotContain(
                 result.WrittenFiles,
                 file => file.RelativePath.EndsWith(
                     "IGlobalFactory.g.cs",
                     StringComparison.Ordinal));
-            Assert.Contains(
+            Assert.DoesNotContain(
                 result.Manifest.Accounting.DeferredMemberEntries,
                 entry => entry.SymbolName == "ReadableStreamBYOBReader"
-                    && entry.MemberName == "read"
-                    && entry.Phase == "advanced-generic-constraints");
+                    && entry.MemberName == "read");
+            var globals = Read(output, "Globals", "IWindow.Globals.g.cs");
+            Assert.Contains("DomGlobalAlias(\"toString\")", globals);
+            Assert.Contains("GlobalToString", globals);
+            Assert.Contains("DomGlobalAlias(\"name\")", globals);
             Assert.Contains(
                 result.Manifest.Accounting.DeferredMemberEntries,
                 entry => entry.MemberName == "addEventListener"
@@ -440,8 +438,7 @@ public sealed class GenericEmitterTests
             new InterfaceEmitter(resolver, "1.0.0", "Blazor.DOM").Emit(target));
         Assert.Contains("incompatible generic constraints", collision.Message);
 
-        var unsupportedConstraint = Assert.Throws<GenericDeferralException>(() =>
-            resolver.CreateGenericDeclaration(
+        var keyConstraint = resolver.CreateGenericDeclaration(
                 [
                     new TypeParameterModel(
                         0,
@@ -451,10 +448,10 @@ public sealed class GenericEmitterTests
                             new ReferenceTypeNode("BaseType", "BaseType", [])),
                         null)
                 ],
-                "Target/Map"));
+                "Target/Map");
         Assert.Equal(
-            "advanced-generic-constraints",
-            unsupportedConstraint.Phase);
+            ["where T : global::Microsoft.JSInterop.ITypeScriptKeyOf<IBaseType>"],
+            keyConstraint.ConstraintClauses);
 
         var unsupportedDefault = Assert.Throws<GenericDeferralException>(() =>
             resolver.CreateGenericDeclaration(
@@ -551,11 +548,13 @@ public sealed class GenericEmitterTests
 
         foreach (var constraint in constraints)
         {
-            var error = Assert.Throws<GenericDeferralException>(() =>
-                resolver.CreateGenericDeclaration(
+            var structuralDeclaration = resolver.CreateGenericDeclaration(
                     [new TypeParameterModel(0, "T", constraint, null)],
-                    "ConstraintFixture"));
-            Assert.Equal("advanced-generic-constraints", error.Phase);
+                    $"ConstraintFixture/{constraint.Kind}");
+            Assert.Single(structuralDeclaration.ConstraintClauses);
+            Assert.Contains(
+                "AdvancedTypes.ConstraintFixtureConstraintShape_",
+                structuralDeclaration.ConstraintClauses[0]);
         }
 
         var declaration = resolver.CreateGenericDeclaration(

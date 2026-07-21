@@ -516,31 +516,6 @@ internal sealed class GlobalNamespaceEmitter(
             .Single(overload =>
                 overload.Declaration.Ordinal == route.Declaration.Ordinal
                 && overload.Kind == "globalFunction");
-        if (route.TypeScriptNamespace is null
-            && route.Symbol.Name == "toString")
-        {
-            const string reason =
-                "The ambient toString declaration is a JavaScript global alias " +
-                "that would collide with System.Object.ToString; it is intentionally " +
-                "deferred to global-alias.";
-            AddDeclarationOutcome(
-                route,
-                MemberOutcomeStatus.Deferred,
-                GlobalAliasPhase,
-                reason);
-            AddOverloadOutcome(
-                sourceOverload,
-                MemberOutcomeStatus.Deferred,
-                GlobalAliasPhase,
-                reason,
-                CreateParameterOutcomes(
-                    sourceOverload,
-                    MemberOutcomeStatus.Deferred,
-                    GlobalAliasPhase,
-                    reason));
-            return;
-        }
-
         ContractCallableResult callable;
         try
         {
@@ -550,7 +525,26 @@ internal sealed class GlobalNamespaceEmitter(
                 route.Declaration.Parameters,
                 route.Declaration.ReturnType,
                 route.Declaration.Documentation,
-                sourceOverload.Provenance);
+                sourceOverload.Provenance,
+                csharpNameOverride: route.TypeScriptNamespace is null
+                    && route.Symbol.Name == "toString"
+                        ? "GlobalToString"
+                        : null);
+            if (route.TypeScriptNamespace is null
+                && route.Symbol.Name == "toString")
+            {
+                callable = callable with
+                {
+                    Signatures = callable.Signatures
+                        .Select(signature => signature with
+                        {
+                            Rendered =
+                                "[global::Microsoft.JSInterop.DomGlobalAlias(\"toString\")]\n" +
+                                signature.Rendered,
+                        })
+                        .ToList(),
+                };
+            }
         }
         catch (ContractCallableException exception)
         {
@@ -702,14 +696,17 @@ internal sealed class GlobalNamespaceEmitter(
                 Name: "VoidKeyword",
             })
         {
-            const string reason =
-                "Deprecated ambient void global is a TypeScript compatibility " +
-                "alias and is intentionally deferred to global-alias.";
-            AddDeclarationOutcome(
-                route,
-                MemberOutcomeStatus.Deferred,
-                GlobalAliasPhase,
-                reason);
+            var aliasName = Naming.ToCSharpMemberName(route.Declaration.Name)
+                + "GlobalAlias";
+            var aliasProperty = new ContractPropertyResult(
+                "[global::Microsoft.JSInterop.DomGlobalAlias(\"" +
+                route.Declaration.Name.Replace("\"", "\\\"", StringComparison.Ordinal) +
+                "\")]\n" +
+                $"global::Microsoft.JSInterop.BrowserUndefined {aliasName} {{ get; }}",
+                $"property:{aliasName}",
+                "global::Microsoft.JSInterop.BrowserUndefined",
+                Mutable: false);
+            AddPropertyToContract(_windowContract, route, aliasProperty);
             return;
         }
 
