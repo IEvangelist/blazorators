@@ -93,6 +93,9 @@ public sealed class DictionaryEmitterTests
         var source = emitter.Emit(symbol);
 
         // D4: record must inherit from EventListenerOptions
+        Assert.Contains(
+            "[global::Microsoft.JSInterop.DomJsonValue]",
+            source);
         Assert.Contains("public record AddEventListenerOptions : EventListenerOptions", source);
         Assert.Contains("bool? Once", source);
         Assert.Contains("bool? Passive", source);
