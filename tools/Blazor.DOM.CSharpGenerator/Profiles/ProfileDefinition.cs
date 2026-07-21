@@ -2,6 +2,7 @@
 // Profile JSON files live at data/Blazor.DOM.Profiles/*.profile.json.
 
 using System.Text.Json.Serialization;
+using Blazor.DOM.CSharpGenerator.Hosts;
 
 namespace Blazor.DOM.CSharpGenerator.Profiles;
 
@@ -21,5 +22,7 @@ public sealed record ProfileDefinition(
     [property: JsonPropertyName("memberIncludes")]
         IReadOnlyDictionary<string, IReadOnlyList<string>>? MemberIncludes = null,
     [property: JsonPropertyName("minimalDependencyContracts")]
-        bool MinimalDependencyContracts = false
+        bool MinimalDependencyContracts = false,
+    [property: JsonPropertyName("entryPoints")]
+        IReadOnlyList<HostEntryPoint>? EntryPoints = null
 );
