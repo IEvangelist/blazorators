@@ -47,8 +47,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsPackable>true</IsPackable>
     <PackageIcon>logo.png</PackageIcon>
-    <_SharedDomStaticAsset>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM\wwwroot\blazorators.dom.js'))</_SharedDomStaticAsset>
-    <_SharedDomStaticAssetRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM\wwwroot\'))</_SharedDomStaticAssetRoot>
+    <_SharedDomStaticAssetSource>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM\wwwroot\blazorators.dom.js'))</_SharedDomStaticAssetSource>
   </PropertyGroup>
 
   <ItemGroup>
@@ -81,9 +80,6 @@
              LinkBase="SharedRuntime\Proxies" />
     <Compile Include="..\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
              Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
-    <Content Include="$(_SharedDomStaticAsset)"
-             Link="wwwroot\blazorators.dom.js"
-             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Label="Generated DOM contracts">
@@ -104,11 +100,28 @@
           PackagePath="build\Blazor.DOM.WebAssembly.host-parity.json" />
   </ItemGroup>
 
-  <Target Name="CorrectLinkedDomStaticAssetRoot"
+  <Target Name="StageDomStaticAsset"
+          BeforeTargets="ResolveProjectStaticWebAssets">
+    <PropertyGroup>
+      <_PackageDomStaticAssetRoot>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)dom-static-assets\'))</_PackageDomStaticAssetRoot>
+      <_PackageDomStaticAsset>$(_PackageDomStaticAssetRoot)blazorators.dom.js</_PackageDomStaticAsset>
+    </PropertyGroup>
+    <MakeDir Directories="$(_PackageDomStaticAssetRoot)" />
+    <Copy SourceFiles="$(_SharedDomStaticAssetSource)"
+          DestinationFiles="$(_PackageDomStaticAsset)"
+          SkipUnchangedFiles="true" />
+    <ItemGroup>
+      <Content Include="$(_PackageDomStaticAsset)"
+               Link="wwwroot\blazorators.dom.js"
+               CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CorrectPackagedDomStaticAssetRoot"
           AfterTargets="ResolveProjectStaticWebAssets">
     <ItemGroup>
-      <StaticWebAsset Update="$(_SharedDomStaticAsset)">
-        <ContentRoot>$(_SharedDomStaticAssetRoot)</ContentRoot>
+      <StaticWebAsset Update="$(_PackageDomStaticAsset)">
+        <ContentRoot>$(_PackageDomStaticAssetRoot)</ContentRoot>
       </StaticWebAsset>
     </ItemGroup>
   </Target>
