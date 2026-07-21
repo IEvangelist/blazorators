@@ -375,6 +375,7 @@ public static class HostPackageEmitter
             });
         writer.AppendLine();
         var dependencies = host == DomHostKind.Server
+            || capability.EntryPoints.All(entry => entry.InvokesFunction)
             ? "IBrowser browser"
             : "IBrowser browser, IDomProxyFactory proxyFactory, IDomRuntime runtime";
         writer.Block(

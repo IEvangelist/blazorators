@@ -103,9 +103,10 @@ public static class ProfileLoader
                     $"Package profile '{profile.Name}' has an incomplete reviewed " +
                     "exclusion; symbol, member, and rationale are required.");
             }
-            if (profile.MemberIncludes?.TryGetValue(
+            if (profile.MemberIncludes is null
+                || !profile.MemberIncludes.TryGetValue(
                     exclusion.Symbol,
-                    out var includedMembers) != true)
+                    out var includedMembers))
             {
                 throw new InvalidDataException(
                     $"Package profile '{profile.Name}' reviewed exclusion " +
