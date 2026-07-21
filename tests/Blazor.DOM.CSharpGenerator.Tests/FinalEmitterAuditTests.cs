@@ -954,13 +954,13 @@ public sealed class FinalEmitterAuditTests
             Assert.Equal((16, 16), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
-            Assert.Equal((25, 25), (
+            Assert.Equal((23, 23), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
-            Assert.Equal((14, 14), (
+            Assert.Equal((12, 12), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
-            Assert.Equal((23, 23), (
+            Assert.Equal((17, 17), (
                 accounting.AccountedSourceParameters,
                 accounting.SourceParameters));
 

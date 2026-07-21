@@ -6,7 +6,7 @@ namespace Blazor.DOM.WakeLock.CompilationTests;
 internal static class WakeLockUsageStub
 {
     internal static void Verify(
-        IEventTarget target,
+        IWakeLockSentinel target,
         EventListenerOrEventListenerObject callback)
     {
         // Overload 1: no third param (2-arg call must not be ambiguous)

@@ -1,0 +1,22 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "StorageManagement",
+  "description": "Storage API - estimate usage, request persistence, and access the origin-private file system.",
+  "rootSymbols": ["StorageManager"],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["storage", "origin-private-file-system"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/StorageManagement",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "StorageManager": ["estimate", "getDirectory", "persist", "persisted"]
+  },
+  "entryPoints": [
+    {
+      "name": "StorageManager",
+      "symbol": "StorageManager",
+      "javaScriptPath": "navigator.storage"
+    }
+  ]
+}
