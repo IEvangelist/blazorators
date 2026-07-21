@@ -205,6 +205,7 @@ public sealed class GenericEmitterTests
                 new ReferenceTypeNode("T", "Outer.Map.T", []),
                 "fixture/inner",
                 inner).CanonicalType);
+        Assert.Equal("T_1", inner.Parameters[0].CSharpName);
         Assert.Equal(
             "!0",
             resolver.Project(
@@ -227,6 +228,117 @@ public sealed class GenericEmitterTests
                 "fixture/out-of-scope",
                 inner));
         Assert.Contains("outside the active lexical generic scope", outOfScope.Message);
+
+        var normalizedOuter = GenericScope.Create(
+            [new TypeParameterModel(0, "T$U", null, null)],
+            "NormalizedOuter");
+        var normalizedInner = GenericScope.Create(
+            [new TypeParameterModel(0, "T_U", null, null)],
+            "NormalizedOuter/Inner",
+            normalizedOuter);
+        Assert.Equal("T_U", normalizedOuter.Parameters[0].CSharpName);
+        Assert.Equal("T_U_1", normalizedInner.Parameters[0].CSharpName);
+
+        var sibling = GenericScope.Create(
+            [new TypeParameterModel(0, "T", null, null)],
+            "Outer/Sibling",
+            outer);
+        Assert.Equal("T_1", sibling.Parameters[0].CSharpName);
+        Assert.Equal("T_1", inner.Parameters[0].CSharpName);
+    }
+
+    [Fact]
+    public void Resolver_DefaultsUseTargetIdentity_AndQualifiedBuiltInsRemainNominal()
+    {
+        var foo = MakeGenericInterfaceSymbol(
+            "Foo",
+            [
+                new TypeParameterModel(0, "T", null, null),
+                new TypeParameterModel(
+                    1,
+                    "U",
+                    null,
+                    new ReferenceTypeNode("T", "Foo.T", [])),
+                new TypeParameterModel(
+                    2,
+                    "V",
+                    null,
+                    new ReferenceTypeNode(
+                        "Array",
+                        "Array",
+                        [new ReferenceTypeNode("U", "Foo.U", [])]))
+            ]);
+        var collisions = new[]
+        {
+            MakeGenericInterfaceSymbol(
+                "Namespace.Map",
+                [
+                    new TypeParameterModel(0, "K", null, null),
+                    new TypeParameterModel(1, "V", null, null),
+                ]),
+            MakeGenericInterfaceSymbol(
+                "Namespace.Set",
+                [new TypeParameterModel(0, "T", null, null)]),
+            MakeGenericInterfaceSymbol(
+                "Namespace.Readonly",
+                [new TypeParameterModel(0, "T", null, null)]),
+            MakeGenericInterfaceSymbol(
+                "Namespace.Array",
+                [new TypeParameterModel(0, "T", null, null)]),
+        };
+        var resolver = new TypeResolver([foo, .. collisions]);
+
+        Assert.Equal(
+            "IFoo<string, string, string[]>",
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Foo",
+                    "Foo",
+                    [new KeywordTypeNode("StringKeyword")]),
+                "Caller/Foo").RenderedType);
+
+        Assert.Equal(
+            [
+                "global::Blazor.DOM.Namespaces.Namespace.IMap<string, double>",
+                "global::Blazor.DOM.Namespaces.Namespace.ISet<string>",
+                "global::Blazor.DOM.Namespaces.Namespace.IReadonly<string>",
+                "global::Blazor.DOM.Namespaces.Namespace.IArray<string>",
+            ],
+            collisions.Select(symbol =>
+            {
+                var simpleName = symbol.Name[(symbol.Name.LastIndexOf('.') + 1)..];
+                var arguments = simpleName == "Map"
+                    ? new TypeNode[]
+                    {
+                        new KeywordTypeNode("StringKeyword"),
+                        new KeywordTypeNode("NumberKeyword"),
+                    }
+                    : [new KeywordTypeNode("StringKeyword")];
+                return resolver.Project(
+                    new ReferenceTypeNode(simpleName, symbol.Name, arguments),
+                    $"Caller/{symbol.Name}").RenderedType;
+            }));
+
+        var cycle = MakeGenericInterfaceSymbol(
+            "Cycle",
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    null,
+                    new ReferenceTypeNode("U", "Cycle.U", [])),
+                new TypeParameterModel(
+                    1,
+                    "U",
+                    null,
+                    new ReferenceTypeNode("T", "Cycle.T", [])),
+            ]);
+        var cycleError = Assert.Throws<GenericDeferralException>(() =>
+            new TypeResolver([cycle]).Project(
+                new ReferenceTypeNode("Cycle", "Cycle", []),
+                "Caller/Cycle"));
+        Assert.Equal("generic-defaults", cycleError.Phase);
+        Assert.Equal("Caller/Cycle/defaultTypeArgument[0]", cycleError.Provenance);
     }
 
     [Fact]
@@ -446,6 +558,23 @@ public sealed class GenericEmitterTests
                 false,
                 [],
                 []));
+
+    private static SymbolModel MakeGenericInterfaceSymbol(
+        string name,
+        IReadOnlyList<TypeParameterModel> typeParameters)
+    {
+        var symbol = MakeInterfaceSymbol(name, []);
+        return symbol with
+        {
+                Declarations =
+                [
+                    symbol.Declarations[0] with
+                    {
+                        TypeParameters = typeParameters,
+                    }
+                ],
+        };
+    }
 
     private static (IrBundle Ir, TypeResolver Resolver) LoadCorpus()
     {

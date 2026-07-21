@@ -38,22 +38,20 @@ public sealed class GenericScope
         var path = provenance.Split(
             '/',
             StringSplitOptions.RemoveEmptyEntries);
-        var owner = path.FirstOrDefault() ?? provenance;
-        var lexicalName = path
+        var lexicalIdentity = string.Join(
+            ".",
+            path
             .Where(segment =>
                 !segment.StartsWith("decl[", StringComparison.Ordinal)
                 && !segment.StartsWith("member[", StringComparison.Ordinal)
-                && !segment.StartsWith("typeParameter[", StringComparison.Ordinal))
-            .LastOrDefault() ?? owner;
+                && !segment.StartsWith("typeParameter[", StringComparison.Ordinal)));
         _byResolvedName = parameters
             .SelectMany(parameter =>
             {
                 var names = new List<string>
                 {
                     parameter.SourceName,
-                    parent is null
-                        ? $"{owner}.{parameter.SourceName}"
-                        : $"{owner}.{lexicalName}.{parameter.SourceName}",
+                    $"{lexicalIdentity}.{parameter.SourceName}",
                 };
                 return names.Select(name =>
                     new KeyValuePair<string, GenericParameterBinding>(
@@ -80,6 +78,8 @@ public sealed class GenericScope
         var ordered = parameters.ToList();
         var bindings = new List<GenericParameterBinding>(ordered.Count);
         var normalizedNames = new Dictionary<string, string>(StringComparer.Ordinal);
+        var ancestorNames = parent?.GetCSharpNames()
+            ?? new HashSet<string>(StringComparer.Ordinal);
         foreach (var parameter in ordered)
         {
             if (string.IsNullOrWhiteSpace(parameter.Name))
@@ -109,6 +109,19 @@ public sealed class GenericScope
                     $"'{parameter.Name}' at '{provenance}' normalize to the duplicate " +
                     $"C# name '{csharpName}'.",
                     $"{provenance}/typeParameter[{parameter.Ordinal}]");
+            }
+            if (ancestorNames.Contains(csharpName))
+            {
+                var suffix = 1;
+                var renamed = $"{csharpName}_{suffix}";
+                while (ancestorNames.Contains(renamed)
+                    || normalizedNames.ContainsKey(renamed))
+                {
+                    renamed = $"{csharpName}_{++suffix}";
+                }
+                normalizedNames.Remove(csharpName);
+                normalizedNames.Add(renamed, parameter.Name);
+                csharpName = renamed;
             }
 
             bindings.Add(new GenericParameterBinding(
@@ -154,6 +167,15 @@ public sealed class GenericScope
     public bool ContainsSourceName(string sourceName)
         => _bySourceName.ContainsKey(sourceName)
             || Parent?.ContainsSourceName(sourceName) == true;
+
+    private HashSet<string> GetCSharpNames()
+    {
+        var names = Parent?.GetCSharpNames()
+            ?? new HashSet<string>(StringComparer.Ordinal);
+        foreach (var parameter in Parameters)
+            names.Add(parameter.CSharpName);
+        return names;
+    }
 }
 
 public sealed record GenericDeclaration(

@@ -45,7 +45,8 @@ public static class TransitiveDependencyResolver
             {
                 var declarationScope = AddTypeParameters(
                     EmptyTypeParameterScope,
-                    decl.TypeParameters);
+                    decl.TypeParameters,
+                    symbol.Name);
                 EnqueueTypeParameters(
                     decl.TypeParameters,
                     declarationScope);
@@ -133,13 +134,18 @@ public static class TransitiveDependencyResolver
 
     private static IReadOnlySet<string> AddTypeParameters(
         IReadOnlySet<string> parent,
-        IReadOnlyList<TypeParameterModel> parameters)
+        IReadOnlyList<TypeParameterModel> parameters,
+        string? ownerIdentity = null)
     {
         if (parameters.Count == 0)
             return parent;
         var scope = new HashSet<string>(parent, StringComparer.Ordinal);
         foreach (var parameter in parameters)
+        {
             scope.Add(parameter.Name);
+            if (!string.IsNullOrWhiteSpace(ownerIdentity))
+                scope.Add($"{ownerIdentity}.{parameter.Name}");
+        }
         return scope;
     }
 
@@ -156,7 +162,7 @@ public static class TransitiveDependencyResolver
                     ? r.Name
                     : r.ResolvedSymbol;
                 if (!string.IsNullOrEmpty(referenceIdentity)
-                    && !typeParameterScope.Contains(r.Name))
+                    && !typeParameterScope.Contains(referenceIdentity))
                     yield return referenceIdentity;
                 foreach (var ta in r.TypeArguments)
                     foreach (var n in CollectTypeNames(ta, typeParameterScope))
