@@ -185,6 +185,10 @@ public sealed record GenericDeclaration(
     string CanonicalConstraints,
     IReadOnlyList<string> DefaultNotes)
 {
+    public int EmittedArity => string.IsNullOrEmpty(TypeParameterList)
+        ? 0
+        : TypeParameterList.Count(character => character == ',') + 1;
+
     public string ConstraintSuffix => ConstraintClauses.Count == 0
         ? ""
         : " " + string.Join(" ", ConstraintClauses);

@@ -59,7 +59,9 @@ public sealed class InterfaceEmitter(
         string ReturnType,
         string CanonicalConstraints,
         int DeclarationOrdinal,
-        int OptionalParamCount = 0);
+        int OptionalParamCount = 0,
+        bool HasRestParameter = false,
+        bool IsDefaultExpansion = false);
     private sealed record MethodBuildResult(
         IReadOnlyList<MethodSig> Outputs,
         IReadOnlyList<MemberOutcome> Outcomes,
@@ -263,6 +265,16 @@ public sealed class InterfaceEmitter(
                             if (!string.Equals(existing.ReturnType, sig.ReturnType, StringComparison.Ordinal))
                             {
                                 var methodName = methodRef.Member.Name?.Text ?? "";
+                                if (existing.IsDefaultExpansion || sig.IsDefaultExpansion)
+                                {
+                                    throw new GenericDeferralException(
+                                        $"Default-expanded generic method " +
+                                        $"'{symbol.Name}.{methodName}' collides with an " +
+                                        "existing CLR signature with a different return type.",
+                                        $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
+                                        $"{methodName}/generic-default",
+                                        "generic-method-defaults");
+                                }
                                 throw new TypeProjectionException(
                                     $"Method '{symbol.Name}.{methodName}' in decl[{methodRef.DeclarationOrdinal}] collides with decl[{existing.DeclarationOrdinal}] " +
                                     $"for canonical signature '{sig.CanonicalKey}' but has incompatible return types '{existing.ReturnType}' and '{sig.ReturnType}'.",
@@ -274,13 +286,25 @@ public sealed class InterfaceEmitter(
                                     StringComparison.Ordinal))
                             {
                                 var methodName = methodRef.Member.Name?.Text ?? "";
+                                if (existing.IsDefaultExpansion || sig.IsDefaultExpansion)
+                                {
+                                    throw new GenericDeferralException(
+                                        $"Default-expanded generic method " +
+                                        $"'{symbol.Name}.{methodName}' collides with " +
+                                        "incompatible generic constraints.",
+                                        $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/" +
+                                        $"{methodName}/generic-default",
+                                        "generic-method-defaults");
+                                }
                                 throw new TypeProjectionException(
                                     $"Method '{symbol.Name}.{methodName}' in decl[{methodRef.DeclarationOrdinal}] collides with decl[{existing.DeclarationOrdinal}] " +
                                     $"for canonical signature '{sig.CanonicalKey}' but has incompatible generic constraints.",
                                     $"{symbol.Name}/decl[{methodRef.DeclarationOrdinal}]/{methodName}/constraints");
                             }
 
-                            if (sig.OptionalParamCount > existing.OptionalParamCount
+                            if ((sig.HasRestParameter && !existing.HasRestParameter
+                                    || sig.HasRestParameter == existing.HasRestParameter
+                                    && sig.OptionalParamCount > existing.OptionalParamCount)
                                 && emittedMethodOutputIndices.TryGetValue(sig.CanonicalKey, out var outputIndex))
                             {
                                 methodOutputs[outputIndex] = sig.Rendered;
@@ -787,6 +811,76 @@ public sealed class InterfaceEmitter(
                 $"// DEFERRED ({exception.Phase}): {memberName} — {exception.Message}");
         }
 
+        IReadOnlyList<GenericDeclaration> defaultExpansions;
+        try
+        {
+            defaultExpansions = typeResolver.CreateDefaultExpandedDeclarations(
+                method.TypeParameters,
+                provenance,
+                declarationScope,
+                canonicalPrefix: "!!");
+        }
+        catch (GenericDeferralException exception)
+        {
+            return new MethodBuildResult(
+                [],
+                [
+                    new MemberOutcome(
+                        method.Ordinal,
+                        memberName,
+                        method.Kind,
+                        MemberOutcomeStatus.Deferred,
+                        exception.Phase,
+                        exception.Message,
+                        declOrdinal)
+                ],
+                $"// DEFERRED ({exception.Phase}): {memberName} — {exception.Message}");
+        }
+
+        var outputs = new List<MethodSig>();
+        outputs.AddRange(BuildMethodVariant(
+            method,
+            symbolName,
+            declOrdinal,
+            provenance,
+            methodGeneric,
+            isDefaultExpansion: false));
+        foreach (var expansion in defaultExpansions)
+        {
+            outputs.AddRange(BuildMethodVariant(
+                method,
+                symbolName,
+                declOrdinal,
+                provenance,
+                expansion,
+                isDefaultExpansion: true));
+        }
+        return new MethodBuildResult(
+            outputs,
+            [
+                new MemberOutcome(
+                    method.Ordinal,
+                    memberName,
+                    method.Kind,
+                    MemberOutcomeStatus.Projected,
+                    null,
+                    defaultExpansions.Count == 0
+                        ? null
+                        : $"Emitted {defaultExpansions.Count} default-expanded overload(s).",
+                    declOrdinal)
+            ]);
+    }
+
+    private IReadOnlyList<MethodSig> BuildMethodVariant(
+        MemberModel method,
+        string symbolName,
+        int declOrdinal,
+        string provenance,
+        GenericDeclaration methodGeneric,
+        bool isDefaultExpansion)
+    {
+        var memberName = method.Name?.Text
+            ?? throw new InvalidOperationException("Method name is required.");
         var returnProj = typeResolver.Project(
             method.ReturnType,
             $"{provenance}/return",
@@ -828,7 +922,8 @@ public sealed class InterfaceEmitter(
                 deprecated,
                 provenance,
                 declOrdinal,
-                methodGeneric);
+                methodGeneric,
+                isDefaultExpansion);
             var boolOverload = BuildMethodSignature(
                 emittedName,
                 csReturn,
@@ -843,7 +938,8 @@ public sealed class InterfaceEmitter(
                 false,
                 provenance,
                 declOrdinal,
-                methodGeneric);
+                methodGeneric,
+                isDefaultExpansion);
             var optOverload = BuildMethodSignature(
                 emittedName,
                 csReturn,
@@ -858,24 +954,15 @@ public sealed class InterfaceEmitter(
                 false,
                 provenance,
                 declOrdinal,
-                methodGeneric);
+                methodGeneric,
+                isDefaultExpansion);
 
-            return new MethodBuildResult(
-                [noOptionsOverload, boolOverload, optOverload],
-                [
-                    new MemberOutcome(
-                        method.Ordinal,
-                        memberName,
-                        method.Kind,
-                        MemberOutcomeStatus.Projected,
-                        null,
-                        $"Expanded bool|{optionsTypeName} optional param into three unambiguous overloads (no-arg, bool, options).",
-                        declOrdinal)
-                ]);
+            return [noOptionsOverload, boolOverload, optOverload];
         }
 
         var parts = new List<string>();
         var canonicalParamTypes = new List<string>();
+        var hasRestParameter = false;
         foreach (var p in paramList)
         {
             var pProj = typeResolver.Project(
@@ -887,6 +974,7 @@ public sealed class InterfaceEmitter(
 
             if (p.Rest)
             {
+                hasRestParameter = true;
                 var restElementType = pType.EndsWith("[]", StringComparison.Ordinal) ? pType[..^2] : pType;
                 parts.Add($"params {restElementType}[] {pName}");
                 canonicalParamTypes.Add(pProj.CanonicalType);
@@ -912,31 +1000,27 @@ public sealed class InterfaceEmitter(
 
         var w = new CSharpWriter();
         w.XmlDoc(docText, deprecated);
+        foreach (var defaultNote in methodGeneric.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
         w.AppendLine(
             $"{csReturn} {emittedName}{methodGeneric.TypeParameterList}(" +
             $"{string.Join(", ", parts)}){methodGeneric.ConstraintSuffix};");
 
-        return new MethodBuildResult(
-            [new MethodSig(
+        return
+        [
+            new MethodSig(
                 w.ToString().TrimEnd(),
                 CanonicalMethodKey(
                     emittedName,
-                    methodGeneric.Scope.Parameters.Count,
+                    methodGeneric.EmittedArity,
                     canonicalParamTypes),
                 returnProj.CanonicalType,
                 methodGeneric.CanonicalConstraints,
                 declOrdinal,
-                optionalParamCount)],
-            [
-                new MemberOutcome(
-                    method.Ordinal,
-                    memberName,
-                    method.Kind,
-                    MemberOutcomeStatus.Projected,
-                    null,
-                    null,
-                    declOrdinal)
-            ]);
+                optionalParamCount,
+                hasRestParameter,
+                isDefaultExpansion)
+        ];
     }
 
     private MethodSig BuildMethodSignature(
@@ -953,11 +1037,13 @@ public sealed class InterfaceEmitter(
         bool deprecated,
         string provenance,
         int declOrdinal,
-        GenericDeclaration methodGeneric)
+        GenericDeclaration methodGeneric,
+        bool isDefaultExpansion)
     {
         var parts = new List<string>();
         var canonicalParamTypes = new List<string>();
         var optionalParamCount = 0;
+        var hasRestParameter = false;
         for (var i = 0; i < paramList.Count; i++)
         {
             if (dropFromIndex >= 0 && i >= dropFromIndex)
@@ -981,6 +1067,7 @@ public sealed class InterfaceEmitter(
 
             if (p.Rest)
             {
+                hasRestParameter = true;
                 var restElementType = pType.EndsWith("[]", StringComparison.Ordinal) ? pType[..^2] : pType;
                 parts.Add($"params {restElementType}[] {pName}");
                 canonicalParamTypes.Add(pProj.CanonicalType);
@@ -1007,6 +1094,8 @@ public sealed class InterfaceEmitter(
         var w = new CSharpWriter();
         if (docText is not null)
             w.XmlDoc(docText, deprecated);
+        foreach (var defaultNote in methodGeneric.DefaultNotes)
+            w.AppendLine($"// TypeScript generic default: {defaultNote}.");
         w.AppendLine(
             $"{csReturn} {emittedName}{methodGeneric.TypeParameterList}(" +
             $"{string.Join(", ", parts)}){methodGeneric.ConstraintSuffix};");
@@ -1015,12 +1104,14 @@ public sealed class InterfaceEmitter(
             w.ToString().TrimEnd(),
             CanonicalMethodKey(
                 emittedName,
-                methodGeneric.Scope.Parameters.Count,
+                methodGeneric.EmittedArity,
                 canonicalParamTypes),
             canonicalReturnType,
             methodGeneric.CanonicalConstraints,
             declOrdinal,
-            optionalParamCount);
+            optionalParamCount,
+            hasRestParameter,
+            isDefaultExpansion);
     }
 
     private static string BuildBaseClause(

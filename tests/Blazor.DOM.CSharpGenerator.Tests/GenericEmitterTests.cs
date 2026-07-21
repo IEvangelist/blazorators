@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Blazor.DOM.CSharpGenerator.Accounting;
 using Blazor.DOM.CSharpGenerator.Emitters;
 using Blazor.DOM.CSharpGenerator.IR;
 using Blazor.DOM.CSharpGenerator.Output;
@@ -68,6 +69,15 @@ public sealed class GenericEmitterTests
                     result.Manifest.Accounting.DeferredSymbols,
                     entry => entry.Symbol == symbolName
                         && entry.Phase == "advanced-generic-constraints"));
+            Assert.Contains(
+                result.Manifest.Accounting.DeferredSymbols,
+                entry => entry.Symbol == "WebAssembly.Global"
+                    && entry.Phase == "advanced-generic-constraints");
+            Assert.DoesNotContain(
+                result.WrittenFiles,
+                file => file.RelativePath.EndsWith(
+                    "IGlobalFactory.g.cs",
+                    StringComparison.Ordinal));
             Assert.Contains(
                 result.Manifest.Accounting.DeferredMemberEntries,
                 entry => entry.SymbolName == "ReadableStreamBYOBReader"
@@ -544,6 +554,178 @@ public sealed class GenericEmitterTests
     }
 
     [Fact]
+    public void GenericMethodDefaults_EmitDeterministicExpandedOverloads()
+    {
+        var method = MakeMethod(
+            0,
+            "Select",
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    null,
+                    new KeywordTypeNode("StringKeyword")),
+                new TypeParameterModel(
+                    1,
+                    "U",
+                    null,
+                    new ReferenceTypeNode("T", "Defaults.Select.T", [])),
+            ],
+            [],
+            new ReferenceTypeNode("U", "Defaults.Select.U", []));
+        var symbol = MakeInterfaceSymbol("Defaults", [method]);
+        var emitted = new InterfaceEmitter(
+            new TypeResolver([symbol]),
+            "1.0.0",
+            "Blazor.DOM").Emit(symbol);
+
+        Assert.Contains("U Select<T, U>();", emitted.Source);
+        Assert.Contains("string Select();", emitted.Source);
+        Assert.Contains("T Select<T>();", emitted.Source);
+        Assert.Contains(
+            "// TypeScript generic default: T = string.",
+            emitted.Source);
+        Assert.Contains(
+            "// TypeScript generic default: U = T.",
+            emitted.Source);
+        Assert.Contains(
+            emitted.MemberOutcomes,
+            outcome => outcome.Status == MemberOutcomeStatus.Projected
+                && outcome.Reason?.Contains(
+                    "2 default-expanded overload(s)",
+                    StringComparison.Ordinal) == true);
+    }
+
+    [Fact]
+    public void GenericMethodDefaultCyclesAndCollisions_AreDeferredWithProvenance()
+    {
+        var cycle = MakeMethod(
+            0,
+            "Cycle",
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    null,
+                    new ReferenceTypeNode("U", "CycleHost.Cycle.U", [])),
+                new TypeParameterModel(
+                    1,
+                    "U",
+                    null,
+                    new ReferenceTypeNode("T", "CycleHost.Cycle.T", [])),
+            ],
+            [],
+            new ReferenceTypeNode("T", "CycleHost.Cycle.T", []));
+        var cycleHost = MakeInterfaceSymbol("CycleHost", [cycle]);
+        var cycleResult = new InterfaceEmitter(
+            new TypeResolver([cycleHost]),
+            "1.0.0",
+            "Blazor.DOM").Emit(cycleHost);
+        var cycleOutcome = Assert.Single(cycleResult.MemberOutcomes);
+        Assert.Equal(MemberOutcomeStatus.Deferred, cycleOutcome.Status);
+        Assert.Equal("generic-method-defaults", cycleOutcome.Phase);
+        Assert.Contains(
+            "CycleHost/decl[0]/Cycle/defaultExpansion[0]/typeParameter[0]",
+            cycleOutcome.Reason);
+
+        var ordinary = MakeMethod(
+            0,
+            "Pick",
+            [],
+            [],
+            new KeywordTypeNode("NumberKeyword"));
+        var defaulted = MakeMethod(
+            1,
+            "Pick",
+            [
+                new TypeParameterModel(
+                    0,
+                    "T",
+                    null,
+                    new KeywordTypeNode("StringKeyword")),
+            ],
+            [],
+            new ReferenceTypeNode("T", "CollisionHost.Pick.T", []));
+        var collisionHost = MakeInterfaceSymbol(
+            "CollisionHost",
+            [ordinary, defaulted]);
+        var collisionResult = new InterfaceEmitter(
+            new TypeResolver([collisionHost]),
+            "1.0.0",
+            "Blazor.DOM").Emit(collisionHost);
+        Assert.Contains("double Pick();", collisionResult.Source);
+        Assert.Equal(
+            "generic-method-defaults",
+            Assert.Single(
+                collisionResult.MemberOutcomes,
+                outcome => outcome.Ordinal == 1).Phase);
+    }
+
+    [Fact]
+    public void RestArrayDedup_PrefersParamsRegardlessOfOrderAndOptionality()
+    {
+        foreach (var ordinaryOptional in new[] { false, true })
+        {
+            foreach (var restFirst in new[] { false, true })
+            {
+                var ordinary = MakeMethod(
+                    restFirst ? 1 : 0,
+                    "Merge",
+                    [],
+                    [
+                        new ParameterModel(
+                            0,
+                            "values",
+                            ordinaryOptional,
+                            false,
+                            new ArrayTypeNode(
+                                new KeywordTypeNode("StringKeyword")),
+                            null,
+                            EmptyDocumentation,
+                            EmptyLocation),
+                    ],
+                    new KeywordTypeNode("VoidKeyword"));
+                var rest = MakeMethod(
+                    restFirst ? 0 : 1,
+                    "Merge",
+                    [],
+                    [
+                        new ParameterModel(
+                            0,
+                            "values",
+                            false,
+                            true,
+                            new ArrayTypeNode(
+                                new KeywordTypeNode("StringKeyword")),
+                            null,
+                            EmptyDocumentation,
+                            EmptyLocation),
+                    ],
+                    new KeywordTypeNode("VoidKeyword"));
+                var symbol = MakeInterfaceSymbol(
+                    $"Rest{ordinaryOptional}{restFirst}",
+                    restFirst ? [rest, ordinary] : [ordinary, rest]);
+                var result = new InterfaceEmitter(
+                    new TypeResolver([symbol]),
+                    "1.0.0",
+                    "Blazor.DOM").Emit(symbol);
+
+                Assert.Contains("void Merge(params string[] values);", result.Source);
+                Assert.Equal(
+                    1,
+                    result.Source.Split(
+                        " Merge(",
+                        StringSplitOptions.None).Length - 1);
+                Assert.All(
+                    result.MemberOutcomes,
+                    outcome => Assert.Equal(
+                        MemberOutcomeStatus.Projected,
+                        outcome.Status));
+            }
+        }
+    }
+
+    [Fact]
     public void GenericArtifacts_AreByteIdenticalAcrossRecursiveTwoPassGeneration()
     {
         var root = FindRepositoryRoot();
@@ -667,6 +849,26 @@ public sealed class GenericEmitterTests
             ],
             null,
             new ReferenceTypeNode("T", $"Target.{name}.T", []),
+            EmptyDocumentation,
+            EmptyLocation);
+
+    private static MemberModel MakeMethod(
+        int ordinal,
+        string name,
+        IReadOnlyList<TypeParameterModel> typeParameters,
+        IReadOnlyList<ParameterModel> parameters,
+        TypeNode returnType)
+        => new(
+            ordinal,
+            "method",
+            new NameNode("identifier", name),
+            false,
+            false,
+            false,
+            typeParameters,
+            parameters,
+            null,
+            returnType,
             EmptyDocumentation,
             EmptyLocation);
 
