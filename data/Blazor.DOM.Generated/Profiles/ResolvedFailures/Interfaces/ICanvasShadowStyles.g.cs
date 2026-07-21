@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasShadowStyles
+public partial interface ICanvasShadowStyles : global::Microsoft.JSInterop.IDomProxy
 {
 }

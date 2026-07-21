@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document)
 /// </summary>
-public partial interface IDocument : INode, IDocumentOrShadowRoot, IFontFaceSource, IGlobalEventHandlers, INonElementParentNode, IParentNode, IXPathEvaluatorBase
+public partial interface IDocument : INode, IDocumentOrShadowRoot, IFontFaceSource, IGlobalEventHandlers, INonElementParentNode, IParentNode, IXPathEvaluatorBase, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// Creates an element with the specified namespace URI and qualified name.

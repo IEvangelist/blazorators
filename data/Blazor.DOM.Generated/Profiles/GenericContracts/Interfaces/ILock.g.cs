@@ -14,7 +14,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Lock)
 /// </summary>
 // Requires secure context (HTTPS).
-public partial interface ILock
+public partial interface ILock : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`mode`** read-only property of the Lock interface returns the access mode passed to LockManager.request() when the lock was requested.

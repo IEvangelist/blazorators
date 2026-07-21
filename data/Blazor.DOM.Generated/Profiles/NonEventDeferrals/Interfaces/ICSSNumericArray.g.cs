@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericArray)
 /// </summary>
-public partial interface ICSSNumericArray
+public partial interface ICSSNumericArray : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The read-only **`length`** property of the An integer representing the number of CSSNumericValue objects in the list.

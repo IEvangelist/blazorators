@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSUnitValue)
 /// </summary>
-public partial interface ICSSUnitValue : ICSSNumericValue
+public partial interface ICSSUnitValue : ICSSNumericValue, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`CSSUnitValue.unit`** read-only property of the CSSUnitValue interface returns a string indicating the type of unit.

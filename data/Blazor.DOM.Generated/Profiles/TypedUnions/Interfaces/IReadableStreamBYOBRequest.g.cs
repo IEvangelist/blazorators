@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest)
 /// </summary>
-public partial interface IReadableStreamBYOBRequest
+public partial interface IReadableStreamBYOBRequest : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`view`** getter property of the ReadableStreamBYOBRequest interface returns the current view.

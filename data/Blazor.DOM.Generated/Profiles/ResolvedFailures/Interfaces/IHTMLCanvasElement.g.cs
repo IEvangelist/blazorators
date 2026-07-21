@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement)
 /// </summary>
-public partial interface IHTMLCanvasElement : IHTMLElement
+public partial interface IHTMLCanvasElement : IHTMLElement, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`HTMLCanvasElement.getContext()`** method returns a drawing context on the canvas, or `null` if the context identifier is not supported, or the canvas has already been set to a different context mode.

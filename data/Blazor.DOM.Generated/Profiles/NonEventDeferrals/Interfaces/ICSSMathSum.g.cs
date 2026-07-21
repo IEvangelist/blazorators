@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathSum)
 /// </summary>
-public partial interface ICSSMathSum : ICSSMathValue
+public partial interface ICSSMathSum : ICSSMathValue, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`CSSMathSum.values`** read-only property of the CSSMathSum interface returns a CSSNumericArray object which contains one or more CSSNumericValue objects.

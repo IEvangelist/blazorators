@@ -14,7 +14,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto)
 /// </summary>
 // Requires secure context (HTTPS).
-public partial interface ISubtleCrypto
+public partial interface ISubtleCrypto : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data.

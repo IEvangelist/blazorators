@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM.Namespaces.WebAssembly;
 
-public partial interface IRuntimeError : global::Blazor.DOM.StandardTypes.ITypeScriptError
+public partial interface IRuntimeError : global::Blazor.DOM.StandardTypes.ITypeScriptError, global::Microsoft.JSInterop.IDomProxy
 {
 }

@@ -1,0 +1,20 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "TypedEvents",
+  "description": "Compact proof for descriptor-selected typed subscriptions, options, and inherited EventMaps.",
+  "rootSymbols": [
+    "AbortSignal",
+    "HTMLElementEventMap"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["typed-events"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/TypedEvents",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "AbortSignalEventMap": ["abort"],
+    "EventListener": ["$callSignature"],
+    "GlobalEventHandlersEventMap": ["click"]
+  }
+}

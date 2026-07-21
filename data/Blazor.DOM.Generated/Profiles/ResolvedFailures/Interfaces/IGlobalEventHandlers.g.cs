@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IGlobalEventHandlers
+public partial interface IGlobalEventHandlers : global::Microsoft.JSInterop.IDomProxy
 {
 }

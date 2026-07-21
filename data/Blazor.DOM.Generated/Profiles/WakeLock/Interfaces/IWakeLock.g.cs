@@ -14,7 +14,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLock)
 /// </summary>
 // Requires secure context (HTTPS).
-public partial interface IWakeLock
+public partial interface IWakeLock : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`request()`** method of the WakeLock interface returns a Promise that fulfills with a WakeLockSentinel object if the system screen wake lock is granted.

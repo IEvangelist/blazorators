@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IWebGLRenderingContextBase
+public partial interface IWebGLRenderingContextBase : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getExtension)

@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasPathDrawingStyles
+public partial interface ICanvasPathDrawingStyles : global::Microsoft.JSInterop.IDomProxy
 {
 }

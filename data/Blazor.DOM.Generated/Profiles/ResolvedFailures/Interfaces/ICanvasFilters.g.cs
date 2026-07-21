@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasFilters
+public partial interface ICanvasFilters : global::Microsoft.JSInterop.IDomProxy
 {
 }

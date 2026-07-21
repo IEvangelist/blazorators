@@ -13,7 +13,7 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController)
 /// </summary>
 // TypeScript generic default: R = object.
-public partial interface IReadableStreamDefaultController<R>
+public partial interface IReadableStreamDefaultController<R> : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`desiredSize`** read-only property of the required to fill the stream's internal queue.

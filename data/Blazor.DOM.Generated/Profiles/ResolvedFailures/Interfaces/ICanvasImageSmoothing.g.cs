@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasImageSmoothing
+public partial interface ICanvasImageSmoothing : global::Microsoft.JSInterop.IDomProxy
 {
 }

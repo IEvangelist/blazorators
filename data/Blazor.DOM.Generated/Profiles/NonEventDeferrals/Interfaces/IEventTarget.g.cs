@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget)
 /// </summary>
-public partial interface IEventTarget
+public partial interface IEventTarget : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target.

@@ -8,7 +8,7 @@
 namespace Blazor.DOM;
 
 // TypeScript generic default: R = object.
-public partial interface IUnderlyingDefaultSource<R>
+public partial interface IUnderlyingDefaultSource<R> : global::Microsoft.JSInterop.IDomProxy
 {
     [global::Microsoft.JSInterop.DomAccessor("cancel", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "UnderlyingSourceCancelCallback", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Callback type 'UnderlyingSourceCancelCallback' requires generated callback marshalling.")]
 [global::Microsoft.JSInterop.DomAccessor("cancel", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "UnderlyingSourceCancelCallback", Nullable = true, Streamable = false, StructuredClone = false, UnsupportedReason = "Callback type 'UnderlyingSourceCancelCallback' requires generated callback marshalling.")]

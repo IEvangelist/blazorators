@@ -2,6 +2,7 @@ using Blazor.DOM.CSharpGenerator.Accounting;
 using Blazor.DOM.CSharpGenerator.Emitters;
 using Blazor.DOM.CSharpGenerator.IR;
 using Blazor.DOM.CSharpGenerator.Projection;
+using Blazor.DOM.CSharpGenerator.Profiles;
 using Xunit;
 
 namespace Blazor.DOM.CSharpGenerator.Tests;
@@ -94,6 +95,47 @@ public sealed class EventMapEmitterTests
                 [invalid]).Emit(invalid));
 
         Assert.Contains("live-reference payload", exception.Message);
+    }
+
+    [Fact]
+    public void Corpus_TypedEventsProfile_IsFailureFreeAndByteIdentical()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var profile = ProfileLoader.Load(Path.Combine(
+            root,
+            "data",
+            "Blazor.DOM.Profiles",
+            "TypedEvents.profile.json"));
+        var output = Path.Combine(
+            root,
+            "artifacts",
+            $"typed-events-profile-test-{Guid.NewGuid():N}");
+        try
+        {
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+
+            Assert.True(
+                result.PipelineResult.Errors.Count == 0,
+                "PROFILE_ERRORS: " + string.Join(
+                    Environment.NewLine,
+                    result.PipelineResult.Errors.Select(error =>
+                        $"{error.SymbolName}: {error.Message}")));
+            Assert.True(result.PipelineResult.Validation.IsValid);
+            Assert.True(result.Coverage.ByteIdentityVerified);
+            Assert.Empty(result.PipelineResult.Manifest.Accounting.DeferredSymbols);
+            Assert.Empty(
+                result.PipelineResult.Manifest.Accounting.DeferredMemberEntries);
+        }
+        finally
+        {
+            if (Directory.Exists(output))
+                Directory.Delete(output, recursive: true);
+        }
     }
 
     private static int Count(string value, string text)
@@ -224,4 +266,16 @@ public sealed class EventMapEmitterTests
 
     private static LocationModel Location() =>
         new("fixture.d.ts", new(1, 1, 0), new(1, 2, 1));
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "blazorators.sln")))
+                return directory.FullName;
+            directory = directory.Parent;
+        }
+        throw new InvalidOperationException("Repository root not found.");
+    }
 }

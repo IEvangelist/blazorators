@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IReadableStreamGenericReader
+public partial interface IReadableStreamGenericReader : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed)

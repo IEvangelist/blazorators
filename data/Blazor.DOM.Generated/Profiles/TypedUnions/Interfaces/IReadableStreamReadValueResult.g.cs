@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IReadableStreamReadValueResult<T>
+public partial interface IReadableStreamReadValueResult<T> : global::Microsoft.JSInterop.IDomProxy
 {
     [global::Microsoft.JSInterop.DomAccessor("done", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "false", Nullable = false, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomAccessor("done", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "false", Nullable = false, Streamable = false, StructuredClone = true)]

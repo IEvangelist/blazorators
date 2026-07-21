@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasFillStrokeStyles
+public partial interface ICanvasFillStrokeStyles : global::Microsoft.JSInterop.IDomProxy
 {
 }

@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IDocumentOrShadowRoot
+public partial interface IDocumentOrShadowRoot : global::Microsoft.JSInterop.IDomProxy
 {
 }

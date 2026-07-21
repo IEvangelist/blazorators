@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ANGLE_instanced_arrays)
 /// </summary>
-public partial interface IANGLE_instanced_arrays
+public partial interface IANGLE_instanced_arrays : global::Microsoft.JSInterop.IDomProxy
 {
 }

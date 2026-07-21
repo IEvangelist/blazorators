@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue)
 /// </summary>
-public partial interface ICSSNumericValue : ICSSStyleValue
+public partial interface ICSSNumericValue : ICSSStyleValue, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`add()`** method of the `CSSNumericValue`.

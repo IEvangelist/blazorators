@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasTextDrawingStyles
+public partial interface ICanvasTextDrawingStyles : global::Microsoft.JSInterop.IDomProxy
 {
 }

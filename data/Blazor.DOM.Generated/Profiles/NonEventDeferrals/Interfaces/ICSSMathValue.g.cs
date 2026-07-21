@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathValue)
 /// </summary>
-public partial interface ICSSMathValue : ICSSNumericValue
+public partial interface ICSSMathValue : ICSSNumericValue, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`CSSMathValue.operator`** read-only property of the CSSMathValue interface indicates the operator that the current subtype represents.

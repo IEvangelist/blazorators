@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IElementContentEditable
+public partial interface IElementContentEditable : global::Microsoft.JSInterop.IDomProxy
 {
 }

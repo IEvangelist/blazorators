@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IEventListenerObject
+public partial interface IEventListenerObject : global::Microsoft.JSInterop.IDomProxy
 {
     void HandleEvent(IEvent @object);
 }

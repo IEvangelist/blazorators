@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/EXT_blend_minmax)
 /// </summary>
-public partial interface IEXT_blend_minmax
+public partial interface IEXT_blend_minmax : global::Microsoft.JSInterop.IDomProxy
 {
 }

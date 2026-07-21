@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException)
 /// </summary>
-public partial interface IDOMException : global::Blazor.DOM.StandardTypes.ITypeScriptError
+public partial interface IDOMException : global::Blazor.DOM.StandardTypes.ITypeScriptError, global::Microsoft.JSInterop.IDomProxy
 {
 }

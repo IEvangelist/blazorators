@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface INonDocumentTypeChildNode
+public partial interface INonDocumentTypeChildNode : global::Microsoft.JSInterop.IDomProxy
 {
 }

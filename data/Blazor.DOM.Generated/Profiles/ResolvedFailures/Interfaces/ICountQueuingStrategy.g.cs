@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy)
 /// </summary>
-public partial interface ICountQueuingStrategy : IQueuingStrategyContract<object>
+public partial interface ICountQueuingStrategy : IQueuingStrategyContract<object>, global::Microsoft.JSInterop.IDomProxy
 {
 }

@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IARIAMixin
+public partial interface IARIAMixin : global::Microsoft.JSInterop.IDomProxy
 {
 }

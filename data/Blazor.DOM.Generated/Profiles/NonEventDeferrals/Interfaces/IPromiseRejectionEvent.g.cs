@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent)
 /// </summary>
-public partial interface IPromiseRejectionEvent : IEvent
+public partial interface IPromiseRejectionEvent : IEvent, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The PromiseRejectionEvent interface's **`promise`** read-only property indicates the JavaScript rejected.

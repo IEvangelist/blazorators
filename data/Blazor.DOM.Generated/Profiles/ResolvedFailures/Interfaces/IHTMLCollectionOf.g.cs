@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface IHTMLCollectionOf<T> : IHTMLCollectionBase where T : IElement
+public partial interface IHTMLCollectionOf<T> : IHTMLCollectionBase, global::Microsoft.JSInterop.IDomProxy where T : IElement
 {
 }

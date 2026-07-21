@@ -7,6 +7,6 @@
 
 namespace Blazor.DOM;
 
-public partial interface ICanvasCompositing
+public partial interface ICanvasCompositing : global::Microsoft.JSInterop.IDomProxy
 {
 }

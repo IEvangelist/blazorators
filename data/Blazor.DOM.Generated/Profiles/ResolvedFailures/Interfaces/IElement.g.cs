@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element)
 /// </summary>
-public partial interface IElement : INode, IARIAMixin, IAnimatable, IChildNode, INonDocumentTypeChildNode, IParentNode, ISlottable
+public partial interface IElement : INode, IARIAMixin, IAnimatable, IChildNode, INonDocumentTypeChildNode, IParentNode, ISlottable, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`Element.getElementsByTagNameNS()`** method returns a live HTMLCollection of elements with the given tag name belonging to the given namespace.

@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController)
 /// </summary>
-public partial interface IWritableStreamDefaultController
+public partial interface IWritableStreamDefaultController : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The read-only **`signal`** property of the WritableStreamDefaultController interface returns the AbortSignal associated with the controller.

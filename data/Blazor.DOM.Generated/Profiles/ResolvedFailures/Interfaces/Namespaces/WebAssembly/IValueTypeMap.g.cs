@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM.Namespaces.WebAssembly;
 
-public partial interface IValueTypeMap
+public partial interface IValueTypeMap : global::Microsoft.JSInterop.IDomProxy
 {
     [global::Microsoft.JSInterop.DomAccessor("v128", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "never", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript 'never' has no runtime value to transport.")]
 [global::Microsoft.JSInterop.DomAccessor("v128", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.Unsupported, "never", Nullable = false, Streamable = false, StructuredClone = false, UnsupportedReason = "TypeScript 'never' has no runtime value to transport.")]

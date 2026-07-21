@@ -7,7 +7,7 @@
 
 namespace Blazor.DOM;
 
-public partial interface IUnderlyingByteSource
+public partial interface IUnderlyingByteSource : global::Microsoft.JSInterop.IDomProxy
 {
     [global::Microsoft.JSInterop.DomAccessor("autoAllocateChunkSize", global::Microsoft.JSInterop.DomAccessorOperation.Get, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = true, Streamable = false, StructuredClone = true)]
 [global::Microsoft.JSInterop.DomAccessor("autoAllocateChunkSize", global::Microsoft.JSInterop.DomAccessorOperation.Set, global::Microsoft.JSInterop.DomTransportKind.JsonValue, "number", Nullable = true, Streamable = false, StructuredClone = true)]

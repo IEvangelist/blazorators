@@ -12,6 +12,6 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SVGElement)
 /// </summary>
-public partial interface ISVGElement : IElement, IElementCSSInlineStyle, IGlobalEventHandlers, IHTMLOrSVGElement
+public partial interface ISVGElement : IElement, IElementCSSInlineStyle, IGlobalEventHandlers, IHTMLOrSVGElement, global::Microsoft.JSInterop.IDomProxy
 {
 }

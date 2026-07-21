@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader)
 /// </summary>
-public partial interface IReadableStreamBYOBReader : IReadableStreamGenericReader
+public partial interface IReadableStreamBYOBReader : IReadableStreamGenericReader, global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`read()`** method of the ReadableStreamBYOBReader interface is used to read data into a view on a user-supplied buffer from an associated readable byte stream.

@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob)
 /// </summary>
-public partial interface IBlob
+public partial interface IBlob : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes.

@@ -27,7 +27,7 @@ public sealed class GenericEmitterTests
                     "Blazor.DOM")));
 
             Assert.Contains(
-                "public partial interface IHTMLCollectionOf<T> : IHTMLCollectionBase where T : IElement",
+                "public partial interface IHTMLCollectionOf<T> : IHTMLCollectionBase, global::Microsoft.JSInterop.IDomProxy where T : IElement",
                 Read(output, "Interfaces", "IHTMLCollectionOf.g.cs"));
             Assert.Contains(
                 "T AppendChild<T>(T node) where T : INode;",
@@ -95,10 +95,10 @@ public sealed class GenericEmitterTests
             Assert.Contains("DomGlobalAlias(\"toString\")", globals);
             Assert.Contains("GlobalToString", globals);
             Assert.Contains("DomGlobalAlias(\"name\")", globals);
-            Assert.Contains(
-                result.Manifest.Accounting.DeferredMemberEntries,
-                entry => entry.MemberName == "addEventListener"
-                    && entry.Phase == "event-subscription");
+            Assert.Empty(result.Manifest.Accounting.DeferredMemberEntries);
+            Assert.DoesNotContain(
+                result.Manifest.Accounting.SourceOverloadEntries ?? [],
+                entry => entry.Status != nameof(MemberOutcomeStatus.Projected));
 
             var blob = Assert.Single(
                 ir.TypescriptSymbols,
@@ -1152,8 +1152,8 @@ public sealed class GenericEmitterTests
                 result.ClosureSize,
                 result.IncludedSymbolCount,
                 result.ExternalReferenceCount));
-            Assert.Equal(17, result.PipelineResult.Manifest.Accounting.Projected);
-            Assert.Equal(1, result.PipelineResult.Manifest.Accounting.Deferred);
+            Assert.Equal(18, result.PipelineResult.Manifest.Accounting.Projected);
+            Assert.Equal(0, result.PipelineResult.Manifest.Accounting.Deferred);
             Assert.DoesNotContain(
                 result.Coverage.ExternalReferences,
                 reference => reference is "T" or "K"

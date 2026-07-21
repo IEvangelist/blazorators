@@ -14,7 +14,8 @@ namespace Blazor.DOM;
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel)
 /// </summary>
 // Requires secure context (HTTPS).
-public partial interface IWakeLockSentinel : IEventTarget
+[global::Microsoft.JSInterop.DomEventTarget("WakeLockSentinel", "WakeLockSentinelEventMap")]
+public partial interface IWakeLockSentinel : IEventTarget, global::Microsoft.JSInterop.IDomEventTargetProxy
 {
     /// <summary>
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/WakeLockSentinel/release_event)
@@ -47,15 +48,11 @@ WakeLockType Type { get; }
 [global::Microsoft.JSInterop.DomJavaScriptName("release")]
 ValueTask ReleaseAsync();
 
-    // DEFERRED (event-subscription): addEventListener<K> — deferred to typed event subscription phase.
-
     void AddEventListener(string type, EventListenerOrEventListenerObject listener);
 
     void AddEventListener(string type, EventListenerOrEventListenerObject listener, bool capture);
 
     void AddEventListener(string type, EventListenerOrEventListenerObject listener, AddEventListenerOptions? options);
-
-    // DEFERRED (event-subscription): removeEventListener<K> — deferred to typed event subscription phase.
 
     void RemoveEventListener(string type, EventListenerOrEventListenerObject listener);
 

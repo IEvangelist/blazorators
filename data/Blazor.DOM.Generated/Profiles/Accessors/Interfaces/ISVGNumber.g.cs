@@ -12,7 +12,7 @@ namespace Blazor.DOM;
 ///
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/SVGNumber)
 /// </summary>
-public partial interface ISVGNumber
+public partial interface ISVGNumber : global::Microsoft.JSInterop.IDomProxy
 {
     /// <summary>
 /// The **`value`** read-only property of the SVGNumber interface represents the number.
