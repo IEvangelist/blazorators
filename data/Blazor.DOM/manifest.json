@@ -13,8 +13,8 @@
       "path": "typescript-symbols.jsonl",
       "format": "jsonl",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/typescript-symbol.schema.json",
-      "records": 1866,
-      "sha256": "e3795c0df5fffaaad69af5def9757c4889ceb2b94e60d04a7ecc3503fb3bd51e"
+      "records": 2173,
+      "sha256": "a32344da18a6fe899dd5f81a25849bc7b27a323ee7e136f459d9d524b97b1e0e"
     },
     "webIdlSymbols": {
       "path": "webidl-symbols.jsonl",
@@ -28,21 +28,21 @@
       "format": "json",
       "schema": "../../tools/Blazor.DOM.TypeScriptModel/schema/coverage.schema.json",
       "records": 1,
-      "sha256": "fe4695dd004100f545d34c88c959e680387b19d6c8fe106db9d5dcf51d4fa555"
+      "sha256": "12f2387ea6f95375a642ad0273c00ac4f0a2070b0b08b559f0617a45e813a947"
     }
   },
   "counts": {
-    "typescriptSymbols": 1866,
-    "typescriptDeclarations": 2598,
-    "typescriptMembers": 11314,
+    "typescriptSymbols": 2173,
+    "typescriptDeclarations": 3009,
+    "typescriptMembers": 12255,
     "webIdlSpecifications": 325,
     "webIdlSymbols": 2750,
     "webIdlMembers": 11338,
     "webIdlArguments": 4306,
-    "reconciledSymbols": 1709,
-    "reconciledWebIdlSymbols": 1413,
-    "unmatchedTypeScriptSymbols": 154,
-    "unmatchedWebIdlSymbols": 1334,
+    "reconciledSymbols": 2003,
+    "reconciledWebIdlSymbols": 1681,
+    "unmatchedTypeScriptSymbols": 167,
+    "unmatchedWebIdlSymbols": 1066,
     "ambiguousSymbols": 3,
     "ambiguousWebIdlSymbols": 3,
     "unsupportedShapes": 0
@@ -1385,6 +1385,141 @@
       "version": "24.5.0",
       "license": "W3C"
     },
+    "supplementalTypeScript": [
+      {
+        "family": "Presentation API",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://www.w3.org/TR/presentation-api/",
+        "inputs": [
+          {
+            "name": "presentation-api.idl",
+            "sha256": "84885b11ad6e2ed19facefe44c6f4151415a99e17d6334fab29f57a50d4907b2"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/presentation-api.d.ts",
+          "sha256": "6b823ac6b98adbac37b79423367ccf87a090b929e77837f743b2ccfc8a7605f6"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
+      {
+        "family": "Web Serial",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://wicg.github.io/serial/",
+        "inputs": [
+          {
+            "name": "serial.idl",
+            "sha256": "f798b10d70edf5726405aef00c681b3d3c8bb5a0fc2f539d4ab8f6e1a806ab48"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/serial.d.ts",
+          "sha256": "bae662a448e0a8c5071563c831ea2e4488a9cea9b2d050ab02121e3b87969272"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
+      {
+        "family": "Web Bluetooth",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://webbluetoothcg.github.io/web-bluetooth/",
+        "inputs": [
+          {
+            "name": "web-bluetooth.idl",
+            "sha256": "96f550941c539d5a7d284d48fac6bb3417ab3cfcc1c18a7076a66d3f3824c20e"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/web-bluetooth.d.ts",
+          "sha256": "faab55e3f2c6c0305a4275435cc547fad7a6b6882e471146b7f1e5e9994665a5"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
+      {
+        "family": "Web Bluetooth",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://webbluetoothcg.github.io/web-bluetooth/scanning.html",
+        "inputs": [
+          {
+            "name": "web-bluetooth-scanning.idl",
+            "sha256": "cb811facf3d25493875a2141fc76cef73dec88c0bfa966ac38e1b7bc8baf8529"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/web-bluetooth-scanning.d.ts",
+          "sha256": "6939f24f1c83734054a6b77b82d5e0f76b7946b3cafe1d1dbe5f2d8c80d1897a"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
+      {
+        "family": "WebHID",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://wicg.github.io/webhid/",
+        "inputs": [
+          {
+            "name": "webhid.idl",
+            "sha256": "9bfc20955bff84325c7891e68501f1e388562a4e8b058696a86f85fc4aea7e76"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/webhid.d.ts",
+          "sha256": "adfffe85c22c9cbdc8199475656e2bbc63bb5956e7378f77d194e34fa3a0eb52"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
+      {
+        "family": "WebUSB",
+        "sourceKind": "webref-idl-generated",
+        "package": "@webref/idl",
+        "version": "3.81.3",
+        "license": "MIT",
+        "sourceUrl": "https://wicg.github.io/webusb/",
+        "inputs": [
+          {
+            "name": "webusb.idl",
+            "sha256": "4515994d138f58aeaf68d2554d89b19f68980e5b4339c753ca3c783cacd2be1f"
+          }
+        ],
+        "output": {
+          "name": "supplemental/webref/webusb.d.ts",
+          "sha256": "cd82932a78169b37365e43ac29664e2e494f721c9b695f477e3059c9a9c81957"
+        },
+        "generationMethod": "Strict deterministic WebIDL-to-TypeScript conversion; unsupported definitions, members, and type forms fail generation."
+      },
+      {
+        "family": "WebGPU",
+        "sourceKind": "package-declaration",
+        "package": "@webgpu/types",
+        "version": "0.1.71",
+        "license": "BSD-3-Clause",
+        "sourceUrl": "https://github.com/gpuweb/types",
+        "inputs": [
+          {
+            "name": "@webgpu/types/dist/index.d.ts",
+            "sha256": "d2e5cfb2397ec8cacfd30de0e6f7992eb7db7b02cc83b7c43ef58bcd5aa88bc3"
+          }
+        ],
+        "output": {
+          "name": "supplemental/@webgpu/types/dist/index.window.d.ts",
+          "sha256": "1e10b2f648da0ad168ec2f4036efd7464d5c84ece2d58e8b5a0e7c1383d7be38"
+        },
+        "generationMethod": "Exact package declaration filtered to Window exposure; Web IDL namespaces are normalized from interface/value pairs and finite Required/Omit mapped heritage is flattened without widening."
+      }
+    ],
     "overrides": {
       "input": "tools/Blazor.DOM.TypeScriptModel/overrides.json",
       "sha256": "5abee32ac91fcb3f3cdf2491323df6f92562af6688ecdca36f18f25243e0789e",
