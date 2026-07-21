@@ -760,6 +760,29 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Browser_array_proxy_owns_array_and_returned_element_references(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var factory = CreateFactory(host.Runtime);
+        var arrayReference = new FakeJSObjectReference();
+        var elementReference = new FakeJSObjectReference();
+        host.Module.InvocationHandlers["getIndexDotNetObjectReference"] =
+            DeliverResultReference(elementReference, handlerIndex: 2);
+        var array = factory.Create<IReadOnlyBrowserArray<FixtureBlobProxy>>(
+            arrayReference);
+
+        var element = await array.GetAsync(0);
+
+        Assert.Same(elementReference, element.Reference);
+        await element.DisposeAsync();
+        await array.DisposeAsync();
+        Assert.Equal(1, elementReference.DisposeCallCount);
+        Assert.Equal(1, arrayReference.DisposeCallCount);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Reference_result_failure_after_delivery_releases_proxy(bool wasm)
     {
         var host = CreateHost(wasm);

@@ -797,12 +797,13 @@ public sealed class TypeResolver
                 : $"ValueTask<{inner.CanonicalType}>";
             return ValueType(
                 promiseType,
-                providerNote: "Promise<T>→ValueTask<T>",
+                providerNote: "browser-awaited-promise",
                 canonicalType: canonicalType,
                 isAwaitable: true,
                 typeArguments: inner.Identity.Kind == ClrTypeKind.Void
                     ? []
-                    : [inner.Identity]);
+                    : [inner.Identity],
+                transport: AwaitedTransport(rf, inner));
         }
 
         // ReadableStream/WritableStream/TransformStream are live DOM proxy objects —
@@ -3214,6 +3215,32 @@ public sealed class TypeResolver
             false,
             false,
             null);
+
+    private static TransportModel? AwaitedTransport(
+        ReferenceTypeNode promise,
+        TypeProjection inner)
+    {
+        if (inner.Identity.Kind == ClrTypeKind.Void)
+        {
+            return new TransportModel(
+                "json-value",
+                false,
+                promise.Transport?.SourceType ?? promise.CheckerType ?? "Promise<void>",
+                false,
+                true,
+                null);
+        }
+        if (inner.Transport is null)
+            return promise.Transport;
+
+        return inner.Transport with
+        {
+            SourceType = promise.Transport?.SourceType
+                ?? promise.CheckerType
+                ?? $"Promise<{inner.Transport.SourceType}>",
+            Nullable = inner.IsNullable || inner.Transport.Nullable,
+        };
+    }
 
     private bool IsSemanticallyImmutable(
         TypeNode node,

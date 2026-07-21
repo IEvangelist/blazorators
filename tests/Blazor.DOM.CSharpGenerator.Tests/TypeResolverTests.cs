@@ -263,6 +263,50 @@ public sealed class TypeResolverTests
         Assert.Equal("ValueTask<string>", result.CSharpType);
     }
 
+    [Fact]
+    public void Project_AwaitedReferenceArray_RetainsLiveReferenceTransport()
+    {
+        var resolver = WithSymbol("Request");
+        var request = new ReferenceTypeNode("Request", "Request", [])
+        {
+            Transport = new TransportModel(
+                "js-reference",
+                false,
+                "Request",
+                false,
+                false,
+                null),
+        };
+        var array = new ReferenceTypeNode("ReadonlyArray", "ReadonlyArray<Request>", [request])
+        {
+            Transport = new TransportModel(
+                "unsupported",
+                false,
+                "readonly Request[]",
+                false,
+                false,
+                "Collection contains a non-JSON transport."),
+        };
+        var promise = new ReferenceTypeNode("Promise", "Promise<readonly Request[]>", [array])
+        {
+            Transport = new TransportModel(
+                "unsupported",
+                false,
+                "Promise<readonly Request[]>",
+                false,
+                false,
+                "Collection contains a non-JSON transport."),
+        };
+
+        var result = resolver.Project(promise, "Cache/keys/return");
+
+        Assert.Equal(
+            "ValueTask<global::Microsoft.JSInterop.IReadOnlyBrowserArray<IRequest>>",
+            result.CSharpType);
+        Assert.Equal("js-reference", result.Transport?.Kind);
+        Assert.Equal("Promise<readonly Request[]>", result.Transport?.SourceType);
+    }
+
     // ── Nullable unions ────────────────────────────────────────────────────────
 
     [Fact]
