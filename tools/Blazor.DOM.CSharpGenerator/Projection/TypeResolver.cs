@@ -596,10 +596,12 @@ public sealed class TypeResolver
                 StringComparison.Ordinal);
         return projection with
         {
-            Transport = reducedTransport
-                || projection.ProviderNote == "declaration-shape-dictionary"
-                ? projection.Transport
-                : typeNode.Transport ?? projection.Transport,
+            Transport = typeNode.Transport?.Kind == "runtime-inferred"
+                ? typeNode.Transport
+                : reducedTransport
+                    || projection.ProviderNote == "declaration-shape-dictionary"
+                    ? projection.Transport
+                    : typeNode.Transport ?? projection.Transport,
         };
     }
 

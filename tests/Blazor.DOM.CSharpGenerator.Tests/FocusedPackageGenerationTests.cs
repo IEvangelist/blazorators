@@ -73,6 +73,74 @@ public sealed class FocusedPackageGenerationTests
     }
 
     [Fact]
+    public void GenericResultProfile_UsesReviewedTransportOverride()
+    {
+        var root = FindRepositoryRoot();
+        var data = Path.Combine(root, "data", "Blazor.DOM");
+        var output = CreateTempDir();
+        try
+        {
+            var profile = new ProfileDefinition(
+                "GenericResult",
+                "Reviewed generic result transport fixture.",
+                ["IDBRequest"],
+                false,
+                false,
+                [],
+                "Blazor.DOM",
+                "Profiles/GenericResult",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["IDBRequest"] = ["result"],
+                },
+                true,
+                EntryPoints:
+                [
+                    new HostEntryPoint(
+                        "IDBRequest",
+                        "IDBRequest",
+                        "indexedDB.fixture"),
+                ],
+                TransportOverrides:
+                [
+                    new ProfileTransportOverride(
+                        "IDBRequest",
+                        "result",
+                        "runtime-inferred",
+                        "The closed CLR result determines proxy or value transport."),
+                ]);
+
+            var result = ProfilePipeline.Run(
+                profile,
+                IrLoader.Load(data),
+                output,
+                EmitterOverridesLoader.Load(data));
+
+            Assert.Empty(result.PipelineResult.Errors);
+            var generated = Path.Combine(
+                output,
+                "Profiles",
+                "GenericResult",
+                "Server",
+                "Interfaces",
+                "IIDBRequest.g.cs");
+            var source = File.ReadAllText(generated);
+            Assert.Contains(
+                "DomTransportKind.Inferred",
+                source,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "DomTransportKind.Unsupported",
+                source,
+                StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
     public void PackageProfile_EmitsDeterministicHostPairsAndCapabilityMetadata()
     {
         var root = FindRepositoryRoot();
