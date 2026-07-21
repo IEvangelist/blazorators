@@ -477,25 +477,29 @@ public sealed class GenericEmitterTests
             [new TypeParameterModel(0, "T", null, null)]);
         var resolver = new TypeResolver([box]);
 
-        foreach (var keyword in new[]
+        foreach (var (keyword, expected) in new[]
                  {
-                     "UndefinedKeyword",
-                     "NullKeyword",
-                     "VoidKeyword",
+                     ("UndefinedKeyword", "global::Microsoft.JSInterop.BrowserUndefined"),
+                     ("NullKeyword", "global::Microsoft.JSInterop.BrowserNull"),
                  })
         {
-            var error = Assert.Throws<GenericDeferralException>(() =>
+            Assert.Equal(
+                $"IBox<{expected}>",
                 resolver.Project(
                     new ReferenceTypeNode(
                         "Box",
                         "Box",
                         [new KeywordTypeNode(keyword)]),
-                    $"fixture/Box/{keyword}"));
-            Assert.Equal("illegal-clr-generic-arguments", error.Phase);
-            Assert.Equal(
-                $"fixture/Box/{keyword}/typeArgument[0]",
-                error.Provenance);
+                    $"fixture/Box/{keyword}").RenderedType);
         }
+        var voidError = Assert.Throws<GenericDeferralException>(() =>
+            resolver.Project(
+                new ReferenceTypeNode(
+                    "Box",
+                    "Box",
+                    [new KeywordTypeNode("VoidKeyword")]),
+                "fixture/Box/VoidKeyword"));
+        Assert.Equal("illegal-clr-generic-arguments", voidError.Phase);
 
         Assert.Equal(
             "global::Microsoft.JSInterop.IBrowserPromise",
@@ -948,13 +952,12 @@ public sealed class GenericEmitterTests
             "1.0.0",
             "Blazor.DOM").Emit(nullHost);
         var nullOutcome = Assert.Single(nullResult.MemberOutcomes);
-        Assert.Equal(MemberOutcomeStatus.Deferred, nullOutcome.Status);
-        Assert.Equal("generic-method-defaults", nullOutcome.Phase);
+        Assert.Equal(MemberOutcomeStatus.Projected, nullOutcome.Status);
+        Assert.Null(nullOutcome.Phase);
+        Assert.Contains("T Get<T>();", nullResult.Source);
         Assert.Contains(
-            "NullHost/decl[0]/Get/return/defaultExpansion",
-            nullOutcome.Reason);
-        Assert.DoesNotContain(" Get<", nullResult.Source);
-        Assert.DoesNotContain(" Get(", nullResult.Source);
+            "global::Microsoft.JSInterop.BrowserNull Get();",
+            nullResult.Source);
 
         var ordinary = MakeMethod(
             0,

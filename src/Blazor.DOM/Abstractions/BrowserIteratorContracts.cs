@@ -3,8 +3,52 @@
 
 namespace Microsoft.JSInterop;
 
+/// <summary>Represents JavaScript's distinct <c>null</c> value in generic positions.</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(BrowserNullJsonConverter))]
+public readonly record struct BrowserNull;
+
 /// <summary>Represents JavaScript's distinct <c>undefined</c> value in generic positions.</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(BrowserUndefinedJsonConverter))]
 public readonly record struct BrowserUndefined;
+
+internal sealed class BrowserNullJsonConverter
+    : System.Text.Json.Serialization.JsonConverter<BrowserNull>
+{
+    public override BrowserNull Read(
+        ref System.Text.Json.Utf8JsonReader reader,
+        Type typeToConvert,
+        System.Text.Json.JsonSerializerOptions options)
+    {
+        if (reader.TokenType != System.Text.Json.JsonTokenType.Null)
+            throw new System.Text.Json.JsonException("BrowserNull must be encoded as JSON null.");
+        return default;
+    }
+
+    public override void Write(
+        System.Text.Json.Utf8JsonWriter writer,
+        BrowserNull value,
+        System.Text.Json.JsonSerializerOptions options) => writer.WriteNullValue();
+}
+
+internal sealed class BrowserUndefinedJsonConverter
+    : System.Text.Json.Serialization.JsonConverter<BrowserUndefined>
+{
+    public override BrowserUndefined Read(
+        ref System.Text.Json.Utf8JsonReader reader,
+        Type typeToConvert,
+        System.Text.Json.JsonSerializerOptions options)
+    {
+        if (reader.TokenType != System.Text.Json.JsonTokenType.Null)
+            throw new System.Text.Json.JsonException(
+                "BrowserUndefined can only be received through the JSON null sentinel.");
+        return default;
+    }
+
+    public override void Write(
+        System.Text.Json.Utf8JsonWriter writer,
+        BrowserUndefined value,
+        System.Text.Json.JsonSerializerOptions options) => writer.WriteNullValue();
+}
 
 /// <summary>The exact yielded-or-returned result of a JavaScript iterator step.</summary>
 public readonly struct BrowserIteratorResult<TYield, TReturn>

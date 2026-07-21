@@ -201,37 +201,39 @@ public sealed class CallbackEmitterTests
     }
 
     [Fact]
-    public void EmitWithOutcomes_ObjectOnlyAlias_FailsWithQualifiedDeferredObjectArm()
+    public void EmitWithOutcomes_ObjectOnlyAlias_EmitsTypedObjectArm()
     {
         var symbol = MakeAliasCallback(
             "ObjectOnlyCallback",
             MakeObjectForm("accept", "objectValue"));
 
-        var exception = Assert.Throws<CallbackEmitException>(
-            () => new CallbackEmitter(
-                EmptyResolver(),
-                "1.0.0",
-                "Blazor.DOM").EmitWithOutcomes(symbol));
+        var result = new CallbackEmitter(
+            EmptyResolver(),
+            "1.0.0",
+            "Blazor.DOM").EmitWithOutcomes(symbol);
 
-        Assert.Contains("no direct", exception.Message);
-        var member = Assert.Single(exception.PartialOutcomes);
-        Assert.Equal(MemberOutcomeStatus.Deferred, member.Status);
-        Assert.Equal("callback-object-form", member.Phase);
+        Assert.Contains("public interface IObjectOnlyCallbackCallbackObject", result.Source);
+        Assert.Contains("void Accept(string objectValue);", result.Source);
+        Assert.Contains("public readonly struct ObjectOnlyCallback", result.Source);
+        Assert.DoesNotContain("object value", result.Source);
+        var member = Assert.Single(result.MemberOutcomes);
+        Assert.Equal(MemberOutcomeStatus.Projected, member.Status);
+        Assert.Null(member.Phase);
         Assert.Contains("/type/typeLiteral/member[0]", member.QualifiedKey);
-        var overload = Assert.Single(exception.PartialOverloadOutcomes);
-        Assert.Equal(MemberOutcomeStatus.Deferred, overload.Status);
-        Assert.Equal("callback-object-form", overload.Phase);
+        var overload = Assert.Single(result.OverloadOutcomes ?? []);
+        Assert.Equal(MemberOutcomeStatus.Projected, overload.Status);
+        Assert.Null(overload.Phase);
         Assert.Contains("/type/typeLiteral/member[0]/overload", overload.QualifiedKey);
         var parameter = Assert.Single(overload.ParameterOutcomes);
-        Assert.Equal(MemberOutcomeStatus.Deferred, parameter.Status);
+        Assert.Equal(MemberOutcomeStatus.Projected, parameter.Status);
         Assert.Contains("/parameter[0]/objectValue", parameter.Provenance);
         Assert.Equal(
-            MemberOutcomeStatus.Deferred,
-            Assert.Single(exception.PartialDeclarationOutcomes).Status);
+            MemberOutcomeStatus.Projected,
+            Assert.Single(result.DeclarationOutcomes ?? []).Status);
     }
 
     [Fact]
-    public void EmitWithOutcomes_FunctionOrObjectAlias_ProjectsFunctionAndDefersObjectArm()
+    public void EmitWithOutcomes_FunctionOrObjectAlias_ProjectsBothTypedArms()
     {
         var symbol = MakeAliasCallback(
             "FunctionOrObjectCallback",
@@ -247,14 +249,15 @@ public sealed class CallbackEmitterTests
             "Blazor.DOM").EmitWithOutcomes(symbol);
 
         Assert.Contains(
-            "public delegate void FunctionOrObjectCallback(string functionValue);",
+            "public delegate void FunctionOrObjectCallbackFunction(string functionValue);",
             result.Source);
-        Assert.DoesNotContain("objectValue", result.Source);
+        Assert.Contains("void Accept(string objectValue);", result.Source);
+        Assert.Contains("public readonly struct FunctionOrObjectCallback", result.Source);
         var objectMember = Assert.Single(result.MemberOutcomes);
-        Assert.Equal(MemberOutcomeStatus.Deferred, objectMember.Status);
-        Assert.Equal("callback-object-form", objectMember.Phase);
+        Assert.Equal(MemberOutcomeStatus.Projected, objectMember.Status);
+        Assert.Null(objectMember.Phase);
         Assert.Equal(
-            MemberOutcomeStatus.Deferred,
+            MemberOutcomeStatus.Projected,
             Assert.Single(result.DeclarationOutcomes ?? []).Status);
 
         var overloads = result.OverloadOutcomes ?? [];
@@ -269,10 +272,10 @@ public sealed class CallbackEmitterTests
         var objectOverload = Assert.Single(
             overloads,
             overload => overload.Kind == "method");
-        Assert.Equal(MemberOutcomeStatus.Deferred, objectOverload.Status);
-        Assert.Equal("callback-object-form", objectOverload.Phase);
+        Assert.Equal(MemberOutcomeStatus.Projected, objectOverload.Status);
+        Assert.Null(objectOverload.Phase);
         Assert.Equal(
-            MemberOutcomeStatus.Deferred,
+            MemberOutcomeStatus.Projected,
             Assert.Single(objectOverload.ParameterOutcomes).Status);
     }
 

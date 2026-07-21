@@ -209,7 +209,7 @@ public sealed class AdvancedTypeProjectionTests
     }
 
     [Fact]
-    public void Tuple_UnsupportedTransportDefersWithoutObjectFallback()
+    public void Tuple_NonJsonTransportEmitsTypedReferenceView()
     {
         var resolver = new TypeResolver([]);
         var tuple = new TupleTypeNode([String(), Number()])
@@ -219,12 +219,17 @@ public sealed class AdvancedTypeProjectionTests
                 "fixture contains an unsupported transport"),
         };
 
-        var error = Assert.Throws<GenericDeferralException>(
-            () => resolver.Project(tuple, "Fixture/unsupported-tuple"));
+        var projection = resolver.Project(tuple, "Fixture/unsupported-tuple");
+        var definition = Assert.Single(resolver.SynthesizedTypes);
 
-        Assert.Equal("tuple-transport", error.Phase);
-        Assert.Empty(resolver.SynthesizedTypes);
-        Assert.DoesNotContain("object", error.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("js-reference", projection.Transport?.Kind);
+        Assert.StartsWith(
+            "global::Blazor.DOM.AdvancedTypes.FixtureReferenceTupleShape_",
+            projection.RenderedType);
+        Assert.Contains("public partial interface", definition.Source);
+        Assert.Contains("string GetItem1();", definition.Source);
+        Assert.Contains("double GetItem2();", definition.Source);
+        Assert.DoesNotContain("object", definition.Source, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
