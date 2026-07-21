@@ -127,6 +127,35 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Reviewed_DTO_preserves_nested_binary_union_and_reference(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+        var reference = new FakeJSObjectReference();
+        byte[] challenge = [1, 2, 3];
+        byte[] identifier = [4, 5, 6];
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "create",
+            [
+                new FixtureInteropDto(
+                    challenge,
+                    FixtureUnion.FromBinary(identifier),
+                    reference),
+            ]);
+
+        var invocation = Assert.Single(host.Module.Invocations);
+        var arguments = Assert.IsType<object?[]>(invocation.Args![2]);
+        var options = Assert.IsType<Dictionary<string, object?>>(arguments[0]);
+        Assert.Same(challenge, options["challenge"]);
+        Assert.Same(identifier, options["identifier"]);
+        Assert.Same(reference, options["signal"]);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Typed_union_selects_JSON_or_reference_transport(bool wasm)
     {
         var host = CreateHost(wasm);
@@ -2039,6 +2068,12 @@ public sealed class TransportRuntimeTests
     [DomJsonValue]
     private sealed record FixtureNestedDto(object? Child);
 
+    [DomJsonValue]
+    private sealed record FixtureInteropDto(
+        byte[] Challenge,
+        FixtureUnion Identifier,
+        IJSObjectReference Signal);
+
     private sealed record UnreviewedDto(string Name);
 
     private sealed class DestructiveEnumerable(
@@ -2100,8 +2135,11 @@ public sealed class TransportRuntimeTests
         public static FixtureUnion FromReference(IJSObjectReference value) =>
             new(2, value, DomTransportDescriptor.JsReference("Blob"));
 
+        public static FixtureUnion FromBinary(byte[] value) =>
+            new(3, value, DomTransportDescriptor.Binary("ArrayBuffer"));
+
         public static FixtureUnion FromNull() =>
-            new(3, null, DomTransportDescriptor.JsonValue("null", nullable: true));
+            new(4, null, DomTransportDescriptor.JsonValue("null", nullable: true));
 
         public static FixtureUnion WithWrongReferenceValue(object value) =>
             new(2, value, DomTransportDescriptor.JsReference("Blob"));

@@ -314,6 +314,7 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
             : $"public record {declaredName} : {string.Join(", ", recordBases)}" +
               $"{generic.ConstraintSuffix}";
 
+        w.AppendLine("[global::Microsoft.JSInterop.DomJsonValue]");
         w.Block(header, () =>
         {
             for (var i = 0; i < propertyOutputs.Count; i++)
