@@ -321,6 +321,68 @@ internal static class DomRuntimeTransport
         }
     }
 
+    public static async ValueTask<DomCallbackConstruction>
+        ConstructReferencePairCallbackAsync<TFirst, TSecond>(
+            IJSObjectReference module,
+            IDomProxyFactory factory,
+            string constructorPath,
+            int callbackArgumentIndex,
+            object?[]? args,
+            DomTransportDescriptor firstTransport,
+            DomTransportDescriptor secondTransport,
+            Func<
+                DomBorrowedReference<TFirst>,
+                DomBorrowedReference<TSecond>,
+                Task> callback,
+            CancellationToken cancellationToken)
+        where TFirst : class, IDomProxy
+        where TSecond : class, IDomProxy
+    {
+        var handler = new DomReferencePairCallbackHandler<TFirst, TSecond>(
+            factory,
+            firstTransport,
+            secondTransport,
+            callback);
+        var handlerReference = DotNetObjectReference.Create(handler);
+        try
+        {
+            var reference = await module.InvokeAsync<IJSObjectReference>(
+                "constructReferencePairCallback",
+                cancellationToken,
+                [
+                    constructorPath,
+                    args,
+                    callbackArgumentIndex,
+                    handlerReference,
+                    "HandleReferencePair",
+                ]).ConfigureAwait(false);
+            return new DomCallbackConstruction(
+                reference,
+                new CallbackResource(handler, handlerReference));
+        }
+        catch
+        {
+            handler.Dispose();
+            handlerReference.Dispose();
+            throw;
+        }
+    }
+
+    private sealed class CallbackResource(
+        IDisposable handler,
+        IDisposable handlerReference) : IDisposable
+    {
+        private int _disposed;
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+                return;
+            handler.Dispose();
+            handlerReference.Dispose();
+        }
+    }
+
     public static async ValueTask<DomReferenceEventSubscription<TProxy>>
         AddReferenceEventListenerAsync<TProxy>(
             IJSObjectReference module,

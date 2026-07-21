@@ -74,6 +74,14 @@ public sealed partial class HostFactoryTransformer(DomHostKind host)
             }
             if (trimmed.EndsWith(';') && trimmed.Contains('('))
             {
+                if (TryEmitPerformanceObserverConstructor(
+                    symbol,
+                    trimmed,
+                    output,
+                    operations))
+                {
+                    continue;
+                }
                 EmitMethod(
                     symbol,
                     trimmed,
@@ -104,6 +112,54 @@ public sealed partial class HostFactoryTransformer(DomHostKind host)
             contract,
             proxy,
             operations);
+    }
+
+    private static bool TryEmitPerformanceObserverConstructor(
+        SymbolModel symbol,
+        string declaration,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        if (!string.Equals(
+                symbol.Name,
+                "PerformanceObserver",
+                StringComparison.Ordinal)
+            || !declaration.Contains(
+                "Create(PerformanceObserverCallback callback)",
+                StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        const string callback =
+            "global::System.Func<global::Microsoft.JSInterop." +
+            "DomBorrowedReference<global::Blazor.DOM." +
+            "IPerformanceObserverEntryList>, global::Microsoft.JSInterop." +
+            "DomBorrowedReference<global::Blazor.DOM.IPerformanceObserver>, " +
+            "global::System.Threading.Tasks.Task> callback";
+        var signature =
+            "global::System.Threading.Tasks.ValueTask<IPerformanceObserver> " +
+            $"CreateAsync({callback}, global::System.Threading." +
+            "CancellationToken cancellationToken = default)";
+        output.Add(
+            $"    {signature} => global::Microsoft.JSInterop.DomDispatch." +
+            "ConstructReferencePairCallbackAsync<IPerformanceObserver, " +
+            "IPerformanceObserverEntryList, IPerformanceObserver>(" +
+            "(global::Microsoft.JSInterop.IDomDispatchProxy)this, " +
+            "\"PerformanceObserver\", 0, null, " +
+            "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+            "\"PerformanceObserverEntryList\"), " +
+            "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+            "\"PerformanceObserver\"), callback, cancellationToken);");
+        operations.Add(new HostApiOperation(
+            "PerformanceObserver/factory-method:PerformanceObserver:" +
+            "Create(PerformanceObserverCallback callback)",
+            symbol.Name,
+            "constructor-callback",
+            "PerformanceObserver",
+            false,
+            signature));
+        return true;
     }
 
     private void EmitProperty(

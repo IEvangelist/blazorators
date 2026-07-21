@@ -33,6 +33,53 @@ public static class DomDispatch
         return CreateProxy<TResult>(owner, reference);
     }
 
+    /// <summary>
+    /// Constructs and wraps an owned proxy whose persistent callback receives
+    /// two callback-scoped typed references.
+    /// </summary>
+    public static async ValueTask<TResult>
+        ConstructReferencePairCallbackAsync<TResult, TFirst, TSecond>(
+            IDomDispatchProxy owner,
+            string constructorPath,
+            int callbackArgumentIndex,
+            object?[]? arguments,
+            DomTransportDescriptor firstTransport,
+            DomTransportDescriptor secondTransport,
+            Func<
+                DomBorrowedReference<TFirst>,
+                DomBorrowedReference<TSecond>,
+                Task> callback,
+            CancellationToken cancellationToken = default)
+        where TResult : class, IDomProxy
+        where TFirst : class, IDomProxy
+        where TSecond : class, IDomProxy
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentException.ThrowIfNullOrWhiteSpace(constructorPath);
+        ArgumentNullException.ThrowIfNull(callback);
+        using var construction = await owner.DispatchRuntime
+            .ConstructReferencePairCallbackAsync(
+                constructorPath,
+                callbackArgumentIndex,
+                arguments,
+                owner.DispatchFactory,
+                firstTransport,
+                secondTransport,
+                callback,
+                cancellationToken)
+            .ConfigureAwait(false);
+        var proxy = CreateProxy<TResult>(owner, construction.Reference);
+        if (proxy is not DomProxyBase resourceOwner)
+        {
+            await proxy.DisposeAsync().ConfigureAwait(false);
+            throw new InvalidOperationException(
+                $"Callback-backed proxy '{typeof(TResult)}' must derive from " +
+                $"{nameof(DomProxyBase)}.");
+        }
+        resourceOwner.AttachOwnedResource(construction.TakeCallbackResource());
+        return proxy;
+    }
+
     /// <summary>Reads a Server/async property using reviewed transport metadata.</summary>
     public static async ValueTask<TResult> GetPropertyAsync<TResult>(
         IDomDispatchProxy proxy,
