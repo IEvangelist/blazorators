@@ -107,6 +107,135 @@ public sealed class TypedUnionEmitterTests
         Assert.Contains("TextKinds/typeAlias/arm[1]", error.Provenance);
     }
 
+    [Fact]
+    public void AnonymousPromiseUnion_ProducesTypedSynthesizedValue()
+    {
+        var blob = MakeSymbol("Blob", "interface", null);
+        var resolver = new TypeResolver([blob]);
+        var union = new UnionTypeNode(
+        [
+            new KeywordTypeNode("StringKeyword")
+            {
+                Transport = JsonTransport("string"),
+            },
+            new ReferenceTypeNode("Blob", "Blob", [])
+            {
+                Transport = ReferenceTransport("Blob"),
+            },
+        ]);
+
+        var projection = resolver.Project(
+            new ReferenceTypeNode("Promise", "Promise", [union]),
+            "ClipboardItemData");
+
+        Assert.StartsWith("ValueTask<global::Blazor.DOM.AdvancedTypes.", projection.RenderedType);
+        var synthesized = Assert.Single(
+            resolver.SynthesizedTypes,
+            type => type.Kind == "Union");
+        Assert.Contains("FromString(string value)", synthesized.Source);
+        Assert.Contains("FromBlob(IBlob value)", synthesized.Source);
+        Assert.Contains("IDomUnionValue", synthesized.Source);
+        Assert.DoesNotContain("public object", synthesized.Source);
+    }
+
+    [Fact]
+    public void AnonymousUnion_NestsInArrayAndUsesDeterministicIdentity()
+    {
+        var union = new UnionTypeNode(
+        [
+            new KeywordTypeNode("StringKeyword"),
+            new KeywordTypeNode("BooleanKeyword"),
+        ]);
+        var first = new TypeResolver([]).Project(
+            new ArrayTypeNode(union),
+            "Owner/member[2]/parameter[0]");
+        var second = new TypeResolver([]).Project(
+            new ArrayTypeNode(union),
+            "Owner/member[2]/parameter[0]");
+
+        Assert.Equal(first.CanonicalType, second.CanonicalType);
+        Assert.EndsWith("[]", first.RenderedType);
+        Assert.Contains("OwnerUnionShape_", first.RenderedType);
+    }
+
+    [Fact]
+    public void CompleteBooleanLiteralUnion_CollapsesButNumericLiteralsDoNotWiden()
+    {
+        var resolver = new TypeResolver([]);
+        var boolean = resolver.Project(
+            new UnionTypeNode(
+            [
+                new LiteralTypeNode("TrueLiteral", "true"),
+                new LiteralTypeNode("FalseLiteral", "false"),
+            ]),
+            "Owner/bool");
+        var numeric = resolver.Project(
+            new UnionTypeNode(
+            [
+                new LiteralTypeNode("NumericLiteral", "1"),
+                new LiteralTypeNode("NumericLiteral", "2"),
+            ]),
+            "Owner/number");
+
+        Assert.Equal("bool", boolean.RenderedType);
+        Assert.NotEqual("double", numeric.RenderedType);
+        Assert.Contains("UnionShape_", numeric.RenderedType);
+    }
+
+    [Fact]
+    public void GenericAnonymousUnion_DeclaresFactoriesWithoutConversions()
+    {
+        var resolver = new TypeResolver([]);
+        var generic = resolver.CreateGenericDeclaration(
+        [
+            new TypeParameterModel(0, "T", null, null),
+            new TypeParameterModel(1, "U", null, null),
+        ],
+        "Owner/member");
+        var projection = resolver.Project(
+            new UnionTypeNode(
+            [
+                new ReferenceTypeNode("T", null, []),
+                new ReferenceTypeNode("U", null, []),
+            ]),
+            "Owner/member/return",
+            generic.Scope);
+
+        Assert.Contains("<T, U>", projection.RenderedType);
+        var source = Assert.Single(
+            resolver.SynthesizedTypes,
+            type => type.Kind == "Union").Source;
+        Assert.Contains("struct OwnerUnionShape_", source);
+        Assert.Contains("<T, U>", source);
+        Assert.Contains("FromT(T value)", source);
+        Assert.Contains("FromU(U value)", source);
+        Assert.DoesNotContain("implicit operator", source);
+    }
+
+    [Fact]
+    public void InterfaceOnlyUnion_DefersWithoutAuthoritativeBrand()
+    {
+        var first = MakeSymbol("First", "interface", null);
+        var second = MakeSymbol("Second", "interface", null);
+        var resolver = new TypeResolver([first, second]);
+        var error = Assert.Throws<GenericDeferralException>(() => resolver.Project(
+            new UnionTypeNode(
+            [
+                new ReferenceTypeNode("First", "First", [])
+                {
+                    Transport = ReferenceTransport("First"),
+                },
+                new ReferenceTypeNode("Second", "Second", [])
+                {
+                    Transport = ReferenceTransport("Second"),
+                },
+            ]),
+            "Owner/member"));
+
+        Assert.Equal("typed-union-interface-discriminator", error.Phase);
+        Assert.Contains("arm[1]", error.Provenance);
+    }
+
     private static SymbolModel MakeSymbol(
         string name,
         string classification,
@@ -156,4 +285,10 @@ public sealed class TypedUnionEmitterTests
 
     private static int Count(string source, string value)
         => source.Split(value, StringSplitOptions.None).Length - 1;
+
+    private static TransportModel JsonTransport(string source)
+        => new("json-value", false, source, false, true, null);
+
+    private static TransportModel ReferenceTransport(string source)
+        => new("js-reference", false, source, false, false, null);
 }

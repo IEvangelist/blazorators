@@ -127,6 +127,60 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Typed_union_selects_JSON_or_reference_transport(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+        var reference = new FakeJSObjectReference();
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "jsonUnion",
+            [FixtureUnion.FromJson("text")]);
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "referenceUnion",
+            [FixtureUnion.FromReference(reference)]);
+
+        var jsonCall = Assert.Single(
+            host.Module.Invocations,
+            call => call.Args?[1] as string == "jsonUnion");
+        var jsonArguments = Assert.IsType<object?[]>(jsonCall.Args![2]);
+        Assert.Equal("text", jsonArguments[0]);
+        var referenceCall = Assert.Single(
+            host.Module.Invocations,
+            call => call.Args?[1] as string == "referenceUnion");
+        var referenceArguments = Assert.IsType<object?[]>(referenceCall.Args![2]);
+        Assert.Same(reference, referenceArguments[0]);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Typed_union_rejects_uninitialized_and_wrong_arm_transport(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+
+        var uninitialized = await Assert.ThrowsAsync<DomTransportException>(
+            () => host.Runtime.InvokeMethodVoidAsync(
+                target,
+                "invalid",
+                [default(FixtureUnion)]).AsTask());
+        var wrongType = await Assert.ThrowsAsync<DomTransportException>(
+            () => host.Runtime.InvokeMethodVoidAsync(
+                target,
+                "invalid",
+                [FixtureUnion.WithWrongReferenceValue("not a reference")]).AsTask());
+
+        Assert.Contains("no selected arm", uninitialized.Message);
+        Assert.Contains(nameof(IJSObjectReference), wrongType.Message);
+        Assert.Empty(host.Module.Invocations);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Unsupported_transport_fails_before_JS_invocation(bool wasm)
     {
         var host = CreateHost(wasm);
@@ -1722,5 +1776,37 @@ public sealed class TransportRuntimeTests
     {
         public ValueTask<long> GetSizeAsync(CancellationToken cancellationToken = default) =>
             Runtime.GetPropertyAsync<long>(Reference, "size", cancellationToken);
+    }
+
+    private readonly struct FixtureUnion : IDomUnionValue
+    {
+        private readonly object? _value;
+        private readonly DomTransportDescriptor? _transport;
+
+        private FixtureUnion(
+            int armIndex,
+            object? value,
+            DomTransportDescriptor transport)
+        {
+            ArmIndex = armIndex;
+            _value = value;
+            _transport = transport;
+        }
+
+        public int ArmIndex { get; }
+
+        public DomTransportDescriptor SelectedTransport =>
+            _transport ?? DomTransportDescriptor.Unsupported(
+                "uninitialized union",
+                "No arm selected.");
+
+        public static FixtureUnion FromJson(string value) =>
+            new(1, value, DomTransportDescriptor.JsonValue("string"));
+
+        public static FixtureUnion FromReference(IJSObjectReference value) =>
+            new(2, value, DomTransportDescriptor.JsReference("Blob"));
+
+        public static FixtureUnion WithWrongReferenceValue(object value) =>
+            new(2, value, DomTransportDescriptor.JsReference("Blob"));
     }
 }

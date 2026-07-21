@@ -624,7 +624,11 @@ internal sealed class GlobalNamespaceEmitter(
             && primaryEmissions.TryGetValue(
                 ownerMatch.Owner.Name,
                 out var ownerEmission)
-            && ownerEmission.Disposition == SymbolEmissionDisposition.Projected)
+            && ownerEmission.Disposition == SymbolEmissionDisposition.Projected
+            && ownerEmission.GeneratedFile is not null
+            && !(ownerEmission.MemberOutcomes ?? []).Any(
+                outcome => outcome.Status == MemberOutcomeStatus.Failed)
+            && HasCompleteWindowContract())
         {
             var ownerOutcome = FindMemberOutcome(
                 ownerEmission,
@@ -665,8 +669,7 @@ internal sealed class GlobalNamespaceEmitter(
                 null,
                 "Merged with an identical canonical Window-profile signature.",
                 callable.ParameterOutcomes);
-            if (ownerEmission.GeneratedFile is not null)
-                GetBuilder(route.Symbol).AddFile(ownerEmission.GeneratedFile);
+            GetBuilder(route.Symbol).AddFile(ownerEmission.GeneratedFile);
             return;
         }
 
@@ -769,7 +772,11 @@ internal sealed class GlobalNamespaceEmitter(
             && primaryEmissions.TryGetValue(
                 ownerMatch.Owner.Name,
                 out var ownerEmission)
-            && ownerEmission.Disposition == SymbolEmissionDisposition.Projected)
+            && ownerEmission.Disposition == SymbolEmissionDisposition.Projected
+            && ownerEmission.GeneratedFile is not null
+            && !(ownerEmission.MemberOutcomes ?? []).Any(
+                outcome => outcome.Status == MemberOutcomeStatus.Failed)
+            && HasCompleteWindowContract())
         {
             var ownerOutcome = FindMemberOutcome(
                 ownerEmission,
@@ -793,13 +800,19 @@ internal sealed class GlobalNamespaceEmitter(
                 $"Merged with canonical Window-profile property " +
                 $"'{ownerMatch.Owner.Name}.{route.Declaration.Name}', including " +
                 "global setter semantics.");
-            if (ownerEmission.GeneratedFile is not null)
-                GetBuilder(route.Symbol).AddFile(ownerEmission.GeneratedFile);
+            GetBuilder(route.Symbol).AddFile(ownerEmission.GeneratedFile);
             return;
         }
 
         AddPropertyToContract(_windowContract, route, mergedProperty);
     }
+
+    private bool HasCompleteWindowContract()
+        => primaryEmissions.TryGetValue("Window", out var emission)
+            && emission.Disposition == SymbolEmissionDisposition.Projected
+            && emission.GeneratedFile is not null
+            && !(emission.MemberOutcomes ?? []).Any(
+                outcome => outcome.Status == MemberOutcomeStatus.Failed);
 
     private ContractCallableResult MergeOwnerCallable(
         RoutedDeclaration route,

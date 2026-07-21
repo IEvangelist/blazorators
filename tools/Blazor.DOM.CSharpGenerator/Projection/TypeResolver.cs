@@ -508,6 +508,20 @@ public sealed class TypeResolver
             case "DOMHighResTimeStamp": return ValueType("double");
             case "EpochTimeStamp": return ValueType("long");
             case "DOMTimeStamp": return ValueType("long");
+            case "Date": return ValueType(
+                "DateTimeOffset",
+                providerNote: "JavaScript Date");
+            case "Function": return ReferenceType(
+                "Delegate",
+                providerNote: "JavaScript Function");
+            case "ArrayBufferLike": return ReferenceType(
+                "byte[]",
+                true,
+                "mapped-from-ArrayBufferLike");
+            case "ArrayBufferView": return ReferenceType(
+                "byte[]",
+                true,
+                "mapped-from-ArrayBufferView");
         }
 
         // Promise<T> -> ValueTask<T>
@@ -981,71 +995,68 @@ public sealed class TypeResolver
         GenericScope? scope,
         int depth)
     {
-        var types = un.Types;
-
-        // Pattern 1: T | null | undefined  ->  T?
-        var nonNull = types.Where(t =>
-            t is not KeywordTypeNode kw ||
-            (kw.Name != "NullKeyword" && kw.Name != "UndefinedKeyword" &&
-             kw.CheckerType != "null" && kw.CheckerType != "undefined"))
-            .ToList();
-
-        // Also filter literal null/undefined (the IR uses LiteralKind="NullKeyword" in practice)
-        nonNull = nonNull.Where(t =>
-            t is not LiteralTypeNode lit ||
-            (lit.LiteralKind != "NullLiteral" &&
-             lit.LiteralKind != "NullKeyword" &&
-             lit.LiteralKind != "UndefinedKeyword"))
-            .ToList();
-
-        if (nonNull.Count < types.Count && nonNull.Count == 1)
+        var normalized = UnionNormalization.Normalize(un, provenance);
+        if (normalized.HasNull
+            && !normalized.HasUndefined
+            && normalized.ValueArms.Count == 1)
         {
             var inner = Project(
-                nonNull[0],
+                normalized.ValueArms[0].Type,
                 $"{provenance}/nullable",
                 scope,
                 depth + 1);
             return inner with { IsNullable = true };
         }
 
-        // Pattern 2: All string literals -> enum (handled at symbol level, return string here)
-        if (types.All(t => t is LiteralTypeNode lt && lt.LiteralKind == "StringLiteral"))
-            return ReferenceType("string", providerNote: "string-literal-union");
-
-        // Pattern 3: T | null | undefined where T is nullable-safe -> T?
-        if (nonNull.Count == 1)
+        if (normalized.Arms.Count == 2
+            && normalized.Arms.All(arm => arm.Type is LiteralTypeNode literal
+                && literal.LiteralKind is "TrueLiteral" or "FalseLiteral"
+                    or "TrueKeyword" or "FalseKeyword")
+            && normalized.Arms.Select(arm => ((LiteralTypeNode)arm.Type).LiteralKind
+                    is "TrueLiteral" or "TrueKeyword")
+                .Distinct()
+                .Count() == 2)
         {
-            var inner = Project(
-                nonNull[0],
-                $"{provenance}/nullable",
+            return ValueType("bool", providerNote: "complete-boolean-literal-union");
+        }
+
+        if (normalized.Arms.Count > 0
+            && normalized.Arms.All(arm => arm.Type is LiteralTypeNode
+            {
+                LiteralKind: "StringLiteral",
+            }))
+        {
+            var values = normalized.Arms
+                .Select(arm => ((LiteralTypeNode)arm.Type).Text.Trim('"'))
+                .ToList();
+            var enumType = _synthesizedTypes.RegisterStringDomain(provenance, values);
+            return ValueType(
+                enumType,
+                providerNote: "finite-string-literal-union",
+                canonicalType: enumType);
+        }
+
+        var arms = Emitters.UnionWrapperEmitter.ProjectArms(
+            normalized,
+            arm => Project(
+                arm.Type,
+                arm.Provenances[0],
                 scope,
-                depth + 1);
-            return inner with { IsNullable = true };
-        }
-
-        // Pattern 4: EventHandler union  (EventHandler types already handled in ProjectReference)
-        // Check if all non-null members are event handlers
-        var nonNullTypes = types.Where(t =>
-            !(t is KeywordTypeNode kw &&
-              (kw.Name is "NullKeyword" or "UndefinedKeyword" ||
-               kw.CheckerType is "null" or "undefined")) &&
-            !(t is LiteralTypeNode lt &&
-              lt.LiteralKind is "NullLiteral" or "NullKeyword" or "UndefinedKeyword"))
-            .ToList();
-
-        // Pattern 5: number | null -> double?
-        if (nonNullTypes.Count == 1 && nonNullTypes[0] is KeywordTypeNode kwt &&
-            (kwt.Name == "NumberKeyword" || kwt.CheckerType == "number"))
-        {
-            return ValueType("double") with { IsNullable = true };
-        }
-
-        // Mixed union: fail hard with source provenance
-        var typeDescriptions = string.Join(" | ", types.Select(DescribeType));
-        throw new TypeProjectionException(
-            $"Unsupported union type '{typeDescriptions}' at '{provenance}'. " +
-            "Mixed unions (non-nullable, non-all-string-literal) cannot be projected to C# without an explicit override.",
-            provenance);
+                depth + 1));
+        Emitters.UnionWrapperEmitter.ValidateRuntimeArms(provenance, arms);
+        var unionType = _synthesizedTypes.RegisterUnion(
+            provenance,
+            normalized,
+            arms,
+            scope);
+        return ValueType(
+            unionType,
+            providerNote: "typed-union",
+            canonicalType: unionType,
+            typeArguments: arms
+                .Where(arm => arm.Projection is not null)
+                .Select(arm => arm.Projection!.Identity)
+                .ToList());
     }
 
     private TypeProjection ProjectArray(

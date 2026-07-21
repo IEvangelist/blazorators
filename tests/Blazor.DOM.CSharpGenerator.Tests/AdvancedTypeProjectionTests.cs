@@ -151,15 +151,14 @@ public sealed class AdvancedTypeProjectionTests
 
         var source = new AliasEmitter(resolver, "1.0.0", "Blazor.DOM").Emit(symbol);
 
-        Assert.Contains("AsGlobal_Blazor_DOM_AdvancedTypes_", source);
-        Assert.Contains(
-            "FromIReadOnlyDictionary_string_string_(",
-            source);
+        Assert.Contains("FromArray(", source);
+        Assert.Contains("FromRecord(", source);
+        Assert.Contains("TryGetHeaders(", source);
         Assert.DoesNotContain(
             "implicit operator HeadersInit(IReadOnlyDictionary",
             source);
-        Assert.DoesNotContain("Asglobal::", source);
-        Assert.DoesNotContain("Isglobal::", source);
+        Assert.DoesNotContain("public object", source);
+        Assert.DoesNotContain("implicit operator", source);
     }
 
     [Fact]

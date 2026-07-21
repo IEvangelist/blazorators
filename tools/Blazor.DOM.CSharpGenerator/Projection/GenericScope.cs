@@ -180,6 +180,13 @@ public sealed class GenericScope
         => _bySourceName.ContainsKey(sourceName)
             || Parent?.ContainsSourceName(sourceName) == true;
 
+    public IReadOnlyList<GenericParameterBinding> GetAllParameters()
+    {
+        var parameters = Parent?.GetAllParameters().ToList() ?? [];
+        parameters.AddRange(Parameters);
+        return parameters;
+    }
+
     private HashSet<string> GetLogicalCSharpNames()
     {
         var names = Parent?.GetLogicalCSharpNames()

@@ -205,7 +205,7 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
                 arm.Type,
                 arm.Provenances[0],
                 generic.Scope));
-        ValidateDistinctRuntimeArms(symbol.Name, arms);
+        UnionWrapperEmitter.ValidateRuntimeArms(symbol.Name, arms);
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         var declaredName = $"{csName}{generic.TypeParameterList}";
         return UnionWrapperEmitter.Emit(
@@ -219,29 +219,6 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
             decl.Documentation?.Deprecated ?? false,
             $"{symbol.Name} = {string.Join(" | ", arms.Select(arm =>
                 arm.Source.Type.CheckerType ?? arm.Source.Type.Kind))}");
-    }
-
-    private static void ValidateDistinctRuntimeArms(
-        string unionName,
-        IReadOnlyList<ProjectedUnionArm> arms)
-    {
-        foreach (var group in arms
-            .Where(arm => arm.Projection is not null)
-            .GroupBy(arm => arm.Projection!.CanonicalType, StringComparer.Ordinal))
-        {
-            if (group.Count() < 2)
-                continue;
-            var items = group.ToList();
-            if (items.All(item => item.Source.Type is LiteralTypeNode))
-                continue;
-            throw new GenericDeferralException(
-                $"Union '{unionName}' has distinct TypeScript arms at " +
-                $"[{string.Join(", ", items.SelectMany(item => item.Source.Provenances))}] " +
-                $"that project to the same CLR type '{group.Key}' without an inbound " +
-                "runtime discriminator.",
-                items[1].Source.Provenances[0],
-                "typed-union-arm-discriminator");
-        }
     }
 
     private static bool IsAllStringLiteralUnion(TypeNode typeNode)
