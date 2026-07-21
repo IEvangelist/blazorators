@@ -46,7 +46,8 @@ public sealed class InterfaceEmitter(
     TypeResolver typeResolver,
     string generatorVersion,
     string ns,
-    DeclarationRoutingPlan? routingPlan = null)
+    DeclarationRoutingPlan? routingPlan = null,
+    EventTargetAssociationResolver? eventAssociations = null)
 {
     private static readonly IReadOnlySet<string> EmittedDeclarationKinds =
         new HashSet<string>(["interface"], StringComparer.Ordinal);
@@ -84,6 +85,8 @@ public sealed class InterfaceEmitter(
     private sealed record InheritedContract(
         IReadOnlyList<ReconciledAccessor> Accessors,
         IReadOnlyDictionary<string, string> MemberNames);
+    private readonly EventTargetAssociationResolver _eventAssociations =
+        eventAssociations ?? new EventTargetAssociationResolver(typeResolver);
 
     /// <summary>
     /// Emits a C# partial interface for a symbol classified as WebIDL interface or mixin.
@@ -145,6 +148,7 @@ public sealed class InterfaceEmitter(
         if (primaryDecl.EventMap.IsEventMap)
             throw new InvalidOperationException(
                 $"InterfaceEmitter: '{symbol.Name}' is an event map and should be deferred, not emitted.");
+        var eventAssociation = _eventAssociations.Resolve(symbol);
 
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         var generic = typeResolver.CreateGenericDeclaration(
@@ -557,9 +561,23 @@ public sealed class InterfaceEmitter(
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
 
         var typeName = $"I{csName}{generic.TypeParameterList}";
-        var header = string.IsNullOrEmpty(baseClause)
-            ? $"public partial interface {typeName}{generic.ConstraintSuffix}"
-            : $"public partial interface {typeName} : {baseClause}{generic.ConstraintSuffix}";
+        var contractBases = new List<string>();
+        if (!string.IsNullOrEmpty(baseClause))
+            contractBases.Add(baseClause);
+        contractBases.Add(eventAssociation is null
+            ? "global::Microsoft.JSInterop.IDomProxy"
+            : "global::Microsoft.JSInterop.IDomEventTargetProxy");
+        if (eventAssociation is not null)
+        {
+            w.AppendLine(
+                "[global::Microsoft.JSInterop.DomEventTarget(" +
+                $"\"{EscapeCSharp(symbol.Name)}\", " +
+                $"{string.Join(", ", eventAssociation.EventMaps.Select(map =>
+                    $"\"{EscapeCSharp(map)}\""))})]");
+        }
+        var header =
+            $"public partial interface {typeName} : " +
+            $"{string.Join(", ", contractBases)}{generic.ConstraintSuffix}";
 
         w.Block(header, () =>
         {
@@ -946,7 +964,6 @@ public sealed class InterfaceEmitter(
 
         if (method.TypeParameters.Count > 0 && IsEventSubscriptionOverload(method))
         {
-            var typeParamNames = string.Join(", ", method.TypeParameters.Select(tp => tp.Name));
             return new MethodBuildResult(
                 [],
                 [
@@ -954,12 +971,11 @@ public sealed class InterfaceEmitter(
                         method.Ordinal,
                         memberName,
                         method.Kind,
-                        MemberOutcomeStatus.Deferred,
-                        "event-subscription",
-                        "Event-map-keyed generic overload deferred to event-subscription phase.",
+                        MemberOutcomeStatus.Projected,
+                        null,
+                        "Mapped to the target's DomEventDescriptor<TEvent> subscription contract.",
                         declOrdinal)
-                ],
-                $"// DEFERRED (event-subscription): {memberName}<{typeParamNames}> — deferred to typed event subscription phase.");
+                ]);
         }
 
         GenericDeclaration methodGeneric;
@@ -1952,11 +1968,11 @@ public sealed class InterfaceEmitter(
     }
 
     /// <summary>
-    /// Returns true if the method is an event-subscription overload that may be deferred:
+    /// Returns true if the method is an authoritative event-subscription overload:
     /// must be named addEventListener or removeEventListener, and all type parameters
     /// must be constrained by keyof &lt;SomeEventMap&gt;.
     /// </summary>
-    private static bool IsEventSubscriptionOverload(MemberModel method)
+    private bool IsEventSubscriptionOverload(MemberModel method)
     {
         var name = method.Name?.Text;
         if (name is not ("addEventListener" or "removeEventListener"))
@@ -1964,11 +1980,12 @@ public sealed class InterfaceEmitter(
         return method.TypeParameters.All(tp => IsKeyofEventMapConstraint(tp.Constraint));
     }
 
-    private static bool IsKeyofEventMapConstraint(TypeNode? constraint)
+    private bool IsKeyofEventMapConstraint(TypeNode? constraint)
         => constraint is OperatorTypeNode op &&
            (op.Operator is "keyof" or "KeyOfKeyword") &&
            op.OperandType is ReferenceTypeNode rf &&
-           rf.Name.EndsWith("EventMap", StringComparison.Ordinal);
+           typeResolver.TryGetSymbol(rf.ResolvedSymbol ?? rf.Name, out var symbol) &&
+           symbol.Declarations.Any(declaration => declaration.EventMap.IsEventMap);
 
     /// <summary>
     /// Checks if a type node is <c>boolean | EventListenerOptions</c> or
