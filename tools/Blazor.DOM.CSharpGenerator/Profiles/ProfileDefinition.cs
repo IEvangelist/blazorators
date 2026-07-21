@@ -24,5 +24,13 @@ public sealed record ProfileDefinition(
     [property: JsonPropertyName("minimalDependencyContracts")]
         bool MinimalDependencyContracts = false,
     [property: JsonPropertyName("entryPoints")]
-        IReadOnlyList<HostEntryPoint>? EntryPoints = null
+        IReadOnlyList<HostEntryPoint>? EntryPoints = null,
+    [property: JsonPropertyName("transportOverrides")]
+        IReadOnlyList<ProfileTransportOverride>? TransportOverrides = null
 );
+
+public sealed record ProfileTransportOverride(
+    [property: JsonPropertyName("symbol")] string Symbol,
+    [property: JsonPropertyName("member")] string Member,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("rationale")] string Rationale);

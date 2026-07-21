@@ -17,7 +17,8 @@ public interface IDomRuntime
     ValueTask<TValue> GetPropertyAsync<TValue>(
         IJSObjectReference reference,
         string name,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        bool allowStructuredClone = false);
 
     /// <summary>Reads a named property as a live JS object reference.</summary>
     ValueTask<IJSObjectReference> GetPropertyRefAsync(
@@ -53,7 +54,8 @@ public interface IDomRuntime
         IJSObjectReference reference,
         string name,
         object?[]? args,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        bool allowStructuredClone = false);
 
     /// <summary>
     /// Invokes a method whose result requires a proven JavaScript-side union

@@ -107,9 +107,12 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public async ValueTask<TValue> GetPropertyAsync<TValue>(
-        IJSObjectReference reference, string name, CancellationToken cancellationToken = default)
+        IJSObjectReference reference,
+        string name,
+        CancellationToken cancellationToken = default,
+        bool allowStructuredClone = false)
     {
-        DomTransportValidator.ValidateJsonResult<TValue>();
+        DomTransportValidator.ValidateJsonResult<TValue>(allowStructuredClone);
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TValue>(
             "getProperty", cancellationToken, [reference, name]).ConfigureAwait(false);
@@ -165,9 +168,13 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
 
     /// <inheritdoc />
     public async ValueTask<TResult> InvokeMethodAsync<TResult>(
-        IJSObjectReference reference, string name, object?[]? args, CancellationToken cancellationToken = default)
+        IJSObjectReference reference,
+        string name,
+        object?[]? args,
+        CancellationToken cancellationToken = default,
+        bool allowStructuredClone = false)
     {
-        DomTransportValidator.ValidateJsonResult<TResult>();
+        DomTransportValidator.ValidateJsonResult<TResult>(allowStructuredClone);
         var preparedArgs = DomArguments.Prepare(args);
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<TResult>(

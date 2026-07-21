@@ -874,6 +874,7 @@ public sealed class InterfaceEmitter(
             "js-stream" => "JsStream",
             "binary" => "Binary",
             "transferable" => "Transferable",
+            "runtime-inferred" => "Inferred",
             _ => "Unsupported",
         };
         var operation = endpoint.Direction == AccessorDirection.Get
@@ -1457,6 +1458,7 @@ public sealed class InterfaceEmitter(
             "js-stream" => "JsStream",
             "binary" => "Binary",
             "transferable" => "Transferable",
+            "runtime-inferred" => "Inferred",
             _ when returnProjection.Identity.Kind == ClrTypeKind.Void => "JsonValue",
             _ => "Unsupported",
         };
