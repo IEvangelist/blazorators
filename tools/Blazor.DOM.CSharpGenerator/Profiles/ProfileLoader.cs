@@ -51,6 +51,40 @@ public static class ProfileLoader
         ProfileDefinition profile,
         string profilePath)
     {
+        var duplicateOverride = (profile.TransportOverrides ?? [])
+            .GroupBy(item => (item.Symbol, item.Member))
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateOverride is not null)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' has duplicate transport override " +
+                $"'{duplicateOverride.Key.Symbol}.{duplicateOverride.Key.Member}'.");
+        }
+        foreach (var transportOverride in profile.TransportOverrides ?? [])
+        {
+            if (string.IsNullOrWhiteSpace(transportOverride.Symbol)
+                || string.IsNullOrWhiteSpace(transportOverride.Member))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' has an incomplete reviewed " +
+                    "transport override.");
+            }
+            if (string.IsNullOrWhiteSpace(transportOverride.Rationale))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' transport override " +
+                    $"'{transportOverride.Symbol}.{transportOverride.Member}' requires " +
+                    "a non-empty rationale.");
+            }
+            if (transportOverride.Kind is not "runtime-inferred")
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' transport override " +
+                    $"'{transportOverride.Symbol}.{transportOverride.Member}' has " +
+                    $"unsupported kind '{transportOverride.Kind}'.");
+            }
+        }
+
         if (profile.EntryPoints is null)
             return;
         if (profile.EntryPoints.Count == 0)

@@ -783,6 +783,75 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Inferred_transport_preserves_proxy_and_structured_clone_results(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var factory = CreateFactory(host.Runtime);
+        var owner = new FixtureBlobProxy(
+            new FakeJSObjectReference(),
+            host.Runtime,
+            factory);
+        var resultReference = new FakeJSObjectReference();
+        host.Module.InvocationHandlers["invokeMethodDotNetObjectReference"] =
+            DeliverResultReference(resultReference, handlerIndex: 3);
+
+        var proxy = await DomDispatch.InvokeAsync<FixtureBlobProxy>(
+            owner,
+            "proxyResult",
+            null,
+            DomTransportDescriptor.Inferred("T"));
+
+        host.Module.ReturnValues["invokeMethod"] =
+            new Dictionary<string, object?> { ["value"] = "cloned" };
+        var structuredClone = await DomDispatch.InvokeAsync<object>(
+            owner,
+            "valueResult",
+            null,
+            DomTransportDescriptor.Inferred("any"));
+
+        Assert.Same(resultReference, proxy.Reference);
+        var values = Assert.IsType<Dictionary<string, object?>>(structuredClone);
+        Assert.Equal("cloned", values["value"]);
+        await proxy.DisposeAsync();
+        Assert.Equal(1, resultReference.DisposeCallCount);
+    }
+
+    [Fact]
+    public async Task Wasm_inferred_transport_preserves_proxy_and_structured_clone_results()
+    {
+        var host = CreateHost(wasm: true);
+        await Assert.IsType<WasmDomRuntime>(host.Runtime).InitializeAsync();
+        var factory = CreateFactory(host.Runtime);
+        var owner = new FixtureBlobProxy(
+            new FakeJSInProcessObjectReference(),
+            host.Runtime,
+            factory);
+        var resultReference = new FakeJSInProcessObjectReference();
+        host.Module.ReturnValues["invokeMethod"] = resultReference;
+
+        var proxy = WasmDomDispatch.Invoke<FixtureBlobProxy>(
+            owner,
+            "proxyResult",
+            null,
+            DomTransportDescriptor.Inferred("T"));
+
+        host.Module.ReturnValues["invokeMethod"] =
+            new Dictionary<string, object?> { ["value"] = "cloned" };
+        var structuredClone = WasmDomDispatch.Invoke<object>(
+            owner,
+            "valueResult",
+            null,
+            DomTransportDescriptor.Inferred("any"));
+
+        Assert.Same(resultReference, proxy.Reference);
+        var values = Assert.IsType<Dictionary<string, object?>>(structuredClone);
+        Assert.Equal("cloned", values["value"]);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Reference_result_failure_after_delivery_releases_proxy(bool wasm)
     {
         var host = CreateHost(wasm);

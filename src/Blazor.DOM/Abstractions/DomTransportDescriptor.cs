@@ -96,6 +96,18 @@ public sealed record DomTransportDescriptor
         bool nullable = false) =>
         new(DomTransportKind.Transferable, sourceType, nullable, false, true, null);
 
+    /// <summary>Defers transport selection to the closed CLR result type.</summary>
+    public static DomTransportDescriptor Inferred(
+        string sourceType,
+        bool nullable = false) =>
+        new(DomTransportKind.Inferred, sourceType, nullable, false, true, null);
+
+    /// <summary>Creates metadata for an API-defined structured-clone value boundary.</summary>
+    public static DomTransportDescriptor StructuredCloneValue(
+        string sourceType,
+        bool nullable = false) =>
+        new(DomTransportKind.StructuredClone, sourceType, nullable, false, true, null);
+
     /// <summary>Creates metadata for an ambiguous or unsupported TypeScript shape.</summary>
     public static DomTransportDescriptor Unsupported(
         string sourceType,

@@ -20,7 +20,10 @@ public interface IDomSyncRuntime : IDomRuntime
     // ── Sync property access ─────────────────────────────────────────────────
 
     /// <summary>Reads a reviewed JSON-valued property synchronously.</summary>
-    TValue GetProperty<TValue>(IJSInProcessObjectReference reference, string name);
+    TValue GetProperty<TValue>(
+        IJSInProcessObjectReference reference,
+        string name,
+        bool allowStructuredClone = false);
 
     /// <summary>Reads a named property synchronously as a live JS object reference.</summary>
     IJSInProcessObjectReference GetPropertyRef(
@@ -37,7 +40,10 @@ public interface IDomSyncRuntime : IDomRuntime
     /// <typeparamref name="TResult"/>.
     /// </summary>
     TResult InvokeMethod<TResult>(
-        IJSInProcessObjectReference reference, string name, object?[]? args);
+        IJSInProcessObjectReference reference,
+        string name,
+        object?[]? args,
+        bool allowStructuredClone = false);
 
     /// <summary>Invokes a void method synchronously.</summary>
     void InvokeMethodVoid(

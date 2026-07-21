@@ -45,7 +45,9 @@ public static class ProfilePipeline
         var generationIndex = profile.MinimalDependencyContracts
             ? sourceIndex.ToDictionary(
                 pair => pair.Key,
-                pair => SelectProfileMembers(pair.Value, profile),
+                pair => ApplyTransportOverrides(
+                    SelectProfileMembers(pair.Value, profile),
+                    profile),
                 StringComparer.Ordinal)
             : sourceIndex;
 
@@ -259,6 +261,79 @@ public static class ProfilePipeline
         };
     }
 
+    private static SymbolModel ApplyTransportOverrides(
+        SymbolModel symbol,
+        ProfileDefinition profile)
+    {
+        var overrides = (profile.TransportOverrides ?? [])
+            .Where(item => string.Equals(
+                item.Symbol,
+                symbol.Name,
+                StringComparison.Ordinal))
+            .ToDictionary(item => item.Member, StringComparer.Ordinal);
+        if (overrides.Count == 0)
+            return symbol;
+
+        var matched = new HashSet<string>(StringComparer.Ordinal);
+        var declarations = symbol.Declarations
+            .Select(declaration => declaration with
+            {
+                Members = declaration.Members
+                    .Select(member =>
+                    {
+                        var memberName = member.Name?.Text
+                            ?? $"${member.Kind}";
+                        if (!overrides.TryGetValue(memberName, out var transportOverride))
+                            return member;
+
+                        var endpoint = member.ReturnType ?? member.Type
+                            ?? throw new InvalidDataException(
+                                $"Transport override '{symbol.Name}.{memberName}' " +
+                                "does not target a value endpoint.");
+                        matched.Add(memberName);
+                        var transport = new TransportModel(
+                            transportOverride.Kind,
+                            endpoint.Transport?.Nullable == true,
+                            endpoint.Transport?.SourceType
+                                ?? endpoint.CheckerType
+                                ?? memberName,
+                            false,
+                            true,
+                            null);
+                        return member.ReturnType is not null
+                            ? member with
+                            {
+                                ReturnType = member.ReturnType with
+                                {
+                                    Transport = transport,
+                                },
+                            }
+                            : member with
+                            {
+                                Type = member.Type! with
+                                {
+                                    Transport = transport,
+                                },
+                            };
+                    })
+                    .ToList(),
+            })
+            .ToList();
+
+        var missing = overrides.Keys
+            .Where(member => !matched.Contains(member))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+        if (missing.Count > 0)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' transport override(s) did not " +
+                $"match selected member(s): {string.Join(", ", missing.Select(
+                    member => $"{symbol.Name}.{member}"))}");
+        }
+        return symbol with { Declarations = declarations };
+    }
+
     private static void ValidatePackageClosure(
         ProfileDefinition profile,
         IReadOnlyDictionary<string, SymbolModel> sourceIndex,
@@ -364,6 +439,7 @@ public static class ProfilePipeline
             ExternalReferenceCount: externalRefs.Count,
             ExternalReferences: externalRefs,
             Accounting: pipelineResult.Manifest.Accounting,
+            TransportOverrides: profile.TransportOverrides ?? [],
             Errors: pipelineResult.Errors.Select(e => new ProfileErrorEntry(
                 e.SymbolName, e.ExceptionType, e.Message)).ToList(),
             ByteIdentityVerified: byteIdentityVerified
@@ -400,6 +476,7 @@ public sealed record ProfileCoverageReport(
     int ExternalReferenceCount,
     IReadOnlyList<string> ExternalReferences,
     AccountingSummary Accounting,
+    IReadOnlyList<ProfileTransportOverride> TransportOverrides,
     IReadOnlyList<ProfileErrorEntry> Errors,
     bool ByteIdentityVerified);
 

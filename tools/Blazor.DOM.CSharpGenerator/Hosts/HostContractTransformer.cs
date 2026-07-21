@@ -1077,6 +1077,9 @@ public sealed partial class HostContractTransformer(DomHostKind host)
             "Transferable" =>
                 $"global::Microsoft.JSInterop.DomTransportDescriptor.Transferable(" +
                 $"{source}, nullable: {Bool(nullable)})",
+            "Inferred" =>
+                $"global::Microsoft.JSInterop.DomTransportDescriptor.Inferred(" +
+                $"{source}, nullable: {Bool(nullable)})",
             _ =>
                 $"global::Microsoft.JSInterop.DomTransportDescriptor.Unsupported(" +
                 $"{source}, {reason ?? "\"Missing reviewed transport metadata.\""}, " +
