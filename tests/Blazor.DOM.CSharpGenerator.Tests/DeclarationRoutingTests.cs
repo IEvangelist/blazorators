@@ -530,6 +530,99 @@ public sealed class DeclarationRoutingTests
         }
     }
 
+    [Fact]
+    public void ConstructorAlias_ReusesCanonicalFactoryWithoutDeferral()
+    {
+        var widget = MakeSymbol(
+            "Widget",
+            0,
+            [
+                InterfaceDeclaration("Widget"),
+                GlobalVariableDeclaration(
+                    "Widget",
+                    new TypeLiteralTypeNode(
+                    [
+                        MakeMember(
+                            0,
+                            "property",
+                            "prototype",
+                            type: new ReferenceTypeNode("Widget", "Widget", []),
+                            readOnly: true),
+                        MakeMember(
+                            1,
+                            "constructSignature",
+                            null,
+                            returnType: new ReferenceTypeNode(
+                                "Widget",
+                                "Widget",
+                                [])),
+                    ]),
+                    ordinal: 1,
+                    constructorObject: true),
+            ],
+            "interface");
+        var legacyWidget = MakeSymbol(
+            "LegacyWidget",
+            1,
+            [
+                TypeAliasDeclaration(
+                    "LegacyWidget",
+                    new ReferenceTypeNode("Widget", "Widget", [])),
+                GlobalVariableDeclaration(
+                    "LegacyWidget",
+                    new QueryTypeNode(
+                        null,
+                        ExpressionName: "Widget",
+                        ResolvedSymbol: "Widget",
+                        TypeArguments: []),
+                    ordinal: 1,
+                    constructorObject: true),
+            ],
+            "interface");
+        var output = CreateOutputDirectory();
+
+        try
+        {
+            var result = GenerationPipeline.Run(
+                new IrBundle(CreateManifest(), [widget, legacyWidget], []),
+                output);
+
+            Assert.Empty(result.Errors);
+            Assert.Equal(2, result.Manifest.Accounting.Projected);
+            Assert.Equal(2, result.Manifest.Accounting.ProjectedClean);
+            Assert.Equal(0, result.Manifest.Accounting.ProjectedWithDeferredMembers);
+            Assert.Equal(0, result.Manifest.Accounting.Deferred);
+            Assert.Equal(0, result.Manifest.Accounting.GenerationFailed);
+            var aliasDeclaration = Assert.Single(
+                result.Manifest.Accounting.SourceDeclarationEntries!,
+                entry => entry.SymbolName == "LegacyWidget"
+                    && entry.Kind == "globalVariable");
+            Assert.Equal(
+                nameof(MemberOutcomeStatus.Projected),
+                aliasDeclaration.Status);
+            Assert.Null(aliasDeclaration.Phase);
+
+            var window = File.ReadAllText(Path.Combine(
+                output,
+                "Globals",
+                "IWindow.Globals.g.cs"));
+            Assert.Contains(
+                "[global::Microsoft.JSInterop.DomGlobalAlias(\"LegacyWidget\")]",
+                window);
+            Assert.Contains(
+                "IWidgetFactory LegacyWidgetConstructor { get; }",
+                window);
+            Assert.False(File.Exists(Path.Combine(
+                output,
+                "Factories",
+                "ILegacyWidgetFactory.g.cs")));
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
+    }
+
     private static SymbolModel MakeSymbol(
         string name,
         int ordinal,
