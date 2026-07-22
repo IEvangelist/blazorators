@@ -1,0 +1,107 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "WebMIDI",
+  "description": "Web MIDI device discovery, port lifecycle, typed state and message events, and binary message transport.",
+  "rootSymbols": [
+    "MIDIAccess",
+    "MIDIPort",
+    "MIDIInput",
+    "MIDIOutput",
+    "MIDIConnectionEvent",
+    "MIDIMessageEvent",
+    "MIDIOptions"
+  ],
+  "secureContext": true,
+  "requiresUserActivation": false,
+  "features": ["web-midi"],
+  "permissions": ["midi", "midi-sysex"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/WebMIDI",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "MIDIAccess": [
+      "inputs",
+      "outputs",
+      "sysexEnabled",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MIDIPort": [
+      "connection",
+      "id",
+      "manufacturer",
+      "name",
+      "state",
+      "type",
+      "version",
+      "close",
+      "open",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MIDIInput": [
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MIDIOutput": [
+      "send@0/0",
+      "addEventListener",
+      "removeEventListener"
+    ],
+    "MIDIConnectionEvent": ["port"],
+    "MIDIMessageEvent": ["data"],
+    "MIDIOptions": ["*"],
+    "MIDIInputMap": [],
+    "MIDIOutputMap": [],
+    "MIDIAccessEventMap": ["statechange"],
+    "MIDIInputEventMap": ["midimessage"],
+    "MIDIPortEventMap": ["statechange"],
+    "EventListener": ["*"],
+    "EventListenerObject": ["*"]
+  },
+  "reviewedExclusions": [
+    {
+      "symbol": "MIDIAccess",
+      "member": "onstatechange",
+      "rationale": "The assignable event-handler property is excluded in favor of the typed statechange descriptor subscription, which has explicit callback lifetime and disposal."
+    },
+    {
+      "symbol": "MIDIPort",
+      "member": "onstatechange",
+      "rationale": "The assignable event-handler property is excluded in favor of the typed statechange descriptor subscription, which has explicit callback lifetime and disposal."
+    },
+    {
+      "symbol": "MIDIInput",
+      "member": "onmidimessage",
+      "rationale": "The assignable event-handler property is excluded in favor of the typed midimessage descriptor subscription, preserving borrowed event ownership and binary data."
+    },
+    {
+      "symbol": "MIDIInputMap",
+      "member": "forEach",
+      "rationale": "Callback enumeration is excluded because the callback exposes borrowed values and the parent map; live size, has, and get operations preserve ownership without widening callback transport."
+    },
+    {
+      "symbol": "MIDIOutputMap",
+      "member": "forEach",
+      "rationale": "Callback enumeration is excluded because the callback exposes borrowed values and the parent map; live size, has, and get operations preserve ownership without widening callback transport."
+    },
+    {
+      "symbol": "MIDIOutput",
+      "member": "send@2/0",
+      "rationale": "The broad Iterable<number> augmentation overload is excluded; the pinned number[] overload provides an exact JSON numeric sequence without introducing a general iterable transport."
+    }
+  ],
+  "entryPoints": [
+    {
+      "name": "RequestMIDIAccess",
+      "symbol": "MIDIAccess",
+      "javaScriptPath": "navigator.requestMIDIAccess",
+      "invokesFunction": true,
+      "parameter": {
+        "name": "options",
+        "type": "MIDIOptions",
+        "optional": true
+      }
+    }
+  ]
+}
