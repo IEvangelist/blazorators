@@ -108,6 +108,30 @@ public static class DomDispatch
                 transport.Kind == DomTransportKind.StructuredClone).ConfigureAwait(false);
     }
 
+    /// <summary>Reads a nullable live-reference property as an owned proxy.</summary>
+    public static ValueTask<TProxy?> GetNullablePropertyAsync<TProxy>(
+        IDomDispatchProxy proxy,
+        string name,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        Validate(proxy, name, transport);
+        transport.RequireReference(nameof(transport));
+        if (!transport.Nullable)
+        {
+            throw new ArgumentException(
+                "Nullable proxy dispatch requires nullable transport metadata.",
+                nameof(transport));
+        }
+        return proxy.DispatchRuntime.GetPropertyReferenceAsync<TProxy>(
+            proxy.Reference,
+            name,
+            proxy.DispatchFactory,
+            transport,
+            cancellationToken);
+    }
+
     /// <summary>Writes a Server/async property.</summary>
     public static ValueTask SetPropertyAsync<TValue>(
         IDomDispatchProxy proxy,
@@ -153,6 +177,32 @@ public static class DomDispatch
             cancellationToken,
             allowStructuredClone:
                 transport.Kind == DomTransportKind.StructuredClone).ConfigureAwait(false);
+    }
+
+    /// <summary>Invokes a method whose result is an optional owned proxy.</summary>
+    public static ValueTask<TProxy?> InvokeNullableAsync<TProxy>(
+        IDomDispatchProxy proxy,
+        string name,
+        object?[]? arguments,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken = default)
+        where TProxy : class, IDomProxy
+    {
+        Validate(proxy, name, transport);
+        transport.RequireReference(nameof(transport));
+        if (!transport.Nullable)
+        {
+            throw new ArgumentException(
+                "Nullable proxy dispatch requires nullable transport metadata.",
+                nameof(transport));
+        }
+        return proxy.DispatchRuntime.InvokeMethodReferenceAsync<TProxy>(
+            proxy.Reference,
+            name,
+            arguments,
+            proxy.DispatchFactory,
+            transport,
+            cancellationToken);
     }
 
     /// <summary>Invokes a Server/async void method.</summary>

@@ -83,6 +83,19 @@ public sealed class WebMIDIPackageTests
         Assert.Equal(
             typeof(ValueTask<ServerDom.IMIDIPort>),
             typeof(ServerDom.IMIDIPort).GetMethod("CloseAsync")?.ReturnType);
+
+        var nullability = new NullabilityInfoContext();
+        var mapLookup = typeof(ServerDom.IMIDIInputMap).GetMethod("GetAsync");
+        var port = typeof(ServerDom.IMIDIConnectionEvent)
+            .GetMethod("GetPortAsync");
+        Assert.Equal(
+            NullabilityState.Nullable,
+            nullability.Create(mapLookup!.ReturnParameter)
+                .GenericTypeArguments[0].ReadState);
+        Assert.Equal(
+            NullabilityState.Nullable,
+            nullability.Create(port!.ReturnParameter)
+                .GenericTypeArguments[0].ReadState);
     }
 
     [Fact]

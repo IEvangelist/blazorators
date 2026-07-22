@@ -220,8 +220,9 @@ public sealed partial class HostContractTransformer(DomHostKind host)
             {
                 output.Add(
                     $"        get => global::Microsoft.JSInterop.WasmDomDispatch." +
-                    $"GetProperty<{type}>({DispatchCast}, {getter!.JavaScriptNameLiteral}, " +
-                    $"{getter.Descriptor});");
+                    $"{NullableReferenceDispatch("GetProperty", type, getter!)}" +
+                    $"({DispatchCast}, {getter!.JavaScriptNameLiteral}, " +
+                    $"{getter!.Descriptor});");
                 AddOperation(symbol, "property-get", name, type, getter, operations);
             }
             if (accessors.Contains("set;", StringComparison.Ordinal))
@@ -247,7 +248,8 @@ public sealed partial class HostContractTransformer(DomHostKind host)
                 "global::System.Threading.CancellationToken cancellationToken = default)";
             output.Add(
                 $"    {signature} => global::Microsoft.JSInterop.DomDispatch." +
-                $"GetPropertyAsync<{type}>({DispatchCast}, {getter.JavaScriptNameLiteral}, " +
+                $"{NullableReferenceDispatch("GetPropertyAsync", type, getter)}" +
+                $"({DispatchCast}, {getter.JavaScriptNameLiteral}, " +
                 $"{getter.Descriptor}, cancellationToken);");
             AddOperation(symbol, "property-get", name, signature, getter, operations);
         }
@@ -709,12 +711,13 @@ public sealed partial class HostContractTransformer(DomHostKind host)
             symbol,
             "get",
             "Get",
-            valueType,
+            IsGeneratedProxyContract(valueType) ? $"{valueType}?" : valueType,
             [$"{keyType} key"],
             ["key"],
             promise: false,
             output,
-            operations);
+            operations,
+            nullableReferenceResult: IsGeneratedProxyContract(valueType));
         if (!mutable)
             return;
         EmitStructuralMethod(
@@ -909,7 +912,8 @@ public sealed partial class HostContractTransformer(DomHostKind host)
         IReadOnlyList<string> argumentNames,
         bool promise,
         List<string> output,
-        List<HostApiOperation> operations)
+        List<HostApiOperation> operations,
+        bool nullableReferenceResult = false)
     {
         output.Add("");
         var arguments = argumentNames.Count == 0
@@ -934,10 +938,16 @@ public sealed partial class HostContractTransformer(DomHostKind host)
                 ? $"global::Microsoft.JSInterop.DomDispatch.InvokeVoidAsync(" +
                     $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
                     $"{cancellationName})"
-                : $"global::Microsoft.JSInterop.DomDispatch.InvokeAsync<{resultType}>(" +
-                    $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
-                    $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
-                    $"\"{javaScriptName}\"), {cancellationName})";
+                : nullableReferenceResult
+                    ? $"global::Microsoft.JSInterop.DomDispatch.InvokeNullableAsync<" +
+                        $"{resultType.TrimEnd('?')}>({DispatchCast}, " +
+                        $"\"{javaScriptName}\", {arguments}, " +
+                        "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+                        $"\"{javaScriptName}\", nullable: true), {cancellationName})"
+                    : $"global::Microsoft.JSInterop.DomDispatch.InvokeAsync<{resultType}>(" +
+                        $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
+                        $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
+                        $"\"{javaScriptName}\"), {cancellationName})";
             output.Add($"    {signature} => {invocation};");
         }
         else
@@ -947,10 +957,16 @@ public sealed partial class HostContractTransformer(DomHostKind host)
             var invocation = resultType == "void"
                 ? $"global::Microsoft.JSInterop.WasmDomDispatch.InvokeVoid(" +
                     $"{DispatchCast}, \"{javaScriptName}\", {arguments})"
-                : $"global::Microsoft.JSInterop.WasmDomDispatch.Invoke<{resultType}>(" +
-                    $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
-                    $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
-                    $"\"{javaScriptName}\"))";
+                : nullableReferenceResult
+                    ? $"global::Microsoft.JSInterop.WasmDomDispatch.InvokeNullable<" +
+                        $"{resultType.TrimEnd('?')}>({DispatchCast}, " +
+                        $"\"{javaScriptName}\", {arguments}, " +
+                        "global::Microsoft.JSInterop.DomTransportDescriptor.JsReference(" +
+                        $"\"{javaScriptName}\", nullable: true))"
+                    : $"global::Microsoft.JSInterop.WasmDomDispatch.Invoke<{resultType}>(" +
+                        $"{DispatchCast}, \"{javaScriptName}\", {arguments}, " +
+                        $"global::Microsoft.JSInterop.DomDispatch.InferTransport<{resultType}>(" +
+                        $"\"{javaScriptName}\"))";
             output.Add($"    {signature} => {invocation};");
         }
         AddStructuralOperation(
@@ -981,6 +997,37 @@ public sealed partial class HostContractTransformer(DomHostKind host)
     {
         var open = type.IndexOf('<');
         return SplitTopLevel(type[(open + 1)..^1]);
+    }
+
+    private static string NullableReferenceDispatch(
+        string operation,
+        string type,
+        DispatchMetadata metadata)
+    {
+        if (metadata.TransportKind == "JsReference"
+            && metadata.Nullable
+            && IsGeneratedProxyContract(type)
+            && type.EndsWith('?'))
+        {
+            return operation switch
+            {
+                "GetProperty" =>
+                    $"GetNullableProperty<{type.TrimEnd('?')}>",
+                "GetPropertyAsync" =>
+                    $"GetNullablePropertyAsync<{type.TrimEnd('?')}>",
+                _ => throw new InvalidOperationException(
+                    $"Unsupported nullable reference operation '{operation}'."),
+            };
+        }
+        return $"{operation}<{type}>";
+    }
+
+    private static bool IsGeneratedProxyContract(string type)
+    {
+        var simpleName = type[(type.LastIndexOf('.') + 1)..].TrimEnd('?');
+        return simpleName.Length > 1
+            && simpleName[0] == 'I'
+            && char.IsUpper(simpleName[1]);
     }
 
     private static bool IsStructuralBase(string baseType) =>
@@ -1246,6 +1293,8 @@ public sealed partial class HostContractTransformer(DomHostKind host)
                 ? match.Groups["operation"].Value
                 : "Invoke",
             ReadBool(args, "Promise"),
+            kind,
+            nullable,
             descriptor);
     }
 
@@ -1278,6 +1327,8 @@ public sealed partial class HostContractTransformer(DomHostKind host)
         string JavaScriptNameLiteral,
         string Operation,
         bool Promise,
+        string TransportKind,
+        bool Nullable,
         string Descriptor);
 
     private sealed record ParsedMethod(

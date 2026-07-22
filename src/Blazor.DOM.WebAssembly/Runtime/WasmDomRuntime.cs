@@ -155,6 +155,15 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
             name);
 
     /// <inheritdoc />
+    public IJSInProcessObjectReference? GetNullablePropertyRef(
+        IJSInProcessObjectReference reference,
+        string name) =>
+        GetSyncModule().Invoke<IJSInProcessObjectReference?>(
+            "getProperty",
+            reference,
+            name);
+
+    /// <inheritdoc />
     public void SetProperty(IJSInProcessObjectReference reference, string name, object? value) =>
         GetSyncModule().InvokeVoid(
             "setProperty",
@@ -187,6 +196,17 @@ internal sealed class WasmDomRuntime : IDomSyncRuntime, IAsyncDisposable
         IJSInProcessObjectReference reference, string name, object?[]? args) =>
         GetSyncModule().Invoke<IJSInProcessObjectReference>(
             "invokeMethod", reference, name, DomArguments.Prepare(args));
+
+    /// <inheritdoc />
+    public IJSInProcessObjectReference? InvokeNullableMethodRef(
+        IJSInProcessObjectReference reference,
+        string name,
+        object?[]? args) =>
+        GetSyncModule().Invoke<IJSInProcessObjectReference?>(
+            "invokeMethod",
+            reference,
+            name,
+            DomArguments.Prepare(args));
 
     /// <inheritdoc />
     public TValue GetIndex<TValue>(IJSInProcessObjectReference reference, int index) =>

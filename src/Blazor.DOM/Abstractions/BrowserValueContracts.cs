@@ -70,7 +70,9 @@ public interface IReadOnlyBrowserMap<TKey, TValue> : IDomProxy
 {
     ValueTask<int> GetSizeAsync(CancellationToken cancellationToken = default);
     ValueTask<bool> HasAsync(TKey key, CancellationToken cancellationToken = default);
-    ValueTask<TValue> GetAsync(TKey key, CancellationToken cancellationToken = default);
+    ValueTask<TValue?> GetAsync(
+        TKey key,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>Mutable logical access to a live JavaScript Map.</summary>

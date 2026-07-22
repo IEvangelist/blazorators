@@ -30,6 +30,11 @@ public interface IDomSyncRuntime : IDomRuntime
         IJSInProcessObjectReference reference,
         string name);
 
+    /// <summary>Reads a nullable live-reference property synchronously.</summary>
+    IJSInProcessObjectReference? GetNullablePropertyRef(
+        IJSInProcessObjectReference reference,
+        string name);
+
     /// <summary>Writes a named property synchronously.</summary>
     void SetProperty(IJSInProcessObjectReference reference, string name, object? value);
 
@@ -54,6 +59,12 @@ public interface IDomSyncRuntime : IDomRuntime
     /// </summary>
     IJSInProcessObjectReference InvokeMethodRef(
         IJSInProcessObjectReference reference, string name, object?[]? args);
+
+    /// <summary>Invokes a method with an optional live-reference result.</summary>
+    IJSInProcessObjectReference? InvokeNullableMethodRef(
+        IJSInProcessObjectReference reference,
+        string name,
+        object?[]? args);
 
     // ── Sync index access ────────────────────────────────────────────────────
 

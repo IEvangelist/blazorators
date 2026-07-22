@@ -61,6 +61,27 @@ public sealed class WasmDomRuntimeTests
     }
 
     [Fact]
+    public async Task Nullable_reference_sync_paths_preserve_missing_values()
+    {
+        var (runtime, module) = await CreateInitializedRuntime();
+        var target = new FakeJSInProcessObjectReference();
+        module.ReturnValues["getProperty"] = null;
+        module.ReturnValues["invokeMethod"] = null;
+
+        var property = runtime.GetNullablePropertyRef(target, "port");
+        var mapEntry = runtime.InvokeNullableMethodRef(target, "get", ["missing"]);
+
+        Assert.Null(property);
+        Assert.Null(mapEntry);
+        Assert.Contains(
+            module.Invocations,
+            invocation => invocation.Identifier == "getProperty");
+        Assert.Contains(
+            module.Invocations,
+            invocation => invocation.Identifier == "invokeMethod");
+    }
+
+    [Fact]
     public async Task SetProperty_sync_calls_setProperty_on_module()
     {
         var (runtime, module) = await CreateInitializedRuntime();

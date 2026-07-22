@@ -45,6 +45,29 @@ public static class WasmDomDispatch
                 transport.Kind == DomTransportKind.StructuredClone);
     }
 
+    /// <summary>Reads a nullable live-reference property synchronously.</summary>
+    public static TProxy? GetNullableProperty<TProxy>(
+        IDomDispatchProxy proxy,
+        string name,
+        DomTransportDescriptor transport)
+        where TProxy : class, IDomProxy
+    {
+        DomDispatch.Validate(proxy, name, transport);
+        transport.RequireReference(nameof(transport));
+        if (!transport.Nullable)
+        {
+            throw new ArgumentException(
+                "Nullable proxy dispatch requires nullable transport metadata.",
+                nameof(transport));
+        }
+        var reference = RequireSyncRuntime(proxy).GetNullablePropertyRef(
+            RequireSyncReference(proxy),
+            name);
+        return reference is null
+            ? null
+            : proxy.DispatchFactory.Create<TProxy>(reference);
+    }
+
     /// <summary>Writes a property synchronously.</summary>
     public static void SetProperty<TValue>(
         IDomDispatchProxy proxy,
@@ -85,6 +108,31 @@ public static class WasmDomDispatch
             arguments,
             allowStructuredClone:
                 transport.Kind == DomTransportKind.StructuredClone);
+    }
+
+    /// <summary>Invokes a method with an optional live-reference result.</summary>
+    public static TProxy? InvokeNullable<TProxy>(
+        IDomDispatchProxy proxy,
+        string name,
+        object?[]? arguments,
+        DomTransportDescriptor transport)
+        where TProxy : class, IDomProxy
+    {
+        DomDispatch.Validate(proxy, name, transport);
+        transport.RequireReference(nameof(transport));
+        if (!transport.Nullable)
+        {
+            throw new ArgumentException(
+                "Nullable proxy dispatch requires nullable transport metadata.",
+                nameof(transport));
+        }
+        var reference = RequireSyncRuntime(proxy).InvokeNullableMethodRef(
+            RequireSyncReference(proxy),
+            name,
+            arguments);
+        return reference is null
+            ? null
+            : proxy.DispatchFactory.Create<TProxy>(reference);
     }
 
     /// <summary>Invokes a non-Promise void method synchronously.</summary>
