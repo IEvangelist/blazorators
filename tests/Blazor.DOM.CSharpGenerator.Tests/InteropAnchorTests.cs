@@ -64,6 +64,7 @@ public sealed class InteropAnchorTests
         {
             ("MediaDevices", "navigator.mediaDevices"),
             ("Notifications", "Notification"),
+            ("MediaSession", "navigator.mediaSession"),
         })
         {
             var profile = ProfileLoader.Load(Path.Combine(
@@ -77,6 +78,17 @@ public sealed class InteropAnchorTests
                 expectedPath,
                 Assert.Single(appliedProfile.EntryPoints!).JavaScriptPath);
         }
+
+        var gamepadProfile = ProfileLoader.Load(Path.Combine(
+            root,
+            "data",
+            "Blazor.DOM.Profiles",
+            "Gamepad.profile.json"));
+        var gamepadEntryPoint = Assert.Single(
+            InteropAnchorLoader.Apply(gamepadProfile, anchors).EntryPoints!);
+
+        Assert.Equal("navigator", gamepadEntryPoint.JavaScriptPath);
+        Assert.Equal("getGamepads", gamepadEntryPoint.Member);
     }
 
     [Fact]

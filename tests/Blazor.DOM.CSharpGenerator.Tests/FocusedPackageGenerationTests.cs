@@ -818,6 +818,175 @@ public sealed class FocusedPackageGenerationTests
         }
     }
 
+    [Fact]
+    public void GamepadProfile_EmitsCallableEntryPointLiveArrayAndTypedEvents()
+    {
+        var output = CreateTempDir();
+        try
+        {
+            var result = GenerateRepositoryProfile("Gamepad", output);
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            var generated = Path.Combine(output, "Profiles", "Gamepad");
+            var serverHost = ReadGenerated(
+                generated, "Server", "GeneratedDomHost.g.cs");
+            var wasmHost = ReadGenerated(
+                generated, "WebAssembly", "GeneratedDomHost.g.cs");
+            var serverNavigator = ReadGenerated(
+                generated, "Server", "Interfaces", "INavigator.g.cs");
+            var serverGamepad = ReadGenerated(
+                generated, "Server", "Interfaces", "IGamepad.g.cs");
+            var serverHaptics = ReadGenerated(
+                generated, "Server", "Interfaces", "IGamepadHapticActuator.g.cs");
+            var eventMap = ReadGenerated(
+                generated, "EventMaps", "WindowEventMap.g.cs");
+
+            Assert.True(hosts.Parity.Exact);
+            Assert.Equal(45, hosts.Server.Operations.Count);
+            Assert.Equal(45, hosts.WebAssembly.Operations.Count);
+            Assert.Equal(36, result.IncludedSymbolCount);
+            Assert.Equal(38, result.ClosureSize);
+            Assert.Equal(2, result.ExternalReferenceCount);
+            Assert.Equal(
+                ["Promise", "ReadonlyArray"],
+                result.Coverage.ExternalReferences);
+            Assert.Equal(36, hosts.Server.GeneratedFiles.Count);
+            Assert.Equal(36, hosts.WebAssembly.GeneratedFiles.Count);
+            Assert.Contains(
+                "ValueTask<global::Blazor.DOM.IGamepadArray> GetGamepadsAsync",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "await browser.GetGlobalAsync<global::Blazor.DOM.INavigator>(\"navigator\"",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "await owner.GetGamepadsAsync(cancellationToken)",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "using var owner = browser.GetGlobal<global::Blazor.DOM.INavigator>(\"navigator\"",
+                wasmHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<IGamepadArray> GetGamepadsAsync",
+                serverNavigator,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<IGamepadButtonArray> GetButtonsAsync",
+                serverGamepad,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<GamepadHapticsResult> PlayEffectAsync",
+                serverHaptics,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "DomEventDescriptor<IGamepadEvent> Gamepadconnected",
+                eventMap,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "DomEventDescriptor<IGamepadEvent> Gamepaddisconnected",
+                eventMap,
+                StringComparison.Ordinal);
+            Assert.Collection(
+                result.Coverage.ReviewedExclusions,
+                exclusion =>
+                {
+                    Assert.Equal("WindowEventHandlers", exclusion.Symbol);
+                    Assert.Equal("ongamepadconnected", exclusion.Member);
+                    Assert.Contains(
+                        "typed WindowEventMap subscription",
+                        exclusion.Rationale,
+                        StringComparison.Ordinal);
+                },
+                exclusion =>
+                {
+                    Assert.Equal("WindowEventHandlers", exclusion.Symbol);
+                    Assert.Equal("ongamepaddisconnected", exclusion.Member);
+                    Assert.Contains(
+                        "typed WindowEventMap subscription",
+                        exclusion.Rationale,
+                        StringComparison.Ordinal);
+                });
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
+    [Fact]
+    public void MediaSessionProfile_EmitsTypedPersistentCallbacksAndPromiseMethods()
+    {
+        var output = CreateTempDir();
+        try
+        {
+            var result = GenerateRepositoryProfile("MediaSession", output);
+            var hosts = Assert.IsType<HostPackageGenerationResult>(
+                result.PipelineResult.HostPackages);
+            var generated = Path.Combine(output, "Profiles", "MediaSession");
+            var serverHost = ReadGenerated(
+                generated, "Server", "GeneratedDomHost.g.cs");
+            var serverSession = ReadGenerated(
+                generated, "Server", "Interfaces", "IMediaSession.g.cs");
+            var wasmSession = ReadGenerated(
+                generated, "WebAssembly", "Interfaces", "IMediaSession.g.cs");
+
+            Assert.True(hosts.Parity.Exact);
+            Assert.Equal(22, hosts.Server.Operations.Count);
+            Assert.Equal(22, hosts.WebAssembly.Operations.Count);
+            Assert.Equal(9, result.IncludedSymbolCount);
+            Assert.Equal(11, result.ClosureSize);
+            Assert.Equal(2, result.ExternalReferenceCount);
+            Assert.Equal(
+                ["Promise", "ReadonlyArray"],
+                result.Coverage.ExternalReferences);
+            Assert.Equal(5, hosts.Server.GeneratedFiles.Count);
+            Assert.Equal(5, hosts.WebAssembly.GeneratedFiles.Count);
+            Assert.Empty(result.Coverage.ReviewedExclusions);
+            Assert.Contains(
+                "ValueTask<global::Blazor.DOM.IMediaSession> GetMediaSessionAsync",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "\"navigator.mediaSession\"",
+                serverHost,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask<global::Microsoft.JSInterop.DomCallbackRegistration> SetActionHandlerAsync",
+                serverSession,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "Func<MediaSessionActionDetails, Task> handler",
+                serverSession,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask ClearActionHandlerAsync",
+                serverSession,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "SetMethodValueCallbackAsync<MediaSessionActionDetails>",
+                serverSession,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "ValueTask SetCameraActiveAsync(bool active",
+                serverSession,
+                StringComparison.Ordinal);
+            Assert.Contains(
+                "void SetCameraActive(bool active)",
+                wasmSession,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain(
+                "Func<object",
+                serverSession,
+                StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(output, true);
+        }
+    }
+
     private static ProfileGenerationResult GenerateRepositoryProfile(
             string profileName,
             string output)

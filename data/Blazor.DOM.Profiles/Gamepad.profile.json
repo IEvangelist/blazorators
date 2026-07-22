@@ -1,0 +1,56 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "Gamepad",
+  "description": "Gamepad API - poll connected controllers, inspect buttons and axes, receive connection events, and control haptics.",
+  "rootSymbols": [
+    "Navigator",
+    "Window",
+    "WindowEventMap",
+    "Gamepad",
+    "GamepadButton",
+    "GamepadEvent",
+    "GamepadHapticActuator"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": true,
+  "features": ["gamepad", "gamepad-haptics"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/Gamepad",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "Navigator": ["getGamepads"],
+    "Window": [],
+    "WindowEventMap": ["gamepadconnected", "gamepaddisconnected"],
+    "WindowEventHandlers": [],
+    "Gamepad": ["*"],
+    "GamepadButton": ["*"],
+    "GamepadEvent": ["gamepad"],
+    "GamepadHapticActuator": ["*"],
+    "GamepadEffectParameters": ["*"]
+  },
+  "reviewedExclusions": [
+    {
+      "symbol": "WindowEventHandlers",
+      "member": "ongamepadconnected",
+      "rationale": "Direct function-valued event-handler property assignment has no independent callback-registration lifetime. The profile preserves this event through the typed WindowEventMap subscription surface and its owned async-disposable registration."
+    },
+    {
+      "symbol": "WindowEventHandlers",
+      "member": "ongamepaddisconnected",
+      "rationale": "Direct function-valued event-handler property assignment has no independent callback-registration lifetime. The profile preserves this event through the typed WindowEventMap subscription surface and its owned async-disposable registration."
+    }
+  ],
+  "entryPoints": [
+    {
+      "name": "Gamepads",
+      "symbol": "Navigator",
+      "javaScriptPath": "navigator.getGamepads",
+      "member": "getGamepads"
+    },
+    {
+      "name": "Window",
+      "symbol": "Window",
+      "javaScriptPath": "window"
+    }
+  ]
+}

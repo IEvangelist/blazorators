@@ -1,0 +1,33 @@
+{
+  "$schema": "../Blazor.DOM/profiles.schema.json",
+  "name": "MediaSession",
+  "description": "Media Session API - publish media metadata, playback state, position, capture state, and typed action handlers.",
+  "rootSymbols": [
+    "MediaSession",
+    "MediaMetadata"
+  ],
+  "secureContext": false,
+  "requiresUserActivation": false,
+  "features": ["media-session"],
+  "permissions": ["camera", "microphone"],
+  "outputNamespace": "Blazor.DOM",
+  "outputSubdirectory": "Profiles/MediaSession",
+  "minimalDependencyContracts": true,
+  "memberIncludes": {
+    "MediaSession": ["*"],
+    "MediaMetadata": ["*"],
+    "MediaMetadataInit": ["*"],
+    "MediaImage": ["*"],
+    "MediaPositionState": ["*"],
+    "MediaSessionActionDetails": ["*"],
+    "MediaSessionActionHandler": ["*"]
+  },
+  "reviewedExclusions": [],
+  "entryPoints": [
+    {
+      "name": "MediaSession",
+      "symbol": "MediaSession",
+      "javaScriptPath": "navigator.mediaSession"
+    }
+  ]
+}
