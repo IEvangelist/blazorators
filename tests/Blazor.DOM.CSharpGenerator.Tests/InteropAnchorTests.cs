@@ -85,9 +85,10 @@ public sealed class InteropAnchorTests
             "Blazor.DOM.Profiles",
             "Gamepad.profile.json"));
         var gamepadEntryPoint = Assert.Single(
-            InteropAnchorLoader.Apply(gamepadProfile, anchors).EntryPoints!);
+            InteropAnchorLoader.Apply(gamepadProfile, anchors).EntryPoints!,
+            entryPoint => entryPoint.Name == "Gamepads");
 
-        Assert.Equal("navigator", gamepadEntryPoint.JavaScriptPath);
+        Assert.Equal("navigator.getGamepads", gamepadEntryPoint.JavaScriptPath);
         Assert.Equal("getGamepads", gamepadEntryPoint.Member);
     }
 

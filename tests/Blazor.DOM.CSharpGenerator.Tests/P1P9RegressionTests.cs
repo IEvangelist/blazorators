@@ -348,6 +348,7 @@ public sealed class P1P9RegressionTests
                 new AccountingSummary(1, 1, 1, 0, 0, 0, 0, ["Root"], [], [], [], [], []),
                 [],
                 [],
+                [],
                 true);
 
             writeMethod!.Invoke(null, [outputDir, report]);

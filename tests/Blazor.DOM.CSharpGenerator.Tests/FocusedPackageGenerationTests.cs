@@ -853,11 +853,11 @@ public sealed class FocusedPackageGenerationTests
             Assert.Equal(36, hosts.Server.GeneratedFiles.Count);
             Assert.Equal(36, hosts.WebAssembly.GeneratedFiles.Count);
             Assert.Contains(
-                "ValueTask<global::Blazor.DOM.IGamepadArray> GetGamepadsAsync",
+                "ValueTask<global::Microsoft.JSInterop.IBrowserArray<global::Blazor.DOM.IGamepad?>> GetGamepadsAsync",
                 serverHost,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "await browser.GetGlobalAsync<global::Blazor.DOM.INavigator>(\"navigator\"",
+                "await using var owner = await browser.GetGlobalAsync<global::Blazor.DOM.INavigator>(\"navigator\"",
                 serverHost,
                 StringComparison.Ordinal);
             Assert.Contains(
@@ -865,15 +865,15 @@ public sealed class FocusedPackageGenerationTests
                 serverHost,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "using var owner = browser.GetGlobal<global::Blazor.DOM.INavigator>(\"navigator\"",
+                "await using var owner = await browser.GetGlobalAsync<global::Blazor.DOM.INavigator>(\"navigator\"",
                 wasmHost,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "ValueTask<IGamepadArray> GetGamepadsAsync",
+                "ValueTask<global::Microsoft.JSInterop.IBrowserArray<IGamepad?>> GetGamepadsAsync",
                 serverNavigator,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "ValueTask<IGamepadButtonArray> GetButtonsAsync",
+                "ValueTask<global::Microsoft.JSInterop.IReadOnlyBrowserArray<IGamepadButton>> GetButtonsAsync",
                 serverGamepad,
                 StringComparison.Ordinal);
             Assert.Contains(
@@ -957,7 +957,7 @@ public sealed class FocusedPackageGenerationTests
                 serverSession,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "Func<MediaSessionActionDetails, Task> handler",
+                "global::Blazor.DOM.MediaSessionActionHandler handler",
                 serverSession,
                 StringComparison.Ordinal);
             Assert.Contains(
@@ -965,7 +965,7 @@ public sealed class FocusedPackageGenerationTests
                 serverSession,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "SetMethodValueCallbackAsync<MediaSessionActionDetails>",
+                "SetValueCallbackAsync<global::Blazor.DOM.MediaSessionActionDetails>",
                 serverSession,
                 StringComparison.Ordinal);
             Assert.Contains(
@@ -973,7 +973,7 @@ public sealed class FocusedPackageGenerationTests
                 serverSession,
                 StringComparison.Ordinal);
             Assert.Contains(
-                "void SetCameraActive(bool active)",
+                "ValueTask SetCameraActiveAsync(bool active",
                 wasmSession,
                 StringComparison.Ordinal);
             Assert.DoesNotContain(
