@@ -8,6 +8,8 @@ public sealed record InteropAnchor(
     string InterfaceName,
     string TypeName,
     string JavaScriptPath,
+    string EntryPointName,
+    string? MemberName,
     string Scope,
     string SourcePath);
 
@@ -118,6 +120,8 @@ public static partial class InteropAnchorLoader
             declaration.Groups["interface"].Value,
             typeName,
             NormalizeJavaScriptPath(implementation),
+            ReadOptionalArgument(arguments, "EntryPointName") ?? typeName,
+            ReadOptionalArgument(arguments, "MemberName"),
             scope,
             path);
     }
@@ -140,11 +144,21 @@ public static partial class InteropAnchorLoader
         return match.Groups["value"].Value;
     }
 
+    private static string? ReadOptionalArgument(string arguments, string name)
+    {
+        var match = Regex.Match(
+            arguments,
+            $@"\b{Regex.Escape(name)}\s*=\s*""(?<value>[^""]+)""",
+            RegexOptions.CultureInvariant);
+        return match.Success ? match.Groups["value"].Value : null;
+    }
+
     private static HostEntryPoint ToEntryPoint(InteropAnchor anchor)
         => new(
+            anchor.EntryPointName,
             anchor.TypeName,
-            anchor.TypeName,
-            anchor.JavaScriptPath);
+            anchor.JavaScriptPath,
+            anchor.MemberName);
 
     private static HostEntryPoint Normalize(HostEntryPoint entryPoint)
         => entryPoint with

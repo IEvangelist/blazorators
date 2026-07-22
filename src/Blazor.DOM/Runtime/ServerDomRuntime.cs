@@ -329,6 +329,60 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
     }
 
     /// <inheritdoc />
+    public async ValueTask<DomCallbackRegistration>
+        SetMethodValueCallbackAsync<TValue>(
+            IJSObjectReference reference,
+            string name,
+            int callbackArgumentIndex,
+            object?[]? args,
+            Func<TValue, Task> callback,
+            CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(callback);
+        var preparedArgs = DomArguments.Prepare(args);
+        var handler = new DomCallbackHandler(json =>
+        {
+            var value = System.Text.Json.JsonSerializer.Deserialize<TValue>(json);
+            return callback(value!);
+        });
+        var handlerReference = DotNetObjectReference.Create(handler);
+        try
+        {
+            var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+            var registrationId = await DomRuntimeTransport.SetValueCallbackAsync(
+                module,
+                reference,
+                name,
+                callbackArgumentIndex,
+                preparedArgs,
+                handlerReference,
+                cancellationToken).ConfigureAwait(false);
+            return new DomCallbackRegistration(this, registrationId, handlerReference);
+        }
+        catch
+        {
+            handler.Dispose();
+            handlerReference.Dispose();
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask RemoveMethodValueCallbackAsync(
+        int registrationId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(registrationId);
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        await module.InvokeVoidAsync(
+            "removeDotNetValueCallback",
+            cancellationToken,
+            [registrationId]).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async ValueTask<DomReadStream> InvokeMethodStreamAsync(
         IJSObjectReference reference,
         string name,

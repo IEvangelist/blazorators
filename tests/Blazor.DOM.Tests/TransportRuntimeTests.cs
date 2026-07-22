@@ -1250,6 +1250,84 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Persistent_value_callback_delivers_typed_values_and_owns_registration(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        DomCallbackHandler? handler = null;
+        host.Module.InvocationHandlers["setDotNetValueCallback"] =
+            async (args, _) =>
+            {
+                Assert.Equal("setActionHandler", args![1]);
+                Assert.Equal(1, args[3]);
+                handler = Assert.IsType<
+                    DotNetObjectReference<DomCallbackHandler>>(args[4]).Value;
+                var registrationHandler = Assert.IsType<
+                    DotNetObjectReference<DomCallbackRegistrationHandler>>(args[6]);
+                await registrationHandler.Value.ReceiveRegistrationAsync(17);
+                return null;
+            };
+        FixtureDto? received = null;
+
+        var registration = await host.Runtime.SetMethodValueCallbackAsync<FixtureDto>(
+            new FakeJSObjectReference(),
+            "setActionHandler",
+            1,
+            ["play"],
+            value =>
+            {
+                received = value;
+                return Task.CompletedTask;
+            });
+        await Assert.IsType<DomCallbackHandler>(handler)
+            .HandleEventAsync("""{"Name":"track"}""");
+        await registration.DisposeAsync();
+        await registration.DisposeAsync();
+
+        Assert.Equal(new FixtureDto("track"), received);
+        var removal = Assert.Single(
+            host.Module.Invocations,
+            invocation => invocation.Identifier == "removeDotNetValueCallback");
+        Assert.Equal(17, Assert.Single(removal.Args!));
+        await Assert.IsType<DomCallbackHandler>(handler)
+            .HandleEventAsync("""{"Name":"ignored"}""");
+        Assert.Equal(new FixtureDto("track"), received);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Persistent_value_callback_registration_failure_rolls_back(
+        bool wasm)
+    {
+        var host = CreateHost(wasm);
+        host.Module.InvocationHandlers["setDotNetValueCallback"] =
+            async (args, _) =>
+            {
+                var registrationHandler = Assert.IsType<
+                    DotNetObjectReference<DomCallbackRegistrationHandler>>(args![6]);
+                await registrationHandler.Value.ReceiveRegistrationAsync(23);
+                throw new JSException("registration failed");
+            };
+
+        var exception = await Assert.ThrowsAsync<JSException>(
+            () => host.Runtime.SetMethodValueCallbackAsync<FixtureDto>(
+                new FakeJSObjectReference(),
+                "setActionHandler",
+                1,
+                ["play"],
+                _ => Task.CompletedTask).AsTask());
+
+        Assert.Equal("registration failed", exception.Message);
+        var removal = Assert.Single(
+            host.Module.Invocations,
+            invocation => invocation.Identifier == "removeDotNetValueCallback");
+        Assert.Equal(23, Assert.Single(removal.Args!));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Typed_event_path_uses_borrowed_reference_and_owned_registration(bool wasm)
     {
         var host = CreateHost(wasm);

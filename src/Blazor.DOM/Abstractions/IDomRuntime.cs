@@ -129,6 +129,23 @@ public interface IDomRuntime
         where TProxy : class, IDomProxy;
 
     /// <summary>
+    /// Installs a persistent method callback whose argument is a reviewed JSON value.
+    /// The returned registration owns the JavaScript handler and managed callback.
+    /// </summary>
+    ValueTask<DomCallbackRegistration> SetMethodValueCallbackAsync<TValue>(
+        IJSObjectReference reference,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? args,
+        Func<TValue, Task> callback,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Removes a persistent method callback by registration ID.</summary>
+    ValueTask RemoveMethodValueCallbackAsync(
+        int registrationId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Invokes a method and opens its Blob, ArrayBuffer, or typed-array result
     /// through an owned, bounded <see cref="IJSStreamReference"/>.
     /// </summary>

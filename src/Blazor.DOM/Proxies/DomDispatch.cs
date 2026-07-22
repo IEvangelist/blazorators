@@ -199,6 +199,29 @@ public static class DomDispatch
                 cancellationToken);
     }
 
+    /// <summary>
+    /// Installs a persistent callback whose argument is a reviewed JSON value.
+    /// </summary>
+    public static ValueTask<DomCallbackRegistration> SetValueCallbackAsync<TValue>(
+        IDomDispatchProxy proxy,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? arguments,
+        Func<TValue, Task> callback,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(proxy);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(callback);
+        return proxy.DispatchRuntime.SetMethodValueCallbackAsync(
+            proxy.Reference,
+            name,
+            callbackArgumentIndex,
+            arguments,
+            callback,
+            cancellationToken);
+    }
+
     /// <summary>Reads an indexed value asynchronously.</summary>
     public static async ValueTask<TResult> GetIndexAsync<TResult>(
         IDomDispatchProxy proxy,

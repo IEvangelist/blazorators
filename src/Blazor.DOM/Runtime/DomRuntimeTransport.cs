@@ -321,6 +321,86 @@ internal static class DomRuntimeTransport
         }
     }
 
+    public static async ValueTask<int> SetValueCallbackAsync(
+        IJSObjectReference module,
+        IJSObjectReference target,
+        string name,
+        int callbackArgumentIndex,
+        object?[]? args,
+        DotNetObjectReference<DomCallbackHandler> handlerReference,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(module);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(handlerReference);
+        var prepared = args ?? [];
+        if (callbackArgumentIndex < 0 || callbackArgumentIndex > prepared.Length)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(callbackArgumentIndex),
+                callbackArgumentIndex,
+                "The callback index must identify an insertion point in the argument list.");
+        }
+
+        var registrationHandler = new DomCallbackRegistrationHandler();
+        var registrationHandlerReference =
+            DotNetObjectReference.Create(registrationHandler);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await module.InvokeVoidAsync(
+                "setDotNetValueCallback",
+                cancellationToken,
+                [
+                    target,
+                    name,
+                    prepared,
+                    callbackArgumentIndex,
+                    handlerReference,
+                    "HandleEvent",
+                    registrationHandlerReference,
+                    "ReceiveRegistration",
+                ]).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            return registrationHandler.TakeRegistration();
+        }
+        catch (Exception registrationFailure)
+        {
+            var registrationId = registrationHandler.CloseAndTakeRegistration();
+            if (registrationId is not null)
+            {
+                try
+                {
+                    await module.InvokeVoidAsync(
+                        "removeDotNetValueCallback",
+                        [registrationId.Value]).ConfigureAwait(false);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception cleanupFailure)
+                {
+                    throw new AggregateException(
+                        "Callback registration failed and rollback also failed.",
+                        registrationFailure,
+                        cleanupFailure);
+                }
+            }
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo
+                .Capture(registrationFailure)
+                .Throw();
+            throw;
+        }
+        finally
+        {
+            registrationHandlerReference.Dispose();
+        }
+    }
+
     public static async ValueTask<DomCallbackConstruction>
         ConstructReferencePairCallbackAsync<TFirst, TSecond>(
             IJSObjectReference module,

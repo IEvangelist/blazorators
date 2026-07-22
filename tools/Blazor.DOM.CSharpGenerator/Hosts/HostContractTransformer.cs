@@ -354,6 +354,15 @@ public sealed partial class HostContractTransformer(DomHostKind host)
         List<HostApiOperation> operations)
     {
         var parsed = ParseMethodDeclaration(declaration);
+        if (TryEmitMediaSessionActionHandler(
+            symbol,
+            parsed,
+            pending,
+            output,
+            operations))
+        {
+            return;
+        }
         if (TryEmitLockRequest(
             symbol,
             parsed,
@@ -413,6 +422,76 @@ public sealed partial class HostContractTransformer(DomHostKind host)
                 $"{metadata.Descriptor})";
         output.Add($"    {syncSignature} => {syncInvocation};");
         AddOperation(symbol, "method", parsed.Name, syncSignature, metadata, operations);
+    }
+
+    private static bool TryEmitMediaSessionActionHandler(
+        SymbolModel symbol,
+        ParsedMethod parsed,
+        IReadOnlyList<string> pending,
+        List<string> output,
+        List<HostApiOperation> operations)
+    {
+        if (!string.Equals(symbol.Name, "MediaSession", StringComparison.Ordinal)
+            || !string.Equals(
+                parsed.Name,
+                "SetActionHandler",
+                StringComparison.Ordinal)
+            || parsed.Parameters.Count != 2)
+        {
+            return false;
+        }
+
+        output.AddRange(pending.Where(line =>
+            !line.Contains("DomOperation(", StringComparison.Ordinal)));
+        output.Add(
+            "    [global::Microsoft.JSInterop.DomOperation(" +
+            "\"setActionHandler:callback\", \"setActionHandler\", " +
+            "global::Microsoft.JSInterop.DomTransportKind.JsonValue, " +
+            "\"void\", Nullable = false, Promise = false, Streamable = false, " +
+            "StructuredClone = true)]");
+        const string callbackSignature =
+            "global::System.Threading.Tasks.ValueTask<global::Microsoft.JSInterop." +
+            "DomCallbackRegistration> SetActionHandlerAsync(" +
+            "global::Blazor.DOM.MediaSessionAction action, " +
+            "global::Blazor.DOM.MediaSessionActionHandler handler, " +
+            "global::System.Threading.CancellationToken cancellationToken = default)";
+        output.Add(
+            $"    {callbackSignature} => global::Microsoft.JSInterop.DomDispatch." +
+            "SetValueCallbackAsync<global::Blazor.DOM.MediaSessionActionDetails>(" +
+            $"{DispatchCast}, \"setActionHandler\", 1, [action], value => " +
+            "{ handler(value); return global::System.Threading.Tasks.Task.CompletedTask; }, " +
+            "cancellationToken);");
+        operations.Add(new HostApiOperation(
+            $"{symbol.Name}/setActionHandler:callback",
+            symbol.Name,
+            "persistent-value-callback",
+            "setActionHandler",
+            false,
+            callbackSignature));
+
+        output.Add("");
+        output.Add(
+            "    [global::Microsoft.JSInterop.DomOperation(" +
+            "\"setActionHandler:clear\", \"setActionHandler\", " +
+            "global::Microsoft.JSInterop.DomTransportKind.JsonValue, " +
+            "\"void\", Nullable = false, Promise = false, Streamable = false, " +
+            "StructuredClone = true)]");
+        const string clearSignature =
+            "global::System.Threading.Tasks.ValueTask ClearActionHandlerAsync(" +
+            "global::Blazor.DOM.MediaSessionAction action, " +
+            "global::System.Threading.CancellationToken cancellationToken = default)";
+        output.Add(
+            $"    {clearSignature} => global::Microsoft.JSInterop.DomDispatch." +
+            $"InvokeVoidAsync({DispatchCast}, \"setActionHandler\", [action, null], " +
+            "cancellationToken);");
+        operations.Add(new HostApiOperation(
+            $"{symbol.Name}/setActionHandler:clear",
+            symbol.Name,
+            "method",
+            "setActionHandler",
+            false,
+            clearSignature));
+        return true;
     }
 
     private static bool TryEmitLockRequest(

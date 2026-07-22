@@ -85,6 +85,26 @@ public static class ProfileLoader
             }
         }
 
+        var duplicateExclusion = (profile.ReviewedExclusions ?? [])
+            .GroupBy(item => (item.Symbol, item.Member))
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateExclusion is not null)
+        {
+            throw new InvalidDataException(
+                $"Package profile '{profile.Name}' has duplicate reviewed exclusion " +
+                $"'{duplicateExclusion.Key.Symbol}.{duplicateExclusion.Key.Member}'.");
+        }
+        foreach (var exclusion in profile.ReviewedExclusions ?? [])
+        {
+            if (string.IsNullOrWhiteSpace(exclusion.Symbol)
+                || string.IsNullOrWhiteSpace(exclusion.Member)
+                || string.IsNullOrWhiteSpace(exclusion.Rationale))
+            {
+                throw new InvalidDataException(
+                    $"Package profile '{profile.Name}' has an incomplete reviewed exclusion.");
+            }
+        }
+
         if (profile.EntryPoints is null)
             return;
         if (profile.EntryPoints.Count == 0)
@@ -128,6 +148,16 @@ public static class ProfileLoader
                 throw new InvalidDataException(
                     $"Entry point '{entry.Name}' references '{entry.Symbol}', which is " +
                     "not an exact root symbol.");
+            }
+            if (entry.Member is not null
+                && (string.IsNullOrWhiteSpace(entry.Member)
+                    || !entry.JavaScriptPath.EndsWith(
+                        $".{entry.Member}",
+                        StringComparison.Ordinal)))
+            {
+                throw new InvalidDataException(
+                    $"Method entry point '{entry.Name}' must end its JavaScript path " +
+                    $"with '.{entry.Member}'.");
             }
             if (!IsValidJavaScriptPath(entry.JavaScriptPath))
             {

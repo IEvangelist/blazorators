@@ -397,6 +397,88 @@ export async function getIndexDotNetObjectReference(
         callbackMethodName);
 }
 
+// ─── Persistent method callbacks ──────────────────────────────────────────────
+
+/** @type {Map<number, {target: object, name: string, args: Array, callbackArgumentIndex: number, key: string, dotnetRef: DotNetObjectReference}>} */
+const _valueCallbacks = new Map();
+/** @type {WeakMap<object, Map<string, number>>} */
+const _activeValueCallbacks = new WeakMap();
+let _nextValueCallbackId = 1;
+
+export async function setDotNetValueCallback(
+    target,
+    name,
+    args,
+    callbackArgumentIndex,
+    dotnetRef,
+    callbackMethodName,
+    registrationDotnetRef,
+    registrationCallbackMethodName) {
+    const invocationArgs = [...(args ?? [])];
+    if (!Number.isInteger(callbackArgumentIndex) ||
+        callbackArgumentIndex < 0 ||
+        callbackArgumentIndex > invocationArgs.length) {
+        throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
+    }
+
+    const id = _nextValueCallbackId++;
+    const key = `${name}:${callbackArgumentIndex}:${JSON.stringify(invocationArgs)}`;
+    const callback = (value) => {
+        dotnetRef.invokeMethodAsync(callbackMethodName, JSON.stringify(value))
+            .catch((error) => {
+                console.error(`[blazorators.dom] method callback error (${name}):`, error);
+            });
+    };
+    invocationArgs.splice(callbackArgumentIndex, 0, callback);
+    await target[name](...invocationArgs);
+
+    let active = _activeValueCallbacks.get(target);
+    if (!active) {
+        active = new Map();
+        _activeValueCallbacks.set(target, active);
+    }
+    const previousId = active.get(key);
+    if (previousId !== undefined) {
+        _valueCallbacks.delete(previousId);
+    }
+    active.set(key, id);
+    _valueCallbacks.set(id, {
+        target,
+        name,
+        args: [...(args ?? [])],
+        callbackArgumentIndex,
+        key,
+        dotnetRef
+    });
+
+    try {
+        const accepted = await registrationDotnetRef.invokeMethodAsync(
+            registrationCallbackMethodName,
+            id);
+        _requireDeliveryAcknowledgement(accepted, 'method callback registration');
+    } catch (error) {
+        await removeDotNetValueCallback(id);
+        throw error;
+    }
+}
+
+export async function removeDotNetValueCallback(id) {
+    const entry = _valueCallbacks.get(id);
+    if (!entry) return;
+    _valueCallbacks.delete(id);
+    const active = _activeValueCallbacks.get(entry.target);
+    if (active?.get(entry.key) === id) {
+        const invocationArgs = [...entry.args];
+        invocationArgs.splice(entry.callbackArgumentIndex, 0, null);
+        await entry.target[entry.name](...invocationArgs);
+        active.delete(entry.key);
+        if (active.size === 0) {
+            _activeValueCallbacks.delete(entry.target);
+        }
+    }
+    try { entry.dotnetRef.dispose(); } catch { /* already disposed */ }
+}
+
 // ─── Event listeners ──────────────────────────────────────────────────────────
 
 /** @type {Map<number, {target: EventTarget, type: string, listener: function, dotnetRef: DotNetObjectReference}>} */

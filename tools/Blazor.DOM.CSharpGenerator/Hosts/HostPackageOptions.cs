@@ -3,7 +3,8 @@ namespace Blazor.DOM.CSharpGenerator.Hosts;
 public sealed record HostEntryPoint(
     string Name,
     string Symbol,
-    string JavaScriptPath);
+    string JavaScriptPath,
+    string? Member = null);
 
 public sealed record HostCapabilityMetadata(
     string Name,

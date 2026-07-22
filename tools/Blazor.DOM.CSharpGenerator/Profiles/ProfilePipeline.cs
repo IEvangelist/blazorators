@@ -51,6 +51,7 @@ public static class ProfilePipeline
                     profile),
                 StringComparer.Ordinal)
             : sourceIndex;
+        ValidateReviewedExclusions(profile, sourceIndex, generationIndex);
 
         var closure = TransitiveDependencyResolver.Resolve(
             profile.RootSymbols,
@@ -443,10 +444,52 @@ public static class ProfilePipeline
             ExternalReferences: externalRefs,
             Accounting: pipelineResult.Manifest.Accounting,
             TransportOverrides: profile.TransportOverrides ?? [],
+            ReviewedExclusions: profile.ReviewedExclusions ?? [],
             Errors: pipelineResult.Errors.Select(e => new ProfileErrorEntry(
                 e.SymbolName, e.ExceptionType, e.Message)).ToList(),
             ByteIdentityVerified: byteIdentityVerified
         );
+    }
+
+    private static void ValidateReviewedExclusions(
+        ProfileDefinition profile,
+        IReadOnlyDictionary<string, SymbolModel> sourceIndex,
+        IReadOnlyDictionary<string, SymbolModel> generationIndex)
+    {
+        foreach (var exclusion in profile.ReviewedExclusions ?? [])
+        {
+            if (!sourceIndex.TryGetValue(exclusion.Symbol, out var source))
+            {
+                throw new InvalidDataException(
+                    $"Reviewed exclusion '{exclusion.Symbol}.{exclusion.Member}' " +
+                    "references a missing symbol.");
+            }
+            var sourceMembers = source.Declarations
+                .SelectMany(declaration => declaration.Members)
+                .Where(member => string.Equals(
+                    member.Name?.Text,
+                    exclusion.Member,
+                    StringComparison.Ordinal))
+                .ToList();
+            if (sourceMembers.Count == 0)
+            {
+                throw new InvalidDataException(
+                    $"Reviewed exclusion '{exclusion.Symbol}.{exclusion.Member}' " +
+                    "references a missing member.");
+            }
+            if (generationIndex.TryGetValue(exclusion.Symbol, out var selected)
+                && selected.Declarations
+                    .SelectMany(declaration => declaration.Members)
+                    .Any(member => string.Equals(
+                        member.Name?.Text,
+                        exclusion.Member,
+                        StringComparison.Ordinal)))
+            {
+                throw new InvalidDataException(
+                    $"Reviewed exclusion '{exclusion.Symbol}.{exclusion.Member}' " +
+                    "is still included by the profile.");
+            }
+        }
     }
 
     private static void WriteProfileCoverage(string outputDir, ProfileCoverageReport report)
@@ -481,6 +524,7 @@ public sealed record ProfileCoverageReport(
     IReadOnlyList<string> ExternalReferences,
     AccountingSummary Accounting,
     IReadOnlyList<ProfileTransportOverride> TransportOverrides,
+    IReadOnlyList<ProfileMemberExclusion> ReviewedExclusions,
     IReadOnlyList<ProfileErrorEntry> Errors,
     bool ByteIdentityVerified);
 

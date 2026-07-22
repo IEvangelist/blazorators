@@ -60,6 +60,17 @@ public class JSAutoInteropAttribute : Attribute
     public string Implementation { get; set; } = null!;
 
     /// <summary>
+    /// Optional focused-package entry point name when it differs from
+    /// <see cref=""TypeName""/>.
+    /// </summary>
+    public string? EntryPointName { get; set; }
+
+    /// <summary>
+    /// Optional zero-argument member invoked by a focused-package entry point.
+    /// </summary>
+    public string? MemberName { get; set; }
+
+    /// <summary>
     /// Whether to generate only pure JavaScript functions that do not require callbacks.
     /// For example, <c>""Geolocation.clearWatch""</c> is consider pure, but <c>""Geolocation.watchPosition""</c> is not.
     /// Defaults to <c>false</c>.
