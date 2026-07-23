@@ -15,8 +15,14 @@ on:
 
 jobs:
   repository_build:
-    name: repository build
-    runs-on: ubuntu-latest
+    name: repository build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
     steps:
     - uses: actions/checkout@main
 

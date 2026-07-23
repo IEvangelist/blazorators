@@ -16,25 +16,28 @@ public enum OutputPromotionFailurePoint
     AfterPromotionCommit,
     DuringBackupDeletion,
     DuringOwnedFileDeletion,
+    DuringCanonicalDirectoryMove,
+    DuringCandidateDirectoryMove,
 }
 
 public sealed class OutputPromotionCleanupException(
     string canonicalDirectory,
-    string backupDirectory,
+    string cleanupDirectory,
     Exception innerException)
     : IOException(
         $"Output promotion to '{canonicalDirectory}' committed and was byte-verified, " +
-        $"but backup cleanup failed. The verified canonical output was preserved; " +
-        $"recoverable backup debris may remain at '{backupDirectory}'.",
+        $"but temporary promotion cleanup failed. The verified canonical output was " +
+        $"preserved; recoverable debris may remain at '{cleanupDirectory}'.",
         innerException)
 {
     public string CanonicalDirectory { get; } = canonicalDirectory;
-    public string BackupDirectory { get; } = backupDirectory;
+    public string CleanupDirectory { get; } = cleanupDirectory;
 }
 
 public static class OutputPromotion
 {
     private const int MaxFileSystemAttempts = 10;
+    private const int MaxDirectoryMoveAttempts = 3;
 
     private static readonly string[] ExhaustiveOwnedDirectories =
     [
@@ -140,7 +143,9 @@ public static class OutputPromotion
             stagingFiles,
             preserveUnownedContent);
         var backupMoved = false;
+        var backupCopied = false;
         var candidatePromoted = false;
+        var canonicalMutationStarted = false;
 
         try
         {
@@ -169,19 +174,76 @@ public static class OutputPromotion
             Inject(failureInjector, OutputPromotionFailurePoint.AfterStagingCopy);
             VerifyPromotion(expectedFiles, candidate);
 
-            Inject(failureInjector, OutputPromotionFailurePoint.BeforeCanonicalSwap);
-            if (canonicalExisted)
+            var canonicalAlreadyCurrent = canonicalExisted
+                && OutputVerifier.Verify(
+                    expectedFiles,
+                    originalCanonicalFiles).Identical;
+            if (!canonicalAlreadyCurrent)
             {
-                MoveDirectoryWithRetry(canonical, backup, retryDelay);
-                backupMoved = true;
-                Inject(failureInjector, OutputPromotionFailurePoint.AfterCanonicalBackupMove);
+                Inject(failureInjector, OutputPromotionFailurePoint.BeforeCanonicalSwap);
+                if (canonicalExisted)
+                {
+                    try
+                    {
+                        MoveDirectoryWithRetry(
+                            canonical,
+                            backup,
+                            retryDelay,
+                            () => Inject(
+                                failureInjector,
+                                OutputPromotionFailurePoint.DuringCanonicalDirectoryMove),
+                            MaxDirectoryMoveAttempts);
+                        backupMoved = true;
+                    }
+                    catch (Exception moveException) when (
+                        IsFileSystemFailure(moveException)
+                        && Directory.Exists(canonical)
+                        && !Directory.Exists(backup))
+                    {
+                        CopyDirectoryWithRetry(canonical, backup, retryDelay);
+                        VerifyTree(
+                            originalCanonicalFiles,
+                            backup,
+                            $"Copied rollback backup for '{canonical}' is not byte-identical");
+                        backupCopied = true;
+                    }
+                    Inject(
+                        failureInjector,
+                        OutputPromotionFailurePoint.AfterCanonicalBackupMove);
+                }
+
+                if (backupCopied)
+                {
+                    canonicalMutationStarted = true;
+                    SynchronizeDirectory(candidate, canonical, retryDelay);
+                }
+                else
+                {
+                    try
+                    {
+                        MoveDirectoryWithRetry(
+                            candidate,
+                            canonical,
+                            retryDelay,
+                            () => Inject(
+                                failureInjector,
+                                OutputPromotionFailurePoint.DuringCandidateDirectoryMove),
+                            MaxDirectoryMoveAttempts);
+                    }
+                    catch (Exception moveException) when (
+                        IsFileSystemFailure(moveException)
+                        && Directory.Exists(candidate)
+                        && !Directory.Exists(canonical))
+                    {
+                        canonicalMutationStarted = true;
+                        SynchronizeDirectory(candidate, canonical, retryDelay);
+                    }
+                }
+                candidatePromoted = true;
+                Inject(failureInjector, OutputPromotionFailurePoint.AfterCandidatePromotion);
+
+                VerifyPromotion(expectedFiles, canonical);
             }
-
-            MoveDirectoryWithRetry(candidate, canonical, retryDelay);
-            candidatePromoted = true;
-            Inject(failureInjector, OutputPromotionFailurePoint.AfterCandidatePromotion);
-
-            VerifyPromotion(expectedFiles, canonical);
         }
         catch (Exception promotionException)
         {
@@ -194,8 +256,11 @@ public static class OutputPromotion
                     rejected,
                     canonicalExisted,
                     backupMoved,
+                    backupCopied,
                     candidatePromoted,
-                    originalCanonicalFiles);
+                    canonicalMutationStarted,
+                    originalCanonicalFiles,
+                    retryDelay);
             }
             catch (Exception rollbackException)
             {
@@ -210,17 +275,22 @@ public static class OutputPromotion
 
         // The transaction commits immediately after the canonical tree is byte-verified.
         // Backup deletion is post-commit cleanup and must never trigger rollback.
+        var cleanupDirectory = candidate;
         try
         {
             Inject(
                 failureInjector,
                 OutputPromotionFailurePoint.AfterPostPromotionVerification);
             Inject(failureInjector, OutputPromotionFailurePoint.AfterPromotionCommit);
-            if (backupMoved)
+            if (Directory.Exists(candidate))
+                DeleteDirectoryWithRetry(candidate, retryDelay: retryDelay);
+
+            if (backupMoved || backupCopied)
             {
                 Inject(
                     failureInjector,
                     OutputPromotionFailurePoint.BeforeBackupDeletion);
+                cleanupDirectory = backup;
                 DeleteDirectoryWithRetry(
                     backup,
                     () => Inject(
@@ -228,13 +298,14 @@ public static class OutputPromotion
                         OutputPromotionFailurePoint.DuringBackupDeletion),
                     retryDelay);
                 backupMoved = false;
+                backupCopied = false;
             }
         }
         catch (Exception cleanupException)
         {
             var failure = new OutputPromotionCleanupException(
                 canonical,
-                backup,
+                cleanupDirectory,
                 cleanupException);
             if (cleanupFailureHandler is null)
                 throw failure;
@@ -274,10 +345,13 @@ public static class OutputPromotion
         string rejected,
         bool canonicalExisted,
         bool backupMoved,
+        bool backupCopied,
         bool candidatePromoted,
-        IReadOnlyList<GeneratedFile> originalCanonicalFiles)
+        bool canonicalMutationStarted,
+        IReadOnlyList<GeneratedFile> originalCanonicalFiles,
+        Action<TimeSpan>? retryDelay)
     {
-        if (backupMoved)
+        if (backupMoved || backupCopied)
         {
             if (!Directory.Exists(backup))
                 throw new IOException(
@@ -289,14 +363,31 @@ public static class OutputPromotion
                 $"Rollback backup for '{canonical}' is not byte-identical");
         }
 
-        if (candidatePromoted && Directory.Exists(canonical))
-            MoveDirectoryWithRetry(canonical, rejected);
+        if (canonicalMutationStarted)
+        {
+            if (canonicalExisted)
+            {
+                if (!Directory.Exists(backup))
+                    throw new IOException(
+                        $"Rollback backup for '{canonical}' is missing.");
+                SynchronizeDirectory(backup, canonical, retryDelay);
+            }
+            else if (Directory.Exists(canonical))
+            {
+                DeleteDirectoryWithRetry(canonical, retryDelay: retryDelay);
+            }
+        }
+        else if (!backupCopied)
+        {
+            if (candidatePromoted && Directory.Exists(canonical))
+                MoveDirectoryWithRetry(canonical, rejected, retryDelay);
 
-        if (backupMoved && Directory.Exists(backup))
-            MoveDirectoryWithRetry(backup, canonical);
-        else if (canonicalExisted && !Directory.Exists(canonical))
-            throw new IOException(
-                $"Rollback backup for '{canonical}' is missing.");
+            if (backupMoved && Directory.Exists(backup))
+                MoveDirectoryWithRetry(backup, canonical, retryDelay);
+            else if (canonicalExisted && !Directory.Exists(canonical))
+                throw new IOException(
+                    $"Rollback backup for '{canonical}' is missing.");
+        }
 
         VerifyRollback(originalCanonicalFiles, canonical, canonicalExisted);
 
@@ -406,6 +497,113 @@ public static class OutputPromotion
             throw new IOException($"{failureMessage}: '{directory}'.");
     }
 
+    private static void CopyDirectoryWithRetry(
+        string source,
+        string destination,
+        Action<TimeSpan>? retryDelay)
+    {
+        Directory.CreateDirectory(destination);
+        foreach (var sourceFile in Directory
+            .EnumerateFiles(source, "*", SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.Ordinal))
+        {
+            var relativePath = Path.GetRelativePath(source, sourceFile);
+            var destinationFile = Path.Combine(destination, relativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(destinationFile)!);
+            CopyFileWithRetry(
+                sourceFile,
+                destinationFile,
+                overwrite: true,
+                retryDelay);
+        }
+    }
+
+    private static void SynchronizeDirectory(
+        string source,
+        string destination,
+        Action<TimeSpan>? retryDelay)
+    {
+        Directory.CreateDirectory(destination);
+        var sourceFiles = OutputVerifier.ScanDirectory(source)
+            .ToDictionary(file => file.RelativePath, StringComparer.Ordinal);
+        var destinationFiles = OutputVerifier.ScanDirectory(destination)
+            .ToDictionary(file => file.RelativePath, StringComparer.Ordinal);
+
+        foreach (var staleFile in destinationFiles.Keys
+            .Except(sourceFiles.Keys, StringComparer.Ordinal)
+            .OrderBy(path => path, StringComparer.Ordinal))
+        {
+            DeleteFileWithRetry(
+                Path.Combine(destination, staleFile),
+                beforeDelete: null,
+                retryDelay);
+        }
+
+        foreach (var sourceFile in sourceFiles.Values
+            .OrderBy(file => file.RelativePath, StringComparer.Ordinal))
+        {
+            if (destinationFiles.TryGetValue(
+                    sourceFile.RelativePath,
+                    out var destinationFile)
+                && string.Equals(
+                    sourceFile.Sha256,
+                    destinationFile.Sha256,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            CopyFileAtomicallyWithRetry(
+                Path.Combine(source, sourceFile.RelativePath),
+                Path.Combine(destination, sourceFile.RelativePath),
+                retryDelay);
+        }
+    }
+
+    private static void CopyFileAtomicallyWithRetry(
+        string source,
+        string destination,
+        Action<TimeSpan>? retryDelay)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+        var temporary = $"{destination}.promotion-{Guid.NewGuid():N}.tmp";
+        CopyFileWithRetry(source, temporary, overwrite: true, retryDelay);
+        try
+        {
+            MoveFileWithRetry(temporary, destination, retryDelay);
+        }
+        catch
+        {
+            if (File.Exists(temporary))
+                DeleteFileWithRetry(temporary, beforeDelete: null, retryDelay);
+            throw;
+        }
+    }
+
+    private static void CopyFileWithRetry(
+        string source,
+        string destination,
+        bool overwrite,
+        Action<TimeSpan>? retryDelay)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                File.Copy(source, destination, overwrite);
+                return;
+            }
+            catch (IOException) when (attempt < MaxFileSystemAttempts)
+            {
+                WaitBeforeRetry(attempt, retryDelay);
+            }
+            catch (UnauthorizedAccessException) when (attempt < MaxFileSystemAttempts)
+            {
+                WaitBeforeRetry(attempt, retryDelay);
+            }
+        }
+    }
+
     internal static void DeleteDirectoryWithRetry(
         string directory,
         Action? afterEntryDeleted = null,
@@ -459,13 +657,44 @@ public static class OutputPromotion
     private static void MoveDirectoryWithRetry(
         string source,
         string destination,
-        Action<TimeSpan>? retryDelay = null)
+        Action<TimeSpan>? retryDelay = null,
+        Action? beforeMove = null,
+        int maxAttempts = MaxFileSystemAttempts)
     {
         for (var attempt = 1; ; attempt++)
         {
             try
             {
+                beforeMove?.Invoke();
                 Directory.Move(source, destination);
+                return;
+            }
+            catch (IOException) when (attempt < maxAttempts)
+            {
+                WaitBeforeRetry(attempt, retryDelay);
+            }
+            catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+            {
+                WaitBeforeRetry(attempt, retryDelay);
+            }
+        }
+    }
+
+    private static void MoveFileWithRetry(
+        string source,
+        string destination,
+        Action<TimeSpan>? retryDelay)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                if (File.Exists(destination))
+                {
+                    var attributes = File.GetAttributes(destination);
+                    ClearReadOnly(destination, attributes);
+                }
+                File.Move(source, destination, overwrite: true);
                 return;
             }
             catch (IOException) when (attempt < MaxFileSystemAttempts)
@@ -478,6 +707,9 @@ public static class OutputPromotion
             }
         }
     }
+
+    private static bool IsFileSystemFailure(Exception exception)
+        => exception is IOException or UnauthorizedAccessException;
 
     private static void WaitBeforeRetry(
         int attempt,

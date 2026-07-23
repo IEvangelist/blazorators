@@ -2278,6 +2278,188 @@ public sealed class FinalEmitterAuditTests
     }
 
     [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void ExhaustivePromotion_PersistentCanonicalMoveFailure_UsesVerifiedFileFallback(
+        bool canonicalHasFiles,
+        bool unauthorized)
+    {
+        var root = CreateTempDirectory();
+        var canonical = Path.Combine(root, "Blazor.DOM.Generated");
+        var staging = Path.Combine(root, "staging");
+        try
+        {
+            Directory.CreateDirectory(canonical);
+            if (canonicalHasFiles)
+            {
+                WriteCanonicalStaticTree(canonical);
+                WriteFile(
+                    Path.Combine(canonical, "Interfaces", "IOld.g.cs"),
+                    "old\n");
+            }
+            WriteExhaustiveStaging(staging);
+            var attempts = 0;
+
+            OutputPromotion.PromoteExhaustive(
+                staging,
+                canonical,
+                failureInjector: point =>
+                {
+                    if (point != OutputPromotionFailurePoint.DuringCanonicalDirectoryMove)
+                        return;
+
+                    attempts++;
+                    if (unauthorized)
+                    {
+                        throw new UnauthorizedAccessException(
+                            "Injected persistent Windows directory access failure.");
+                    }
+                    throw new IOException(
+                        "Injected persistent Windows directory sharing violation.");
+                },
+                retryDelay: _ => { });
+
+            Assert.Equal(3, attempts);
+            Assert.True(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
+            Assert.False(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IOld.g.cs")));
+            if (canonicalHasFiles)
+                Assert.True(File.Exists(Path.Combine(canonical, ".gitattributes")));
+            AssertNoPromotionDebris(root, canonical);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ExhaustivePromotion_PersistentCandidateMoveFailure_UsesVerifiedFileFallback(
+        bool unauthorized)
+    {
+        var root = CreateTempDirectory();
+        var canonical = Path.Combine(root, "Blazor.DOM.Generated");
+        var staging = Path.Combine(root, "staging");
+        try
+        {
+            WriteExhaustiveStaging(staging);
+            var attempts = 0;
+
+            OutputPromotion.PromoteExhaustive(
+                staging,
+                canonical,
+                failureInjector: point =>
+                {
+                    if (point != OutputPromotionFailurePoint.DuringCandidateDirectoryMove)
+                        return;
+
+                    attempts++;
+                    if (unauthorized)
+                    {
+                        throw new UnauthorizedAccessException(
+                            "Injected persistent Windows directory access failure.");
+                    }
+                    throw new IOException(
+                        "Injected persistent Windows directory sharing violation.");
+                },
+                retryDelay: _ => { });
+
+            Assert.Equal(3, attempts);
+            Assert.True(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
+            Assert.Contains(
+                "\"fresh\":true",
+                File.ReadAllText(Path.Combine(
+                    canonical,
+                    "emitter-manifest.json")));
+            AssertNoPromotionDebris(root, canonical);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ExhaustivePromotion_FileFallbackFailure_RestoresByteIdenticalCanonical()
+    {
+        var root = CreateTempDirectory();
+        var canonical = Path.Combine(root, "Blazor.DOM.Generated");
+        var staging = Path.Combine(root, "staging");
+        try
+        {
+            WriteCanonicalStaticTree(canonical);
+            WriteFile(
+                Path.Combine(canonical, "Interfaces", "IOld.g.cs"),
+                "old\n");
+            WriteExhaustiveStaging(staging);
+            var before = SnapshotTree(canonical);
+
+            Assert.Throws<InjectedPromotionException>(
+                () => OutputPromotion.PromoteExhaustive(
+                    staging,
+                    canonical,
+                    failureInjector: point =>
+                    {
+                        if (point == OutputPromotionFailurePoint.DuringCanonicalDirectoryMove)
+                        {
+                            throw new IOException(
+                                "Injected persistent Windows directory sharing violation.");
+                        }
+                        if (point == OutputPromotionFailurePoint.AfterCandidatePromotion)
+                            throw new InjectedPromotionException(point);
+                    },
+                    retryDelay: _ => { }));
+
+            AssertTreesEqual(before, SnapshotTree(canonical));
+            AssertNoPromotionDebris(root, canonical);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ExhaustivePromotion_IdenticalCanonical_SkipsDirectorySwap()
+    {
+        var root = CreateTempDirectory();
+        var canonical = Path.Combine(root, "Blazor.DOM.Generated");
+        var staging = Path.Combine(root, "staging");
+        try
+        {
+            WriteCanonicalStaticTree(canonical);
+            WriteExhaustiveStaging(staging);
+            OutputPromotion.PromoteExhaustive(staging, canonical);
+            WriteExhaustiveStaging(staging);
+            var moveAttempts = 0;
+
+            OutputPromotion.PromoteExhaustive(
+                staging,
+                canonical,
+                failureInjector: point =>
+                {
+                    if (point == OutputPromotionFailurePoint.DuringCanonicalDirectoryMove)
+                        moveAttempts++;
+                });
+
+            Assert.Equal(0, moveAttempts);
+            Assert.True(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
+            AssertNoPromotionDebris(root, canonical);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void ExhaustivePromotion_PersistentWindowsCleanupFailure_PreservesCanonical(
