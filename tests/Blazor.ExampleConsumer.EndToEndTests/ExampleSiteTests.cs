@@ -96,6 +96,66 @@ public sealed class ExampleSiteTests(
     }
 
     [Fact]
+    public async Task CapabilitySidebar_DisclosesOnDemand_AndKeepsPageFragmentsLocal()
+    {
+        await using var context = await NewContextAsync(
+            reducedMotion: ReducedMotion.Reduce);
+        var page = await context.NewPageAsync();
+        await page.SetViewportSizeAsync(1280, 720);
+        await page.GotoAsync(site.UrlFor("/dom-e2e/web-crypto"), new PageGotoOptions
+        {
+            WaitUntil = WaitUntilState.NetworkIdle
+        });
+        await page.WaitForFunctionAsync(
+            "() => document.querySelector('[data-probe-phase]')?.dataset.probePhase === 'ready'");
+
+        var disclosure = page.Locator(".nav-capabilities");
+        Assert.False(await disclosure.EvaluateAsync<bool>("element => element.open"));
+        await Assertions.Expect(page.Locator(".nav-count")).ToHaveTextAsync("14");
+        await Assertions.Expect(page.Locator(".nav-submenu")).ToBeHiddenAsync();
+
+        await disclosure.Locator("summary").ClickAsync();
+
+        Assert.True(await disclosure.EvaluateAsync<bool>("element => element.open"));
+        await Assertions.Expect(page.Locator(".nav-submenu")).ToBeVisibleAsync();
+        await Assertions.Expect(page.Locator(".nav-submenu .nav-subitem")).ToHaveCountAsync(14);
+        Assert.True(
+            await page.EvaluateAsync<bool>(
+                """
+                () => {
+                    const sidebar = document.querySelector('.app-sidebar');
+                    const nav = document.querySelector('.app-sidebar .nav');
+                    const footer = document.querySelector('.app-sidebar .nav-footer');
+                    if (!sidebar || !nav || !footer) {
+                        return false;
+                    }
+
+                    const sidebarBox = sidebar.getBoundingClientRect();
+                    const footerBox = footer.getBoundingClientRect();
+                    return Math.abs(sidebarBox.height - innerHeight) <= 1
+                        && getComputedStyle(nav).overflowY === 'auto'
+                        && nav.scrollHeight > nav.clientHeight
+                        && footerBox.bottom <= sidebarBox.bottom + 1;
+                }
+                """),
+            "The capability list should scroll inside the viewport-height sidebar without displacing its footer.");
+
+        await page.GetByRole(
+            AriaRole.Link,
+            new() { Name = "Try it in this browser" }).ClickAsync();
+        await Assertions.Expect(page).ToHaveURLAsync(
+            new Regex(@"/dom-e2e/web-crypto#try-it$"));
+        await Assertions.Expect(page.Locator("#try-it")).ToBeInViewportAsync();
+
+        await page.GetByRole(
+            AriaRole.Link,
+            new() { Name = "View implementation" }).ClickAsync();
+        await Assertions.Expect(page).ToHaveURLAsync(
+            new Regex(@"/dom-e2e/web-crypto#implementation$"));
+        await Assertions.Expect(page.Locator("#implementation")).ToBeInViewportAsync();
+    }
+
+    [Fact]
     public async Task SkipLink_IsFirstFocusableControl_AndMovesFocusToMainContent()
     {
         await using var context = await NewContextAsync();

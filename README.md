@@ -167,7 +167,7 @@ Install the SDK selected by [`global.json`](global.json), then build from the re
 dotnet build
 ```
 
-The checked-in [`NuGet.config`](NuGet.config) intentionally clears inherited machine-level package feeds and restores from NuGet.org. This keeps central package management deterministic across developer machines and CI. The shared DOM generation node is incremental; a clean build validates the pinned semantic inputs and generates all exhaustive and focused contracts under `artifacts/obj`.
+The checked-in [`NuGet.config`](NuGet.config) intentionally clears inherited machine-level package feeds and restores from NuGet.org. This keeps central package management deterministic across developer machines and CI. Command-line builds use MSBuild's static project graph so every project/framework combination has one artifact writer, including on Windows machines where antivirus scanning makes duplicate writes especially fragile. The shared DOM generation node is incremental; a clean build validates the pinned semantic inputs and generates all exhaustive and focused contracts under `artifacts/obj`.
 
 ## Using the `Blazor.SourceGenerators` package 📦
 

@@ -36,11 +36,13 @@ else
                         <span class="badge">@(Definition.UserActivation ? "User activation" : "Ambient access")</span>
                     </div>
                     <div class="detail-hero-actions">
-                        <a class="btn btn-primary" href="#try-it">
+                        <a class="btn btn-primary"
+                           href="@($"{Definition.Href.TrimStart('/')}#try-it")">
                             <Icon Name="play" />
                             Try it in this browser
                         </a>
-                        <a class="btn btn-ghost" href="#implementation">
+                        <a class="btn btn-ghost"
+                           href="@($"{Definition.Href.TrimStart('/')}#implementation")">
                             <Icon Name="code" />
                             View implementation
                         </a>
@@ -58,6 +60,7 @@ else
 
         <section id="try-it"
                  class="detail-section detail-live"
+                 tabindex="-1"
                  aria-labelledby="live-heading">
             <div class="detail-section-heading">
                 <span>01 / Try the workflow</span>
@@ -98,6 +101,7 @@ else
 
         <section id="implementation"
                  class="detail-section detail-code"
+                 tabindex="-1"
                  aria-labelledby="sample-heading">
             <div class="detail-section-heading">
                 <span>02 / Implement the workflow</span>

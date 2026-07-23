@@ -69,7 +69,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blazor.Serialization\Blazor.Serialization.csproj" />
-    <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Blazor.SourceGenerators\Blazor.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup Label="Files">

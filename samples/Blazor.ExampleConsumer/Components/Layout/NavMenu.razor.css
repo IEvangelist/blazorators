@@ -1,5 +1,13 @@
 /* Sidebar nav — colors come from site.css tokens. */
 
+.nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
 ::deep .nav a {
     position: relative;
 }
@@ -9,11 +17,81 @@
     opacity: 0.7;
 }
 
+.nav-capabilities {
+    margin-bottom: 0.15rem;
+}
+
+.nav-disclosure {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 40px;
+    padding: 0.5rem 0.75rem;
+    color: hsl(var(--muted-foreground));
+    border-radius: var(--radius-sm);
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    list-style: none;
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+}
+
+.nav-disclosure::-webkit-details-marker {
+    display: none;
+}
+
+.nav-disclosure::marker {
+    content: "";
+}
+
+.nav-disclosure:hover,
+.nav-capabilities[open] > .nav-disclosure {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+}
+
+.nav-disclosure:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+}
+
+.nav-disclosure-label {
+    min-width: 0;
+}
+
+.nav-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.7rem;
+    height: 1.35rem;
+    margin-left: auto;
+    padding: 0 0.4rem;
+    color: hsl(var(--foreground));
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+::deep .nav-disclosure-chevron {
+    flex: 0 0 auto;
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.nav-capabilities[open] ::deep .nav-disclosure-chevron {
+    transform: rotate(180deg);
+}
+
 .nav-submenu {
     position: relative;
     display: grid;
     gap: 0.12rem;
-    margin: 0.2rem 0 0.45rem 1.2rem;
+    margin: 0.25rem 0 0.45rem 0.75rem;
     padding-left: 0.75rem;
 }
 
@@ -43,6 +121,14 @@
     padding: 0.35rem 0.5rem;
     border-radius: 0.55rem;
     font-size: 0.74rem;
+}
+
+::deep .nav-submenu .nav-catalog-link {
+    min-height: 2rem;
+    padding: 0.4rem 0.5rem;
+    color: hsl(var(--foreground));
+    font-size: 0.74rem;
+    font-weight: 650;
 }
 
 ::deep .nav-submenu .nav-subitem .icon {

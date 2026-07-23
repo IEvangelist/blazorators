@@ -1,0 +1,3 @@
+# Build each project/target-framework node once, even when it is both in the
+# solution and reachable through project references.
+-graphBuild

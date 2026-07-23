@@ -40,26 +40,45 @@
     <NavLink id="dom-lab" href="dom-e2e" Match="NavLinkMatch.All" @onclick=@(_ => OnNavigate.InvokeAsync())>
         <Icon Name="code" /> <span>DOM API lab</span>
     </NavLink>
-    <NavLink id="dom-capabilities" href="dom-e2e/capabilities" @onclick=@(_ => OnNavigate.InvokeAsync())>
-        <Icon Name="package" /> <span>Capabilities</span>
-    </NavLink>
-    <div class="nav-submenu" aria-label="DOM capability pages">
-        @foreach (var category in DomCapabilityCatalog.Categories)
-        {
-            <span class="nav-submenu-label">@category</span>
-            @foreach (var capability in DomCapabilityCatalog.All.Where(
-                capability => capability.Category == category))
+    <details class="nav-capabilities">
+        <summary class="nav-disclosure">
+            <Icon Name="package" Size="18" />
+            <span class="nav-disclosure-label">Capabilities</span>
+            <span class="nav-count"
+                  aria-label="@($"{DomCapabilityCatalog.All.Count} capability demos")">
+                @DomCapabilityCatalog.All.Count
+            </span>
+            <Icon Name="chevron-down"
+                  Size="16"
+                  Class="nav-disclosure-chevron" />
+        </summary>
+
+        <div class="nav-submenu" aria-label="DOM capability pages">
+            <NavLink id="dom-capabilities"
+                     class="nav-catalog-link"
+                     href="dom-e2e/capabilities"
+                     Match="NavLinkMatch.All"
+                     @onclick=@(_ => OnNavigate.InvokeAsync())>
+                Browse all capabilities
+            </NavLink>
+
+            @foreach (var category in DomCapabilityCatalog.Categories)
             {
-                <NavLink id="@($"dom-{capability.Slug}")"
-                         class="nav-subitem"
-                         href="@capability.Href.TrimStart('/')"
-                         @onclick=@(_ => OnNavigate.InvokeAsync())>
-                    <Icon Name="@capability.Icon" />
-                    <span>@capability.Name</span>
-                </NavLink>
+                <span class="nav-submenu-label">@category</span>
+                @foreach (var capability in DomCapabilityCatalog.All.Where(
+                    capability => capability.Category == category))
+                {
+                    <NavLink id="@($"dom-{capability.Slug}")"
+                             class="nav-subitem"
+                             href="@capability.Href.TrimStart('/')"
+                             @onclick=@(_ => OnNavigate.InvokeAsync())>
+                        <Icon Name="@capability.Icon" />
+                        <span>@capability.Name</span>
+                    </NavLink>
+                }
             }
-        }
-    </div>
+        </div>
+    </details>
 
     <div class="nav-section">Playground</div>
     <NavLink id="sandbox" href="sandbox" @onclick=@(_ => OnNavigate.InvokeAsync())>
