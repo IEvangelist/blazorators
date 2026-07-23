@@ -214,7 +214,7 @@ namespace MyCompany.Web.Interop
     /// (<c>AddPermissionsServices</c>) and its registration shape is
     /// sensitive to <see cref="GeneratorOptions.IsWebAssembly"/> --
     /// WASM hosting goes through an <c>AddSingleton</c> that adapts
-    /// the host's <see cref="IJSRuntime"/> to <see cref="IJSInProcessRuntime"/>
+    /// the host's <c>IJSRuntime</c> to <c>IJSInProcessRuntime</c>
     /// before binding the implementation. Pinning the snapshot
     /// catches accidental regressions to that wiring (e.g. a switch
     /// to <c>Scoped</c> would silently break <c>InvokeUnmarshalled</c>

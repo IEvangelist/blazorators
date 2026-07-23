@@ -2232,6 +2232,54 @@ public sealed class FinalEmitterAuditTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public void ExhaustivePromotion_TransientOwnedFileDeletionFailures_AreRetried(
+        bool unauthorized)
+    {
+        var root = CreateTempDirectory();
+        var canonical = Path.Combine(root, "Blazor.DOM.Generated");
+        var staging = Path.Combine(root, "staging");
+        try
+        {
+            WriteCanonicalStaticTree(canonical);
+            WriteExhaustiveStaging(staging);
+            var failuresRemaining = 2;
+
+            OutputPromotion.PromoteExhaustive(
+                staging,
+                canonical,
+                failureInjector: point =>
+                {
+                    if (point != OutputPromotionFailurePoint.DuringOwnedFileDeletion
+                        || failuresRemaining-- <= 0)
+                    {
+                        return;
+                    }
+
+                    if (unauthorized)
+                        throw new UnauthorizedAccessException(
+                            "Injected Windows access failure.");
+                    throw new IOException("Injected Windows sharing violation.");
+                },
+                retryDelay: _ => { });
+
+            Assert.True(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
+            Assert.Contains(
+                "\"fresh\":true",
+                File.ReadAllText(Path.Combine(
+                    canonical,
+                    "emitter-manifest.json")));
+            AssertNoPromotionDebris(root, canonical);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public void ExhaustivePromotion_PersistentWindowsCleanupFailure_PreservesCanonical(
         bool unauthorized)
     {
@@ -2262,13 +2310,56 @@ public sealed class FinalEmitterAuditTests
                                 "Injected persistent Windows access failure.");
                         throw new IOException(
                             "Injected persistent Windows sharing violation.");
-                    }));
+                    },
+                    retryDelay: _ => { }));
 
-            Assert.Equal(5, attempts);
+            Assert.Equal(10, attempts);
             if (unauthorized)
                 Assert.IsType<UnauthorizedAccessException>(exception.InnerException);
             else
                 Assert.IsType<IOException>(exception.InnerException);
+            Assert.True(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
+            Assert.False(File.Exists(
+                Path.Combine(canonical, "Interfaces", "IOld.g.cs")));
+            Assert.Single(Directory.EnumerateDirectories(
+                root,
+                $".{Path.GetFileName(canonical)}.backup-*",
+                SearchOption.TopDirectoryOnly));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ExhaustivePromotion_HandledPostCommitCleanupFailure_RemainsSuccessful()
+    {
+        var root = CreateTempDirectory();
+        var canonical = Path.Combine(root, "Blazor.DOM.Generated");
+        var staging = Path.Combine(root, "staging");
+        try
+        {
+            WriteCanonicalStaticTree(canonical);
+            WriteFile(
+                Path.Combine(canonical, "Interfaces", "IOld.g.cs"),
+                "old\n");
+            WriteExhaustiveStaging(staging);
+            OutputPromotionCleanupException? cleanupFailure = null;
+
+            OutputPromotion.PromoteExhaustive(
+                staging,
+                canonical,
+                failureInjector: point =>
+                {
+                    if (point == OutputPromotionFailurePoint.BeforeBackupDeletion)
+                        throw new InjectedPromotionException(point);
+                },
+                cleanupFailureHandler: exception => cleanupFailure = exception);
+
+            Assert.NotNull(cleanupFailure);
+            Assert.IsType<InjectedPromotionException>(cleanupFailure.InnerException);
             Assert.True(File.Exists(
                 Path.Combine(canonical, "Interfaces", "IFresh.g.cs")));
             Assert.False(File.Exists(
@@ -2440,6 +2531,58 @@ public sealed class FinalEmitterAuditTests
                 Path.GetDirectoryName(canonical)!,
                 $".{Path.GetFileName(canonical)}.backup-*",
                 SearchOption.TopDirectoryOnly));
+        }
+        finally
+        {
+            Directory.Delete(output, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ProfilePipeline_HandledPostCommitCleanupFailure_ReturnsVerifiedResult()
+    {
+        var output = CreateTempDirectory();
+        var canonical = Path.Combine(output, "Profiles", "TinyProfile");
+        try
+        {
+            WriteFile(Path.Combine(canonical, "old.g.cs"), "old profile\n");
+            WriteFile(
+                Path.Combine(canonical, "profile-coverage.json"),
+                "{\"old\":true}\n");
+            var profile = new ProfileDefinition(
+                "TinyProfile",
+                "fixture",
+                ["TinyEnum"],
+                false,
+                false,
+                [],
+                "Blazor.DOM",
+                "Profiles/TinyProfile");
+            Exception? cleanupFailure = null;
+
+            var result = ProfilePipeline.Run(
+                profile,
+                new IrBundle(
+                    CreateDummyManifest(),
+                    [MakeEnumSymbol("TinyEnum")],
+                    []),
+                output,
+                promotionFailureInjector: point =>
+                {
+                    if (point == OutputPromotionFailurePoint.BeforeBackupDeletion)
+                        throw new InjectedPromotionException(point);
+                },
+                cleanupFailureHandler: exception => cleanupFailure = exception);
+
+            var promotionFailure =
+                Assert.IsType<OutputPromotionCleanupException>(cleanupFailure);
+            Assert.IsType<InjectedPromotionException>(
+                promotionFailure.InnerException);
+            Assert.True(result.Coverage.ByteIdentityVerified);
+            Assert.Empty(result.PipelineResult.Errors);
+            Assert.True(File.Exists(
+                Path.Combine(canonical, "Enums", "TinyEnum.g.cs")));
+            Assert.False(File.Exists(Path.Combine(canonical, "old.g.cs")));
         }
         finally
         {

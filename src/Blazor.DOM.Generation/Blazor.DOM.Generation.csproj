@@ -8,7 +8,7 @@
     <_LowerConfiguration>$([System.String]::Copy('$(Configuration)').ToLowerInvariant())</_LowerConfiguration>
     <DomGeneratedOutputRoot Condition="'$(DomGeneratedOutputRoot)' == ''">$([System.IO.Path]::GetFullPath('$(ArtifactsPath)\obj\Blazor.DOM.Generation\$(_LowerConfiguration)\dom'))</DomGeneratedOutputRoot>
     <DomGenerationStamp Condition="'$(DomGenerationStamp)' == ''">$(DomGeneratedOutputRoot)\generation.stamp</DomGenerationStamp>
-    <DomGeneratorAssembly>$(ArtifactsPath)\bin\Blazor.DOM.CSharpGenerator\$(_LowerConfiguration)\Blazor.DOM.CSharpGenerator.dll</DomGeneratorAssembly>
+    <DomGeneratorAssembly Condition="'$(DomGeneratorAssembly)' == ''">$(ArtifactsPath)\bin\Blazor.DOM.CSharpGenerator\$(_LowerConfiguration)\Blazor.DOM.CSharpGenerator.dll</DomGeneratorAssembly>
     <DomDataDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\data\Blazor.DOM'))</DomDataDirectory>
     <DomProfilesDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\data\Blazor.DOM.Profiles'))</DomProfilesDirectory>
     <DomAnchorsDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Blazor.DOM.Anchors'))</DomAnchorsDirectory>
@@ -35,8 +35,17 @@
           DependsOnTargets="ResolveProjectReferences"
           Inputs="@(_DomGenerationInput)"
           Outputs="$(DomGenerationStamp);$(DomGeneratedOutputRoot)\emitter-manifest.json;$(DomGeneratedOutputRoot)\host-parity.json">
-    <MakeDir Directories="$(DomGeneratedOutputRoot)" />
-    <Exec Command="dotnet &quot;$(DomGeneratorAssembly)&quot; --data &quot;$(DomDataDirectory)&quot; --output &quot;$(DomGeneratedOutputRoot)&quot; --profiles &quot;$(DomProfilesDirectory)&quot; --anchors &quot;$(DomAnchorsDirectory)&quot;" />
+    <Exec Command="dotnet &quot;$(DomGeneratorAssembly)&quot; --data &quot;$(DomDataDirectory)&quot; --output &quot;$(DomGeneratedOutputRoot)&quot; --profiles &quot;$(DomProfilesDirectory)&quot; --anchors &quot;$(DomAnchorsDirectory)&quot;"
+          ConsoleToMsBuild="true"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput"
+              ItemName="_DomGeneratorOutput" />
+      <Output TaskParameter="ExitCode"
+              PropertyName="_DomGeneratorExitCode" />
+    </Exec>
+    <Error Condition="'$(_DomGeneratorExitCode)' != '0'"
+           Code="DOMGEN001"
+           Text="DOM contract generation failed with exit code $(_DomGeneratorExitCode). Generator: $(DomGeneratorAssembly)&#xA;@(_DomGeneratorOutput, '&#xA;')" />
     <WriteLinesToFile File="$(DomGenerationStamp)"
                       Lines="@(_DomGenerationInput->'%(FullPath)')"
                       Overwrite="true" />

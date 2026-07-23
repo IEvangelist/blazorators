@@ -38,7 +38,8 @@ public static class ProfilePipeline
         IrBundle ir,
         string baseOutputDirectory,
         IReadOnlyDictionary<string, EmitterOverrideEntry>? overrides = null,
-        Action<OutputPromotionFailurePoint>? promotionFailureInjector = null)
+        Action<OutputPromotionFailurePoint>? promotionFailureInjector = null,
+        Action<Exception>? cleanupFailureHandler = null)
     {
         var canonicalOutputDir = ProfileOutputPath.Resolve(
             baseOutputDirectory,
@@ -197,14 +198,31 @@ public static class ProfilePipeline
             OutputPromotion.PromoteProfile(
                 stagingPass1,
                 canonicalOutputDir,
-                promotionFailureInjector);
+                promotionFailureInjector,
+                cleanupFailureHandler is null
+                    ? null
+                    : exception => cleanupFailureHandler(exception));
 
             return new ProfileGenerationResult(profile, includedSymbols.Count,
                 closure.Count, externalRefs.Count, result, verifiedCoverage);
         }
         finally
         {
-            OutputPromotion.DeleteDirectoryWithRetry(stagingBase);
+            if (cleanupFailureHandler is null)
+            {
+                OutputPromotion.DeleteDirectoryWithRetry(stagingBase);
+            }
+            else
+            {
+                try
+                {
+                    OutputPromotion.DeleteDirectoryWithRetry(stagingBase);
+                }
+                catch (Exception exception)
+                {
+                    cleanupFailureHandler(exception);
+                }
+            }
         }
     }
 

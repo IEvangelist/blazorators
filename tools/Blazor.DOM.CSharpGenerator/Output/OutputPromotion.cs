@@ -15,6 +15,7 @@ public enum OutputPromotionFailurePoint
     BeforeBackupDeletion,
     AfterPromotionCommit,
     DuringBackupDeletion,
+    DuringOwnedFileDeletion,
 }
 
 public sealed class OutputPromotionCleanupException(
@@ -33,6 +34,8 @@ public sealed class OutputPromotionCleanupException(
 
 public static class OutputPromotion
 {
+    private const int MaxFileSystemAttempts = 10;
+
     private static readonly string[] ExhaustiveOwnedDirectories =
     [
         "AdvancedTypes",
@@ -61,22 +64,30 @@ public static class OutputPromotion
     public static void PromoteExhaustive(
         string stagingDirectory,
         string canonicalDirectory,
-        Action<OutputPromotionFailurePoint>? failureInjector = null)
+        Action<OutputPromotionFailurePoint>? failureInjector = null,
+        Action<OutputPromotionCleanupException>? cleanupFailureHandler = null,
+        Action<TimeSpan>? retryDelay = null)
         => Promote(
             stagingDirectory,
             canonicalDirectory,
             preserveUnownedContent: true,
-            failureInjector);
+            failureInjector,
+            cleanupFailureHandler,
+            retryDelay);
 
     public static void PromoteProfile(
         string stagingDirectory,
         string canonicalDirectory,
-        Action<OutputPromotionFailurePoint>? failureInjector = null)
+        Action<OutputPromotionFailurePoint>? failureInjector = null,
+        Action<OutputPromotionCleanupException>? cleanupFailureHandler = null,
+        Action<TimeSpan>? retryDelay = null)
         => Promote(
             stagingDirectory,
             canonicalDirectory,
             preserveUnownedContent: false,
-            failureInjector);
+            failureInjector,
+            cleanupFailureHandler,
+            retryDelay);
 
     public static bool IsExhaustiveOwnedPath(string relativePath)
     {
@@ -93,7 +104,9 @@ public static class OutputPromotion
         string stagingDirectory,
         string canonicalDirectory,
         bool preserveUnownedContent,
-        Action<OutputPromotionFailurePoint>? failureInjector)
+        Action<OutputPromotionFailurePoint>? failureInjector,
+        Action<OutputPromotionCleanupException>? cleanupFailureHandler,
+        Action<TimeSpan>? retryDelay)
     {
         var staging = Path.GetFullPath(stagingDirectory);
         var canonical = Path.TrimEndingDirectorySeparator(
@@ -143,7 +156,10 @@ public static class OutputPromotion
             if (preserveUnownedContent)
             {
                 Inject(failureInjector, OutputPromotionFailurePoint.BeforeOwnedContentDeletion);
-                DeleteExhaustiveOwnedContent(candidate);
+                DeleteExhaustiveOwnedContent(
+                    candidate,
+                    failureInjector,
+                    retryDelay);
                 ValidateExhaustiveStaging(staging);
                 Inject(failureInjector, OutputPromotionFailurePoint.AfterOwnedContentDeletion);
             }
@@ -156,12 +172,12 @@ public static class OutputPromotion
             Inject(failureInjector, OutputPromotionFailurePoint.BeforeCanonicalSwap);
             if (canonicalExisted)
             {
-                MoveDirectoryWithRetry(canonical, backup);
+                MoveDirectoryWithRetry(canonical, backup, retryDelay);
                 backupMoved = true;
                 Inject(failureInjector, OutputPromotionFailurePoint.AfterCanonicalBackupMove);
             }
 
-            MoveDirectoryWithRetry(candidate, canonical);
+            MoveDirectoryWithRetry(candidate, canonical, retryDelay);
             candidatePromoted = true;
             Inject(failureInjector, OutputPromotionFailurePoint.AfterCandidatePromotion);
 
@@ -209,16 +225,21 @@ public static class OutputPromotion
                     backup,
                     () => Inject(
                         failureInjector,
-                        OutputPromotionFailurePoint.DuringBackupDeletion));
+                        OutputPromotionFailurePoint.DuringBackupDeletion),
+                    retryDelay);
                 backupMoved = false;
             }
         }
         catch (Exception cleanupException)
         {
-            throw new OutputPromotionCleanupException(
+            var failure = new OutputPromotionCleanupException(
                 canonical,
                 backup,
                 cleanupException);
+            if (cleanupFailureHandler is null)
+                throw failure;
+
+            cleanupFailureHandler(failure);
         }
     }
 
@@ -305,20 +326,30 @@ public static class OutputPromotion
         }
     }
 
-    private static void DeleteExhaustiveOwnedContent(string directory)
+    private static void DeleteExhaustiveOwnedContent(
+        string directory,
+        Action<OutputPromotionFailurePoint>? failureInjector,
+        Action<TimeSpan>? retryDelay)
     {
         foreach (var ownedDirectory in ExhaustiveOwnedDirectories)
         {
             var path = Path.Combine(directory, ownedDirectory);
             if (Directory.Exists(path))
-                DeleteDirectoryWithRetry(path);
+                DeleteDirectoryWithRetry(path, retryDelay: retryDelay);
         }
 
         foreach (var ownedFile in ExhaustiveOwnedFiles)
         {
             var path = Path.Combine(directory, ownedFile);
             if (File.Exists(path))
-                File.Delete(path);
+            {
+                DeleteFileWithRetry(
+                    path,
+                    () => Inject(
+                        failureInjector,
+                        OutputPromotionFailurePoint.DuringOwnedFileDeletion),
+                    retryDelay);
+            }
         }
     }
 
@@ -377,33 +408,59 @@ public static class OutputPromotion
 
     internal static void DeleteDirectoryWithRetry(
         string directory,
-        Action? afterEntryDeleted = null)
+        Action? afterEntryDeleted = null,
+        Action<TimeSpan>? retryDelay = null)
     {
         if (!Directory.Exists(directory))
             return;
 
-        const int maxAttempts = 5;
-        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        for (var attempt = 1; attempt <= MaxFileSystemAttempts; attempt++)
         {
             try
             {
                 DeleteDirectoryTree(directory, afterEntryDeleted);
                 return;
             }
-            catch (IOException) when (attempt < maxAttempts)
+            catch (IOException) when (attempt < MaxFileSystemAttempts)
             {
-                Thread.Sleep(20 * attempt);
+                WaitBeforeRetry(attempt, retryDelay);
             }
-            catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+            catch (UnauthorizedAccessException) when (attempt < MaxFileSystemAttempts)
             {
-                Thread.Sleep(20 * attempt);
+                WaitBeforeRetry(attempt, retryDelay);
             }
         }
     }
 
-    private static void MoveDirectoryWithRetry(string source, string destination)
+    private static void DeleteFileWithRetry(
+        string path,
+        Action? beforeDelete,
+        Action<TimeSpan>? retryDelay)
     {
-        const int maxAttempts = 5;
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                beforeDelete?.Invoke();
+                File.Delete(path);
+                return;
+            }
+            catch (IOException) when (attempt < MaxFileSystemAttempts)
+            {
+                WaitBeforeRetry(attempt, retryDelay);
+            }
+            catch (UnauthorizedAccessException) when (attempt < MaxFileSystemAttempts)
+            {
+                WaitBeforeRetry(attempt, retryDelay);
+            }
+        }
+    }
+
+    private static void MoveDirectoryWithRetry(
+        string source,
+        string destination,
+        Action<TimeSpan>? retryDelay = null)
+    {
         for (var attempt = 1; ; attempt++)
         {
             try
@@ -411,15 +468,27 @@ public static class OutputPromotion
                 Directory.Move(source, destination);
                 return;
             }
-            catch (IOException) when (attempt < maxAttempts)
+            catch (IOException) when (attempt < MaxFileSystemAttempts)
             {
-                Thread.Sleep(20 * attempt);
+                WaitBeforeRetry(attempt, retryDelay);
             }
-            catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+            catch (UnauthorizedAccessException) when (attempt < MaxFileSystemAttempts)
             {
-                Thread.Sleep(20 * attempt);
+                WaitBeforeRetry(attempt, retryDelay);
             }
         }
+    }
+
+    private static void WaitBeforeRetry(
+        int attempt,
+        Action<TimeSpan>? retryDelay)
+    {
+        var multiplier = 1 << Math.Min(attempt - 1, 4);
+        var delay = TimeSpan.FromMilliseconds(Math.Min(100 * multiplier, 1_000));
+        if (retryDelay is null)
+            Thread.Sleep(delay);
+        else
+            retryDelay(delay);
     }
 
     private static void DeleteDirectoryTree(

@@ -8,6 +8,52 @@ public sealed class BuildGenerationTests
 {
     [Fact]
     [Trait("Category", "BuildGraph")]
+    public async Task GenerationFailure_SurfacesCapturedGeneratorDiagnostics()
+    {
+        var root = FindRepositoryRoot();
+        var testRoot = Path.Combine(
+            root,
+            "artifacts",
+            "obj",
+            "Blazor.DOM.Generation.Diagnostics.Tests",
+            Guid.NewGuid().ToString("N"));
+        var generated = Path.Combine(testRoot, "dom");
+        var sentinel = Path.Combine(testRoot, "invalidation.sentinel");
+        var missingGenerator = Path.Combine(testRoot, "missing-generator.dll");
+        Directory.CreateDirectory(testRoot);
+        await File.WriteAllTextAsync(sentinel, "force-generation");
+
+        try
+        {
+            var build = await RunDotNetAsync(
+                root,
+                "build",
+                Path.Combine(
+                    "src",
+                    "Blazor.DOM.Generation",
+                    "Blazor.DOM.Generation.csproj"),
+                "--configuration",
+                "Release",
+                $"-p:DomGeneratedOutputRoot={generated}",
+                $"-p:DomGenerationSentinel={sentinel}",
+                $"-p:DomGeneratorAssembly={missingGenerator}",
+                "-p:BuildProjectReferences=false");
+            var diagnostic = $"{build.Output}{Environment.NewLine}{build.Error}";
+
+            Assert.NotEqual(0, build.ExitCode);
+            Assert.Contains("DOMGEN001", diagnostic, StringComparison.Ordinal);
+            Assert.Contains(missingGenerator, diagnostic, StringComparison.Ordinal);
+            Assert.DoesNotContain("MSB3073", diagnostic, StringComparison.Ordinal);
+        }
+        finally
+        {
+            if (Directory.Exists(testRoot))
+                Directory.Delete(testRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    [Trait("Category", "BuildGraph")]
     public async Task ProductionBuildGraph_IsIncrementalRaceSafeCleanAndPackable()
     {
         var root = FindRepositoryRoot();

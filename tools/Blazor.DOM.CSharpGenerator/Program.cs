@@ -115,7 +115,6 @@ var stagingDir = Path.Combine(
 var stagingRun1 = Path.Combine(stagingDir, "run1");
 var stagingRun2 = Path.Combine(stagingDir, "run2");
 int exitCode = 0;
-var cleanupFailed = false;
 
 try
 {
@@ -226,7 +225,11 @@ try
     if (exitCode == 0)
     {
         Console.WriteLine($"\nReplacing canonical output: {cliArgs.OutputDirectory}");
-        OutputPromotion.PromoteExhaustive(stagingRun1, canonicalOutputDirectory);
+        OutputPromotion.PromoteExhaustive(
+            stagingRun1,
+            canonicalOutputDirectory,
+            cleanupFailureHandler: exception =>
+                ReportCleanupFailure("exhaustive output backup", exception));
         Console.WriteLine("  Promotion verified.");
     }
     else
@@ -255,7 +258,15 @@ try
                 Console.Write($"  Profile '{profile.Name}'...");
                 try
                 {
-                    var profileResult = ProfilePipeline.Run(profile, ir, cliArgs.OutputDirectory, overrides);
+                    var profileResult = ProfilePipeline.Run(
+                        profile,
+                        ir,
+                        cliArgs.OutputDirectory,
+                        overrides,
+                        cleanupFailureHandler: exception =>
+                            ReportCleanupFailure(
+                                $"focused profile '{profile.Name}'",
+                                exception));
                     var acc = profileResult.PipelineResult.Manifest.Accounting;
 
                     // Profile fails if: generation errors, accounting invalid,
@@ -325,15 +336,11 @@ finally
     }
     catch (Exception ex)
     {
-        cleanupFailed = true;
-        Console.Error.WriteLine(
-            $"{Environment.NewLine}Failed to clean generation staging output:" +
-            $"{Environment.NewLine}{ex}");
+        ReportCleanupFailure(
+            $"temporary generation staging directory '{stagingDir}'",
+            ex);
     }
 }
-
-if (cleanupFailed)
-    return 10;
 
 if (exitCode != 0)
 {
@@ -350,6 +357,18 @@ static int ReportUnexpectedFailure(string phase, Exception exception)
         $"{Environment.NewLine}Unexpected failure during {phase}:" +
         $"{Environment.NewLine}{exception}");
     return 10;
+}
+
+static void ReportCleanupFailure(string scope, Exception exception)
+{
+    var message = exception.Message
+        .Replace('\r', ' ')
+        .Replace('\n', ' ');
+    Console.Error.WriteLine(
+        $"DOMGEN002: Cleanup for {scope} did not complete after retries. " +
+        $"This does not invalidate verified canonical output or change the " +
+        $"generator result; the leftover directory can be removed after the build. " +
+        $"{message}");
 }
 
 static void ReclaimCompletedProjection()

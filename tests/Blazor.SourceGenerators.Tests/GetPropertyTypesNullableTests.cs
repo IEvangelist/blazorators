@@ -12,7 +12,7 @@ namespace Blazor.SourceGenerators.Tests;
 /// interface / implementation property emission path. The DTO emit
 /// path (<see cref="Blazor.SourceGenerators.CSharp.CSharpObject"/>)
 /// already appends a <c>?</c> when
-/// <see cref="CSharpProperty.IsNullable"/> is set and the mapped
+/// <c>CSharpProperty.IsNullable</c> is set and the mapped
 /// type doesn't already end with <c>?</c>; the parallel top-level
 /// path
 /// (<see cref="Blazor.SourceGenerators.Extensions.CSharpPropertyExtensions.GetPropertyTypes(CSharpProperty, GeneratorOptions)"/>)
