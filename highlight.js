@@ -11,11 +11,12 @@ function load() {
 
     _loader = (async () => {
         const core = (await import('https://esm.sh/highlight.js@11.10.0/lib/core')).default;
-        const [json, csharp, xml, css] = await Promise.all([
+        const [json, csharp, xml, css, bash] = await Promise.all([
             import('https://esm.sh/highlight.js@11.10.0/lib/languages/json').then(m => m.default),
             import('https://esm.sh/highlight.js@11.10.0/lib/languages/csharp').then(m => m.default),
             import('https://esm.sh/highlight.js@11.10.0/lib/languages/xml').then(m => m.default),
             import('https://esm.sh/highlight.js@11.10.0/lib/languages/css').then(m => m.default),
+            import('https://esm.sh/highlight.js@11.10.0/lib/languages/bash').then(m => m.default),
         ]);
 
         core.registerLanguage('json', json);
@@ -24,6 +25,8 @@ function load() {
         core.registerLanguage('html', xml);
         core.registerLanguage('xml', xml);
         core.registerLanguage('css', css);
+        core.registerLanguage('bash', bash);
+        core.registerLanguage('shell', bash);
 
         return core;
     })();

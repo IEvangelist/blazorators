@@ -349,7 +349,7 @@ hr {
     background: hsl(var(--surface));
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
     z-index: 50;
 }
 
@@ -364,6 +364,7 @@ hr {
     letter-spacing: -0.02em;
     font-size: 1.02rem;
     color: hsl(var(--foreground));
+    flex: 0 0 var(--header-h);
 }
 
 .brand img,
@@ -495,7 +496,11 @@ hr {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
 }
 
 .nav-section {
@@ -547,6 +552,7 @@ hr {
 
 .nav-footer {
     margin-top: auto;
+    flex: 0 0 auto;
     padding: 0.75rem 0.75rem 1rem;
     color: hsl(var(--muted-foreground));
     font-size: 0.72rem;
