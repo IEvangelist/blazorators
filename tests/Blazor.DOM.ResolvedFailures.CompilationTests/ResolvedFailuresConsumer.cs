@@ -22,11 +22,13 @@ public static class ResolvedFailuresConsumer
         IValueTypeMap valueTypes)
     {
         _ = onError(
-            OnErrorEventHandlerNonNullUnionShape_993b9fe32c.FromString("failure"),
+            OnErrorEventHandlerNonNullCallEventEventOrStringUnion.FromString("failure"),
             error: error);
 
-        _ = subtleCrypto.ExportKeyAsync(SubtleCryptoStringShape_5694ca1bfd.Jwk, key);
-        _ = subtleCrypto.ExportKeyAsync(SubtleCryptoStringShape_2ae44cd65a.Raw, key);
+        _ = subtleCrypto.ExportKeyAsync(SubtleCryptoExportKeyFormatJwkString.Jwk, key);
+        _ = subtleCrypto.ExportKeyAsync(
+            SubtleCryptoExportKeyFormatExcludePkcs8OrRawOrSpkiString.Raw,
+            key);
 
         IQueuingStrategyContract<byte[]> byteContract = byteStrategy;
         IQueuingStrategyContract<object> countContract = countStrategy;
@@ -47,14 +49,16 @@ public static class ResolvedFailuresConsumer
         IWebGLRenderingContextBase webGl)
     {
         _ = document.CreateElementNS(
-            DocumentStringShape_3ba364cf6c.HttpWwwW3Org1999Xhtml,
+            DocumentCreateElementNSNamespaceURIXhtmlString.HttpWwwW3Org1999Xhtml,
             "main");
         _ = element.GetElementsByTagNameNS(
-            ElementStringShape_ff809a7942.HttpWwwW3Org1999Xhtml,
+            ElementGetElementsByTagNameNSNamespaceURIXhtmlString.HttpWwwW3Org1999Xhtml,
             "main");
-        _ = canvas.GetContext(HTMLCanvasElementStringShape_54c6689cf0._2D);
-        _ = offscreenCanvas.GetContext(OffscreenCanvasStringShape_d9f5dc2874._2D);
+        _ = canvas.GetContext(HTMLCanvasElementGetContextContextIdTwoDString._2D);
+        _ = offscreenCanvas.GetContext(
+            OffscreenCanvasGetContextContextIdTwoDString._2D);
         _ = webGl.GetExtension(
-            WebGLRenderingContextBaseStringShape_9e416f179d.ANGLEInstancedArrays);
+            WebGLRenderingContextBaseGetExtensionExtensionNameANGLEInstancedArraysString
+                .ANGLEInstancedArrays);
     }
 }

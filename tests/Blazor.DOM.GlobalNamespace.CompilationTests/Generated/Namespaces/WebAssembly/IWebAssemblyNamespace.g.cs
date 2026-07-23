@@ -34,7 +34,7 @@ public partial interface IWebAssemblyNamespace
     /// <summary>
     /// [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/compileStreaming_static)
     /// </summary>
-    ValueTask<global::Blazor.DOM.Namespaces.WebAssembly.IModule> CompileStreamingAsync(global::Blazor.DOM.AdvancedTypes.compileStreamingUnionShape_396072feb5 source);
+    ValueTask<global::Blazor.DOM.Namespaces.WebAssembly.IModule> CompileStreamingAsync(global::Blazor.DOM.AdvancedTypes.WebAssemblyCompileStreamingSourceResponseOrResponseBrowserPromiseLikeUnion source);
 
     ValueTask<global::Blazor.DOM.Namespaces.WebAssembly.IInstance> InstantiateAsync(global::Blazor.DOM.Namespaces.WebAssembly.IModule moduleObject, global::Blazor.DOM.Namespaces.WebAssembly.Imports importObject = default);
 

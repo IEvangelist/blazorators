@@ -196,20 +196,67 @@ internal static class UnionWrapperEmitter
         Func<NormalizedUnionArm, TypeProjection> project)
     {
         var projected = normalized.Arms
-            .Select(arm => new ProjectedUnionArm(
-                arm,
-                arm.Special == UnionSpecialArm.None ? project(arm) : null,
-                GetBaseName(arm.Type, arm.Special),
-                GetTransportExpression(arm)))
+            .Select(arm =>
+            {
+                var projection = arm.Special == UnionSpecialArm.None
+                    ? project(arm)
+                    : null;
+                return new ProjectedUnionArm(
+                    arm,
+                    projection,
+                    GetSemanticName(arm, projection),
+                    GetTransportExpression(arm));
+            })
             .ToList();
         var nameGroups = projected
             .GroupBy(arm => arm.Name, StringComparer.Ordinal)
             .Where(group => group.Count() > 1)
             .Select(group => group.Key)
             .ToHashSet(StringComparer.Ordinal);
-        return projected.Select(arm => nameGroups.Contains(arm.Name)
-            ? arm with { Name = $"Arm{arm.Source.SourceIndex + 1}" }
+        var named = projected.Select(arm =>
+            nameGroups.Contains(arm.Name)
+            && arm.Source.Special == UnionSpecialArm.None
+            ? arm with
+            {
+                Name = SemanticTypeNaming.DescribeContextualProjection(
+                    arm.Projection!,
+                    arm.Source.Provenances[0]),
+            }
             : arm).ToList();
+        var collision = named
+            .GroupBy(arm => arm.Name, StringComparer.Ordinal)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (collision is not null)
+        {
+            var provenance = collision
+                .SelectMany(arm => arm.Source.Provenances)
+                .FirstOrDefault() ?? "anonymous union";
+            throw new TypeProjectionException(
+                $"Union arms at '{provenance}' still share the semantic name " +
+                $"'{collision.Key}' after detailed type projection. Add a semantic " +
+                "naming rule for this distinction; ordinal arm names are not permitted.",
+                provenance);
+        }
+        return named;
+    }
+
+    private static string GetSemanticName(
+        NormalizedUnionArm arm,
+        TypeProjection? projection)
+    {
+        if (arm.Special != UnionSpecialArm.None)
+            return GetBaseName(arm.Type, arm.Special);
+        if (projection is not null
+            && (arm.Type is ArrayTypeNode or TupleTypeNode or TypeLiteralTypeNode
+                || arm.Type is ReferenceTypeNode reference
+                && reference.Name is "Array" or "ReadonlyArray" or "Iterable"
+                    or "AsyncIterable" or "PromiseLike" or "Record"))
+        {
+            return SemanticTypeNaming.DescribeContextualProjection(
+                projection,
+                arm.Provenances[0]);
+        }
+        return GetBaseName(arm.Type, arm.Special);
     }
 
     public static void ValidateRuntimeArms(
@@ -265,7 +312,7 @@ internal static class UnionWrapperEmitter
             ArrayTypeNode => "Array",
             TupleTypeNode => "Tuple",
             TypeLiteralTypeNode => "Record",
-            LiteralTypeNode literal => $"Literal{literal.Text}",
+            LiteralTypeNode literal => SemanticTypeNaming.DescribeLiteral(literal.Text),
             FunctionTypeNode => "Callback",
             _ => type.Kind,
         };

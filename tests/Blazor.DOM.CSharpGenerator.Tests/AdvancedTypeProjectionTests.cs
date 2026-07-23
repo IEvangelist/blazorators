@@ -151,8 +151,8 @@ public sealed class AdvancedTypeProjectionTests
 
         var source = new AliasEmitter(resolver, "1.0.0", "Blazor.DOM").Emit(symbol);
 
-        Assert.Contains("FromArray(", source);
-        Assert.Contains("FromRecord(", source);
+        Assert.Contains("FromStringAndStringTupleArray(", source);
+        Assert.Contains("FromStringAndStringReadOnlyDictionary(", source);
         Assert.Contains("TryGetHeaders(", source);
         Assert.DoesNotContain(
             "implicit operator HeadersInit(IReadOnlyDictionary",
@@ -193,8 +193,9 @@ public sealed class AdvancedTypeProjectionTests
         var projection = resolver.Project(tuple, "Fixture/tuple");
         var definition = Assert.Single(resolver.SynthesizedTypes);
 
-        Assert.StartsWith(
-            "global::Blazor.DOM.AdvancedTypes.FixtureTupleShape_",
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes." +
+            "FixtureTupleNameAndCountAndRemainingTuple",
             projection.RenderedType);
         Assert.True(projection.IsCollection);
         Assert.Contains("[JsonConverter(typeof(", definition.Source);
@@ -223,8 +224,9 @@ public sealed class AdvancedTypeProjectionTests
         var definition = Assert.Single(resolver.SynthesizedTypes);
 
         Assert.Equal("js-reference", projection.Transport?.Kind);
-        Assert.StartsWith(
-            "global::Blazor.DOM.AdvancedTypes.FixtureReferenceTupleShape_",
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes." +
+            "FixtureUnsupportedTupleStringAndNumberReferenceTuple",
             projection.RenderedType);
         Assert.Contains("public partial interface", definition.Source);
         Assert.Contains("string GetItem1();", definition.Source);
@@ -254,7 +256,12 @@ public sealed class AdvancedTypeProjectionTests
         var definition = Assert.Single(resolver.SynthesizedTypes);
 
         Assert.Equal(first.CanonicalType, second.CanonicalType);
-        Assert.Contains("public sealed record FixtureRecordShape_", definition.Source);
+        Assert.Equal(
+            "FixtureOptionsDisplayNameStringAndCountNumberRecord",
+            definition.Name);
+        Assert.Contains(
+            "public sealed record FixtureOptionsDisplayNameStringAndCountNumberRecord",
+            definition.Source);
         Assert.Contains("[JsonPropertyName(\"display-name\")]", definition.Source);
         Assert.Contains("required string DisplayName { get; init; }", definition.Source);
         Assert.Contains("double? Count { get; init; } = default;", definition.Source);
@@ -322,6 +329,36 @@ public sealed class AdvancedTypeProjectionTests
     }
 
     [Fact]
+    public void ReferenceIntersectionAlias_UsesFactoryInsteadOfInterfaceConversion()
+    {
+        var left = Interface("LeftContract", []);
+        var right = Interface("RightContract", []);
+        var alias = Alias(
+            "CompositeContract",
+            new IntersectionTypeNode(
+            [
+                new ReferenceTypeNode("LeftContract", "LeftContract", []),
+                new ReferenceTypeNode("RightContract", "RightContract", []),
+            ])
+            {
+                CheckerType = "LeftContract & RightContract",
+            });
+
+        var source = new AliasEmitter(
+            new TypeResolver([left, right, alias]),
+            "1.0.0",
+            "Blazor.DOM").Emit(alias);
+
+        Assert.Contains(
+            "public static CompositeContract From(",
+            source);
+        Assert.DoesNotContain("implicit operator", source);
+        Assert.Contains(
+            "AdvancedTypes.CompositeContractLeftContractRightContractIntersection",
+            source);
+    }
+
+    [Fact]
     public void TemplateLiteral_ExpandsFiniteDomainWithoutWidening()
     {
         var resolver = new TypeResolver([]);
@@ -346,7 +383,12 @@ public sealed class AdvancedTypeProjectionTests
 
         Assert.Equal("finite-template-string", projection.ProviderNote);
         Assert.Equal(ClrTypeKind.Value, projection.Identity.Kind);
-        Assert.Contains("public enum FixtureStringShape_", definition.Source);
+        Assert.Equal(
+            "FixtureTemplatePrefixAlphaSuffixOrPrefixBetaSuffixString",
+            definition.Name);
+        Assert.Contains(
+            "public enum FixtureTemplatePrefixAlphaSuffixOrPrefixBetaSuffixString",
+            definition.Source);
         Assert.Contains(
             "[EnumMember(Value = \"prefix-alpha-suffix\")]",
             definition.Source);

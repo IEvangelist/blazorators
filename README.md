@@ -116,6 +116,8 @@ A Blazor Server component can then resolve and use a live document proxy:
 
 Generated browser interfaces are live JavaScript-reference proxies, not JSON snapshots. The runtime validates JSON dictionaries, strongly typed unions, binary values, streams, transferables, callbacks, and returned references before dispatch. Owned proxies, event subscriptions, callback-scoped borrowed references, and stream handles have explicit disposal rules.
 
+Anonymous advanced shapes use deterministic semantic names derived from their declaring API slot and projected values, such as `ClipboardItemDataStringOrBlobUnion`. Structural fingerprints remain manifest-only; generation fails for an unresolved semantic collision rather than exposing hash suffixes or ordinal arm names in the public API.
+
 ### Focused capability packages
 
 Applications that do not need the complete DOM surface can reference a focused Server/WebAssembly pair generated from the same semantic model and runtime:

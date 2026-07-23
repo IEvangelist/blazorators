@@ -691,8 +691,10 @@ public sealed class HardeningRegressionTests
         ]);
         var result = resolver.Project(union, "test/bool-options");
         Assert.Equal("typed-union", result.ProviderNote);
-        Assert.Contains("UnionShape_", result.RenderedType);
-        Assert.NotEqual("bool", result.RenderedType);
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes." +
+            "TestBoolOptionsBooleanOrEventListenerOptionsUnion",
+            result.RenderedType);
     }
 
     [Fact]

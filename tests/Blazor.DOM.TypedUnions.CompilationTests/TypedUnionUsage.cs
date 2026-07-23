@@ -7,21 +7,21 @@ public static class TypedUnionUsage
 {
     public static ClipboardItemData CreateTextPromise(
         string text,
-        IBrowserPromise<ClipboardItemDataUnionShape_14acc04c76> promise)
+        IBrowserPromise<ClipboardItemDataStringOrBlobUnion> promise)
     {
-        _ = ClipboardItemDataUnionShape_14acc04c76.FromString(text);
+        _ = ClipboardItemDataStringOrBlobUnion.FromString(text);
         return new ClipboardItemData(promise);
     }
 
     public static ClipboardItemData CreateBlobPromise(
         IBlob blob,
-        IBrowserPromise<ClipboardItemDataUnionShape_14acc04c76> promise)
+        IBrowserPromise<ClipboardItemDataStringOrBlobUnion> promise)
     {
-        _ = ClipboardItemDataUnionShape_14acc04c76.FromBlob(blob);
+        _ = ClipboardItemDataStringOrBlobUnion.FromBlob(blob);
         return new ClipboardItemData(promise);
     }
 
-    public static string ReadText(ClipboardItemDataUnionShape_14acc04c76 value)
+    public static string ReadText(ClipboardItemDataStringOrBlobUnion value)
     {
         if (value.TryGetString(out var text))
             return text;

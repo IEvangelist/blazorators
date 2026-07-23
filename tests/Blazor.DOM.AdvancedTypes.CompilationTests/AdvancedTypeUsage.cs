@@ -7,17 +7,17 @@ public static class AdvancedTypeUsage
 {
     public static HeadersInit CreateHeaders()
     {
-        HeadersInitTupleShape_11e4ef35dd pair = new()
+        HeadersInitItemsStringAndStringTuple pair = new()
         {
             Item1 = "content-type",
             Item2 = "application/json",
         };
-        return HeadersInit.FromArray([pair]);
+        return HeadersInit.FromStringAndStringTupleArray([pair]);
     }
 
     public static string SerializeTuple()
     {
-        HeadersInitTupleShape_11e4ef35dd pair = new()
+        HeadersInitItemsStringAndStringTuple pair = new()
         {
             Item1 = "accept",
             Item2 = "application/json",
@@ -25,6 +25,6 @@ public static class AdvancedTypeUsage
         return JsonSerializer.Serialize(pair);
     }
 
-    public static HeadersInitTupleShape_11e4ef35dd? DeserializeTuple(string json)
-        => JsonSerializer.Deserialize<HeadersInitTupleShape_11e4ef35dd>(json);
+    public static HeadersInitItemsStringAndStringTuple? DeserializeTuple(string json)
+        => JsonSerializer.Deserialize<HeadersInitItemsStringAndStringTuple>(json);
 }

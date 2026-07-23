@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Blazor.DOM.CSharpGenerator.Emitters;
 using Blazor.DOM.CSharpGenerator.Output;
 
@@ -34,11 +32,11 @@ internal sealed class SynthesizedTypeRegistry(
 {
     private readonly Dictionary<string, SynthesizedTypeDefinition> _byIdentity =
         new(StringComparer.Ordinal);
-    private readonly Dictionary<string, string> _nameFingerprints =
+    private readonly Dictionary<string, SynthesizedTypeDefinition> _definitionsByName =
         new(StringComparer.Ordinal);
 
     public IReadOnlyList<SynthesizedTypeDefinition> Definitions
-        => _byIdentity.Values
+        => _definitionsByName.Values
             .OrderBy(definition => definition.RelativePath, StringComparer.Ordinal)
             .ToList();
 
@@ -54,7 +52,12 @@ internal sealed class SynthesizedTypeRegistry(
             "Tuple",
             provenance,
             fingerprint,
-            name => EmitTuple(name, elements));
+            name => EmitTuple(name, elements),
+            semanticDetail: SemanticTypeNaming.DescribeTuple(
+                elements.Select(element => (
+                    element.SourceName,
+                    element.CSharpName,
+                    element.Projection)).ToList()));
     }
 
     public string RegisterReferenceTuple(
@@ -80,7 +83,12 @@ internal sealed class SynthesizedTypeRegistry(
             provenance,
             fingerprint,
             name => EmitReferenceTuple($"{name}{genericList}", elements),
-            genericList);
+            genericList,
+            semanticDetail: SemanticTypeNaming.DescribeTuple(
+                elements.Select(element => (
+                    element.SourceName,
+                    element.CSharpName,
+                    element.Projection)).ToList()));
     }
 
     public string RegisterJsonRecord(
@@ -95,7 +103,12 @@ internal sealed class SynthesizedTypeRegistry(
             "Record",
             provenance,
             fingerprint,
-            name => EmitRecord(name, properties));
+            name => EmitRecord(name, properties),
+            semanticDetail: SemanticTypeNaming.DescribeRecord(
+                provenance,
+                properties.Select(property => (
+                    property.CSharpName,
+                    property.Projection)).ToList()));
     }
 
     public string RegisterStringDomain(
@@ -111,7 +124,8 @@ internal sealed class SynthesizedTypeRegistry(
             "String",
             provenance,
             fingerprint,
-            name => EmitStringDomain(name, ordered));
+            name => EmitStringDomain(name, ordered),
+            semanticDetail: SemanticTypeNaming.DescribeStringDomain(ordered));
     }
 
     public string RegisterNumericDomain(
@@ -126,7 +140,8 @@ internal sealed class SynthesizedTypeRegistry(
             "Numeric",
             provenance,
             fingerprint,
-            name => EmitNumericDomain(name, ordered));
+            name => EmitNumericDomain(name, ordered),
+            semanticDetail: SemanticTypeNaming.DescribeNumericDomain(ordered));
     }
 
     public string RegisterConstraint(string provenance, string sourceShape)
@@ -136,7 +151,8 @@ internal sealed class SynthesizedTypeRegistry(
             "Constraint",
             provenance,
             fingerprint,
-            name => EmitConstraint(name, sourceShape));
+            name => EmitConstraint(name, sourceShape),
+            semanticDetail: SemanticTypeNaming.DescribeSourceShape(sourceShape));
     }
 
     public string RegisterIntersection(string provenance, string sourceShape)
@@ -146,7 +162,8 @@ internal sealed class SynthesizedTypeRegistry(
             "Intersection",
             provenance,
             fingerprint,
-            name => EmitIntersection(name, sourceShape));
+            name => EmitIntersection(name, sourceShape),
+            semanticDetail: SemanticTypeNaming.DescribeSourceShape(sourceShape));
     }
 
     public string RegisterStringPattern(
@@ -180,6 +197,7 @@ internal sealed class SynthesizedTypeRegistry(
                 fingerprint,
                 Path.Combine("StandardTypes", $"{name}.g.cs"),
                 EmitTypeScriptError(name)));
+        _definitionsByName.Add(name, _byIdentity[identity]);
         return QualifiedStandard(name);
     }
 
@@ -200,6 +218,7 @@ internal sealed class SynthesizedTypeRegistry(
                 fingerprint,
                 Path.Combine("StandardTypes", $"{name}.g.cs"),
                 EmitTypeScriptNever(name)));
+        _definitionsByName.Add(name, _byIdentity[identity]);
         return QualifiedStandard(name);
     }
 
@@ -237,7 +256,8 @@ internal sealed class SynthesizedTypeRegistry(
                 string.Join(" | ", arms.Select(arm =>
                     arm.Source.Type.CheckerType ?? arm.Source.Type.Kind))),
             genericList,
-            includeProvenanceInIdentity: false);
+            semanticDetail: SemanticTypeNaming.DescribeUnion(
+                arms.Select(arm => arm.Name).ToList()));
     }
 
     private string Register(
@@ -246,45 +266,45 @@ internal sealed class SynthesizedTypeRegistry(
         string fingerprint,
         Func<string, string> emit,
         string typeArguments = "",
-        bool includeProvenanceInIdentity = true)
+        string semanticDetail = "")
     {
-        var identity = includeProvenanceInIdentity
-            ? $"{kind}:{provenance}:{fingerprint}"
-            : $"{kind}:{fingerprint}";
+        var identity = $"{kind}:{provenance}:{fingerprint}";
         if (_byIdentity.TryGetValue(identity, out var existing))
             return Qualified(existing.Name) + typeArguments;
 
-        var owner = provenance
-            .Split(['/', '['], 2, StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault() ?? "Anonymous";
-        var ownerName = Naming.ToCSharpSimpleTypeName(owner);
-        var hash = Convert.ToHexStringLower(
-            SHA256.HashData(Encoding.UTF8.GetBytes(identity)))[..10];
-        var name = $"{ownerName}{kind}Shape_{hash}";
-        if (_nameFingerprints.TryGetValue(name, out var existingFingerprint)
-            && !string.Equals(
-                existingFingerprint,
+        var name = SemanticTypeNaming.BuildSynthesizedTypeName(
+            provenance,
+            kind,
+            semanticDetail);
+        if (_definitionsByName.TryGetValue(name, out var existingByName))
+        {
+            if (!string.Equals(
+                existingByName.Fingerprint,
                 fingerprint,
                 StringComparison.Ordinal))
-        {
-            throw new GenericDeferralException(
-                $"Synthesized CLR identity '{name}' at '{provenance}' collides with " +
-                "a different advanced type shape.",
-                provenance,
-                "synthesized-identity-collision");
+            {
+                throw new GenericDeferralException(
+                    $"Semantic synthesized CLR name '{name}' at '{provenance}' collides with " +
+                    $"the different shape registered at '{existingByName.Provenance}'. " +
+                    "Add a semantic naming rule for this distinction; hashes and ordinals " +
+                    "are not permitted in public identifiers.",
+                    provenance,
+                    "synthesized-semantic-name-collision");
+            }
+            _byIdentity.Add(identity, existingByName);
+            return Qualified(existingByName.Name) + typeArguments;
         }
-        _nameFingerprints[name] = fingerprint;
 
         var relativePath = Path.Combine("AdvancedTypes", $"{name}.g.cs");
-        _byIdentity.Add(
-            identity,
-            new SynthesizedTypeDefinition(
-                name,
-                kind,
-                provenance,
-                fingerprint,
-                relativePath,
-                emit(name)));
+        var definition = new SynthesizedTypeDefinition(
+            name,
+            kind,
+            provenance,
+            fingerprint,
+            relativePath,
+            emit(name));
+        _byIdentity.Add(identity, definition);
+        _definitionsByName.Add(name, definition);
         return Qualified(name) + typeArguments;
     }
 

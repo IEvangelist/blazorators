@@ -167,7 +167,9 @@ public sealed class TypedUnionEmitterTests
 
         Assert.Equal(first.CanonicalType, second.CanonicalType);
         Assert.EndsWith("[]", first.RenderedType);
-        Assert.Contains("OwnerUnionShape_", first.RenderedType);
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes.OwnerItemsStringOrBooleanUnion[]",
+            first.RenderedType);
     }
 
     [Fact]
@@ -190,8 +192,9 @@ public sealed class TypedUnionEmitterTests
             "Owner/number");
 
         Assert.Equal("bool", boolean.RenderedType);
-        Assert.NotEqual("double", numeric.RenderedType);
-        Assert.Contains("NumericShape_", numeric.RenderedType);
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes.OwnerNumberOneOrTwoNumericValue",
+            numeric.RenderedType);
     }
 
     [Fact]
@@ -217,11 +220,94 @@ public sealed class TypedUnionEmitterTests
         var source = Assert.Single(
             resolver.SynthesizedTypes,
             type => type.Kind == "Union").Source;
-        Assert.Contains("struct OwnerUnionShape_", source);
+        Assert.Contains(
+            "struct OwnerMemberResultTOrUUnion<T, U>",
+            source);
         Assert.Contains("<T, U>", source);
         Assert.Contains("FromT(T value)", source);
         Assert.Contains("FromU(U value)", source);
         Assert.DoesNotContain("implicit operator", source);
+    }
+
+    [Fact]
+    public void EquivalentAnonymousUnionShapes_KeepContextualSemanticNames()
+    {
+        var resolver = new TypeResolver([]);
+        var union = new UnionTypeNode(
+        [
+            new KeywordTypeNode("StringKeyword"),
+            new KeywordTypeNode("BooleanKeyword"),
+        ]);
+
+        var first = resolver.Project(union, "FirstHost/value");
+        var second = resolver.Project(union, "SecondHost/value");
+
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes.FirstHostValueStringOrBooleanUnion",
+            first.RenderedType);
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes.SecondHostValueStringOrBooleanUnion",
+            second.RenderedType);
+        Assert.Equal(2, resolver.SynthesizedTypes.Count);
+    }
+
+    [Fact]
+    public void ArrayUnionArms_UseElementTypesInsteadOfOrdinals()
+    {
+        var resolver = new TypeResolver([]);
+        var projection = resolver.Project(
+            new UnionTypeNode(
+            [
+                new KeywordTypeNode("StringKeyword"),
+                new ArrayTypeNode(new KeywordTypeNode("StringKeyword")),
+                new KeywordTypeNode("NumberKeyword"),
+                new KeywordTypeNode("NullKeyword"),
+                new ArrayTypeNode(new UnionTypeNode(
+                [
+                    new KeywordTypeNode("NumberKeyword"),
+                    new KeywordTypeNode("NullKeyword"),
+                ])),
+                new KeywordTypeNode("UndefinedKeyword"),
+            ]),
+            "PropertyIndexedKeyframes/indexSignature/value");
+
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes.PropertyIndexedKeyframesIndexValueUnion",
+            projection.RenderedType);
+        var source = Assert.Single(
+            resolver.SynthesizedTypes,
+            type => type.Kind == "Union").Source;
+        Assert.Contains("StringArray = 2", source);
+        Assert.Contains("NullableNumberArray = 5", source);
+        Assert.Contains("FromStringArray(string[] value)", source);
+        Assert.Contains("FromNullableNumberArray(double?[] value)", source);
+        Assert.DoesNotMatch(@"\bArm\d+\b", source);
+    }
+
+    [Fact]
+    public void SpecialAndSameNamedLiteralArms_RemainSemanticAndDistinct()
+    {
+        var resolver = new TypeResolver([]);
+        var projection = resolver.Project(
+            new UnionTypeNode(
+            [
+                new LiteralTypeNode("StringLiteral", "\"null\""),
+                new KeywordTypeNode("NullKeyword"),
+                new KeywordTypeNode("NumberKeyword"),
+            ]),
+            "Owner/value");
+
+        Assert.Equal(
+            "global::Blazor.DOM.AdvancedTypes.OwnerValueNullStringOrNullOrNumberUnion",
+            projection.RenderedType);
+        var source = Assert.Single(
+            resolver.SynthesizedTypes,
+            type => type.Kind == "Union").Source;
+        Assert.Contains("NullString = 1", source);
+        Assert.Contains("Null = 2", source);
+        Assert.Contains("FromNullString(", source);
+        Assert.Contains("FromNull()", source);
+        Assert.DoesNotMatch(@"\bArm\d+\b", source);
     }
 
     [Fact]

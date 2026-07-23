@@ -74,7 +74,7 @@ namespace Blazor.DOM.Namespaces.WebAssembly
 
 namespace Blazor.DOM.AdvancedTypes
 {
-    public readonly struct compileStreamingUnionShape_396072feb5
+    public readonly struct WebAssemblyCompileStreamingSourceResponseOrResponseBrowserPromiseLikeUnion
     {
     }
 }

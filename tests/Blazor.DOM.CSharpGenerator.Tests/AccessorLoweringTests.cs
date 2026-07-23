@@ -112,9 +112,10 @@ public sealed class AccessorLoweringTests
             "1.0.0",
             "Blazor.DOM").Emit(symbol);
 
-        Assert.Contains("UnionShape_", result.Source);
+        var synthesized = Assert.Single(resolver.SynthesizedTypes);
+        Assert.Contains(synthesized.Name, result.Source);
+        Assert.EndsWith("StringOrNumberUnion", synthesized.Name);
         Assert.Contains("void SetChoice(string value);", result.Source);
-        Assert.Single(resolver.SynthesizedTypes);
     }
 
     [Fact]

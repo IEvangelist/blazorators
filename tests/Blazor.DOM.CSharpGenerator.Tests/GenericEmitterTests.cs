@@ -553,7 +553,13 @@ public sealed class GenericEmitterTests
                     $"ConstraintFixture/{constraint.Kind}");
             Assert.Single(structuralDeclaration.ConstraintClauses);
             Assert.Contains(
-                "AdvancedTypes.ConstraintFixtureConstraintShape_",
+                "AdvancedTypes.ConstraintFixture",
+                structuralDeclaration.ConstraintClauses[0]);
+            Assert.EndsWith(
+                "Constraint",
+                structuralDeclaration.ConstraintClauses[0]);
+            Assert.DoesNotMatch(
+                @"Shape_|_[0-9a-f]{10}",
                 structuralDeclaration.ConstraintClauses[0]);
         }
 
@@ -880,13 +886,16 @@ public sealed class GenericEmitterTests
         var collisionHost = MakeInterfaceSymbol(
             "CollisionHost",
             [ordinary, defaulted]);
+        var collisionResolver = new TypeResolver([collisionHost]);
         var collisionResult = new InterfaceEmitter(
-            new TypeResolver([collisionHost]),
+            collisionResolver,
             "1.0.0",
             "Blazor.DOM").Emit(collisionHost);
-        Assert.Contains(
-            "global::Blazor.DOM.AdvancedTypes.CollisionHostUnionShape_",
-            collisionResult.Source);
+        var collisionUnion = Assert.Single(
+            collisionResolver.SynthesizedTypes,
+            type => type.Kind == "Union");
+        Assert.Contains(collisionUnion.Name, collisionResult.Source);
+        Assert.EndsWith("Union", collisionUnion.Name);
         Assert.Contains(" Pick();", collisionResult.Source);
         Assert.Contains("T Pick<T>();", collisionResult.Source);
         var collisionOutcome = Assert.Single(
@@ -984,13 +993,16 @@ public sealed class GenericEmitterTests
         var orderingHost = MakeInterfaceSymbol(
             "OrderingHost",
             [ordinary, partiallyColliding]);
+        var orderingResolver = new TypeResolver([orderingHost]);
         var orderingResult = new InterfaceEmitter(
-            new TypeResolver([orderingHost]),
+            orderingResolver,
             "1.0.0",
             "Blazor.DOM").Emit(orderingHost);
-        Assert.Contains(
-            "global::Blazor.DOM.AdvancedTypes.OrderingHostUnionShape_",
-            orderingResult.Source);
+        var orderingUnion = Assert.Single(
+            orderingResolver.SynthesizedTypes,
+            type => type.Kind == "Union");
+        Assert.Contains(orderingUnion.Name, orderingResult.Source);
+        Assert.EndsWith("Union", orderingUnion.Name);
         Assert.Contains(" Choose<T>();", orderingResult.Source);
         Assert.Contains("U Choose<T, U>();", orderingResult.Source);
         Assert.Contains("string Choose();", orderingResult.Source);

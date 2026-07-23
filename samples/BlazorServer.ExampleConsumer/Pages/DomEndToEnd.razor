@@ -98,13 +98,14 @@
 
         await using var urlFactory = await Browser.GetGlobalAsync<IURLFactory>("URL");
         await using var url = await urlFactory.CreateAsync(
-            DocumentUnionShape_3847f64189.FromString("data:text/plain,dom-e2e"),
-            DocumentUnionShape_3847f64189.FromString("http://localhost/"));
+            URLConstructorUrlStringOrURLUnion.FromString("data:text/plain,dom-e2e"),
+            URLConstructorBaseStringOrURLUnion.FromString("http://localhost/"));
         await url.SetHashAsync("mutated");
         var hash = await url.GetHashAsync();
         _results["mutable-property"] = hash == "#mutated" ? "written" : hash;
 
-        await using var response = await _window.FetchAsync(CacheUnionShape_c53da6bcf4.FromURL(url));
+        await using var response = await _window.FetchAsync(
+            WindowOrWorkerGlobalScopeFetchInputRequestInfoOrURLUnion.FromURL(url));
         _ownedResponse = await response.CloneAsync();
         _results["promise-union"] = await response.TextAsync() == "dom-e2e" ? "fulfilled" : "invalid";
         _results["returned-proxy"] = await _ownedResponse.GetOkAsync() ? "read" : "invalid";
@@ -115,8 +116,8 @@
         try
         {
             await using var invalid = await urlFactory.CreateAsync(
-                DocumentUnionShape_3847f64189.FromString("http://["),
-                DocumentUnionShape_3847f64189.FromString("http://localhost/"));
+                URLConstructorUrlStringOrURLUnion.FromString("http://["),
+                URLConstructorBaseStringOrURLUnion.FromString("http://localhost/"));
             _results["js-error"] = "unexpected-success";
         }
         catch (JSException)

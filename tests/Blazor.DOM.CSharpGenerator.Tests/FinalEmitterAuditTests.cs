@@ -280,7 +280,7 @@ public sealed class FinalEmitterAuditTests
             Assert.Equal(0, accounting.Excluded);
             Assert.Equal(0, accounting.Deferred);
             Assert.Equal(0, accounting.GenerationFailed);
-            Assert.Equal(2914, result.WrittenFiles.Count);
+            Assert.Equal(3028, result.WrittenFiles.Count);
             Assert.Equal((3022, 3022), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
@@ -307,9 +307,9 @@ public sealed class FinalEmitterAuditTests
             Assert.True(result.Validation.ParameterReconciliationValid);
             Assert.Empty(result.Errors);
             Assert.Empty(result.Manifest.Diagnostics);
-            Assert.Equal(318, result.Manifest.SynthesizedTypes?.Count);
+            Assert.Equal(432, result.Manifest.SynthesizedTypes?.Count);
             Assert.Equal(
-                (6, 4, 188, 87, 1, 1),
+                (6, 3, 182, 208, 1, 1),
                 (
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Tuple"),
@@ -323,6 +323,19 @@ public sealed class FinalEmitterAuditTests
                         type.Kind == "Standard"),
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Never")));
+            Assert.All(
+                result.Manifest.SynthesizedTypes ?? [],
+                type =>
+                {
+                    Assert.DoesNotMatch(@"_[0-9a-f]{10}$", type.Name);
+                    Assert.DoesNotContain("Shape_", type.Name);
+                });
+            Assert.All(
+                (result.Manifest.SynthesizedTypes ?? [])
+                    .Where(type => type.Kind == "Union"),
+                type => Assert.DoesNotMatch(
+                    @"\bArm\d+\b",
+                    File.ReadAllText(Path.Combine(output, type.RelativePath))));
             Assert.Empty(accounting.DeferredSymbols);
             Assert.Empty(accounting.DeferredMemberEntries ?? []);
             Assert.Empty(accounting.FailedSymbols);
@@ -1183,10 +1196,11 @@ public sealed class FinalEmitterAuditTests
             "Blazor.DOM").Emit(symbol);
 
         Assert.Equal(1, result.Source.Split(" Read(").Length - 1);
-        Assert.Contains("UnionShape_", result.Source);
-        Assert.Single(
+        var union = Assert.Single(
             resolver.SynthesizedTypes,
             type => type.Kind == "Union");
+        Assert.Contains(union.Name, result.Source);
+        Assert.EndsWith("StringOrNumberUnion", union.Name);
         Assert.Equal(
             2,
             result.MemberOutcomes.Count(outcome =>

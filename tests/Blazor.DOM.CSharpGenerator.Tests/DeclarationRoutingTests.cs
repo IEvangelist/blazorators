@@ -9,7 +9,7 @@ namespace Blazor.DOM.CSharpGenerator.Tests;
 public sealed class DeclarationRoutingTests
 {
     [Theory]
-    [InlineData("AdvancedTypes/WidgetUnionShape_1234567890.g.cs")]
+    [InlineData("AdvancedTypes/WidgetValueStringOrBlobUnion.g.cs")]
     [InlineData("Factories/IWidgetFactory.g.cs")]
     [InlineData("Globals/IWindow.Globals.g.cs")]
     [InlineData("Namespaces/WebAssembly/IWebAssemblyNamespace.g.cs")]

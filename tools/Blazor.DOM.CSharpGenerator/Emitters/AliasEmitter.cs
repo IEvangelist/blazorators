@@ -126,7 +126,9 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         w.XmlDoc(docText, deprecated);
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         var innerType = proj.CSharpType;
-        var isIface = IsInterfaceType(innerType) || proj.Identity.IsTypeParameter;
+        var isIface = IsInterfaceType(innerType)
+            || proj.Identity.IsTypeParameter
+            || proj.ProviderNote == "browser-intersection-composite";
         w.AppendLine($"// Typedef alias: {symbol.Name} = {innerType}");
         foreach (var defaultNote in generic.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
@@ -167,7 +169,9 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
         w.XmlDoc(docText, deprecated);
         var csName = Naming.ToCSharpSimpleTypeName(symbol.Name);
         var innerType = proj.CSharpType;
-        var isIface = IsInterfaceType(innerType) || proj.Identity.IsTypeParameter;
+        var isIface = IsInterfaceType(innerType)
+            || proj.Identity.IsTypeParameter
+            || proj.ProviderNote == "browser-intersection-composite";
         w.AppendLine($"// Nullable typedef alias: {symbol.Name} = {innerType}?");
         foreach (var defaultNote in generic.DefaultNotes)
             w.AppendLine($"// TypeScript generic default: {defaultNote}.");
@@ -195,8 +199,7 @@ public sealed class AliasEmitter(TypeResolver typeResolver, string generatorVers
     }
 
     private static bool CanEmitImplicitConversion(string innerType) =>
-        !string.Equals(innerType, "object", StringComparison.Ordinal)
-        && !innerType.Contains("IntersectionShape_", StringComparison.Ordinal);
+        !string.Equals(innerType, "object", StringComparison.Ordinal);
 
     private string EmitMixedUnionWrapper(
         SymbolModel symbol,
