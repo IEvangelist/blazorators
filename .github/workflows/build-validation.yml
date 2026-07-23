@@ -15,204 +15,185 @@ on:
 
 jobs:
   build:
-    name: build
+    name: build (Blazor.${{ matrix.component }}${{ matrix.variant }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        project:
-        - Blazor.SourceGenerators
-        - Blazor.Serialization
-        - Blazor.LocalStorage.WebAssembly
-        - Blazor.LocalStorage
-        - Blazor.SessionStorage.WebAssembly
-        - Blazor.SessionStorage
-        - Blazor.Geolocation.WebAssembly
-        - Blazor.Geolocation
-        - Blazor.SpeechSynthesis.WebAssembly
-        - Blazor.SpeechSynthesis
-        - Blazor.SpeechRecognition.WebAssembly
-        - Blazor.SpeechRecognition
-        - Blazor.DOM
-        - Blazor.DOM.WebAssembly
-        - Blazor.Permissions
-        - Blazor.Permissions.WebAssembly
-        - Blazor.WakeLock
-        - Blazor.WakeLock.WebAssembly
-        - Blazor.Clipboard
-        - Blazor.Clipboard.WebAssembly
-        - Blazor.Share
-        - Blazor.Share.WebAssembly
-        - Blazor.StorageManagement
-        - Blazor.StorageManagement.WebAssembly
-        - Blazor.Screen
-        - Blazor.Screen.WebAssembly
-        - Blazor.OfflineStorage
-        - Blazor.OfflineStorage.WebAssembly
-        - Blazor.BrowserCoordination
-        - Blazor.BrowserCoordination.WebAssembly
-        - Blazor.Performance
-        - Blazor.Performance.WebAssembly
-        - Blazor.Credentials
-        - Blazor.Credentials.WebAssembly
-        - Blazor.WebCrypto
-        - Blazor.WebCrypto.WebAssembly
-        - Blazor.MediaDevices
-        - Blazor.MediaDevices.WebAssembly
-        - Blazor.Notifications
-        - Blazor.Notifications.WebAssembly
+        component:
+        - LocalStorage
+        - SessionStorage
+        - Geolocation
+        - SpeechSynthesis
+        - SpeechRecognition
+        - DOM
+        - Permissions
+        - WakeLock
+        - Clipboard
+        - Share
+        - StorageManagement
+        - Screen
+        - OfflineStorage
+        - BrowserCoordination
+        - Performance
+        - Credentials
+        - WebCrypto
+        - MediaDevices
+        - Notifications
+        - FileSystemAccess
+        variant: [ '', '.WebAssembly' ]
+        include:
+        - component: SourceGenerators
+          variant: ''
+        - component: Serialization
+          variant: ''
     steps:
     - uses: actions/checkout@main
 
-    - name: 'Print manual run reason'
-      if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: |
-        echo 'Reason: ${{ github.event.inputs.reason }}'
     - name: Setup .NET
       uses: actions/setup-dotnet@main
       with:
         global-json-file: global.json
 
-    - name: Restore dependencies for ${{ matrix.project }}
-      run: |
-        dotnet restore ./src/${{ matrix.project }}/${{ matrix.project }}.csproj
-      
-    - name: Build ${{ matrix.project }}
-      run: |
-        dotnet build ./src/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --no-restore
+    - name: Build
+      run: dotnet build ./src/Blazor.${{ matrix.component }}${{ matrix.variant }}/Blazor.${{ matrix.component }}${{ matrix.variant }}.csproj --configuration Release
+
+  unit_tests:
+    name: unit tests (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+        - Blazor.SourceGenerators.Tests
+        - Blazor.DOM.CSharpGenerator.Tests
+        - Blazor.WakeLock.Tests
+        - Blazor.Clipboard.Tests
+        - Blazor.Share.Tests
+        - Blazor.StorageManagement.Tests
+        - Blazor.Screen.Tests
+        - Blazor.OfflineStorage.Tests
+        - Blazor.BrowserCoordination.Tests
+        - Blazor.Performance.Tests
+        - Blazor.Credentials.Tests
+        - Blazor.WebCrypto.Tests
+        - Blazor.FileSystemAccess.Tests
+
+    steps:
+    - uses: actions/checkout@main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@main
+      with:
+        global-json-file: global.json
+
+    - name: Test
+      run: dotnet test ./tests/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --framework net10.0 --verbosity normal
+
+  runtime_tests:
+    name: DOM runtime tests (${{ matrix.framework }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [ net8.0, net9.0, net10.0 ]
+
+    steps:
+    - uses: actions/checkout@main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@main
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+          10.0.x
+
+    - name: Test
+      run: dotnet test ./tests/Blazor.DOM.Tests/Blazor.DOM.Tests.csproj --configuration Release --framework ${{ matrix.framework }} --verbosity normal
+
+  compilation_tests:
+    name: compilation (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+        - Blazor.DOM.GlobalNamespace.CompilationTests
+        - Blazor.DOM.Generic.CompilationTests
+        - Blazor.DOM.WakeLock.CompilationTests
+        - Blazor.DOM.AdvancedTypes.CompilationTests
+        - Blazor.DOM.TypedUnions.CompilationTests
+        - Blazor.DOM.Accessors.CompilationTests
+        - Blazor.DOM.TypedEvents.CompilationTests
+        - Blazor.DOM.NonEventDeferrals.CompilationTests
+        - Blazor.DOM.ResolvedFailures.CompilationTests
+        - Blazor.DOM.SupplementalBrowserApis.CompilationTests
+        - Blazor.DOM.Server.CompilationTests
+        - Blazor.DOM.WebAssembly.CompilationTests
+
+    steps:
+    - uses: actions/checkout@main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@main
+      with:
+        global-json-file: global.json
+
+    - name: Build all target frameworks with warnings as errors
+      run: dotnet build ./tests/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --warnaserror
+
+  browser_tests:
+    name: browser tests (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - suite: DOM interop
+          filter: Category=DOMEndToEnd
+        - suite: existing samples
+          filter: Category!=DOMEndToEnd
+
+    steps:
+    - uses: actions/checkout@main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@main
+      with:
+        global-json-file: global.json
+
+    - name: Build end-to-end tests
+      run: dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release
+
+    - name: Install Playwright dependencies
+      run: pwsh ./artifacts/bin/Blazor.ExampleConsumer.EndToEndTests/release/playwright.ps1 install --with-deps
+
+    - name: Test
+      run: dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release --no-build --filter "${{ matrix.filter }}" --verbosity normal
 
   test:
     name: test
     runs-on: ubuntu-latest
-    needs: build
-
+    if: ${{ always() }}
+    needs:
+    - build
+    - unit_tests
+    - runtime_tests
+    - compilation_tests
+    - browser_tests
     steps:
-    - uses: actions/checkout@main
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@main
-      with:
-        global-json-file: global.json
-
-    - name: Run tests
+    - name: Require every test matrix
+      env:
+        BUILD: ${{ needs.build.result }}
+        UNIT_TESTS: ${{ needs.unit_tests.result }}
+        RUNTIME_TESTS: ${{ needs.runtime_tests.result }}
+        COMPILATION_TESTS: ${{ needs.compilation_tests.result }}
+        BROWSER_TESTS: ${{ needs.browser_tests.result }}
       run: |
-        dotnet test ./tests/Blazor.SourceGenerators.Tests/Blazor.SourceGenerators.Tests.csproj --verbosity normal
-
-    - name: Run DOM C# generator tests
-      run: |
-        dotnet test ./tests/Blazor.DOM.CSharpGenerator.Tests/Blazor.DOM.CSharpGenerator.Tests.csproj --configuration Release --verbosity normal
-
-    - name: Run Wake Lock focused package tests
-      run: |
-        dotnet test ./tests/Blazor.WakeLock.Tests/Blazor.WakeLock.Tests.csproj --configuration Release --verbosity normal
-
-    - name: Run essential focused package tests
-      run: |
-        dotnet test ./tests/Blazor.Clipboard.Tests/Blazor.Clipboard.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.Share.Tests/Blazor.Share.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.StorageManagement.Tests/Blazor.StorageManagement.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.Screen.Tests/Blazor.Screen.Tests.csproj --configuration Release --verbosity normal
-
-    - name: Run platform focused package tests
-      run: |
-        dotnet test ./tests/Blazor.OfflineStorage.Tests/Blazor.OfflineStorage.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.BrowserCoordination.Tests/Blazor.BrowserCoordination.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.Performance.Tests/Blazor.Performance.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.Credentials.Tests/Blazor.Credentials.Tests.csproj --configuration Release --verbosity normal
-        dotnet test ./tests/Blazor.WebCrypto.Tests/Blazor.WebCrypto.Tests.csproj --configuration Release --verbosity normal
-
-    - name: Restore DOM global namespace compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.GlobalNamespace.CompilationTests/Blazor.DOM.GlobalNamespace.CompilationTests.csproj
-
-    - name: Build DOM global namespace compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.GlobalNamespace.CompilationTests/Blazor.DOM.GlobalNamespace.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.GlobalNamespace.CompilationTests/Blazor.DOM.GlobalNamespace.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.GlobalNamespace.CompilationTests/Blazor.DOM.GlobalNamespace.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Build exhaustive DOM host consumers with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.Server.CompilationTests/Blazor.DOM.Server.CompilationTests.csproj --configuration Release --warnaserror
-        dotnet build ./tests/Blazor.DOM.WebAssembly.CompilationTests/Blazor.DOM.WebAssembly.CompilationTests.csproj --configuration Release --warnaserror
-
-    - name: Restore DOM generic compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.Generic.CompilationTests/Blazor.DOM.Generic.CompilationTests.csproj
-
-    - name: Build DOM generic compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.Generic.CompilationTests/Blazor.DOM.Generic.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.Generic.CompilationTests/Blazor.DOM.Generic.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.Generic.CompilationTests/Blazor.DOM.Generic.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Restore DOM Wake Lock compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.WakeLock.CompilationTests/Blazor.DOM.WakeLock.CompilationTests.csproj
-
-    - name: Build DOM Wake Lock compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.WakeLock.CompilationTests/Blazor.DOM.WakeLock.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.WakeLock.CompilationTests/Blazor.DOM.WakeLock.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.WakeLock.CompilationTests/Blazor.DOM.WakeLock.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Restore DOM advanced type compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.AdvancedTypes.CompilationTests/Blazor.DOM.AdvancedTypes.CompilationTests.csproj
-
-    - name: Build DOM advanced type compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.AdvancedTypes.CompilationTests/Blazor.DOM.AdvancedTypes.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.AdvancedTypes.CompilationTests/Blazor.DOM.AdvancedTypes.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.AdvancedTypes.CompilationTests/Blazor.DOM.AdvancedTypes.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Restore DOM typed union compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj
-
-    - name: Build DOM typed union compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.TypedUnions.CompilationTests/Blazor.DOM.TypedUnions.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Restore DOM accessor compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.Accessors.CompilationTests/Blazor.DOM.Accessors.CompilationTests.csproj
-
-    - name: Build DOM accessor compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.Accessors.CompilationTests/Blazor.DOM.Accessors.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.Accessors.CompilationTests/Blazor.DOM.Accessors.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.Accessors.CompilationTests/Blazor.DOM.Accessors.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Restore DOM typed event compilation tests
-      run: |
-        dotnet restore ./tests/Blazor.DOM.TypedEvents.CompilationTests/Blazor.DOM.TypedEvents.CompilationTests.csproj
-
-    - name: Build DOM typed event compilation tests with warnings as errors
-      run: |
-        dotnet build ./tests/Blazor.DOM.TypedEvents.CompilationTests/Blazor.DOM.TypedEvents.CompilationTests.csproj --configuration Release --framework net8.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.TypedEvents.CompilationTests/Blazor.DOM.TypedEvents.CompilationTests.csproj --configuration Release --framework net9.0 --no-restore --warnaserror
-        dotnet build ./tests/Blazor.DOM.TypedEvents.CompilationTests/Blazor.DOM.TypedEvents.CompilationTests.csproj --configuration Release --framework net10.0 --no-restore --warnaserror
-
-    - name: Build remaining DOM profile compilation tests with warnings as errors
-      run: |
-        for project in NonEventDeferrals ResolvedFailures SupplementalBrowserApis; do
-          dotnet build "./tests/Blazor.DOM.${project}.CompilationTests/Blazor.DOM.${project}.CompilationTests.csproj" --configuration Release --warnaserror
+        for result in "$BUILD" "$UNIT_TESTS" "$RUNTIME_TESTS" "$COMPILATION_TESTS" "$BROWSER_TESTS"; do
+          if [ "$result" != "success" ]; then
+            echo "A test matrix completed with status: $result"
+            exit 1
+          fi
         done
-
-    - name: Build end-to-end tests
-      run: |
-        dotnet build ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release
-
-    - name: Install Playwright dependencies
-      run: |
-        pwsh ./artifacts/bin/Blazor.ExampleConsumer.EndToEndTests/release/playwright.ps1 install --with-deps
-
-    - name: Run WebAssembly and Server DOM end-to-end tests
-      run: |
-        dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --configuration Release --no-build --filter "Category=DOMEndToEnd" --verbosity normal
-
-    - name: Run existing end-to-end tests
-      run: |
-        dotnet test ./tests/Blazor.ExampleConsumer.EndToEndTests/Blazor.ExampleConsumer.EndToEndTests.csproj --filter "Category!=DOMEndToEnd" --verbosity normal

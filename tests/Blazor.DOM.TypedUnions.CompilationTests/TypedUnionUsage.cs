@@ -32,12 +32,11 @@ public static class TypedUnionUsage
         Action<IBlob?> callback) =>
         blob => callback(blob);
 
-    public static void SetUnionProperty(
-        IReadableStreamReadDoneResult<string> result,
-        string value)
+    public static void RoundTripUnionProperty(
+        IReadableStreamReadDoneResult<string> result)
     {
-        result.Value =
-            ReadableStreamReadDoneResultUnionShape_f2d5ea4ede<string>.FromT(value);
+        var value = result.Value;
+        result.Value = value;
     }
 
     public static ValueTask<string> CallBlobMethod(IBlob blob) =>
