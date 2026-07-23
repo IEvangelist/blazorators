@@ -273,15 +273,15 @@ public sealed class FinalEmitterAuditTests
             var accounting = result.Manifest.Accounting;
 
             Assert.True(result.Validation.IsValid);
-            Assert.Equal(2173, accounting.TotalSymbols);
-            Assert.Equal(2173, accounting.Projected);
-            Assert.Equal(2173, accounting.ProjectedClean);
+            Assert.Equal(2183, accounting.TotalSymbols);
+            Assert.Equal(2183, accounting.Projected);
+            Assert.Equal(2183, accounting.ProjectedClean);
             Assert.Equal(0, accounting.ProjectedWithDeferredMembers);
             Assert.Equal(0, accounting.Excluded);
             Assert.Equal(0, accounting.Deferred);
             Assert.Equal(0, accounting.GenerationFailed);
-            Assert.Equal(2930, result.WrittenFiles.Count);
-            Assert.Equal((3009, 3009), (
+            Assert.Equal(2914, result.WrittenFiles.Count);
+            Assert.Equal((3022, 3022), (
                 accounting.AccountedSourceDeclarations,
                 accounting.SourceDeclarations));
             Assert.All(
@@ -289,27 +289,27 @@ public sealed class FinalEmitterAuditTests
                 entry => Assert.Equal(
                     nameof(MemberOutcomeStatus.Projected),
                     entry.Status));
-            Assert.Equal((12197, 12197), (
+            Assert.Equal((12217, 12217), (
                 accounting.AccountedSourceMembers,
                 accounting.SourceMembers));
-            Assert.Equal(12197, accounting.TotalMembers);
-            Assert.Equal(12197, accounting.ExpectedMembers);
-            Assert.Equal(12197, accounting.ProjectedMembers);
+            Assert.Equal(12217, accounting.TotalMembers);
+            Assert.Equal(12217, accounting.ExpectedMembers);
+            Assert.Equal(12217, accounting.ProjectedMembers);
             Assert.Equal(0, accounting.DeferredMembers);
             Assert.Equal(0, accounting.FailedMembers);
-            Assert.Equal((3874, 3874), (
+            Assert.Equal((3880, 3880), (
                 accounting.AccountedSourceOverloads,
                 accounting.SourceOverloads));
-            Assert.Equal((6517, 6517), (
+            Assert.Equal((6522, 6522), (
                 accounting.AccountedSourceParameters,
                 accounting.SourceParameters));
             Assert.True(accounting.ParameterReconciliationValid);
             Assert.True(result.Validation.ParameterReconciliationValid);
             Assert.Empty(result.Errors);
             Assert.Empty(result.Manifest.Diagnostics);
-            Assert.Equal(344, result.Manifest.SynthesizedTypes?.Count);
+            Assert.Equal(318, result.Manifest.SynthesizedTypes?.Count);
             Assert.Equal(
-                (6, 4, 188, 111, 1, 1),
+                (6, 4, 188, 87, 1, 1),
                 (
                     result.Manifest.SynthesizedTypes?.Count(type =>
                         type.Kind == "Tuple"),
@@ -327,7 +327,7 @@ public sealed class FinalEmitterAuditTests
             Assert.Empty(accounting.DeferredMemberEntries ?? []);
             Assert.Empty(accounting.FailedSymbols);
             Assert.Equal(
-                (3874, 0, 0),
+                (3880, 0, 0),
                 (
                     (accounting.SourceOverloadEntries ?? []).Count(entry =>
                         entry.Status == nameof(MemberOutcomeStatus.Projected)),
@@ -342,7 +342,7 @@ public sealed class FinalEmitterAuditTests
                 .SelectMany(entry => entry.ParameterOutcomes)
                 .ToList();
             Assert.Equal(
-                (6517, 0, 0),
+                (6522, 0, 0),
                 (
                     allParameters.Count(entry =>
                         entry.Status == MemberOutcomeStatus.Projected),

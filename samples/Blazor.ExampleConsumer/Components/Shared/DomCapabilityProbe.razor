@@ -1,0 +1,1428 @@
+@using Blazor.DOM
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@implements IAsyncDisposable
+@inject IBrowser Browser
+
+<section class="live-probe"
+         aria-labelledby="live-probe-heading"
+         data-probe="@Definition.Slug"
+         data-probe-phase="@_phase">
+    <div class="live-probe-heading">
+        <span class="probe-signal @(_phase == "ready" ? "is-ready" : null)" aria-hidden="true"></span>
+        <div>
+            <span>Live browser contract</span>
+            <h2 id="live-probe-heading">@ProbeTitle</h2>
+        </div>
+        <span class="probe-phase">@ProbePhase</span>
+    </div>
+
+    <dl class="probe-readiness">
+        <div>
+            <dt>Runtime context</dt>
+            <dd data-probe-result="context">@_context</dd>
+        </div>
+        <div>
+            <dt>@_readingLabel</dt>
+            <dd data-probe-result="reading">@_reading</dd>
+        </div>
+        <div>
+            <dt>User activation</dt>
+            <dd data-probe-result="activation">@_activation</dd>
+        </div>
+    </dl>
+
+    <div class="live-action">
+        <div class="live-action-intro">
+            <span>Interactive workflow</span>
+            <h3>@ActionTitle</h3>
+            <p>@ActionDescription</p>
+        </div>
+
+        <div class="workflow-grid">
+            <section class="workflow-stage" data-workflow-step="configure">
+                <div class="workflow-stage-heading">
+                    <span>1</span>
+                    <div>
+                        <small>Configure</small>
+                        <h4>@ConfigureTitle</h4>
+                    </div>
+                </div>
+                <p>@ConfigureDescription</p>
+
+                @if (Definition.Slug == "permissions")
+                {
+                    <label for="permission-demo-name">Permission name</label>
+                    <select id="permission-demo-name" @bind="_permissionName">
+                        <option value="@PermissionName.Geolocation">Geolocation</option>
+                        <option value="@PermissionName.Camera">Camera</option>
+                        <option value="@PermissionName.Microphone">Microphone</option>
+                        <option value="@PermissionName.Notifications">Notifications</option>
+                        <option value="@PermissionName.PersistentStorage">Persistent storage</option>
+                    </select>
+                }
+                else if (Definition.Slug == "clipboard")
+                {
+                    <label for="clipboard-demo-value">Text to copy</label>
+                    <textarea id="clipboard-demo-value"
+                              rows="4"
+                              @bind="_clipboardText"
+                              @bind:event="oninput"
+                              autocomplete="off"></textarea>
+                    <small class="field-hint">@_clipboardText.Length characters will be written.</small>
+                }
+                else if (Definition.Slug == "web-share")
+                {
+                    <label for="share-demo-title">Share title</label>
+                    <input id="share-demo-title"
+                           @bind="_shareTitle"
+                           @bind:event="oninput"
+                           autocomplete="off" />
+                    <label for="share-demo-value">Share text</label>
+                    <textarea id="share-demo-value"
+                              rows="3"
+                              @bind="_shareText"
+                              @bind:event="oninput"
+                              autocomplete="off"></textarea>
+                }
+                else if (Definition.Slug == "performance")
+                {
+                    <label for="performance-demo-delay">Target workload delay</label>
+                    <input id="performance-demo-delay"
+                           type="range"
+                           min="25"
+                           max="500"
+                           step="25"
+                           @bind="_performanceDelay" />
+                    <output class="range-value" for="performance-demo-delay">@_performanceDelay ms</output>
+                }
+                else if (Definition.Slug == "offline-storage")
+                {
+                    <label for="cache-demo-name">Cache name</label>
+                    <input id="cache-demo-name"
+                           @bind="_cacheName"
+                           @bind:event="oninput"
+                           autocomplete="off" />
+                }
+                else if (Definition.Slug == "notifications")
+                {
+                    <label for="notification-demo-title">Notification title</label>
+                    <input id="notification-demo-title"
+                           @bind="_notificationTitle"
+                           @bind:event="oninput"
+                           autocomplete="off" />
+                    <label for="notification-demo-body">Notification body</label>
+                    <textarea id="notification-demo-body"
+                              rows="3"
+                              @bind="_notificationBody"
+                              @bind:event="oninput"
+                              autocomplete="off"></textarea>
+                }
+                else
+                {
+                    <div class="configure-token">
+                        <Icon Name="@Definition.Icon" />
+                        <span>@ConfigureToken</span>
+                    </div>
+                }
+            </section>
+
+            <section class="workflow-stage workflow-run" data-workflow-step="run">
+                <div class="workflow-stage-heading">
+                    <span>2</span>
+                    <div>
+                        <small>Run</small>
+                        <h4>Invoke the generated member</h4>
+                    </div>
+                </div>
+                <p>The call below is dispatched directly against the explicit browser root.</p>
+
+                <div class="operation-trace">
+                    <code>@ActionExpression</code>
+                    <span>@ActionTransport</span>
+                </div>
+
+                <div class="live-action-controls">
+                    <button id="capability-action"
+                            class="btn btn-primary"
+                            type="button"
+                            disabled="@(_actionRunning || _phase != "ready")"
+                            @onclick="RunActionAsync">
+                        <Icon Name="@ActionIcon" />
+                        @ActionButtonLabel
+                    </button>
+
+                    @if (Definition.Slug == "web-share" && _canShare)
+                    {
+                        <button id="share-action"
+                                class="btn btn-ghost"
+                                type="button"
+                                disabled="@(_actionRunning || _phase != "ready")"
+                                @onclick="SharePayloadAsync">
+                            <Icon Name="navigation" />
+                            Open share sheet
+                        </button>
+                    }
+                    else if (Definition.Slug == "storage-management")
+                    {
+                        <button id="storage-persist-action"
+                                class="btn btn-ghost"
+                                type="button"
+                                disabled="@(_actionRunning || _phase != "ready")"
+                                @onclick="RequestPersistenceAsync">
+                            <Icon Name="database" />
+                            Request persistence
+                        </button>
+                    }
+                    else if (Definition.Slug == "notifications"
+                             && _notificationPermission == NotificationPermission.Granted)
+                    {
+                        <button id="notification-show-action"
+                                class="btn btn-ghost"
+                                type="button"
+                                disabled="@(_actionRunning || _phase != "ready")"
+                                @onclick="ShowNotificationAsync">
+                            <Icon Name="info" />
+                            Show notification
+                        </button>
+                    }
+                </div>
+            </section>
+
+            <section class="workflow-stage workflow-result" data-workflow-step="verify">
+                <div class="workflow-stage-heading">
+                    <span>3</span>
+                    <div>
+                        <small>Verify</small>
+                        <h4>Inspect what the browser returned</h4>
+                    </div>
+                </div>
+                <p>@VerifyDescription</p>
+
+                <output class="result-summary result-@_result.Tone"
+                        role="status"
+                        aria-live="polite"
+                        data-demo-result="@Definition.Slug">@_result.Summary</output>
+
+                @if (_result.Facts.Count > 0)
+                {
+                    <dl class="result-facts">
+                        @foreach (var fact in _result.Facts)
+                        {
+                            <div>
+                                <dt>@fact.Label</dt>
+                                <dd>@fact.Value</dd>
+                            </div>
+                        }
+                    </dl>
+                }
+
+                @if (Definition.Slug == "clipboard")
+                {
+                    <div class="clipboard-verifier">
+                        <label for="clipboard-paste-target">Paste from your clipboard to verify</label>
+                        <textarea id="clipboard-paste-target"
+                                  rows="4"
+                                  @bind="_clipboardPasteText"
+                                  @bind:event="oninput"
+                                  autocomplete="off"
+                                  placeholder="Press Ctrl+V or Command+V here"></textarea>
+                        <output class="verification-state is-@ClipboardVerificationTone"
+                                data-clipboard-verification="@ClipboardVerificationTone">
+                            <Icon Name="@ClipboardVerificationIcon" />
+                            @ClipboardVerification
+                        </output>
+                    </div>
+                }
+                else if (Definition.Slug == "storage-management" && _storageQuota > 0)
+                {
+                    <div class="storage-visual" aria-label="Storage usage">
+                        <div>
+                            <span>@FormatBytes(_storageUsage) used</span>
+                            <span>@FormatBytes(_storageQuota) quota</span>
+                        </div>
+                        <progress value="@_storageUsage" max="@_storageQuota"></progress>
+                    </div>
+                }
+                else if (Definition.Slug == "media-devices" && _mediaDevices.Count > 0)
+                {
+                    <ul class="device-results" aria-label="Enumerated media devices">
+                        @foreach (var device in _mediaDevices)
+                        {
+                            <li>
+                                <Icon Name="mic" />
+                                <span>
+                                    <strong>@device.DisplayLabel</strong>
+                                    <small>@device.Kind · @device.ShortId</small>
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else if (Definition.Slug == "web-crypto" && _uuidHistory.Count > 0)
+                {
+                    <ol class="uuid-history" aria-label="Generated UUID history">
+                        @foreach (var uuid in _uuidHistory)
+                        {
+                            <li><code>@uuid</code></li>
+                        }
+                    </ol>
+                }
+            </section>
+        </div>
+
+        @if (_result.Json is not null)
+        {
+            <details class="raw-result" open>
+                <summary>
+                    <span>
+                        <Icon Name="code" />
+                        Raw result envelope
+                    </span>
+                    <small>Exact sample values and transport metadata</small>
+                </summary>
+                <CodeSnippet @key="_result.Json"
+                             Source="@_result.Json"
+                             Language="json"
+                             FileName="@($"{Definition.Slug}-result.json")"
+                             Label="@($"{Definition.Name} raw result JSON")" />
+            </details>
+        }
+    </div>
+
+    <footer>
+        <Icon Name="code" />
+        <span>@Definition.Operations generated host operations; no handwritten JavaScript adapter.</span>
+    </footer>
+</section>
+
+@code {
+    static readonly JsonSerializerOptions s_jsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+
+    [Parameter, EditorRequired]
+    public DomCapabilityDefinition Definition { get; set; } = null!;
+
+    string _phase = "loading";
+    string _context = "Connecting";
+    string _readingLabel = "Generated root";
+    string _reading = "Waiting";
+    string _activation = "Waiting";
+    DemoResult _result = DemoResult.Pending;
+    PermissionName _permissionName = PermissionName.Geolocation;
+    string _clipboardText = "Hello from Blazorators";
+    string _clipboardPasteText = string.Empty;
+    string _shareTitle = "Blazorators DOM lab";
+    string _shareText = "Generated browser APIs for Blazor";
+    string _cacheName = "blazorators-dom-demo";
+    string _notificationTitle = "Blazorators DOM lab";
+    string _notificationBody = "The generated Notifications API is working.";
+    int _performanceDelay = 75;
+    bool _actionRunning;
+    bool _canShare;
+    double _storageUsage;
+    double _storageQuota;
+    bool _storagePersisted;
+    NotificationPermission _notificationPermission = NotificationPermission.Default;
+    IWakeLockSentinel? _wakeLockSentinel;
+    INotification? _notification;
+    List<MediaDeviceSnapshot> _mediaDevices = [];
+    List<string> _uuidHistory = [];
+
+    string ProbeTitle => _phase switch
+    {
+        "ready" => "Generated API is responding",
+        "unavailable" => "Browser support is unavailable",
+        _ => "Resolving generated roots"
+    };
+
+    string ProbePhase => _phase switch
+    {
+        "ready" => "Ready",
+        "unavailable" => "Unavailable",
+        _ => "Running"
+    };
+
+    string ActionTitle => Definition.Slug switch
+    {
+        "permissions" => "Query a real permission",
+        "clipboard" => "Complete a clipboard round trip",
+        "web-share" => "Validate and share a typed payload",
+        "wake-lock" => "Control the screen wake lock",
+        "storage-management" => "Inspect origin storage",
+        "screen" => "Compare screen and viewport geometry",
+        "performance" => "Measure an async workload",
+        "web-crypto" => "Generate secure identifiers",
+        "credentials" => "Require explicit credential access",
+        "offline-storage" => "Toggle a named application cache",
+        "browser-coordination" => "Inspect the Web Locks queue",
+        "media-devices" => "Enumerate available devices",
+        "notifications" => "Request permission and notify",
+        "file-system-access" => "Inspect a user-selected file",
+        _ => "Run the generated API"
+    };
+
+    string ActionDescription => Definition.Slug switch
+    {
+        "clipboard" => "Write from the user gesture, then paste manually to verify the exact system clipboard value without requesting read permission.",
+        "web-share" => "Build a typed ShareData dictionary, validate it, and expose the native share action only when the browser accepts it.",
+        "wake-lock" => "Acquire an owned sentinel, inspect its state, then release and dispose the same browser proxy.",
+        "storage-management" => "Read numeric usage and quota values, visualize their ratio, and optionally request persistent storage.",
+        "notifications" => "Permission remains a separate, visible decision. A notification can be created only after the browser reports granted.",
+        "file-system-access" => "The browser owns the picker. Select a test file to inspect metadata through its generated File proxy, or cancel safely.",
+        _ => "Configure a representative value, run the generated contract, then inspect both the visual result and raw JSON."
+    };
+
+    string ConfigureTitle => Definition.Slug switch
+    {
+        "permissions" => "Choose the browser policy",
+        "clipboard" => "Enter a recognizable value",
+        "web-share" => "Compose the share payload",
+        "performance" => "Choose a workload duration",
+        "offline-storage" => "Name the cache",
+        "notifications" => "Author the notification",
+        _ => "Confirm the browser context"
+    };
+
+    string ConfigureDescription => Definition.Slug switch
+    {
+        "permissions" => "The query reads state only; it does not prompt the user.",
+        "clipboard" => "Use text you can recognize when it comes back through a real paste.",
+        "web-share" => "Unset optional dictionary members are omitted instead of serialized as null.",
+        "performance" => "The browser clock measures elapsed time; scheduling may make the result slightly longer.",
+        "offline-storage" => "A cache name is origin-scoped and can be queried again after the operation.",
+        "notifications" => "These values are used only if permission is granted and you choose to show the notification.",
+        _ => "The readiness values above show whether this browser can run the sample safely."
+    };
+
+    string ConfigureToken => Definition.Slug switch
+    {
+        "wake-lock" => "Keep this page visible while the sentinel is active.",
+        "storage-management" => "This origin's current storage bucket.",
+        "screen" => "Resize this window before refreshing to compare values.",
+        "web-crypto" => "The browser's cryptographically secure random source.",
+        "credentials" => "This secure origin's credential mediation state.",
+        "browser-coordination" => "The current origin's held and pending lock queues.",
+        "media-devices" => "Labels may remain private until camera or microphone permission is granted.",
+        "file-system-access" => "Use a disposable local file; the page reads metadata only.",
+        _ => "Current browser runtime"
+    };
+
+    string VerifyDescription => Definition.Slug switch
+    {
+        "clipboard" => "A successful write is only half of the user journey. Paste below to prove the exact value crossed the system clipboard.",
+        "media-devices" => "Privacy-redacted labels are still valid browser results; permission controls what can be revealed.",
+        "file-system-access" => "Only metadata is displayed. The file handle and File proxy are disposed after the action.",
+        _ => "The summary is optimized for people; the expandable JSON keeps the exact values available for debugging."
+    };
+
+    string ActionExpression => Definition.Slug switch
+    {
+        "permissions" => "navigator.permissions.query(descriptor)",
+        "clipboard" => "navigator.clipboard.writeText(text)",
+        "web-share" => "navigator.canShare(shareData)",
+        "wake-lock" => _wakeLockSentinel is null
+            ? "navigator.wakeLock.request(\"screen\")"
+            : "wakeLockSentinel.release()",
+        "storage-management" => "navigator.storage.estimate()",
+        "screen" => "window.screen + window.innerWidth/innerHeight",
+        "performance" => "performance.now()",
+        "web-crypto" => "crypto.randomUUID()",
+        "credentials" => "navigator.credentials.preventSilentAccess()",
+        "offline-storage" => "caches.has/open/delete(cacheName)",
+        "browser-coordination" => "navigator.locks.query()",
+        "media-devices" => "navigator.mediaDevices.enumerateDevices()",
+        "notifications" => "Notification.requestPermission()",
+        "file-system-access" => "window.showOpenFilePicker(options)",
+        _ => "generated browser operation"
+    };
+
+    string ActionTransport => Definition.Slug switch
+    {
+        "wake-lock" or "media-devices" or "file-system-access" => "Promise → owned live proxy",
+        "clipboard" or "credentials" or "web-share" => "Typed JSON value → Promise",
+        "web-crypto" or "screen" or "performance" => "Synchronous WebAssembly value",
+        _ => "Typed structured result"
+    };
+
+    string ActionIcon => Definition.Slug switch
+    {
+        "clipboard" => "copy",
+        "performance" => "refresh",
+        "screen" => "monitor",
+        "media-devices" => "mic",
+        "offline-storage" or "storage-management" => "database",
+        "file-system-access" => "code",
+        _ => "play"
+    };
+
+    string ActionButtonLabel => Definition.Slug switch
+    {
+        "permissions" => "Query permission",
+        "clipboard" => "Copy text",
+        "web-share" => "Validate payload",
+        "wake-lock" => _wakeLockSentinel is null ? "Acquire wake lock" : "Release wake lock",
+        "storage-management" => "Refresh storage",
+        "screen" => "Refresh geometry",
+        "performance" => $"Measure {_performanceDelay} ms",
+        "web-crypto" => "Generate UUID",
+        "credentials" => "Prevent silent access",
+        "offline-storage" => "Toggle cache",
+        "browser-coordination" => "Query lock state",
+        "media-devices" => "Enumerate devices",
+        "notifications" => "Request permission",
+        "file-system-access" => "Choose a file",
+        _ => "Run demo"
+    };
+
+    string ClipboardVerification => string.IsNullOrEmpty(_clipboardPasteText)
+        ? "Waiting for a real paste from the system clipboard."
+        : string.Equals(_clipboardPasteText, _clipboardText, StringComparison.Ordinal)
+            ? "Exact match. The clipboard round trip is verified."
+            : "The pasted value does not match the source text yet.";
+
+    string ClipboardVerificationTone => string.IsNullOrEmpty(_clipboardPasteText)
+        ? "waiting"
+        : string.Equals(_clipboardPasteText, _clipboardText, StringComparison.Ordinal)
+            ? "verified"
+            : "mismatch";
+
+    string ClipboardVerificationIcon =>
+        ClipboardVerificationTone == "verified" ? "check" : "info";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var missingPath = await FindMissingFeatureAsync();
+            if (missingPath is null)
+            {
+                await RunProbeAsync();
+                _phase = "ready";
+            }
+            else
+            {
+                SetProbeUnavailable(
+                    $"The browser does not expose {missingPath}.");
+            }
+        }
+        catch (Exception ex) when (IsExpectedBrowserFailure(ex))
+        {
+            SetProbeUnavailable(FirstLine(ex.Message));
+        }
+
+        StateHasChanged();
+    }
+
+    async Task RunProbeAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var document = window.Document;
+        await using var navigator = window.Navigator;
+        await using var activation = navigator.UserActivation;
+
+        _context = window.IsSecureContext ? "Secure localhost context" : "Insecure context";
+        _activation = activation.IsActive
+            ? "Active now"
+            : activation.HasBeenActive
+                ? "Previously active"
+                : "Not yet active";
+
+        (_readingLabel, _reading) = Definition.Slug switch
+        {
+            "permissions" => await ProbePermissionsAsync(navigator),
+            "clipboard" => await ProbeClipboardAsync(navigator),
+            "web-share" => ProbeShare(navigator),
+            "wake-lock" => await ProbeWakeLockAsync(navigator, document),
+            "storage-management" => await ProbeStorageAsync(navigator),
+            "screen" => await ProbeScreenAsync(window),
+            "performance" => await ProbePerformanceAsync(window),
+            "web-crypto" => await ProbeCryptoAsync(window),
+            "credentials" => await ProbeCredentialsAsync(navigator),
+            "offline-storage" => await ProbeOfflineStorageAsync(window),
+            "browser-coordination" => await ProbeCoordinationAsync(navigator, document),
+            "media-devices" => await ProbeMediaDevicesAsync(navigator),
+            "notifications" => await ProbeNotificationsAsync(),
+            "file-system-access" => ("Picker entry point", "window.showOpenFilePicker is available"),
+            _ => throw new InvalidOperationException($"No live probe exists for '{Definition.Slug}'.")
+        };
+    }
+
+    async Task RunActionAsync()
+    {
+        if (_phase != "ready")
+        {
+            _result = CreateUnavailableResult(
+                "Feature detection did not find every browser entry point required by this workflow.");
+            return;
+        }
+
+        _actionRunning = true;
+        _result = DemoResult.Running;
+
+        try
+        {
+            _result = Definition.Slug switch
+            {
+                "permissions" => await QueryPermissionAsync(),
+                "clipboard" => await WriteClipboardAsync(),
+                "web-share" => await CheckShareAsync(),
+                "wake-lock" => await ToggleWakeLockAsync(),
+                "storage-management" => await RefreshStorageAsync(),
+                "screen" => await RefreshScreenAsync(),
+                "performance" => await MeasurePerformanceAsync(),
+                "web-crypto" => await GenerateUuidAsync(),
+                "credentials" => await PreventSilentAccessAsync(),
+                "offline-storage" => await ToggleDemoCacheAsync(),
+                "browser-coordination" => await QueryLocksAsync(),
+                "media-devices" => await EnumerateDevicesAsync(),
+                "notifications" => await RequestNotificationsAsync(),
+                "file-system-access" => await ChooseFileAsync(),
+                _ => throw new InvalidOperationException(
+                    $"No interactive demo exists for '{Definition.Slug}'.")
+            };
+        }
+        catch (Exception ex) when (IsExpectedBrowserFailure(ex))
+        {
+            var unavailable = IsMissingApiFailure(ex);
+            if (unavailable)
+            {
+                SetProbeUnavailable(FirstLine(ex.Message));
+            }
+            _result = CreateResult(
+                unavailable
+                    ? $"Browser API unavailable: {FirstLine(ex.Message)}"
+                    : $"Browser response: {FirstLine(ex.Message)}",
+                unavailable ? "warning" : "error",
+                new
+                {
+                    status = unavailable ? "unavailable" : "browser-error",
+                    message = FirstLine(ex.Message)
+                },
+                new("Status", unavailable ? "Unavailable" : "Browser error"),
+                new("Exception", ex.GetType().Name));
+        }
+        finally
+        {
+            _actionRunning = false;
+        }
+    }
+
+    async Task<DemoResult> QueryPermissionAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var permissions = navigator.Permissions;
+        await using var status = await permissions.QueryAsync(
+            new PermissionDescriptor { Name = _permissionName });
+        var state = status.State.ToString().ToLowerInvariant();
+        return CreateResult(
+            $"{DisplayName(_permissionName)} is {state}.",
+            StateTone(state),
+            new { permission = _permissionName, state },
+            new("Permission", DisplayName(_permissionName)),
+            new("Typed state", state));
+    }
+
+    async Task<DemoResult> WriteClipboardAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var clipboard = navigator.Clipboard;
+        await clipboard.WriteTextAsync(_clipboardText);
+        _clipboardPasteText = string.Empty;
+        return CreateResult(
+            $"Copied {_clipboardText.Length} characters. Paste into step 3 to verify.",
+            "success",
+            new
+            {
+                writeCompleted = true,
+                charactersWritten = _clipboardText.Length,
+                expectedText = _clipboardText
+            },
+            new("Promise", "Completed"),
+            new("Characters", _clipboardText.Length.ToString()),
+            new("Verification", "Paste required"));
+    }
+
+    async Task<DemoResult> CheckShareAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        var data = new ShareData { Title = _shareTitle, Text = _shareText };
+        _canShare = navigator.CanShare(data);
+        return CreateResult(
+            _canShare
+                ? "The browser accepts this payload. The native share action is now available."
+                : "The browser does not expose a compatible share sheet for this payload.",
+            _canShare ? "success" : "warning",
+            new
+            {
+                title = _shareTitle,
+                text = _shareText,
+                canShare = _canShare
+            },
+            new("Payload", _canShare ? "Accepted" : "Rejected"),
+            new("Title length", _shareTitle.Length.ToString()),
+            new("Text length", _shareText.Length.ToString()));
+    }
+
+    async Task SharePayloadAsync()
+    {
+        _actionRunning = true;
+        _result = DemoResult.Running;
+        try
+        {
+            await using var window = await Browser.GetWindowProxyAsync();
+            await using var navigator = window.Navigator;
+            await navigator.ShareAsync(new ShareData { Title = _shareTitle, Text = _shareText });
+            _result = CreateOperationResult(
+                "navigator.share(shareData)",
+                "Typed JSON value → Promise",
+                "The native share workflow completed.",
+                "success",
+                new { title = _shareTitle, text = _shareText, shared = true },
+                new("Share Promise", "Completed"),
+                new("Browser UI", "Closed"));
+        }
+        catch (Exception ex) when (IsExpectedBrowserFailure(ex))
+        {
+            var unavailable = IsMissingApiFailure(ex);
+            if (unavailable)
+            {
+                SetProbeUnavailable(FirstLine(ex.Message));
+            }
+            _result = CreateOperationResult(
+                "navigator.share(shareData)",
+                "Typed JSON value → Promise",
+                unavailable
+                    ? $"Share API unavailable: {FirstLine(ex.Message)}"
+                    : $"Share sheet response: {FirstLine(ex.Message)}",
+                "warning",
+                new
+                {
+                    shared = false,
+                    status = unavailable ? "unavailable" : "cancelled-or-rejected",
+                    message = FirstLine(ex.Message)
+                },
+                new DemoFact(
+                    "Share Promise",
+                    unavailable ? "Unavailable" : "Cancelled or rejected"));
+        }
+        finally
+        {
+            _actionRunning = false;
+        }
+    }
+
+    async Task<DemoResult> ToggleWakeLockAsync()
+    {
+        if (_wakeLockSentinel is not null)
+        {
+            await _wakeLockSentinel.ReleaseAsync();
+            var released = _wakeLockSentinel.Released;
+            await _wakeLockSentinel.DisposeAsync();
+            _wakeLockSentinel = null;
+            return CreateOperationResult(
+                "wakeLockSentinel.release()",
+                "Promise → owned live proxy",
+                "Wake lock released and its live proxy disposed.",
+                "success",
+                new { state = "released", released, disposed = true },
+                new("Sentinel", "Released"),
+                new("Proxy", "Disposed"));
+        }
+
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var wakeLock = navigator.WakeLock;
+        _wakeLockSentinel = await wakeLock.RequestAsync(WakeLockType.Screen);
+        return CreateResult(
+            "Screen wake lock acquired. Use the same control to release it.",
+            "success",
+            new
+            {
+                state = "active",
+                type = WakeLockType.Screen,
+                released = _wakeLockSentinel.Released,
+                ownedProxy = true
+            },
+            new("Sentinel", "Active"),
+            new("Released", _wakeLockSentinel.Released.ToString().ToLowerInvariant()),
+            new("Ownership", "Component"));
+    }
+
+    async Task<DemoResult> RefreshStorageAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var storage = navigator.Storage;
+        var estimate = await storage.EstimateAsync();
+        _storageUsage = estimate.Usage.GetValueOrDefault();
+        _storageQuota = estimate.Quota.GetValueOrDefault();
+        _storagePersisted = await storage.PersistedAsync();
+        var percent = _storageQuota <= 0 ? 0 : _storageUsage / _storageQuota * 100;
+        return CreateResult(
+            $"{FormatBytes(_storageUsage)} used of {FormatBytes(_storageQuota)}.",
+            "success",
+            new
+            {
+                usageBytes = _storageUsage,
+                quotaBytes = _storageQuota,
+                percentUsed = Math.Round(percent, 4),
+                persisted = _storagePersisted
+            },
+            new("Usage", FormatBytes(_storageUsage)),
+            new("Quota", FormatBytes(_storageQuota)),
+            new("Persistent", _storagePersisted ? "Yes" : "No"));
+    }
+
+    async Task RequestPersistenceAsync()
+    {
+        _actionRunning = true;
+        _result = DemoResult.Running;
+        try
+        {
+            await using var window = await Browser.GetWindowProxyAsync();
+            await using var navigator = window.Navigator;
+            await using var storage = navigator.Storage;
+            _storagePersisted = await storage.PersistAsync();
+            _result = CreateOperationResult(
+                "navigator.storage.persist()",
+                "Typed boolean → Promise",
+                _storagePersisted
+                    ? "The browser granted persistent storage for this origin."
+                    : "The browser kept this origin on best-effort storage.",
+                _storagePersisted ? "success" : "warning",
+                new { persisted = _storagePersisted, decision = _storagePersisted ? "granted" : "not-granted" },
+                new("Persistence", _storagePersisted ? "Granted" : "Not granted"),
+                new("Browser policy", "Applied"));
+        }
+        catch (Exception ex) when (IsExpectedBrowserFailure(ex))
+        {
+            var unavailable = IsMissingApiFailure(ex);
+            if (unavailable)
+            {
+                SetProbeUnavailable(FirstLine(ex.Message));
+            }
+            _result = CreateOperationResult(
+                "navigator.storage.persist()",
+                "Typed boolean → Promise",
+                unavailable
+                    ? $"Storage API unavailable: {FirstLine(ex.Message)}"
+                    : $"Persistence response: {FirstLine(ex.Message)}",
+                unavailable ? "warning" : "error",
+                new
+                {
+                    persisted = false,
+                    status = unavailable ? "unavailable" : "browser-error",
+                    message = FirstLine(ex.Message)
+                },
+                new DemoFact(
+                    "Persistence",
+                    unavailable ? "Unavailable" : "Browser error"));
+        }
+        finally
+        {
+            _actionRunning = false;
+        }
+    }
+
+    async Task<DemoResult> RefreshScreenAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var screen = window.Screen;
+        await using var orientation = screen.Orientation;
+        return CreateResult(
+            $"{screen.Width:F0} × {screen.Height:F0} screen; {window.InnerWidth:F0} × {window.InnerHeight:F0} viewport.",
+            "success",
+            new
+            {
+                screen = new
+                {
+                    width = screen.Width,
+                    height = screen.Height,
+                    availableWidth = screen.AvailWidth,
+                    availableHeight = screen.AvailHeight,
+                    colorDepth = screen.ColorDepth,
+                    orientation = orientation.Type
+                },
+                viewport = new { width = window.InnerWidth, height = window.InnerHeight }
+            },
+            new("Screen", $"{screen.Width:F0} × {screen.Height:F0}"),
+            new("Viewport", $"{window.InnerWidth:F0} × {window.InnerHeight:F0}"),
+            new("Orientation", orientation.Type.ToString()));
+    }
+
+    async Task<DemoResult> MeasurePerformanceAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var performance = window.Performance;
+        var started = performance.Now();
+        await Task.Delay(_performanceDelay);
+        var measured = performance.Now() - started;
+        var delta = measured - _performanceDelay;
+        return CreateResult(
+            $"Requested {_performanceDelay} ms; measured {measured:F2} ms.",
+            "success",
+            new
+            {
+                requestedMilliseconds = _performanceDelay,
+                measuredMilliseconds = Math.Round(measured, 3),
+                schedulingDeltaMilliseconds = Math.Round(delta, 3),
+                timeOrigin = performance.TimeOrigin
+            },
+            new("Requested", $"{_performanceDelay} ms"),
+            new("Measured", $"{measured:F2} ms"),
+            new("Delta", $"{delta:+0.00;-0.00;0.00} ms"));
+    }
+
+    async Task<DemoResult> GenerateUuidAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var crypto = window.Crypto;
+        var uuid = crypto.RandomUUID().ToString();
+        _uuidHistory.Insert(0, uuid);
+        if (_uuidHistory.Count > 4)
+        {
+            _uuidHistory.RemoveAt(_uuidHistory.Count - 1);
+        }
+
+        return CreateResult(
+            $"Generated secure UUID {uuid}.",
+            "success",
+            new
+            {
+                uuid,
+                valid = Guid.TryParse(uuid, out _),
+                version = uuid[14].ToString(),
+                variant = uuid[19].ToString(),
+                generatedThisSession = _uuidHistory.Count
+            },
+            new("Version", "4"),
+            new("Variant", uuid[19].ToString()),
+            new("Session values", _uuidHistory.Count.ToString()));
+    }
+
+    async Task<DemoResult> PreventSilentAccessAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var credentials = navigator.Credentials;
+        await credentials.PreventSilentAccessAsync();
+        return CreateResult(
+            "Silent credential access is disabled for this origin.",
+            "success",
+            new
+            {
+                silentAccessPrevented = true,
+                originScoped = true,
+                nextStep = "Begin an explicit user-activated credential request"
+            },
+            new("Promise", "Completed"),
+            new("Scope", "Current origin"),
+            new("Next request", "Explicit"));
+    }
+
+    async Task<DemoResult> ToggleDemoCacheAsync()
+    {
+        var cacheName = _cacheName.Trim();
+        if (cacheName.Length == 0)
+        {
+            return CreateResult(
+                "Enter a cache name before running the operation.",
+                "warning",
+                new { validation = "cache-name-required" },
+                new DemoFact("Cache name", "Required"));
+        }
+
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var caches = window.Caches;
+        var existedBefore = await caches.HasAsync(cacheName);
+        string action;
+
+        if (existedBefore)
+        {
+            var deleted = await caches.DeleteAsync(cacheName);
+            action = deleted ? "removed" : "unchanged";
+        }
+        else
+        {
+            await using var cache = await caches.OpenAsync(cacheName);
+            action = "created";
+        }
+
+        var existsAfter = await caches.HasAsync(cacheName);
+        return CreateResult(
+            $"Cache '{cacheName}' was {action}; exists now={existsAfter.ToString().ToLowerInvariant()}.",
+            action == "unchanged" ? "warning" : "success",
+            new { cacheName, existedBefore, action, existsAfter },
+            new("Cache", cacheName),
+            new("Before", existedBefore ? "Present" : "Missing"),
+            new("After", existsAfter ? "Present" : "Missing"));
+    }
+
+    async Task<DemoResult> QueryLocksAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var locks = navigator.Locks;
+        var snapshot = await locks.QueryAsync();
+        var held = snapshot.Held?.Length ?? 0;
+        var pending = snapshot.Pending?.Length ?? 0;
+        return CreateResult(
+            $"{held} held and {pending} pending locks for this origin.",
+            "success",
+            new
+            {
+                heldCount = held,
+                pendingCount = pending,
+                held = snapshot.Held,
+                pending = snapshot.Pending
+            },
+            new("Held locks", held.ToString()),
+            new("Pending locks", pending.ToString()),
+            new("Scope", "Current origin"));
+    }
+
+    async Task<DemoResult> EnumerateDevicesAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var navigator = window.Navigator;
+        await using var mediaDevices = navigator.MediaDevices;
+        await using var devices = await mediaDevices.EnumerateDevicesAsync();
+        var count = await devices.GetLengthAsync();
+        var snapshots = new List<MediaDeviceSnapshot>();
+
+        for (var index = 0; index < count; index++)
+        {
+            await using var device = await devices.GetAsync(index);
+            snapshots.Add(new(
+                device.Kind.ToString(),
+                device.Label,
+                device.DeviceId,
+                device.GroupId));
+        }
+
+        _mediaDevices = snapshots;
+        return CreateResult(
+            $"The browser returned {count} media device{(count == 1 ? "" : "s")}.",
+            "success",
+            new
+            {
+                count,
+                labelsArePrivacyControlled = snapshots.Any(device => device.Label.Length == 0),
+                devices = snapshots
+            },
+            new("Devices", count.ToString()),
+            new("Named labels", snapshots.Count(device => device.Label.Length > 0).ToString()),
+            new("Redacted labels", snapshots.Count(device => device.Label.Length == 0).ToString()));
+    }
+
+    async Task<DemoResult> RequestNotificationsAsync()
+    {
+        await using var factory = await Browser.GetGlobalAsync<INotificationFactory>("Notification");
+        _notificationPermission = await factory.RequestPermissionAsync(null);
+        var value = _notificationPermission.ToString().ToLowerInvariant();
+        return CreateResult(
+            $"Notification permission is {value}.",
+            _notificationPermission switch
+            {
+                NotificationPermission.Granted => "success",
+                NotificationPermission.Denied => "error",
+                _ => "warning"
+            },
+            new
+            {
+                permission = _notificationPermission,
+                canCreateNotification = _notificationPermission == NotificationPermission.Granted
+            },
+            new("Permission", value),
+            new("Create allowed", _notificationPermission == NotificationPermission.Granted ? "Yes" : "No"));
+    }
+
+    async Task ShowNotificationAsync()
+    {
+        _actionRunning = true;
+        _result = DemoResult.Running;
+        try
+        {
+            if (_notification is not null)
+            {
+                _notification.Close();
+                await _notification.DisposeAsync();
+            }
+
+            await using var factory = await Browser.GetGlobalAsync<INotificationFactory>("Notification");
+            _notification = factory.Create(
+                _notificationTitle,
+                new NotificationOptions { Body = _notificationBody });
+            _result = CreateOperationResult(
+                "new Notification(title, options)",
+                "Typed dictionary → owned live proxy",
+                "Created a live browser notification with the entered values.",
+                "success",
+                new
+                {
+                    title = _notification.Title,
+                    body = _notification.Body,
+                    permission = _notificationPermission,
+                    ownedProxy = true
+                },
+                new("Title", _notification.Title),
+                new("Body", _notification.Body),
+                new("Proxy", "Owned"));
+        }
+        catch (Exception ex) when (IsExpectedBrowserFailure(ex))
+        {
+            var unavailable = IsMissingApiFailure(ex);
+            if (unavailable)
+            {
+                SetProbeUnavailable(FirstLine(ex.Message));
+            }
+            _result = CreateOperationResult(
+                "new Notification(title, options)",
+                "Typed dictionary → owned live proxy",
+                unavailable
+                    ? $"Notifications unavailable: {FirstLine(ex.Message)}"
+                    : $"Notification response: {FirstLine(ex.Message)}",
+                unavailable ? "warning" : "error",
+                new
+                {
+                    created = false,
+                    status = unavailable ? "unavailable" : "browser-error",
+                    message = FirstLine(ex.Message)
+                },
+                new DemoFact(
+                    "Notification",
+                    unavailable ? "Unavailable" : "Browser error"));
+        }
+        finally
+        {
+            _actionRunning = false;
+        }
+    }
+
+    async Task<DemoResult> ChooseFileAsync()
+    {
+        await using var window = await Browser.GetWindowProxyAsync();
+        await using var handles = await window.ShowOpenFilePickerAsync(
+            new OpenFilePickerOptions { Multiple = false });
+        var count = await handles.GetLengthAsync();
+        if (count == 0)
+        {
+            return CreateResult(
+                "The browser returned no file handles.",
+                "warning",
+                new { selected = false, handleCount = 0 },
+                new DemoFact("Selection", "Empty"));
+        }
+
+        await using var handle = await handles.GetAsync(0);
+        await using var file = await handle.GetFileAsync();
+        var lastModified = DateTimeOffset.FromUnixTimeMilliseconds((long)file.LastModified);
+        return CreateResult(
+            $"Selected {file.Name} ({FormatBytes(file.Size)}).",
+            "success",
+            new
+            {
+                selected = true,
+                handleCount = count,
+                file = new
+                {
+                    file.Name,
+                    file.Type,
+                    sizeBytes = file.Size,
+                    file.LastModified,
+                    lastModifiedUtc = lastModified,
+                    file.WebkitRelativePath
+                },
+                proxiesDisposed = true
+            },
+            new("Name", file.Name),
+            new("MIME type", file.Type.Length == 0 ? "Not provided" : file.Type),
+            new("Size", FormatBytes(file.Size)),
+            new("Modified", lastModified.ToLocalTime().ToString("g")));
+    }
+
+    static async Task<(string Label, string Value)> ProbePermissionsAsync(INavigator navigator)
+    {
+        await using var permissions = navigator.Permissions;
+        await using var status = await permissions.QueryAsync(
+            new PermissionDescriptor { Name = PermissionName.Geolocation });
+        return ("Geolocation permission", status.State.ToString().ToLowerInvariant());
+    }
+
+    static async Task<(string Label, string Value)> ProbeClipboardAsync(INavigator navigator)
+    {
+        await using var clipboard = navigator.Clipboard;
+        return ("Clipboard root", "navigator.clipboard resolved");
+    }
+
+    static (string Label, string Value) ProbeShare(INavigator navigator)
+    {
+        var supported = navigator.CanShare(new ShareData { Text = "Blazorators DOM lab" });
+        return ("Share payload", supported ? "Text sharing supported" : "Share sheet unavailable");
+    }
+
+    static async Task<(string Label, string Value)> ProbeWakeLockAsync(
+        INavigator navigator,
+        IDocument document)
+    {
+        await using var wakeLock = navigator.WakeLock;
+        return ("Wake lock readiness", $"Root resolved; document is {document.VisibilityState}");
+    }
+
+    async Task<(string Label, string Value)> ProbeStorageAsync(INavigator navigator)
+    {
+        await using var storage = navigator.Storage;
+        var estimate = await storage.EstimateAsync();
+        _storageUsage = estimate.Usage.GetValueOrDefault();
+        _storageQuota = estimate.Quota.GetValueOrDefault();
+        _storagePersisted = await storage.PersistedAsync();
+        return ("Origin storage", $"{FormatBytes(_storageUsage)} / {FormatBytes(_storageQuota)}; persisted={_storagePersisted}");
+    }
+
+    static async Task<(string Label, string Value)> ProbeScreenAsync(IWindow window)
+    {
+        await using var screen = window.Screen;
+        await using var orientation = screen.Orientation;
+        return ("Current display", $"{screen.Width:F0} × {screen.Height:F0}; {orientation.Type}");
+    }
+
+    static async Task<(string Label, string Value)> ProbePerformanceAsync(IWindow window)
+    {
+        await using var performance = window.Performance;
+        return ("High-resolution clock", $"{performance.Now():F2} ms; origin {performance.TimeOrigin:F0}");
+    }
+
+    static async Task<(string Label, string Value)> ProbeCryptoAsync(IWindow window)
+    {
+        await using var crypto = window.Crypto;
+        return ("Secure randomness", "crypto.randomUUID is available");
+    }
+
+    static async Task<(string Label, string Value)> ProbeCredentialsAsync(INavigator navigator)
+    {
+        await using var credentials = navigator.Credentials;
+        return ("Credential root", "Ready for an explicit request");
+    }
+
+    static async Task<(string Label, string Value)> ProbeOfflineStorageAsync(IWindow window)
+    {
+        await using var caches = window.Caches;
+        await using var indexedDb = window.IndexedDB;
+        var cacheNames = await caches.KeysAsync();
+        var databases = await indexedDb.DatabasesAsync();
+        return ("Origin databases", $"{cacheNames.Length} caches; {databases.Length} IndexedDB databases");
+    }
+
+    static async Task<(string Label, string Value)> ProbeCoordinationAsync(
+        INavigator navigator,
+        IDocument document)
+    {
+        await using var locks = navigator.Locks;
+        var snapshot = await locks.QueryAsync();
+        var held = snapshot.Held?.Length ?? 0;
+        var pending = snapshot.Pending?.Length ?? 0;
+        return ("Coordination state", $"{document.VisibilityState}; {held} held / {pending} pending locks");
+    }
+
+    static async Task<(string Label, string Value)> ProbeMediaDevicesAsync(INavigator navigator)
+    {
+        await using var mediaDevices = navigator.MediaDevices;
+        var constraints = mediaDevices.GetSupportedConstraints();
+        return ("Supported constraints", $"deviceId={constraints.DeviceId}; width={constraints.Width}; audio={constraints.EchoCancellation}");
+    }
+
+    async Task<(string Label, string Value)> ProbeNotificationsAsync()
+    {
+        await using var factory = await Browser.GetGlobalAsync<INotificationFactory>("Notification");
+        _notificationPermission = factory.Permission;
+        return ("Notification permission", _notificationPermission.ToString().ToLowerInvariant());
+    }
+
+    IReadOnlyList<string> ProbeFeaturePaths => Definition.Slug switch
+    {
+        "permissions" => ["navigator.permissions"],
+        "clipboard" => ["navigator.clipboard"],
+        "web-share" => ["navigator.canShare"],
+        "wake-lock" => ["navigator.wakeLock"],
+        "storage-management" => ["navigator.storage"],
+        "screen" => ["window.screen"],
+        "performance" => ["performance.now"],
+        "web-crypto" => ["crypto.randomUUID"],
+        "credentials" => ["navigator.credentials"],
+        "offline-storage" => ["caches", "indexedDB.databases"],
+        "browser-coordination" => ["navigator.locks"],
+        "media-devices" => ["navigator.mediaDevices"],
+        "notifications" => ["Notification"],
+        "file-system-access" => ["window.showOpenFilePicker"],
+        _ => [],
+    };
+
+    async Task<string?> FindMissingFeatureAsync()
+    {
+        foreach (var path in ProbeFeaturePaths)
+        {
+            if (!await Browser.IsGlobalAvailableAsync(path))
+            {
+                return path;
+            }
+        }
+
+        return null;
+    }
+
+    void SetProbeUnavailable(string response)
+    {
+        _phase = "unavailable";
+        _readingLabel = "Feature detection";
+        _reading = response;
+        _result = CreateUnavailableResult(
+            $"Browser entry point unavailable: {response}");
+    }
+
+    DemoResult CreateUnavailableResult(string message) =>
+        CreateResult(
+            message,
+            "warning",
+            new { status = "unavailable", message },
+            new DemoFact("Status", "Unavailable"));
+
+    static bool IsExpectedBrowserFailure(Exception exception) =>
+        exception is JSException
+            or DomTransportException
+            or ArgumentNullException;
+
+    static bool IsMissingApiFailure(Exception exception) =>
+        exception is DomTransportException or ArgumentNullException;
+
+    DemoResult CreateResult(
+        string summary,
+        string tone,
+        object payload,
+        params DemoFact[] facts)
+        => CreateOperationResult(
+            ActionExpression,
+            ActionTransport,
+            summary,
+            tone,
+            payload,
+            facts);
+
+    DemoResult CreateOperationResult(
+        string operation,
+        string transport,
+        string summary,
+        string tone,
+        object payload,
+        params DemoFact[] facts)
+    {
+        var envelope = new
+        {
+            capability = Definition.Slug,
+            root = Definition.Roots,
+            operation,
+            transport,
+            result = payload
+        };
+
+        return new(summary, tone, facts, JsonSerializer.Serialize(envelope, s_jsonOptions));
+    }
+
+    static string DisplayName(PermissionName permission) => permission switch
+    {
+        PermissionName.PersistentStorage => "Persistent storage",
+        PermissionName.ScreenWakeLock => "Screen wake lock",
+        PermissionName.StorageAccess => "Storage access",
+        _ => permission.ToString()
+    };
+
+    static string StateTone(string state) => state switch
+    {
+        "granted" => "success",
+        "denied" => "error",
+        _ => "warning"
+    };
+
+    static string FormatBytes(double? bytes)
+    {
+        var value = bytes.GetValueOrDefault();
+        if (value < 1024)
+        {
+            return $"{value:F0} B";
+        }
+
+        var units = new[] { "KB", "MB", "GB", "TB" };
+        var unit = -1;
+        do
+        {
+            value /= 1024;
+            unit++;
+        }
+        while (value >= 1024 && unit < units.Length - 1);
+
+        return $"{value:F1} {units[unit]}";
+    }
+
+    static string FirstLine(string value) =>
+        value.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
+        ?? "The browser did not expose this capability.";
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_wakeLockSentinel is not null)
+        {
+            if (!_wakeLockSentinel.Released)
+            {
+                await _wakeLockSentinel.ReleaseAsync();
+            }
+            await _wakeLockSentinel.DisposeAsync();
+        }
+
+        if (_notification is not null)
+        {
+            _notification.Close();
+            await _notification.DisposeAsync();
+        }
+    }
+
+    sealed record DemoFact(string Label, string Value);
+
+    sealed record DemoResult(
+        string Summary,
+        string Tone,
+        IReadOnlyList<DemoFact> Facts,
+        string? Json)
+    {
+        public static DemoResult Pending { get; } =
+            new("Ready for interaction.", "neutral", [], null);
+
+        public static DemoResult Running { get; } =
+            new("Running generated interop...", "neutral", [], null);
+    }
+
+    sealed record MediaDeviceSnapshot(
+        string Kind,
+        string Label,
+        string DeviceId,
+        string GroupId)
+    {
+        public string DisplayLabel => Label.Length == 0 ? "Label hidden by browser" : Label;
+
+        public string ShortId => DeviceId.Length <= 12
+            ? DeviceId
+            : $"{DeviceId[..8]}…{DeviceId[^4..]}";
+    }
+}

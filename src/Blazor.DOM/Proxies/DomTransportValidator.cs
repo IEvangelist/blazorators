@@ -111,6 +111,21 @@ internal static class DomTransportValidator
         Dictionary<object, string> visiting,
         int containerDepth)
     {
+        if (value is IDomOptionalValue optional)
+        {
+            if (!optional.IsSpecified)
+            {
+                throw new DomTransportException(
+                    $"Optional DOM value at '{path}' was not specified.");
+            }
+            return optional.UntypedValue is { } specified
+                ? NormalizeJsonValue(specified, path, visiting, containerDepth)
+                : null;
+        }
+        if (value is BrowserNull or BrowserUndefined)
+        {
+            return null;
+        }
         if (value is IDomUnionValue union)
         {
             return PrepareUnion(union, path);
@@ -123,6 +138,10 @@ internal static class DomTransportValidator
         if (value is JsonDocument document)
         {
             return NormalizeJsonElement(document.RootElement, path, containerDepth);
+        }
+        if (value is ITypeScriptStringValue stringValue)
+        {
+            return stringValue.Value;
         }
 
         var type = value.GetType();
@@ -295,13 +314,23 @@ internal static class DomTransportValidator
             {
                 var ignore = property.GetCustomAttribute<JsonIgnoreAttribute>();
                 if (ignore?.Condition == JsonIgnoreCondition.Always)
+                {
                     continue;
+                }
+
+                var propertyValue = property.GetValue(value);
+                if ((ignore?.Condition == JsonIgnoreCondition.WhenWritingNull
+                        && propertyValue is null)
+                    || (ignore?.Condition == JsonIgnoreCondition.WhenWritingDefault
+                        && IsDefaultJsonValue(propertyValue, property.PropertyType)))
+                {
+                    continue;
+                }
                 var name = property.GetCustomAttribute<JsonPropertyNameAttribute>()
                     ?.Name
                     ?? s_reviewedJsonSerializerOptions.PropertyNamingPolicy
                         ?.ConvertName(property.Name)
                     ?? property.Name;
-                var propertyValue = property.GetValue(value);
                 normalized[name] = propertyValue is null
                     ? null
                     : NormalizeReviewedMember(
@@ -310,6 +339,7 @@ internal static class DomTransportValidator
                         visiting,
                         containerDepth + 1);
             }
+
             return normalized;
         }
         finally
@@ -318,12 +348,45 @@ internal static class DomTransportValidator
         }
     }
 
+    private static bool IsDefaultJsonValue(object? value, Type propertyType)
+    {
+        if (value is null)
+        {
+            return true;
+        }
+        if (!propertyType.IsValueType || Nullable.GetUnderlyingType(propertyType) is not null)
+        {
+            return false;
+        }
+
+        return Equals(value, Activator.CreateInstance(propertyType));
+    }
+
     private static object? NormalizeReviewedMember(
         object value,
         string path,
         Dictionary<object, string> visiting,
         int containerDepth)
     {
+        if (value is IDomOptionalValue optional)
+        {
+            if (!optional.IsSpecified)
+            {
+                throw new DomTransportException(
+                    $"Optional DOM value at '{path}' was not specified.");
+            }
+            return optional.UntypedValue is { } specified
+                ? NormalizeReviewedMember(
+                    specified,
+                    path,
+                    visiting,
+                    containerDepth)
+                : null;
+        }
+        if (value is BrowserNull or BrowserUndefined)
+        {
+            return null;
+        }
         if (value is IDomProxy proxy)
             return proxy.Reference;
         if (value is IJSObjectReference
@@ -347,6 +410,10 @@ internal static class DomTransportValidator
                 document.RootElement,
                 path,
                 containerDepth);
+        }
+        if (value is ITypeScriptStringValue stringValue)
+        {
+            return stringValue.Value;
         }
 
         var type = value.GetType();
@@ -625,6 +692,10 @@ internal static class DomTransportValidator
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
         if (IsScalar(type) || type.IsEnum)
+        {
+            return true;
+        }
+        if (typeof(ITypeScriptStringValue).IsAssignableFrom(type))
         {
             return true;
         }

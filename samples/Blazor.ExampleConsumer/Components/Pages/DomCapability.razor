@@ -1,0 +1,300 @@
+@page "/dom-e2e/{Slug}"
+
+@if (Definition is null)
+{
+    <PageTitle>Capability not found · Blazorators</PageTitle>
+    <div class="capability-not-found">
+        <span class="feature-icon"><Icon Name="alert-circle" /></span>
+        <h1>Capability not found</h1>
+        <p>The requested DOM profile is not part of the generated capability catalog.</p>
+        <a class="btn btn-primary" href="dom-e2e/capabilities">Open the capability catalog</a>
+    </div>
+}
+else
+{
+    <PageTitle>@Definition.Name · DOM capability lab</PageTitle>
+
+    <div class="capability-detail" data-capability-page="@Definition.Slug">
+        <header class="detail-hero">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <a href="dom-e2e">DOM API lab</a>
+                <Icon Name="chevron-right" />
+                <a href="dom-e2e/capabilities">Capabilities</a>
+                <Icon Name="chevron-right" />
+                <span aria-current="page">@Definition.Name</span>
+            </nav>
+
+            <div class="detail-hero-grid">
+                <div class="detail-hero-copy">
+                    <span class="detail-category">@Definition.Category profile</span>
+                    <span class="detail-icon"><Icon Name="@Definition.Icon" /></span>
+                    <h1>@Definition.Name</h1>
+                    <p>@Definition.Summary</p>
+                    <div class="detail-badges" aria-label="Runtime requirements">
+                        <span class="badge badge-primary">@Definition.Package</span>
+                        <span class="badge">@(Definition.SecureContext ? "Secure context" : "Any context")</span>
+                        <span class="badge">@(Definition.UserActivation ? "User activation" : "Ambient access")</span>
+                    </div>
+                    <div class="detail-hero-actions">
+                        <a class="btn btn-primary" href="#try-it">
+                            <Icon Name="play" />
+                            Try it in this browser
+                        </a>
+                        <a class="btn btn-ghost" href="#implementation">
+                            <Icon Name="code" />
+                            View implementation
+                        </a>
+                    </div>
+                </div>
+
+                <div class="detail-metrics" aria-label="Generated profile metrics">
+                    <span><strong>@Definition.Symbols</strong><small>symbols</small></span>
+                    <span><strong>@Definition.Members</strong><small>members</small></span>
+                    <span><strong>@Definition.Operations</strong><small>operations</small></span>
+                    <span><strong>@Definition.Exclusions</strong><small>reviewed exclusions</small></span>
+                </div>
+            </div>
+        </header>
+
+        <section id="try-it"
+                 class="detail-section detail-live"
+                 aria-labelledby="live-heading">
+            <div class="detail-section-heading">
+                <span>01 / Try the workflow</span>
+                <h2 id="live-heading">Use the generated API before reading the setup</h2>
+                <p>
+                    Start with the browser behavior a user will experience. The demo exposes
+                    the exact generated call, a human-readable result, and the raw JSON
+                    envelope returned by this sample.
+                </p>
+            </div>
+
+            <div class="journey-card">
+                <div class="journey-goal">
+                    <span class="journey-label">Application scenario</span>
+                    <h3>@Definition.UseCase</h3>
+                </div>
+                <ol>
+                    @foreach (var (step, index) in Definition.TrySteps.Select(
+                        (step, index) => (step, index)))
+                    {
+                        <li>
+                            <span>@(index + 1)</span>
+                            <p>@step</p>
+                        </li>
+                    }
+                </ol>
+                <div class="journey-success">
+                    <Icon Name="check" />
+                    <div>
+                        <span class="journey-label">Success looks like</span>
+                        <p>@Definition.Success</p>
+                    </div>
+                </div>
+            </div>
+
+            <DomCapabilityProbe @key="Definition.Slug" Definition="Definition" />
+        </section>
+
+        <section id="implementation"
+                 class="detail-section detail-code"
+                 aria-labelledby="sample-heading">
+            <div class="detail-section-heading">
+                <span>02 / Implement the workflow</span>
+                <h2 id="sample-heading">The same browser call in a Blazor component</h2>
+                <p>
+                    This sample uses the focused package façade. Server and WebAssembly keep
+                    the same logical contract while preserving intentional host-specific
+                    sync, async, and disposal shapes.
+                </p>
+            </div>
+
+            <CodeSnippet @key="@($"{Definition.Slug}-sample")"
+                         Source="@Definition.Sample"
+                         Language="csharp"
+                         FileName="@($"{Definition.Name.Replace(" ", "")}Lab.razor")"
+                         Label="@($"{Definition.Name} example code")" />
+        </section>
+
+        <section class="detail-section detail-setup" aria-labelledby="setup-heading">
+            <div class="detail-section-heading">
+                <span>03 / Add it to your app</span>
+                <h2 id="setup-heading">Install, register, then inject</h2>
+                <p>
+                    Complete these once in order. Each command gets the full row so package
+                    names and generated service types stay readable at every viewport size.
+                </p>
+            </div>
+
+            <div class="setup-grid">
+                <article>
+                    <span class="setup-step-number">1</span>
+                    <div class="setup-step-content">
+                        <small>Terminal</small>
+                        <h3>Install the host-specific package</h3>
+                        <p>Add the WebAssembly package used by this live sample.</p>
+                        <CodeSnippet Source="@InstallCommand"
+                                     Language="bash"
+                                     FileName="Terminal"
+                                     Label="@($"Install {Definition.Package}")" />
+                    </div>
+                </article>
+                <article>
+                    <span class="setup-step-number">2</span>
+                    <div class="setup-step-content">
+                        <small>Program.cs</small>
+                        <h3>Register the generated façade</h3>
+                        <p>Register one capability root with the application's service container.</p>
+                        <CodeSnippet Source="@RegistrationCode"
+                                     Language="csharp"
+                                     FileName="Program.cs"
+                                     Label="@($"Register {Definition.Name}")" />
+                    </div>
+                </article>
+                <article>
+                    <span class="setup-step-number">3</span>
+                    <div class="setup-step-content">
+                        <small>Component.razor</small>
+                        <h3>Inject it where the interaction lives</h3>
+                        <p>Keep the browser-owned workflow close to the UI that initiates it.</p>
+                        <CodeSnippet Source="@InjectionCode"
+                                     Language="csharp"
+                                     FileName="Component.razor"
+                                     Label="@($"Inject {Definition.Service}")" />
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="detail-section detail-topology" aria-labelledby="topology-heading">
+            <div class="detail-section-heading">
+                <span>04 / Follow the browser roots</span>
+                <h2 id="topology-heading">Exact entry points, never inferred</h2>
+                <p>
+                    The profile records each JavaScript path explicitly. Generated façades
+                    resolve only these roots and retain live object identity beyond them.
+                </p>
+            </div>
+            <div class="root-list">
+                @foreach (var root in Definition.Roots)
+                {
+                    <div>
+                        <span class="root-pulse" aria-hidden="true"></span>
+                        <code>@root</code>
+                        <small>explicit profile entry point</small>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="detail-section detail-contract" aria-labelledby="contract-heading">
+            <div class="detail-section-heading">
+                <span>05 / Understand the contract</span>
+                <h2 id="contract-heading">A focused surface without weaker types</h2>
+                <p>
+                    Focus changes package size, not semantic quality. Promise state,
+                    dictionaries, unions, callbacks, browser arrays, and owned references
+                    use the same transport rules as the exhaustive host.
+                </p>
+            </div>
+
+            <div class="contract-grid">
+                <article class="contract-card">
+                    <span class="feature-icon"><Icon Name="package" /></span>
+                    <h3>Generated package</h3>
+                    <code>@Definition.Package</code>
+                    <p>Register <code>@(Definition.Registration)()</code> and inject <code>@Definition.Service</code>.</p>
+                </article>
+                <article class="contract-card">
+                    <span class="feature-icon"><Icon Name="route" /></span>
+                    <h3>Feature detection</h3>
+                    <div class="token-list">
+                        @foreach (var feature in Definition.Features)
+                        {
+                            <span>@feature</span>
+                        }
+                    </div>
+                </article>
+                <article class="contract-card">
+                    <span class="feature-icon"><Icon Name="check" /></span>
+                    <h3>Projection guarantees</h3>
+                    <ul>
+                        @foreach (var highlight in Definition.Highlights)
+                        {
+                            <li>@highlight</li>
+                        }
+                    </ul>
+                </article>
+                <article class="contract-card">
+                    <span class="feature-icon"><Icon Name="info" /></span>
+                    <h3>Browser policy</h3>
+                    <p>@PolicySummary(Definition)</p>
+                    @if (Definition.Permissions.Length > 0)
+                    {
+                        <div class="token-list" aria-label="Browser permissions">
+                            @foreach (var permission in Definition.Permissions)
+                            {
+                                <span>@permission</span>
+                            }
+                        </div>
+                    }
+                </article>
+            </div>
+        </section>
+
+        <nav class="detail-pagination" aria-label="Capability pages">
+            <a href="@Previous.Href">
+                <Icon Name="chevron-right" />
+                <span><small>Previous capability</small><strong>@Previous.Name</strong></span>
+            </a>
+            <a class="all-capabilities" href="dom-e2e/capabilities">
+                <Icon Name="package" />
+                <span>All @DomCapabilityCatalog.All.Count capabilities</span>
+            </a>
+            <a href="@Next.Href">
+                <span><small>Next capability</small><strong>@Next.Name</strong></span>
+                <Icon Name="chevron-right" />
+            </a>
+        </nav>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Slug { get; set; }
+
+    DomCapabilityDefinition? Definition { get; set; }
+
+    DomCapabilityDefinition Previous =>
+        DomCapabilityCatalog.All[(DefinitionIndex - 1 + DomCapabilityCatalog.All.Count) % DomCapabilityCatalog.All.Count];
+
+    DomCapabilityDefinition Next =>
+        DomCapabilityCatalog.All[(DefinitionIndex + 1) % DomCapabilityCatalog.All.Count];
+
+    int DefinitionIndex =>
+        Definition is null ? 0 : DomCapabilityCatalog.IndexOf(Definition);
+
+    string InstallCommand => $"dotnet add package {Definition!.Package}";
+
+    string RegistrationCode => $"builder.Services.{Definition!.Registration}();";
+
+    string InjectionCode => $"@inject {Definition!.Service} Capability";
+
+    protected override void OnParametersSet() =>
+        Definition = DomCapabilityCatalog.Find(Slug);
+
+    static string PolicySummary(DomCapabilityDefinition capability)
+    {
+        if (capability.SecureContext && capability.UserActivation)
+        {
+            return "The browser exposes this profile only in a secure context, and sensitive operations must begin from a user gesture.";
+        }
+
+        if (capability.SecureContext)
+        {
+            return "The browser requires a secure context. Individual methods can still apply additional permission or visibility rules.";
+        }
+
+        return "The profile has no secure-context or user-activation prerequisite. Normal browser feature support still applies.";
+    }
+}

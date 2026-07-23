@@ -91,7 +91,7 @@ public sealed class ProfileClosureRoutingTests
         Assert.Equal(
             webAssembly.OrderBy(name => name, StringComparer.Ordinal),
             instantiate.OrderBy(name => name, StringComparer.Ordinal));
-        Assert.Equal(1433, instantiate.Count);
+        Assert.Equal(1442, instantiate.Count);
         Assert.Contains("WebAssembly.CompileError", webAssembly);
         Assert.Contains("WebAssembly.Imports", instantiate);
         Assert.Contains("WebAssembly.Module", instantiate);
@@ -106,14 +106,14 @@ public sealed class ProfileClosureRoutingTests
             index);
         Assert.Contains("CSS", cssEscape);
         Assert.Contains("CSS.supports", cssEscape);
-        Assert.Equal(1476, cssEscape.Count);
+        Assert.Equal(1485, cssEscape.Count);
         Assert.Equal(31, CountExternal(cssEscape, index));
 
         var innerWidth = TransitiveDependencyResolver.Resolve(
             ["innerWidth"],
             index);
         Assert.Contains("Window", innerWidth);
-        Assert.Equal(1405, innerWidth.Count);
+        Assert.Equal(1414, innerWidth.Count);
         Assert.Equal(30, CountExternal(innerWidth, index));
     }
 

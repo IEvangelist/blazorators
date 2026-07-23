@@ -1,0 +1,140 @@
+@page "/dom-e2e/capabilities"
+
+<PageTitle>DOM capability catalog · Blazorators</PageTitle>
+
+<div class="capability-catalog">
+    <header class="catalog-hero">
+        <div class="catalog-hero-copy">
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <a href="dom-e2e">DOM API lab</a>
+                <Icon Name="chevron-right" />
+                <span aria-current="page">Capabilities</span>
+            </nav>
+            <span class="catalog-eyebrow">
+                <span class="badge-dot live" aria-hidden="true"></span>
+                Focused package explorer
+            </span>
+            <h1>DOM capability catalog</h1>
+            <p>
+                Fourteen browser capability profiles, each generated from the same pinned
+                semantic model as the exhaustive DOM host. Open any lab for its exact roots,
+                runtime requirements, public surface, and a live browser reading.
+            </p>
+            <div class="catalog-actions">
+                <a class="btn btn-primary" href="#essentials">
+                    Browse packages <Icon Name="arrow-right" />
+                </a>
+                <a class="btn btn-ghost" href="dom-e2e">
+                    <Icon Name="code" /> Run the end-to-end lab
+                </a>
+            </div>
+        </div>
+
+        <div class="catalog-summary" aria-label="Generated catalog totals">
+            <span class="catalog-summary-glow" aria-hidden="true"></span>
+            <div>
+                <strong>@DomCapabilityCatalog.All.Count</strong>
+                <span>focused profiles</span>
+            </div>
+            <div>
+                <strong>@DomCapabilityCatalog.All.Sum(capability => capability.Operations).ToString("N0")</strong>
+                <span>generated operations</span>
+            </div>
+            <div>
+                <strong>@DomCapabilityCatalog.All.Sum(capability => capability.Members).ToString("N0")</strong>
+                <span>projected members</span>
+            </div>
+            <small>Exact Server / WebAssembly parity across every package</small>
+        </div>
+    </header>
+
+    <nav class="catalog-jump-nav" aria-label="Capability groups">
+        @foreach (var category in DomCapabilityCatalog.Categories)
+        {
+            <a href="#@CategoryId(category)">@category</a>
+        }
+    </nav>
+
+    @foreach (var category in DomCapabilityCatalog.Categories)
+    {
+        var capabilities = DomCapabilityCatalog.All
+            .Where(capability => capability.Category == category)
+            .ToArray();
+
+        <section id="@CategoryId(category)"
+                 class="catalog-group"
+                 aria-labelledby="@($"{CategoryId(category)}-heading")">
+            <div class="catalog-group-heading">
+                <span>@GroupNumber(category) / @category</span>
+                <h2 id="@($"{CategoryId(category)}-heading")">@GroupTitle(category)</h2>
+                <p>@GroupDescription(category)</p>
+            </div>
+
+            <div class="capability-grid">
+                @foreach (var capability in capabilities)
+                {
+                    <a class="capability-card"
+                       href="@capability.Href"
+                       data-capability="@capability.Slug">
+                        <span class="capability-card-icon">
+                            <Icon Name="@capability.Icon" />
+                        </span>
+                        <span class="capability-card-copy">
+                            <span class="capability-card-category">@capability.Package</span>
+                            <strong>@capability.Name</strong>
+                            <span>@capability.Summary</span>
+                        </span>
+                        <span class="capability-card-metrics">
+                            <span><b>@capability.Operations</b> ops</span>
+                            <span><b>@capability.Symbols</b> symbols</span>
+                        </span>
+                        <span class="capability-card-flags">
+                            @if (capability.SecureContext)
+                            {
+                                <span>HTTPS</span>
+                            }
+                            @if (capability.UserActivation)
+                            {
+                                <span>User gesture</span>
+                            }
+                            @if (!capability.SecureContext && !capability.UserActivation)
+                            {
+                                <span>Ambient</span>
+                            }
+                        </span>
+                        <Icon Name="arrow-up-right" Class="capability-card-arrow" />
+                    </a>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    static string CategoryId(string category) =>
+        category.ToLowerInvariant();
+
+    static string GroupNumber(string category) => category switch
+    {
+        "Essentials" => "01",
+        "Platform" => "02",
+        _ => "03"
+    };
+
+    static string GroupTitle(string category) => category switch
+    {
+        "Essentials" => "Daily browser capabilities, packaged narrowly",
+        "Platform" => "Stateful platform APIs with exact transport",
+        _ => "Browser-owned handles and iterative state"
+    };
+
+    static string GroupDescription(string category) => category switch
+    {
+        "Essentials" =>
+            "Small profiles for permissions, clipboard, sharing, wake locks, storage, and display state.",
+        "Platform" =>
+            "Broader capabilities where callbacks, Promise results, structured data, and live proxies meet.",
+        _ =>
+            "Specialized APIs that rely on user activation and preserve browser object identity."
+    };
+}

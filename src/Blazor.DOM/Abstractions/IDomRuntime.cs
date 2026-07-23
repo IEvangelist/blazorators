@@ -163,6 +163,11 @@ public interface IDomRuntime
         string path,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Checks whether a dotted global path currently resolves.</summary>
+    ValueTask<bool> IsGlobalAvailableAsync(
+        string path,
+        CancellationToken cancellationToken = default);
+
     // ── Constructor ──────────────────────────────────────────────────────────
 
     /// <summary>

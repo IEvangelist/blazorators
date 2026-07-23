@@ -1,0 +1,438 @@
+.capability-catalog {
+    display: grid;
+    gap: 3.4rem;
+    width: min(100%, 88rem);
+    margin-inline: auto;
+    padding-bottom: 4rem;
+}
+
+.catalog-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(19rem, 0.55fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+    overflow: hidden;
+    padding: clamp(2rem, 6vw, 5.6rem);
+    border: 1px solid hsl(var(--border));
+    border-radius: 1.7rem;
+    background:
+        radial-gradient(circle at 92% 10%, hsl(var(--primary) / 0.14), transparent 32rem),
+        linear-gradient(145deg, hsl(var(--surface-1)), hsl(var(--surface-2)));
+}
+
+.catalog-hero::before {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(hsl(var(--border) / 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, hsl(var(--border) / 0.25) 1px, transparent 1px);
+    background-size: 3rem 3rem;
+    mask-image: linear-gradient(90deg, transparent, black 75%);
+    content: "";
+    pointer-events: none;
+}
+
+.catalog-hero-copy,
+.catalog-summary {
+    position: relative;
+    z-index: 1;
+}
+
+.breadcrumbs {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+    margin-bottom: 2.2rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75rem;
+}
+
+.breadcrumbs a {
+    color: hsl(var(--muted-foreground));
+    text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+    color: hsl(var(--foreground));
+}
+
+.breadcrumbs ::deep svg {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+.catalog-eyebrow,
+.capability-card-category,
+.catalog-group-heading > span {
+    color: hsl(var(--primary));
+    font-size: 0.7rem;
+    font-weight: 750;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.catalog-eyebrow {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.catalog-hero h1 {
+    max-width: 12ch;
+    margin: 0.8rem 0 1rem;
+    font-size: clamp(3rem, 7vw, 6.4rem);
+    line-height: 0.88;
+    letter-spacing: -0.07em;
+}
+
+.catalog-hero-copy > p {
+    max-width: 58rem;
+    margin: 0;
+    color: hsl(var(--muted-foreground));
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    line-height: 1.75;
+}
+
+.catalog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.8rem;
+}
+
+.catalog-summary {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid hsl(var(--primary) / 0.3);
+    border-radius: 1.25rem;
+    background: hsl(var(--background) / 0.72);
+    box-shadow: 0 2rem 5rem -3.5rem hsl(var(--primary));
+    backdrop-filter: blur(18px);
+}
+
+.catalog-summary-glow {
+    position: absolute;
+    top: -4rem;
+    right: -4rem;
+    width: 9rem;
+    height: 9rem;
+    border-radius: 50%;
+    background: hsl(var(--primary) / 0.22);
+    filter: blur(2rem);
+}
+
+.catalog-summary > div {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+    padding: 1.2rem 1.4rem;
+}
+
+.catalog-summary > div + div {
+    border-top: 1px solid hsl(var(--border));
+}
+
+.catalog-summary strong {
+    color: hsl(var(--primary));
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.catalog-summary span {
+    color: hsl(var(--muted-foreground));
+    font-size: 0.78rem;
+}
+
+.catalog-summary small {
+    padding: 1rem 1.4rem;
+    border-top: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+    font-size: 0.7rem;
+    line-height: 1.5;
+}
+
+.catalog-jump-nav {
+    position: sticky;
+    z-index: 4;
+    top: 4.6rem;
+    display: flex;
+    gap: 0.35rem;
+    width: fit-content;
+    margin: -1.7rem auto -1.4rem;
+    padding: 0.35rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    background: hsl(var(--background) / 0.88);
+    box-shadow: 0 1rem 3rem -2rem hsl(var(--foreground) / 0.45);
+    backdrop-filter: blur(16px);
+}
+
+.catalog-jump-nav a {
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.73rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.catalog-jump-nav a:hover,
+.catalog-jump-nav a:focus-visible {
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--foreground));
+}
+
+.catalog-group {
+    scroll-margin-top: 10rem;
+}
+
+.catalog-group-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+    gap: 0 3rem;
+    align-items: end;
+    margin-bottom: 1.4rem;
+}
+
+.catalog-group-heading > span {
+    grid-column: 1 / -1;
+    margin-bottom: 0.55rem;
+}
+
+.catalog-group-heading h2 {
+    max-width: 18ch;
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+}
+
+.catalog-group-heading p {
+    margin: 0;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.65;
+}
+
+.capability-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.capability-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        "icon copy arrow"
+        "metrics metrics flags";
+    gap: 1rem;
+    min-width: 0;
+    padding: 1.25rem;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: 1rem;
+    background: hsl(var(--surface-1));
+    color: hsl(var(--foreground));
+    text-decoration: none;
+    transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.capability-card::after {
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+    opacity: 0;
+    content: "";
+    transition: opacity 160ms ease;
+}
+
+.capability-card:hover,
+.capability-card:focus-visible {
+    border-color: hsl(var(--primary) / 0.52);
+    outline: none;
+    transform: translateY(-2px);
+    box-shadow: 0 1.6rem 3.5rem -2.8rem hsl(var(--primary));
+}
+
+.capability-card:hover::after,
+.capability-card:focus-visible::after {
+    opacity: 1;
+}
+
+.capability-card-icon {
+    grid-area: icon;
+    display: grid;
+    place-items: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border: 1px solid hsl(var(--primary) / 0.25);
+    border-radius: 0.8rem;
+    background: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+}
+
+.capability-card-copy {
+    grid-area: copy;
+    display: grid;
+    min-width: 0;
+}
+
+.capability-card-copy strong {
+    margin: 0.15rem 0 0.3rem;
+    font-size: 1.05rem;
+}
+
+.capability-card-copy > span:last-child {
+    color: hsl(var(--muted-foreground));
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.capability-card-category {
+    overflow: hidden;
+    font-size: 0.58rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.capability-card-arrow {
+    grid-area: arrow;
+    color: hsl(var(--muted-foreground));
+}
+
+.capability-card-metrics {
+    grid-area: metrics;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.68rem;
+}
+
+.capability-card-metrics b {
+    color: hsl(var(--foreground));
+    font-variant-numeric: tabular-nums;
+}
+
+.capability-card-flags {
+    grid-area: flags;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    justify-content: end;
+}
+
+.capability-card-flags span {
+    padding: 0.25rem 0.45rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+    .catalog-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .catalog-summary > div {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+    }
+
+    .catalog-summary > div + div {
+        border-top: 0;
+        border-left: 1px solid hsl(var(--border));
+    }
+
+    .catalog-summary small {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .capability-catalog {
+        gap: 2.7rem;
+    }
+
+    .catalog-hero {
+        padding: 1.5rem;
+        border-radius: 1.1rem;
+    }
+
+    .catalog-hero h1 {
+        font-size: clamp(2.7rem, 15vw, 4.6rem);
+    }
+
+    .catalog-actions {
+        display: grid;
+    }
+
+    .catalog-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-summary > div {
+        grid-template-columns: 5rem minmax(0, 1fr);
+    }
+
+    .catalog-summary > div + div {
+        border-top: 1px solid hsl(var(--border));
+        border-left: 0;
+    }
+
+    .catalog-jump-nav {
+        top: 3.8rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .catalog-jump-nav a {
+        flex: 1;
+        padding-inline: 0.5rem;
+        text-align: center;
+    }
+
+    .catalog-group-heading {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .capability-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .capability-card {
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas:
+            "icon copy"
+            "metrics metrics"
+            "flags flags";
+    }
+
+    .capability-card-arrow {
+        display: none;
+    }
+
+    .capability-card-flags {
+        justify-content: start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .capability-card {
+        transition: none;
+    }
+}

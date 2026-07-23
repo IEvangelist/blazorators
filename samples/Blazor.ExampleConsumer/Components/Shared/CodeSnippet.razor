@@ -1,0 +1,151 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="codeblock code-snippet" data-filename="@FileName" data-language="@Language">
+    <div class="codeblock-toolbar">
+        <span class="codeblock-filename">
+            <Icon Name="code" Class="icon-sm" />
+            @FileName
+        </span>
+        <span class="codeblock-lang">@LanguageLabel</span>
+        <button type="button"
+                class="btn btn-icon btn-ghost copy-btn"
+                title="@CopyTitle"
+                aria-label="@CopyAriaLabel"
+                data-copy-status="@CopyStatus"
+                @onclick="CopyAsync">
+            <Icon Name="@(_copied ? "check" : _copyFailed ? "x" : "copy")" Class="icon-sm" />
+        </button>
+        <span class="visually-hidden" role="status" aria-live="polite">@CopyAnnouncement</span>
+    </div>
+    <pre tabindex="0" aria-label="@AriaLabel"><code class="hljs language-@Language">@_highlightedCode</code></pre>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Source { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string FileName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Language { get; set; } = "csharp";
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    IJSObjectReference? _clipboardModule;
+    IJSObjectReference? _highlightModule;
+    MarkupString _highlightedCode;
+    string? _lastHighlightKey;
+    bool _copied;
+    bool _copyFailed;
+
+    string AriaLabel => Label ?? $"{FileName} code";
+    string CopyStatus => _copied ? "copied" : _copyFailed ? "failed" : "idle";
+    string CopyTitle => _copyFailed ? "Copy failed" : _copied ? "Copied" : "Copy code";
+    string CopyAriaLabel => _copyFailed
+        ? $"Copy {FileName} failed"
+        : _copied
+            ? $"Copied {FileName}"
+            : $"Copy {FileName}";
+    string CopyAnnouncement => _copyFailed
+        ? $"{FileName} could not be copied."
+        : _copied
+            ? $"{FileName} copied."
+            : string.Empty;
+
+    string LanguageLabel => Language switch
+    {
+        "csharp" or "cs" => "C#",
+        "bash" or "shell" => "Shell",
+        "json" => "JSON",
+        _ => Language
+    };
+
+    protected override void OnParametersSet()
+    {
+        var current = Normalize(Source);
+        var key = $"{Language}\n{current}";
+        if (key == _lastHighlightKey)
+        {
+            return;
+        }
+
+        _highlightedCode = new MarkupString(System.Net.WebUtility.HtmlEncode(current));
+        _lastHighlightKey = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var current = Normalize(Source);
+        var key = $"{Language}\n{current}";
+        if (string.IsNullOrWhiteSpace(current) || key == _lastHighlightKey)
+        {
+            return;
+        }
+
+        _highlightModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./highlight.js");
+
+        try
+        {
+            var html = await _highlightModule.InvokeAsync<string>("highlight", current, Language);
+            _highlightedCode = new MarkupString(html);
+        }
+        catch (JSException)
+        {
+            _highlightedCode = new MarkupString(System.Net.WebUtility.HtmlEncode(current));
+        }
+
+        _lastHighlightKey = key;
+        StateHasChanged();
+    }
+
+    async Task CopyAsync()
+    {
+        var current = Normalize(Source);
+        if (string.IsNullOrWhiteSpace(current))
+        {
+            return;
+        }
+
+        try
+        {
+            _clipboardModule ??=
+                await JS.InvokeAsync<IJSObjectReference>("import", "./clipboard.js");
+            _copied = await _clipboardModule.InvokeAsync<bool>("copyText", current);
+            _copyFailed = !_copied;
+        }
+        catch (JSException)
+        {
+            _copied = false;
+            _copyFailed = true;
+        }
+        StateHasChanged();
+        _ = ResetCopyStatusAsync();
+    }
+
+    async Task ResetCopyStatusAsync()
+    {
+        await Task.Delay(1500);
+        _copied = false;
+        _copyFailed = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    static string Normalize(string source) =>
+        source.ReplaceLineEndings("\n").Trim();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_clipboardModule is not null)
+        {
+            await _clipboardModule.DisposeAsync();
+        }
+
+        if (_highlightModule is not null)
+        {
+            await _highlightModule.DisposeAsync();
+        }
+    }
+}

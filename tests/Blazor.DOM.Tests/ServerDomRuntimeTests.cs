@@ -101,6 +101,22 @@ public sealed class ServerDomRuntimeTests
     }
 
     [Fact]
+    public async Task IsGlobalAvailableAsync_calls_hasGlobal_with_path()
+    {
+        var (runtime, module) = CreateRuntime();
+        module.ReturnValues["hasGlobal"] = true;
+
+        var result = await runtime.IsGlobalAvailableAsync(
+            "navigator.wakeLock");
+
+        Assert.True(result);
+        var call = Assert.Single(
+            module.Invocations,
+            invocation => invocation.Identifier == "hasGlobal");
+        Assert.Equal("navigator.wakeLock", call.Args![0]);
+    }
+
+    [Fact]
     public async Task ConstructAsync_calls_construct_with_path_and_args()
     {
         var (runtime, module) = CreateRuntime();

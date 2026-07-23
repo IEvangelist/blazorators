@@ -41,8 +41,7 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         string DocLines,
         string PropertyLine,
         string ContractLine,
-        bool HasJsonAttr,
-        string JsonAttr);
+        IReadOnlyList<string> JsonAttributes);
 
     private static readonly IReadOnlySet<string> EmittedDeclarationKinds =
         new HashSet<string>(["interface", "typeAlias"], StringComparer.Ordinal);
@@ -323,7 +322,8 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
                 var property = propertyOutputs[i];
                 if (!string.IsNullOrEmpty(property.DocLines))
                     w.AppendLine(property.DocLines.TrimEnd());
-                if (property.HasJsonAttr) w.AppendLine(property.JsonAttr);
+                foreach (var attribute in property.JsonAttributes)
+                    w.AppendLine(attribute);
                 w.AppendLine(property.PropertyLine);
             }
         });
@@ -378,16 +378,37 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
         if (csType is "null" or "void")
             return null;
 
-        // Optional members become nullable unless already nullable
-        if (member.Optional && !projection.IsNullable)
+        var preservesExplicitNull =
+            member.Optional &&
+            member.Type is not null &&
+            IncludesTopLevelNull(member.Type);
+        if (preservesExplicitNull)
+        {
+            csType =
+                $"global::Microsoft.JSInterop.DomOptional<{projection.RenderedType}>";
+        }
+        else if (member.Optional && !projection.IsNullable)
+        {
+            // Non-nullable optional members use null only as the omission marker.
             csType = (projection with { IsNullable = true }).RenderedType;
+        }
 
         var docW = new CSharpWriter();
         docW.XmlDoc(docText, deprecated);
         var docLines = docW.ToString();
 
-        var hasJsonAttr = !string.Equals(memberName, csName, StringComparison.Ordinal);
-        var jsonAttr = hasJsonAttr ? $"[JsonPropertyName(\"{memberName}\")]" : "";
+        var jsonAttributes = new List<string>();
+        if (!string.Equals(memberName, csName, StringComparison.Ordinal))
+        {
+            jsonAttributes.Add($"[JsonPropertyName(\"{memberName}\")]");
+        }
+        if (member.Optional)
+        {
+            jsonAttributes.Add(
+                preservesExplicitNull
+                    ? "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]"
+                    : "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]");
+        }
         var required = member.Optional ? "" : "required ";
         var propLine = $"public {required}{csType} {csName} {{ get; init; }}";
 
@@ -395,9 +416,22 @@ public sealed class DictionaryEmitter(TypeResolver typeResolver, string generato
             docLines,
             propLine,
             $"{csType} {csName} {{ get; }}",
-            hasJsonAttr,
-            jsonAttr);
+            jsonAttributes);
     }
+
+    private static bool IncludesTopLevelNull(TypeNode type) =>
+        type switch
+        {
+            LiteralTypeNode
+            {
+                LiteralKind: "NullKeyword" or "NullLiteral"
+            } => true,
+            UnionTypeNode union => union.Types.Any(IncludesTopLevelNull),
+            ParenthesizedTypeNode parenthesized =>
+                IncludesTopLevelNull(parenthesized.InnerType),
+            OptionalTypeNode optional => IncludesTopLevelNull(optional.InnerType),
+            _ => false,
+        };
 
     private static bool IsOptionalUndefined(MemberModel member)
         => member.Optional

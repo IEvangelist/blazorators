@@ -1,6 +1,7 @@
 using Deque.AxeCore.Commons;
 using Deque.AxeCore.Playwright;
 using Microsoft.Playwright;
+using System.Text.RegularExpressions;
 
 namespace Blazor.ExampleConsumer.EndToEndTests;
 
@@ -18,7 +19,23 @@ public sealed class ExampleSiteTests(
         new("/speak", "Text-to-speech", "Text-to-speech"),
         new("/listen", "Speech-to-text", "Speech-to-text"),
         new("/sandbox", "Sandbox", "Sandbox"),
-        new("/audio", "Audio", "Audio")
+        new("/audio", "Audio", "Audio"),
+        new("/dom-e2e", "DOM API lab", "Every browser API. Generated for Blazor."),
+        new("/dom-e2e/capabilities", "DOM capability catalog", "DOM capability catalog"),
+        new("/dom-e2e/permissions", "Permissions", "Permissions"),
+        new("/dom-e2e/clipboard", "Clipboard", "Clipboard"),
+        new("/dom-e2e/web-share", "Web Share", "Web Share"),
+        new("/dom-e2e/wake-lock", "Wake Lock", "Wake Lock"),
+        new("/dom-e2e/storage-management", "Storage management", "Storage management"),
+        new("/dom-e2e/screen", "Screen", "Screen"),
+        new("/dom-e2e/performance", "Performance", "Performance"),
+        new("/dom-e2e/web-crypto", "Web Crypto", "Web Crypto"),
+        new("/dom-e2e/credentials", "Credentials & WebAuthn", "Credentials & WebAuthn"),
+        new("/dom-e2e/offline-storage", "Offline storage", "Offline storage"),
+        new("/dom-e2e/browser-coordination", "Browser coordination", "Browser coordination"),
+        new("/dom-e2e/media-devices", "Media devices", "Media devices"),
+        new("/dom-e2e/notifications", "Notifications", "Notifications"),
+        new("/dom-e2e/file-system-access", "File System Access", "File System Access")
     ];
 
     public static IEnumerable<object[]> RouteData() =>
@@ -39,6 +56,23 @@ public sealed class ExampleSiteTests(
 
         await ExpectHeadingAsync(page, route.Heading);
         Assert.Contains(route.TitleFragment, await page.TitleAsync(), StringComparison.OrdinalIgnoreCase);
+
+        if (route.Path.StartsWith("/dom-e2e/", StringComparison.Ordinal)
+            && route.Path != "/dom-e2e/capabilities")
+        {
+            await page.WaitForFunctionAsync(
+                """
+                () => ['ready', 'unavailable'].includes(
+                    document.querySelector('[data-probe-phase]')?.dataset.probePhase)
+                """);
+            var expectedPhase = route.Path == "/dom-e2e/web-share"
+                ? new Regex("^(ready|unavailable)$")
+                : new Regex("^ready$");
+            await Assertions.Expect(page.Locator("[data-probe-phase]"))
+                .ToHaveAttributeAsync("data-probe-phase", expectedPhase);
+            await Assertions.Expect(page.Locator(".setup-grid article")).ToHaveCountAsync(3);
+            await Assertions.Expect(page.Locator("#capability-action")).ToBeVisibleAsync();
+        }
 
         await AssertNoAxeViolationsAsync(page);
         await AssertNoDocumentOverflowAsync(page);
@@ -419,7 +453,9 @@ public sealed class ExampleSiteTests(
 
     static async Task ExpectHeadingAsync(IPage page, string heading)
     {
-        await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = heading })).ToBeVisibleAsync();
+        await Assertions.Expect(page.GetByRole(
+            AriaRole.Heading,
+            new() { Name = heading, Level = 1 })).ToBeVisibleAsync();
     }
 
     static async Task AssertNoAxeViolationsAsync(IPage page)

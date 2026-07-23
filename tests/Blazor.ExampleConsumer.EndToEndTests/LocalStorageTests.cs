@@ -38,15 +38,19 @@ public sealed partial class LocalStorageTests(BlazoratorsSiteFixture site)
         await page.EvaluateAsync("() => localStorage.clear()");
         await page.ReloadAsync(new() { WaitUntil = WaitUntilState.NetworkIdle });
 
+        var locator = page.Locator(Selectors.TodoList);
+        var distinctTodos = new HashSet<string>(StringComparer.Ordinal);
+
         // Act
         foreach (var todo in todos)
         {
             await page.FillAsync(Selectors.TodoInput, todo);
             await page.ClickAsync(Selectors.AddButton);
+            distinctTodos.Add(todo);
+            await Assertions.Expect(locator).ToHaveCountAsync(distinctTodos.Count);
         }
 
         // Assert
-        var locator = page.Locator(Selectors.TodoList);
         await Assertions.Expect(locator).ToHaveCountAsync(expectedTodoCount);
     }
 }

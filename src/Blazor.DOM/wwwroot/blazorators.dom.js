@@ -28,6 +28,16 @@ export function getGlobal(path) {
     return obj;
 }
 
+export function hasGlobal(path) {
+    try {
+        const value = getGlobal(path);
+        return value !== null && value !== undefined;
+    }
+    catch {
+        return false;
+    }
+}
+
 // ─── Property access ──────────────────────────────────────────────────────────
 
 /**
@@ -192,88 +202,89 @@ export function invokeMethodReferenceCallback(
                 });
             }
 
-            /**
-             * Invoke a method whose one-shot callback receives a live JS object and returns
-             * the JSON-valued result used to settle the JavaScript operation.
-             */
-            export function invokeMethodReferenceResultCallback(
-                ref,
-                name,
-                args,
-                callbackArgumentIndex,
-                dotnetRef,
-                callbackMethodName) {
-                const invocationArgs = [...(args ?? [])];
-                if (!Number.isInteger(callbackArgumentIndex) ||
-                    callbackArgumentIndex < 0 ||
-                    callbackArgumentIndex > invocationArgs.length) {
-                    throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
-                }
-
-                const callback = async (value) => {
-                    const reference = value === null || value === undefined
-                        ? null
-                        : DotNet.createJSObjectReference(value);
-                    try {
-                        const delivery = await dotnetRef.invokeMethodAsync(
-                            callbackMethodName,
-                            reference);
-                        if (delivery?.accepted !== true) {
-                            throw new Error('.NET rejected callback reference delivery.');
-                        }
-                        return delivery.result;
-                    } catch (error) {
-                        _disposeJSReference(reference);
-                        throw error;
-                    }
-                };
-                invocationArgs.splice(callbackArgumentIndex, 0, callback);
-                return ref[name](...invocationArgs);
-            }
-
-            /**
-             * Construct an object whose persistent callback receives two live JS objects.
-             */
-            export function constructReferencePairCallback(
-                constructorPath,
-                args,
-                callbackArgumentIndex,
-                dotnetRef,
-                callbackMethodName) {
-                const ctor = _resolvePath(constructorPath);
-                const constructorArgs = [...(args ?? [])];
-                if (!Number.isInteger(callbackArgumentIndex) ||
-                    callbackArgumentIndex < 0 ||
-                    callbackArgumentIndex > constructorArgs.length) {
-                    throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
-                }
-                const callback = (first, second) => {
-                    const firstReference = DotNet.createJSObjectReference(first);
-                    const secondReference = DotNet.createJSObjectReference(second);
-                    dotnetRef.invokeMethodAsync(
-                        callbackMethodName,
-                        firstReference,
-                        secondReference)
-                        .then((accepted) => {
-                            if (accepted !== true) {
-                                _disposeJSReference(firstReference);
-                                _disposeJSReference(secondReference);
-                            }
-                        })
-                        .catch((error) => {
-                            _disposeJSReference(firstReference);
-                            _disposeJSReference(secondReference);
-                            console.error('[blazorators.dom] callback delivery failed:', error);
-                        });
-                };
-                constructorArgs.splice(callbackArgumentIndex, 0, callback);
-                return new ctor(...constructorArgs);
-            }
         } catch (error) {
             settled = true;
             reject(error);
         }
     });
+}
+
+/**
+ * Invoke a method whose one-shot callback receives a live JS object and returns
+ * the JSON-valued result used to settle the JavaScript operation.
+ */
+export function invokeMethodReferenceResultCallback(
+    ref,
+    name,
+    args,
+    callbackArgumentIndex,
+    dotnetRef,
+    callbackMethodName) {
+    const invocationArgs = [...(args ?? [])];
+    if (!Number.isInteger(callbackArgumentIndex) ||
+        callbackArgumentIndex < 0 ||
+        callbackArgumentIndex > invocationArgs.length) {
+        throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
+    }
+
+    const callback = async (value) => {
+        const reference = value === null || value === undefined
+            ? null
+            : DotNet.createJSObjectReference(value);
+        try {
+            const delivery = await dotnetRef.invokeMethodAsync(
+                callbackMethodName,
+                reference);
+            if (delivery?.accepted !== true) {
+                throw new Error('.NET rejected callback reference delivery.');
+            }
+            return delivery.result;
+        } catch (error) {
+            _disposeJSReference(reference);
+            throw error;
+        }
+    };
+    invocationArgs.splice(callbackArgumentIndex, 0, callback);
+    return ref[name](...invocationArgs);
+}
+
+/**
+ * Construct an object whose persistent callback receives two live JS objects.
+ */
+export function constructReferencePairCallback(
+    constructorPath,
+    args,
+    callbackArgumentIndex,
+    dotnetRef,
+    callbackMethodName) {
+    const ctor = _resolvePath(constructorPath);
+    const constructorArgs = [...(args ?? [])];
+    if (!Number.isInteger(callbackArgumentIndex) ||
+        callbackArgumentIndex < 0 ||
+        callbackArgumentIndex > constructorArgs.length) {
+        throw new RangeError(`Invalid callback insertion index ${callbackArgumentIndex}.`);
+    }
+    const callback = (first, second) => {
+        const firstReference = DotNet.createJSObjectReference(first);
+        const secondReference = DotNet.createJSObjectReference(second);
+        dotnetRef.invokeMethodAsync(
+            callbackMethodName,
+            firstReference,
+            secondReference)
+            .then((accepted) => {
+                if (accepted !== true) {
+                    _disposeJSReference(firstReference);
+                    _disposeJSReference(secondReference);
+                }
+            })
+            .catch((error) => {
+                _disposeJSReference(firstReference);
+                _disposeJSReference(secondReference);
+                console.error('[blazorators.dom] callback delivery failed:', error);
+            });
+    };
+    constructorArgs.splice(callbackArgumentIndex, 0, callback);
+    return new ctor(...constructorArgs);
 }
 
 /**

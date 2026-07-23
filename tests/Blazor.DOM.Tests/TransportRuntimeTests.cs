@@ -3,6 +3,7 @@
 
 using Blazor.DOM.Tests.Fakes;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Blazor.DOM.Tests;
 
@@ -122,6 +123,148 @@ public sealed class TransportRuntimeTests
 
         Assert.Equal(7, primitive);
         Assert.Equal("typed", dto.Name);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Reviewed_DTO_omits_optional_null_members(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "options",
+            [new FixtureOptionalDto("required", null)]);
+
+        var invocation = Assert.Single(host.Module.Invocations);
+        var arguments = Assert.IsType<object?[]>(invocation.Args![2]);
+        var options = Assert.IsType<Dictionary<string, object?>>(arguments[0]);
+        Assert.Equal("required", options["required"]);
+        Assert.DoesNotContain("optional", options);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Reviewed_DTO_preserves_omitted_null_and_value_optional_states(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "options",
+            [new FixtureTriStateDto()]);
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "options",
+            [new FixtureTriStateDto
+            {
+                Optional = DomOptional<string?>.From(null)
+            }]);
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "options",
+            [new FixtureTriStateDto { Optional = "specified" }]);
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "options",
+            [new FixtureTriStateDto
+            {
+                NullOnly = DomOptional<BrowserNull>.From(default)
+            }]);
+
+        var invocations = host.Module.Invocations;
+        var omitted = Assert.IsType<Dictionary<string, object?>>(
+            Assert.IsType<object?[]>(invocations[0].Args![2])[0]);
+        var explicitNull = Assert.IsType<Dictionary<string, object?>>(
+            Assert.IsType<object?[]>(invocations[1].Args![2])[0]);
+        var specified = Assert.IsType<Dictionary<string, object?>>(
+            Assert.IsType<object?[]>(invocations[2].Args![2])[0]);
+        var nullOnly = Assert.IsType<Dictionary<string, object?>>(
+            Assert.IsType<object?[]>(invocations[3].Args![2])[0]);
+
+        Assert.DoesNotContain("optional", omitted);
+        Assert.DoesNotContain("nullOnly", omitted);
+        Assert.True(explicitNull.ContainsKey("optional"));
+        Assert.Null(explicitNull["optional"]);
+        Assert.Equal("specified", specified["optional"]);
+        Assert.True(nullOnly.ContainsKey("nullOnly"));
+        Assert.Null(nullOnly["nullOnly"]);
+        Assert.Equal("{}", JsonSerializer.Serialize(new FixtureTriStateDto()));
+        Assert.Equal(
+            """{"optional":null}""",
+            JsonSerializer.Serialize(new FixtureTriStateDto
+            {
+                Optional = DomOptional<string?>.From(null)
+            }));
+        Assert.Equal(
+            """{"nullOnly":null}""",
+            JsonSerializer.Serialize(new FixtureTriStateDto
+            {
+                NullOnly = DomOptional<BrowserNull>.From(default)
+            }));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Null_and_undefined_sentinels_normalize_to_JSON_null(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "sentinels",
+            [default(BrowserNull), default(BrowserUndefined)]);
+
+        var invocation = Assert.Single(host.Module.Invocations);
+        var arguments = Assert.IsType<object?[]>(invocation.Args![2]);
+        Assert.Equal(2, arguments.Length);
+        Assert.All(arguments, Assert.Null);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Reviewed_DTO_does_not_evaluate_always_ignored_getters(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+
+        await host.Runtime.InvokeMethodVoidAsync(
+            target,
+            "options",
+            [new FixtureIgnoredGetterDto()]);
+
+        var invocation = Assert.Single(host.Module.Invocations);
+        var arguments = Assert.IsType<object?[]>(invocation.Args![2]);
+        var options = Assert.IsType<Dictionary<string, object?>>(arguments[0]);
+        Assert.Equal("included", options["included"]);
+        Assert.DoesNotContain("ignored", options);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TypeScript_string_values_use_their_validated_JSON_string(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var target = new FakeJSObjectReference();
+        host.Module.ReturnValues["invokeMethod"] = new FixtureStringValue("result");
+
+        var result = await host.Runtime.InvokeMethodAsync<FixtureStringValue>(
+            target,
+            "pattern",
+            [new FixtureStringValue("argument")]);
+
+        Assert.Equal("result", result.Value);
+        var invocation = Assert.Single(host.Module.Invocations);
+        var arguments = Assert.IsType<object?[]>(invocation.Args![2]);
+        Assert.Equal("argument", Assert.IsType<string>(arguments[0]));
     }
 
     [Theory]
@@ -412,6 +555,108 @@ public sealed class TransportRuntimeTests
             rejectedSecond));
         Assert.True(rejectedFirst.IsDisposed);
         Assert.True(rejectedSecond.IsDisposed);
+    }
+
+    [Fact]
+    public async Task Pair_callback_factory_failure_awaits_cleanup_and_releases_both_references()
+    {
+        var host = CreateHost(wasm: false);
+        var factory = new DomProxyFactory(host.Runtime);
+        factory.Register<FixtureBlobProxy>(
+            (_, _, _) => throw new InvalidOperationException("factory failed"));
+        var firstDisposeStarted = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstDisposeAllowed = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondDisposeStarted = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondDisposeAllowed = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstReference = new FakeJSObjectReference
+        {
+            DisposeHandler = async () =>
+            {
+                firstDisposeStarted.TrySetResult(true);
+                await firstDisposeAllowed.Task.ConfigureAwait(false);
+            },
+        };
+        var secondReference = new FakeJSObjectReference
+        {
+            DisposeHandler = async () =>
+            {
+                secondDisposeStarted.TrySetResult(true);
+                await secondDisposeAllowed.Task.ConfigureAwait(false);
+            },
+        };
+        using var handler = new DomReferencePairCallbackHandler<
+            FixtureBlobProxy,
+            FixtureBlobProxy>(
+                factory,
+                DomTransportDescriptor.JsReference("FixtureEntries"),
+                DomTransportDescriptor.JsReference("FixtureObserver"),
+                (_, _) => Task.CompletedTask);
+        Task<bool>? callbackTask = null;
+        var callReturned = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var callWorker = Task.Run(() =>
+        {
+            callbackTask = handler.HandleReferencePairAsync(
+                firstReference,
+                secondReference);
+            callReturned.TrySetResult(true);
+        });
+
+        await firstDisposeStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var returnedBeforeCleanupCompleted =
+            await Task.WhenAny(
+                callReturned.Task,
+                Task.Delay(TimeSpan.FromSeconds(2))) == callReturned.Task;
+        firstDisposeAllowed.TrySetResult(true);
+        if (returnedBeforeCleanupCompleted)
+        {
+            await secondDisposeStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        secondDisposeAllowed.TrySetResult(true);
+        await callWorker.WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.NotNull(callbackTask);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => callbackTask);
+        Assert.True(returnedBeforeCleanupCompleted);
+        Assert.True(firstReference.IsDisposed);
+        Assert.True(secondReference.IsDisposed);
+        Assert.Equal(1, firstReference.DisposeCallCount);
+        Assert.Equal(1, secondReference.DisposeCallCount);
+    }
+
+    [Fact]
+    public async Task Disposed_pair_callback_attempts_both_reference_cleanups()
+    {
+        var host = CreateHost(wasm: false);
+        var factory = CreateFactory(host.Runtime);
+        var firstReference = new FakeJSObjectReference
+        {
+            DisposeHandler = () => ValueTask.FromException(
+                new InvalidOperationException("first cleanup failed")),
+        };
+        var secondReference = new FakeJSObjectReference();
+        using var handler = new DomReferencePairCallbackHandler<
+            FixtureBlobProxy,
+            FixtureBlobProxy>(
+                factory,
+                DomTransportDescriptor.JsReference("FixtureEntries"),
+                DomTransportDescriptor.JsReference("FixtureObserver"),
+                (_, _) => Task.CompletedTask);
+        handler.Dispose();
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => handler.HandleReferencePairAsync(
+                firstReference,
+                secondReference));
+
+        Assert.Equal("first cleanup failed", error.Message);
+        Assert.Equal(1, firstReference.DisposeCallCount);
+        Assert.True(secondReference.IsDisposed);
+        Assert.Equal(1, secondReference.DisposeCallCount);
     }
 
     [Theory]
@@ -2167,6 +2412,37 @@ public sealed class TransportRuntimeTests
     private sealed record FixtureDto(string Name);
 
     [DomJsonValue]
+    private sealed record FixtureOptionalDto(
+        [property: JsonPropertyName("required")] string Required,
+        [property: JsonPropertyName("optional")]
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string? Optional);
+
+    [DomJsonValue]
+    private sealed record FixtureTriStateDto
+    {
+        [JsonPropertyName("optional")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public DomOptional<string?> Optional { get; init; }
+
+        [JsonPropertyName("nullOnly")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public DomOptional<BrowserNull> NullOnly { get; init; }
+    }
+
+    [DomJsonValue]
+    private sealed class FixtureIgnoredGetterDto
+    {
+        [JsonPropertyName("included")]
+        public string Included => "included";
+
+        [JsonPropertyName("ignored")]
+        [JsonIgnore]
+        public string Ignored => throw new InvalidOperationException(
+            "An always-ignored getter must not be evaluated.");
+    }
+
+    [DomJsonValue]
     private sealed record FixtureNestedDto(object? Child);
 
     [DomJsonValue]
@@ -2174,6 +2450,9 @@ public sealed class TransportRuntimeTests
         byte[] Challenge,
         FixtureUnion Identifier,
         IJSObjectReference Signal);
+
+    private readonly record struct FixtureStringValue(string Value)
+        : ITypeScriptStringValue;
 
     private sealed record UnreviewedDto(string Name);
 

@@ -49,46 +49,58 @@ internal sealed class DomReferencePairCallbackHandler<TFirst, TSecond> : IDispos
         ArgumentNullException.ThrowIfNull(secondReference);
         if (Volatile.Read(ref _disposed) != 0)
         {
-            await DisposeReferenceAsync(firstReference).ConfigureAwait(false);
-            await DisposeReferenceAsync(secondReference).ConfigureAwait(false);
+            try
+            {
+                await DisposeReferenceAsync(firstReference).ConfigureAwait(false);
+            }
+            finally
+            {
+                await DisposeReferenceAsync(secondReference).ConfigureAwait(false);
+            }
             return false;
         }
 
-        var first = CreateBorrowed<TFirst>(firstReference);
+        DomBorrowedReference<TFirst>? first = null;
         DomBorrowedReference<TSecond>? second = null;
         var succeeded = false;
         try
         {
-            second = CreateBorrowed<TSecond>(secondReference);
+            first = new(_factory.Create<TFirst>(firstReference));
+            second = new(_factory.Create<TSecond>(secondReference));
             await _callback(first, second).ConfigureAwait(false);
             succeeded = Volatile.Read(ref _disposed) == 0;
             return succeeded;
         }
         finally
         {
-            await first.CompleteAsync(succeeded).ConfigureAwait(false);
-            if (second is not null)
-                await second.CompleteAsync(succeeded).ConfigureAwait(false);
-            else
-                await DisposeReferenceAsync(secondReference).ConfigureAwait(false);
+            try
+            {
+                await CompleteReferenceAsync(first, firstReference, succeeded)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                await CompleteReferenceAsync(second, secondReference, succeeded)
+                    .ConfigureAwait(false);
+            }
         }
     }
 
     public void Dispose() => Interlocked.Exchange(ref _disposed, 1);
 
-    private DomBorrowedReference<TProxy> CreateBorrowed<TProxy>(
-        IJSObjectReference reference)
+    private static async ValueTask CompleteReferenceAsync<TProxy>(
+        DomBorrowedReference<TProxy>? borrowed,
+        IJSObjectReference reference,
+        bool callbackSucceeded)
         where TProxy : class, IDomProxy
     {
-        try
+        if (borrowed is not null)
         {
-            return new(_factory.Create<TProxy>(reference));
+            await borrowed.CompleteAsync(callbackSucceeded).ConfigureAwait(false);
+            return;
         }
-        catch
-        {
-            DisposeReferenceAsync(reference).AsTask().GetAwaiter().GetResult();
-            throw;
-        }
+
+        await DisposeReferenceAsync(reference).ConfigureAwait(false);
     }
 
     private static async ValueTask DisposeReferenceAsync(IJSObjectReference reference)

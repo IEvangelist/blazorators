@@ -141,6 +141,43 @@ public sealed class PackageProjectTests
             value => value.Contains("data\\Blazor.DOM.Generated", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void FocusedPackages_AlignRuntimeAssembliesWithStaticAssetPackagePaths()
+    {
+        var root = FindRepositoryRoot();
+        var projects = Directory
+            .EnumerateFiles(
+                Path.Combine(root, "src"),
+                "*.csproj",
+                SearchOption.AllDirectories)
+            .Select(path => (Path: path, Project: XDocument.Load(path)))
+            .Where(item => item.Project.Descendants("Import").Any(
+                element => element.Attribute("Project")?.Value.Contains(
+                    "Blazor.DOM.FocusedPackage.props",
+                    StringComparison.Ordinal) == true))
+            .ToList();
+
+        Assert.NotEmpty(projects);
+        var focusedProps = XDocument.Load(Path.Combine(
+            root,
+            "src",
+            "Blazor.DOM.FocusedPackage.props"));
+        Assert.Contains(
+            "System.StringComparison.Ordinal",
+            focusedProps.Descendants("Target")
+                .Single(element =>
+                    element.Attribute("Name")?.Value
+                        == "ValidateFocusedDomStaticAssetBasePath")
+                .Attribute("Condition")?.Value,
+            StringComparison.Ordinal);
+        foreach (var (_, project) in projects)
+        {
+            Assert.Equal(
+                project.Descendants("PackageId").Single().Value,
+                project.Descendants("AssemblyName").Single().Value);
+        }
+    }
+
     [Theory]
     [InlineData("WakeLock", 24)]
     [InlineData("Permissions", 23)]

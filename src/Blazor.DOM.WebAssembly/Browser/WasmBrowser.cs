@@ -28,6 +28,12 @@ internal sealed class WasmBrowser(
         runtime.GetGlobalAsync(path, cancellationToken);
 
     /// <inheritdoc />
+    public ValueTask<bool> IsGlobalAvailableAsync(
+        string path,
+        CancellationToken cancellationToken = default) =>
+        runtime.IsGlobalAvailableAsync(path, cancellationToken);
+
+    /// <inheritdoc />
     public async ValueTask<TProxy> GetGlobalAsync<TProxy>(
         string path,
         CancellationToken cancellationToken = default)

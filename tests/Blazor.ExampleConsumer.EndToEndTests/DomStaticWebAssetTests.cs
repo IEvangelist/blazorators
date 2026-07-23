@@ -11,6 +11,27 @@ public sealed class DomStaticWebAssetTests(BlazoratorsSiteFixture webAssemblySit
     const string AssetRequestPath = $"/_content/Blazor.DOM.WebAssembly/{AssetName}";
 
     [Fact]
+    public async Task CanonicalStaticAssetIsValidEsModule()
+    {
+        var repoRoot = BlazorSiteFixture.FindRepositoryRoot();
+        var assetPath = Path.Combine(
+            repoRoot,
+            "src",
+            "Blazor.DOM",
+            "wwwroot",
+            AssetName);
+        var result = await RunProcessAsync(
+            "node",
+            "--input-type=module --check",
+            repoRoot,
+            await File.ReadAllTextAsync(assetPath));
+
+        Assert.True(
+            result.ExitCode is 0,
+            $"ES module syntax validation failed.{Environment.NewLine}{result.StandardOutput}{result.StandardError}");
+    }
+
+    [Fact]
     public async Task WebAssemblyConsumerResolvesPackageLocalPhysicalAsset()
     {
         using var client = new HttpClient();
@@ -72,7 +93,7 @@ public sealed class DomStaticWebAssetTests(BlazoratorsSiteFixture webAssemblySit
             Directory.CreateDirectory(packageOutput);
             var result = await RunProcessAsync(
                 "dotnet",
-                $"pack \"{packageProject}\" --configuration Release --no-restore --output \"{packageOutput}\" --nologo",
+                $"pack \"{packageProject}\" --configuration Release --no-restore --output \"{packageOutput}\" --nologo --disable-build-servers",
                 repoRoot);
             Assert.True(
                 result.ExitCode is 0,
@@ -106,7 +127,8 @@ public sealed class DomStaticWebAssetTests(BlazoratorsSiteFixture webAssemblySit
     static async Task<ProcessResult> RunProcessAsync(
         string fileName,
         string arguments,
-        string workingDirectory)
+        string workingDirectory,
+        string? standardInput = null)
     {
         using var process = Process.Start(new ProcessStartInfo
         {
@@ -116,11 +138,18 @@ public sealed class DomStaticWebAssetTests(BlazoratorsSiteFixture webAssemblySit
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            RedirectStandardInput = standardInput is not null,
             CreateNoWindow = true
         }) ?? throw new InvalidOperationException($"Unable to start {fileName}.");
 
         var standardOutput = process.StandardOutput.ReadToEndAsync();
         var standardError = process.StandardError.ReadToEndAsync();
+        if (standardInput is not null)
+        {
+            await process.StandardInput.WriteAsync(standardInput);
+            process.StandardInput.Close();
+        }
+
         await process.WaitForExitAsync();
 
         return new(

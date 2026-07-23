@@ -8,3 +8,54 @@
     margin-left: auto;
     opacity: 0.7;
 }
+
+.nav-submenu {
+    position: relative;
+    display: grid;
+    gap: 0.12rem;
+    margin: 0.2rem 0 0.45rem 1.2rem;
+    padding-left: 0.75rem;
+}
+
+.nav-submenu::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 1px;
+    background: linear-gradient(
+        hsl(var(--primary) / 0.48),
+        hsl(var(--border)),
+        hsl(var(--primary) / 0.16));
+    content: "";
+}
+
+.nav-submenu-label {
+    margin: 0.55rem 0 0.15rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.58rem;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+::deep .nav-submenu .nav-subitem {
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.55rem;
+    font-size: 0.74rem;
+}
+
+::deep .nav-submenu .nav-subitem .icon {
+    width: 0.9rem;
+    height: 0.9rem;
+}
+
+::deep .nav-submenu .nav-subitem.active {
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--foreground));
+    box-shadow: inset 2px 0 0 hsl(var(--primary));
+}
+
+::deep .nav-submenu .nav-subitem.active .icon {
+    color: hsl(var(--primary));
+}

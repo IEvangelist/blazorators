@@ -100,7 +100,42 @@ public sealed class DictionaryEmitterTests
         Assert.Contains("bool? Once", source);
         Assert.Contains("bool? Passive", source);
         Assert.Contains("[JsonPropertyName(\"once\")]", source);
+        Assert.Contains(
+            "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]",
+            source);
         Assert.DoesNotContain("object", source);
+    }
+
+    [Fact]
+    public void Emit_OptionalNullableMember_PreservesOmittedAndExplicitNullStates()
+    {
+        var resolver = WithSymbol("AbortSignal");
+        var emitter = new DictionaryEmitter(resolver, "1.0.0", "Blazor.DOM");
+        var symbol = MakeDictSymbol(
+            "RequestInit",
+            [
+                MakeProp(
+                    0,
+                    "signal",
+                    new UnionTypeNode(
+                    [
+                        new ReferenceTypeNode("AbortSignal", "AbortSignal", []),
+                        new LiteralTypeNode("NullKeyword", "null"),
+                    ]),
+                    optional: true),
+            ]);
+
+        var source = emitter.Emit(symbol);
+
+        Assert.Contains(
+            "DomOptional<IAbortSignal?> Signal",
+            source);
+        Assert.Contains(
+            "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]",
+            source);
+        Assert.DoesNotContain(
+            "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]",
+            source);
     }
 
     [Fact]

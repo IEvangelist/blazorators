@@ -1,4 +1,5 @@
 @inject NavigationManager Nav
+@using Blazor.ExampleConsumer.Components.Pages
 
 <a class="brand" href="" @onclick=@(_ => OnNavigate.InvokeAsync())>
     <img src="logo.png" alt="" />
@@ -35,7 +36,32 @@
         <Icon Name="volume" /> <span>Audio lab</span>
     </NavLink>
 
-    <div class="nav-section">Lab</div>
+    <div class="nav-section">DOM labs</div>
+    <NavLink id="dom-lab" href="dom-e2e" Match="NavLinkMatch.All" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="code" /> <span>DOM API lab</span>
+    </NavLink>
+    <NavLink id="dom-capabilities" href="dom-e2e/capabilities" @onclick=@(_ => OnNavigate.InvokeAsync())>
+        <Icon Name="package" /> <span>Capabilities</span>
+    </NavLink>
+    <div class="nav-submenu" aria-label="DOM capability pages">
+        @foreach (var category in DomCapabilityCatalog.Categories)
+        {
+            <span class="nav-submenu-label">@category</span>
+            @foreach (var capability in DomCapabilityCatalog.All.Where(
+                capability => capability.Category == category))
+            {
+                <NavLink id="@($"dom-{capability.Slug}")"
+                         class="nav-subitem"
+                         href="@capability.Href.TrimStart('/')"
+                         @onclick=@(_ => OnNavigate.InvokeAsync())>
+                    <Icon Name="@capability.Icon" />
+                    <span>@capability.Name</span>
+                </NavLink>
+            }
+        }
+    </div>
+
+    <div class="nav-section">Playground</div>
     <NavLink id="sandbox" href="sandbox" @onclick=@(_ => OnNavigate.InvokeAsync())>
         <Icon Name="rocket" /> <span>Sandbox</span>
     </NavLink>

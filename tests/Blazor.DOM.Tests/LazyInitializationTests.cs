@@ -12,6 +12,18 @@ namespace Blazor.DOM.Tests;
 public sealed class LazyInitializationTests
 {
     [Fact]
+    public void Module_paths_follow_the_assembly_containing_each_runtime()
+    {
+        Assert.Equal(
+            DomModulePath.ForAssemblyContaining<ServerDomRuntime>(),
+            ServerDomRuntime.ModulePath);
+        Assert.Equal(
+            DomModulePath.ForAssemblyContaining<WasmDomRuntime>(),
+            WasmDomRuntime.ModulePath);
+        Assert.NotEqual(ServerDomRuntime.ModulePath, WasmDomRuntime.ModulePath);
+    }
+
+    [Fact]
     public async Task Module_is_not_imported_until_first_operation()
     {
         var jsRuntime = new FakeJSRuntime();

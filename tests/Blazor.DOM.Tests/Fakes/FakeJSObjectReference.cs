@@ -12,6 +12,7 @@ public sealed class FakeJSObjectReference : IConfigurableJSObjectReference
 {
     public bool IsDisposed { get; private set; }
     public int DisposeCallCount { get; private set; }
+    public Func<ValueTask>? DisposeHandler { get; init; }
     public List<(string Identifier, object?[]? Args)> Invocations { get; } = [];
     public Dictionary<string, object?> ReturnValues { get; } = [];
     public Dictionary<
@@ -86,10 +87,13 @@ public sealed class FakeJSObjectReference : IConfigurableJSObjectReference
         return resultIdentifier.Length > 0;
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         DisposeCallCount++;
+        if (DisposeHandler is not null)
+        {
+            await DisposeHandler().ConfigureAwait(false);
+        }
         IsDisposed = true;
-        return ValueTask.CompletedTask;
     }
 }

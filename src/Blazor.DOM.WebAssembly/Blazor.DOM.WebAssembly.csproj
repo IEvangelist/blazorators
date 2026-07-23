@@ -79,6 +79,8 @@
              LinkBase="SharedRuntime\Exceptions" />
     <Compile Include="..\Blazor.DOM\Proxies\**\*.cs"
              LinkBase="SharedRuntime\Proxies" />
+    <Compile Include="..\Blazor.DOM\Runtime\DomModulePath.cs"
+             Link="SharedRuntime\Runtime\DomModulePath.cs" />
     <Compile Include="..\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
              Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
   </ItemGroup>

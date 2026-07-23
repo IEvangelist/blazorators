@@ -13,7 +13,8 @@ namespace Microsoft.JSInterop;
 /// </summary>
 internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
 {
-    internal const string ModulePath = "./_content/Blazor.DOM/blazorators.dom.js";
+    internal static readonly string ModulePath =
+        DomModulePath.ForAssemblyContaining<ServerDomRuntime>();
 
     private readonly IJSRuntime _jsRuntime;
     private readonly SemaphoreSlim _importLock = new(1, 1);
@@ -399,6 +400,18 @@ internal sealed class ServerDomRuntime : IDomRuntime, IAsyncDisposable
         var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
         return await module.InvokeAsync<IJSObjectReference>(
             "getGlobal", cancellationToken, [path]).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<bool> IsGlobalAvailableAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        var module = await GetModuleAsync(cancellationToken).ConfigureAwait(false);
+        return await module.InvokeAsync<bool>(
+            "hasGlobal",
+            cancellationToken,
+            [path]).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

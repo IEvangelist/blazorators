@@ -263,7 +263,10 @@ public sealed class BuildGenerationTests
     private static Task<ProcessResult> RunDotNetAsync(
         string workingDirectory,
         params string[] arguments)
-        => RunProcessAsync(workingDirectory, "dotnet", arguments);
+        => RunProcessAsync(
+            workingDirectory,
+            "dotnet",
+            [.. arguments, "--disable-build-servers"]);
 
     private static async Task<ProcessResult> RunProcessAsync(
         string workingDirectory,

@@ -25,6 +25,7 @@
                type="text"
                class="input input-lg"
                @bind=_todoValue
+               @bind:event="oninput"
                @onkeyup=@OnKeyUp
                autocomplete="off"
                placeholder="Add a task and press Enter…"

@@ -25,6 +25,8 @@
              LinkBase="SharedRuntime\Exceptions" />
     <Compile Include="..\Blazor.DOM\Proxies\**\*.cs"
              LinkBase="SharedRuntime\Proxies" />
+    <Compile Include="..\Blazor.DOM\Runtime\DomModulePath.cs"
+             Link="SharedRuntime\Runtime\DomModulePath.cs" />
     <Compile Include="..\Blazor.DOM\Runtime\DomRuntimeTransport.cs"
              Link="SharedRuntime\Runtime\DomRuntimeTransport.cs" />
     <Content Include="..\Blazor.DOM\wwwroot\blazorators.dom.js"
@@ -64,4 +66,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
     <SupportedPlatform Include="browser" />
   </ItemGroup>
+
+  <Target Name="ValidateFocusedDomStaticAssetBasePath"
+          BeforeTargets="PrepareForBuild"
+          Condition="!$([System.String]::Equals('$(AssemblyName)', '$(PackageId)', System.StringComparison.Ordinal))">
+    <Error Text="Focused DOM packages require AssemblyName and PackageId to match so the runtime module resolves from the package static web asset path." />
+  </Target>
 </Project>

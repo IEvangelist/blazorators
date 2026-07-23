@@ -28,6 +28,11 @@ public interface IBrowser : IAsyncDisposable
     ValueTask<IJSObjectReference> GetGlobalAsync(
         string path, CancellationToken cancellationToken = default);
 
+    /// <summary>Checks whether a browser global or nested entry point is available.</summary>
+    ValueTask<bool> IsGlobalAvailableAsync(
+        string path,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Resolves an authoritative global path as an owned typed proxy.</summary>
     ValueTask<TProxy> GetGlobalAsync<TProxy>(
         string path,

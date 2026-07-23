@@ -5,31 +5,380 @@
 @inject IBrowser Browser
 @inject IDomSyncRuntime SyncRuntime
 @inject IServiceProvider Services
+@inject NavigationManager Navigation
 
-<PageTitle>DOM end-to-end</PageTitle>
+<PageTitle>DOM API lab · Blazorators</PageTitle>
 
-<h1>DOM end-to-end</h1>
+<div id="dom-e2e"
+     class="dom-lab"
+     data-host="webassembly"
+     data-phase="@_phase">
+    <header class="dom-hero">
+        <div class="dom-hero-glow" aria-hidden="true"></div>
+        <div class="dom-hero-copy">
+            <span class="hero-eyebrow">
+                <span class="badge-dot live" aria-hidden="true"></span>
+                Blazor.DOM.WebAssembly
+            </span>
+            <h1>Every browser API.<br /><span>Generated for Blazor.</span></h1>
+            <p>
+                A live tour through the generated <code>lib.dom.d.ts</code> surface:
+                synchronous WASM access, Promise transport, live references, typed
+                dictionaries, unions, events, and deterministic ownership.
+            </p>
+            <div class="dom-hero-actions">
+                <a class="btn btn-primary"
+                   href="@SectionHref("capabilities")"
+                   @onclick="@(() => NavigateToSectionAsync("capabilities"))"
+                   @onclick:preventDefault="true">
+                    <Icon Name="play" /> Explore live APIs
+                </a>
+                <a class="btn btn-ghost"
+                   href="https://github.com/IEvangelist/blazorators"
+                   target="_blank" rel="noopener noreferrer">
+                    <Icon Name="github" /> Generator source
+                    <Icon Name="external-link" Class="icon-sm" />
+                </a>
+            </div>
+        </div>
 
-<main id="dom-e2e"
-      data-host="webassembly"
-      data-phase="@_phase">
-    @foreach (var result in _results)
-    {
-        <output data-result="@result.Key">@result.Value</output>
-    }
+        <div class="dom-runtime-card" role="status" aria-live="polite">
+            <div class="dom-runtime-orbit" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <Icon Name="code" />
+            </div>
+            <div>
+                <span class="dom-overline">Runtime state</span>
+                <strong>@PhaseLabel</strong>
+                <small>@_results.Count generated checks completed</small>
+            </div>
+            <span class="dom-phase-dot @(_phase == "ready" ? "is-ready" : null)"></span>
+        </div>
+    </header>
 
-    <button id="dom-event-target" type="button">Dispatch typed event</button>
-    <button id="dom-dispose" type="button" @onclick="DisposeOwnedReferencesAsync">Dispose DOM references</button>
-    <output data-result="event-count">@_eventCount</output>
-    <output data-result="event-type">@_eventType</output>
-    <output data-result="borrowed-release">@_borrowedRelease</output>
-    <output data-result="proxy-release">@_proxyRelease</output>
+    <nav class="dom-section-nav" aria-label="DOM lab sections">
+        <a class="@SectionClass("runtime")"
+           aria-current="@SectionCurrent("runtime")"
+           href="@SectionHref("runtime")"
+           @onclick="@(() => NavigateToSectionAsync("runtime"))"
+           @onclick:preventDefault="true">Runtime roots</a>
+        <a class="@SectionClass("capabilities")"
+           aria-current="@SectionCurrent("capabilities")"
+           href="@SectionHref("capabilities")"
+           @onclick="@(() => NavigateToSectionAsync("capabilities"))"
+           @onclick:preventDefault="true">Capabilities</a>
+        <a class="@SectionClass("transport")"
+           aria-current="@SectionCurrent("transport")"
+           href="@SectionHref("transport")"
+           @onclick="@(() => NavigateToSectionAsync("transport"))"
+           @onclick:preventDefault="true">Transport</a>
+        <a class="@SectionClass("events")"
+           aria-current="@SectionCurrent("events")"
+           href="@SectionHref("events")"
+           @onclick="@(() => NavigateToSectionAsync("events"))"
+           @onclick:preventDefault="true">Events &amp; ownership</a>
+        <a class="@SectionClass("packages")"
+           aria-current="@SectionCurrent("packages")"
+           href="@SectionHref("packages")"
+           @onclick="@(() => NavigateToSectionAsync("packages"))"
+           @onclick:preventDefault="true">Package families</a>
+    </nav>
 
     @if (_error is not null)
     {
-        <pre data-result="error">@_error</pre>
+        <section class="card dom-error" aria-labelledby="dom-error-title">
+            <span class="feature-icon"><Icon Name="alert-circle" /></span>
+            <div>
+                <h2 id="dom-error-title">The runtime probe failed</h2>
+                <pre data-result="error">@_error</pre>
+            </div>
+        </section>
     }
-</main>
+
+    <section id="runtime" class="dom-section" aria-labelledby="runtime-heading" tabindex="-1">
+        <div class="dom-section-heading">
+            <span>01 / Runtime</span>
+            <h2 id="runtime-heading">The browser object graph, strongly typed</h2>
+            <p>
+                Exact global paths resolve to generated proxies. WASM then switches to
+                synchronous property access without sacrificing async Promise APIs.
+            </p>
+        </div>
+
+        <div class="dom-root-grid">
+            <article class="dom-root-card">
+                <span class="dom-card-index" aria-hidden="true">01</span>
+                <span class="feature-icon"><Icon Name="monitor" /></span>
+                <div>
+                    <code>globalThis.window</code>
+                    <h3>IWindow</h3>
+                    <output data-result="window">@Result("window")</output>
+                </div>
+            </article>
+            <article class="dom-root-card">
+                <span class="dom-card-index" aria-hidden="true">02</span>
+                <span class="feature-icon"><Icon Name="code" /></span>
+                <div>
+                    <code>window.document</code>
+                    <h3>IDocument</h3>
+                    <output data-result="document">@Result("document")</output>
+                </div>
+            </article>
+            <article class="dom-root-card">
+                <span class="dom-card-index" aria-hidden="true">03</span>
+                <span class="feature-icon"><Icon Name="compass" /></span>
+                <div>
+                    <code>window.navigator</code>
+                    <h3>INavigator</h3>
+                    <output data-result="navigator">@Result("navigator")</output>
+                </div>
+            </article>
+        </div>
+
+        <div class="dom-signal-strip">
+            <span>
+                <small>Dependency injection</small>
+                <output data-result="di-root">@Result("di-root")</output>
+            </span>
+            <span>
+                <small>Pre-initialization guard</small>
+                <output data-result="sync-before-init">@Result("sync-before-init")</output>
+            </span>
+            <span>
+                <small>Post-initialization sync access</small>
+                <output data-result="sync-after-init">@Result("sync-after-init")</output>
+            </span>
+            <span>
+                <small>Viewport</small>
+                <output data-result="viewport">@Result("viewport")</output>
+            </span>
+        </div>
+    </section>
+
+    <section id="capabilities" class="dom-section" aria-labelledby="capabilities-heading" tabindex="-1">
+        <div class="dom-section-heading">
+            <span>02 / Capabilities</span>
+            <h2 id="capabilities-heading">Live data from generated Web APIs</h2>
+            <p>
+                These values come directly from generated interfaces and records. No
+                handwritten JavaScript adapter sits between this page and the browser.
+            </p>
+        </div>
+
+        <div class="dom-capability-grid">
+            <article class="dom-capability-card dom-capability-featured">
+                <span class="feature-icon"><Icon Name="refresh" /></span>
+                <div class="dom-capability-title">
+                    <span>High-resolution timing</span>
+                    <code>IPerformance.Now()</code>
+                </div>
+                <output data-result="performance">@Result("performance")</output>
+                <p>A monotonic, sub-millisecond browser clock.</p>
+            </article>
+
+            <article class="dom-capability-card">
+                <span class="feature-icon"><Icon Name="check" /></span>
+                <div class="dom-capability-title">
+                    <span>Web Crypto</span>
+                    <code>ICrypto.RandomUUID()</code>
+                </div>
+                <output class="dom-mono-value" data-result="crypto">@Result("crypto")</output>
+            </article>
+
+            <article class="dom-capability-card">
+                <span class="feature-icon"><Icon Name="database" /></span>
+                <div class="dom-capability-title">
+                    <span>Storage quota</span>
+                    <code>IStorageManager.EstimateAsync()</code>
+                </div>
+                <output data-result="storage">@Result("storage")</output>
+            </article>
+
+            <article class="dom-capability-card">
+                <span class="feature-icon"><Icon Name="monitor" /></span>
+                <div class="dom-capability-title">
+                    <span>Display</span>
+                    <code>IScreen</code>
+                </div>
+                <output data-result="screen">@Result("screen")</output>
+            </article>
+
+            <article class="dom-capability-card">
+                <span class="feature-icon"><Icon Name="mic" /></span>
+                <div class="dom-capability-title">
+                    <span>Media constraints</span>
+                    <code>MediaTrackSupportedConstraints</code>
+                </div>
+                <output data-result="media-devices">@Result("media-devices")</output>
+            </article>
+
+            <article class="dom-capability-card">
+                <span class="feature-icon"><Icon Name="navigation" /></span>
+                <div class="dom-capability-title">
+                    <span>Browser environment</span>
+                    <code>Window + Document + Navigator</code>
+                </div>
+                <output data-result="environment">@Result("environment")</output>
+                <small data-result="document-state">@Result("document-state")</small>
+                <small data-result="languages">@Result("languages")</small>
+            </article>
+        </div>
+    </section>
+
+    <section id="transport" class="dom-section" aria-labelledby="transport-heading" tabindex="-1">
+        <div class="dom-section-heading">
+            <span>03 / Transport</span>
+            <h2 id="transport-heading">Values, Promises, unions, and live references</h2>
+            <p>
+                The emitter selects transport from the semantic type: JSON values stay
+                values, browser objects stay owned proxies, and Promise results stay async.
+            </p>
+        </div>
+
+        <div class="dom-transport-grid">
+            <article class="dom-transport-card">
+                <span class="dom-overline">Live execution trace</span>
+                <h3>One URL and fetch round-trip</h3>
+                <div class="dom-trace">
+                    <span>
+                        <i>1</i>
+                        <span><code>IURLFactory.Create</code><small>string union to live URL proxy</small></span>
+                        <output data-result="mutable-property">@Result("mutable-property")</output>
+                    </span>
+                    <span>
+                        <i>2</i>
+                        <span><code>IWindow.FetchAsync</code><small>Promise with URL union input</small></span>
+                        <output data-result="promise-union">@Result("promise-union")</output>
+                    </span>
+                    <span>
+                        <i>3</i>
+                        <span><code>IResponse.Clone</code><small>independently owned result proxy</small></span>
+                        <output data-result="returned-proxy">@Result("returned-proxy")</output>
+                    </span>
+                    <span>
+                        <i>4</i>
+                        <span><code>INavigator.Clipboard</code><small>exact capability root</small></span>
+                        <output data-result="feature-detection">@Result("feature-detection")</output>
+                    </span>
+                    <span>
+                        <i>5</i>
+                        <span><code>new URL(invalid)</code><small>JSException propagation</small></span>
+                        <output data-result="js-error">@Result("js-error")</output>
+                    </span>
+                </div>
+            </article>
+
+            <article class="dom-code-card">
+                <div class="dom-code-title">
+                    <span><i></i><i></i><i></i></span>
+                    <code>DomLab.razor</code>
+                </div>
+<pre><code><span class="code-keyword">await using var</span> performance =
+    <span class="code-keyword">await</span> Browser.GetGlobalAsync&lt;IPerformance&gt;(
+        <span class="code-string">"performance"</span>);
+
+<span class="code-keyword">var</span> now = performance.Now();
+
+<span class="code-keyword">await using var</span> storage = navigator.Storage;
+<span class="code-keyword">var</span> estimate =
+    <span class="code-keyword">await</span> storage.EstimateAsync();</code></pre>
+                <p>Generated contracts remain idiomatic C# on both Server and WASM.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="events" class="dom-section" aria-labelledby="events-heading" tabindex="-1">
+        <div class="dom-section-heading">
+            <span>04 / Events &amp; ownership</span>
+            <h2 id="events-heading">Borrowed callbacks, deterministic release</h2>
+            <p>
+                Dispatch a typed pointer event, then dispose the subscription and owned
+                response twice to prove idempotent cleanup across the JS boundary.
+            </p>
+        </div>
+
+        <div class="dom-event-grid">
+            <article class="dom-event-stage">
+                <div class="dom-event-visual" aria-hidden="true">
+                    <span class="@(_eventCount > 0 ? "is-active" : null)"></span>
+                    <Icon Name="navigation" />
+                </div>
+                <h3>Typed <code>DocumentEventMap.Click</code></h3>
+                <p>The callback receives a borrowed <code>IPointerEvent</code> reference.</p>
+                <button id="dom-event-target"
+                        class="btn btn-primary"
+                        type="button"
+                        disabled="@(_phase != "ready")">
+                    <Icon Name="play" /> Dispatch typed event
+                </button>
+                <dl>
+                    <div><dt>Subscription</dt><dd><output data-result="typed-event">@Result("typed-event")</output></dd></div>
+                    <div><dt>Event count</dt><dd><output data-result="event-count">@_eventCount</output></dd></div>
+                    <div><dt>Event type</dt><dd><output data-result="event-type">@(_eventType.Length > 0 ? _eventType : "waiting")</output></dd></div>
+                </dl>
+            </article>
+
+            <article class="dom-ownership-card">
+                <span class="feature-icon"><Icon Name="eraser" /></span>
+                <div>
+                    <span class="dom-overline">Ownership audit</span>
+                    <h3>Dispose every reference exactly once</h3>
+                    <p>
+                        Repeated .NET disposal remains safe while listeners and JS object
+                        references are released at the correct lifetime boundary.
+                    </p>
+                </div>
+                <button id="dom-dispose"
+                        class="btn btn-ghost"
+                        type="button"
+                        disabled="@(_phase != "ready")"
+                        @onclick="DisposeOwnedReferencesAsync">
+                    Dispose owned references
+                </button>
+                <div class="dom-release-results">
+                    <span>
+                        <small>Borrowed event</small>
+                        <output data-result="borrowed-release">@_borrowedRelease</output>
+                    </span>
+                    <span>
+                        <small>Owned response</small>
+                        <output data-result="proxy-release">@_proxyRelease</output>
+                    </span>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section id="packages" class="dom-section" aria-labelledby="packages-heading" tabindex="-1">
+        <div class="dom-section-heading">
+            <span>05 / Focused packages</span>
+            <h2 id="packages-heading">Take only the browser surface you need</h2>
+            <p>
+                The exhaustive host and focused profiles share the same semantic model,
+                transport rules, generated runtime, and Server/WASM parity guarantees.
+            </p>
+            <a class="dom-package-catalog-link" href="dom-e2e/capabilities">
+                Explore all capability labs <Icon Name="arrow-right" />
+            </a>
+        </div>
+
+        <div class="dom-package-grid">
+            @foreach (var capability in DomCapabilityCatalog.All)
+            {
+                <a class="dom-package-card"
+                   href="@capability.Href"
+                   data-capability="@capability.Slug">
+                    <span class="feature-icon"><Icon Name="@capability.Icon" /></span>
+                    <div>
+                        <h3>@capability.Name</h3>
+                        <p>@string.Join(", ", capability.Features)</p>
+                    </div>
+                    <span class="badge badge-primary">@capability.Operations ops</span>
+                </a>
+            }
+        </div>
+    </section>
+</div>
 
 @code {
     readonly SortedDictionary<string, string> _results = [];
@@ -38,14 +387,40 @@
     string _eventType = "";
     string _borrowedRelease = "pending";
     string _proxyRelease = "pending";
+    string _activeSection = "runtime";
     int _eventCount;
     IWindow? _window;
+    IHistory? _history;
     IDocument? _document;
     INavigator? _navigator;
     IHTMLElement? _eventTarget;
     IResponse? _ownedResponse;
     IPointerEvent? _borrowedEvent;
     DomReferenceEventSubscription<IPointerEvent>? _subscription;
+
+    string PhaseLabel => _phase switch
+    {
+        "ready" => "All systems ready",
+        "failed" => "Probe failed",
+        _ => "Connecting to browser"
+    };
+
+    string Result(string key) =>
+        _results.TryGetValue(key, out var value) ? value : "waiting";
+
+    string SectionHref(string section) => $"dom-e2e#{section}";
+
+    string? SectionClass(string section) =>
+        _activeSection == section ? "is-active" : null;
+
+    string? SectionCurrent(string section) =>
+        _activeSection == section ? "location" : null;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        _activeSection = SectionFromUri(Navigation.Uri) ?? "runtime";
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -58,6 +433,10 @@
         {
             await RunAsync();
             _phase = "ready";
+            if (SectionFromUri(Navigation.Uri) is { } section)
+            {
+                await ScrollToSectionAsync(section);
+            }
         }
         catch (Exception ex)
         {
@@ -66,6 +445,64 @@
         }
 
         StateHasChanged();
+    }
+
+    async Task NavigateToSectionAsync(string section)
+    {
+        _activeSection = section;
+        var destination = Navigation.ToAbsoluteUri(SectionHref(section)).AbsoluteUri;
+        if (string.Equals(Navigation.Uri, destination, StringComparison.Ordinal))
+        {
+            await ScrollToSectionAsync(section);
+            StateHasChanged();
+            return;
+        }
+
+        Navigation.NavigateTo(SectionHref(section));
+        await ScrollToSectionAsync(section);
+        StateHasChanged();
+    }
+
+    async Task ScrollToSectionAsync(string section)
+    {
+        if (_document?.GetElementById(section) is not { } target)
+        {
+            return;
+        }
+
+        await using (target)
+        {
+            target.Focus(new FocusOptions { PreventScroll = true });
+            target.ScrollIntoView(
+                ElementUnionShape_38554fe30c.FromScrollIntoViewOptions(
+                    new ScrollIntoViewOptions
+                    {
+                        Behavior = ScrollBehavior.Smooth,
+                        Block = ScrollLogicalPosition.Start,
+                        Inline = ScrollLogicalPosition.Nearest
+                    }));
+        }
+    }
+
+    void OnLocationChanged(
+        object? sender,
+        Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
+    {
+        var section = SectionFromUri(args.Location) ?? "runtime";
+        _activeSection = section;
+        _ = InvokeAsync(async () =>
+        {
+            await ScrollToSectionAsync(section);
+            StateHasChanged();
+        });
+    }
+
+    static string? SectionFromUri(string uri)
+    {
+        var fragment = new Uri(uri).Fragment.TrimStart('#');
+        return fragment is "runtime" or "capabilities" or "transport" or "events" or "packages"
+            ? fragment
+            : null;
     }
 
     async Task RunAsync()
@@ -85,11 +522,13 @@
         }
 
         _window = await Browser.GetWindowProxyAsync();
+        _history = _window.History;
+        _history.ScrollRestoration = ScrollRestoration.Manual;
         _document = _window.Document;
         _navigator = _window.Navigator;
 
         _results["window"] = _window.InnerWidth > 0 ? "read" : "invalid";
-        _results["document"] = _document.Title.Contains("DOM end-to-end", StringComparison.Ordinal)
+        _results["document"] = _document.Title.Contains("DOM API lab", StringComparison.Ordinal)
             ? "read"
             : _document.Title;
         _results["navigator"] =
@@ -100,6 +539,15 @@
         _results["sync-after-init"] = _window.Document.URL.Contains("/dom-e2e", StringComparison.Ordinal)
             ? "read"
             : "invalid";
+        _results["viewport"] =
+            $"{_window.InnerWidth:F0} x {_window.InnerHeight:F0} @ {_window.DevicePixelRatio:F1}x";
+        _results["environment"] =
+            $"{(_navigator.OnLine ? "online" : "offline")} | {_navigator.HardwareConcurrency:F0} logical processors";
+        _results["document-state"] =
+            $"{_document.ReadyState} | {_document.VisibilityState} | {_document.CharacterSet}";
+        _results["languages"] = string.Join(", ", _navigator.Languages);
+
+        await RunCapabilitySamplesAsync();
 
         await using var urlFactory = await Browser.GetGlobalAsync<IURLFactory>("URL");
         await using var url = urlFactory.Create(
@@ -134,6 +582,47 @@
             DocumentEventMap.Click,
             OnClickAsync);
         _results["typed-event"] = "subscribed";
+    }
+
+    async Task RunCapabilitySamplesAsync()
+    {
+        await using var performance = await Browser.GetGlobalAsync<IPerformance>("performance");
+        _results["performance"] = $"{performance.Now():F2} ms";
+
+        await using var crypto = await Browser.GetGlobalAsync<ICrypto>("crypto");
+        _results["crypto"] = crypto.RandomUUID().ToString();
+
+        await using var storage = _navigator!.Storage;
+        var estimate = await storage.EstimateAsync();
+        _results["storage"] = $"{FormatBytes(estimate.Usage)} used / {FormatBytes(estimate.Quota)} quota";
+
+        await using var screen = _window!.Screen;
+        _results["screen"] = $"{screen.Width:F0} x {screen.Height:F0} at {screen.ColorDepth}-bit color";
+
+        await using var mediaDevices = _navigator.MediaDevices;
+        var constraints = mediaDevices.GetSupportedConstraints();
+        _results["media-devices"] =
+            $"deviceId={constraints.DeviceId}, width={constraints.Width}, echoCancellation={constraints.EchoCancellation}";
+    }
+
+    static string FormatBytes(double? bytes)
+    {
+        var value = bytes.GetValueOrDefault();
+        if (value < 1024)
+        {
+            return $"{value:F0} B";
+        }
+
+        var units = new[] { "KB", "MB", "GB", "TB" };
+        var unit = -1;
+        do
+        {
+            value /= 1024;
+            unit++;
+        }
+        while (value >= 1024 && unit < units.Length - 1);
+
+        return $"{value:F1} {units[unit]}";
     }
 
     async Task OnClickAsync(DomBorrowedReference<IPointerEvent> borrowed)
@@ -187,6 +676,7 @@
 
     public async ValueTask DisposeAsync()
     {
+        Navigation.LocationChanged -= OnLocationChanged;
         if (_subscription is not null)
         {
             await _subscription.DisposeAsync();
@@ -209,6 +699,11 @@
         }
         if (_window is not null)
         {
+            if (_history is not null)
+            {
+                _history.ScrollRestoration = ScrollRestoration.Auto;
+                await _history.DisposeAsync();
+            }
             await _window.DisposeAsync();
         }
     }

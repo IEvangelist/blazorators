@@ -9,9 +9,14 @@
 
 <h1>DOM end-to-end</h1>
 
-<main id="dom-e2e"
-      data-host="server"
-      data-phase="@_phase">
+<p>
+    Generated samples cover live DOM proxies, dictionaries, unions, events, disposal,
+    Performance, Web Crypto, Storage, Screen, and Media Devices.
+</p>
+
+<div id="dom-e2e"
+     data-host="server"
+     data-phase="@_phase">
     @foreach (var result in _results)
     {
         <output data-result="@result.Key">@result.Value</output>
@@ -28,7 +33,7 @@
     {
         <pre data-result="error">@_error</pre>
     }
-</main>
+</div>
 
 @code {
     readonly SortedDictionary<string, string> _results = [];
@@ -89,6 +94,8 @@
             ? "interactive-only"
             : "invalid";
 
+        await RunCapabilitySamplesAsync();
+
         await using var urlFactory = await Browser.GetGlobalAsync<IURLFactory>("URL");
         await using var url = await urlFactory.CreateAsync(
             DocumentUnionShape_3847f64189.FromString("data:text/plain,dom-e2e"),
@@ -123,6 +130,48 @@
             DocumentEventMap.Click,
             OnClickAsync);
         _results["typed-event"] = "subscribed";
+    }
+
+    async Task RunCapabilitySamplesAsync()
+    {
+        await using var performance = await Browser.GetGlobalAsync<IPerformance>("performance");
+        _results["performance"] = $"{await performance.NowAsync():F2} ms";
+
+        await using var crypto = await Browser.GetGlobalAsync<ICrypto>("crypto");
+        _results["crypto"] = (await crypto.RandomUUIDAsync()).ToString();
+
+        await using var storage = await _navigator!.GetStorageAsync();
+        var estimate = await storage.EstimateAsync();
+        _results["storage"] = $"{FormatBytes(estimate.Usage)} used / {FormatBytes(estimate.Quota)} quota";
+
+        await using var screen = await _window!.GetScreenAsync();
+        _results["screen"] =
+            $"{await screen.GetWidthAsync()}x{await screen.GetHeightAsync()} at {await screen.GetColorDepthAsync()}-bit color";
+
+        await using var mediaDevices = await _navigator.GetMediaDevicesAsync();
+        var constraints = await mediaDevices.GetSupportedConstraintsAsync();
+        _results["media-devices"] =
+            $"deviceId={constraints.DeviceId}, width={constraints.Width}, echoCancellation={constraints.EchoCancellation}";
+    }
+
+    static string FormatBytes(double? bytes)
+    {
+        var value = bytes.GetValueOrDefault();
+        if (value < 1024)
+        {
+            return $"{value:F0} B";
+        }
+
+        var units = new[] { "KB", "MB", "GB", "TB" };
+        var unit = -1;
+        do
+        {
+            value /= 1024;
+            unit++;
+        }
+        while (value >= 1024 && unit < units.Length - 1);
+
+        return $"{value:F1} {units[unit]}";
     }
 
     async Task OnClickAsync(DomBorrowedReference<IPointerEvent> borrowed)
