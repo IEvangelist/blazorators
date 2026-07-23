@@ -75,6 +75,48 @@ public sealed class IrLoaderTests : IDisposable
         Assert.Single(bundle.WebIdlSymbols);
     }
 
+    [Fact]
+    public void LoadForGeneration_ValidatesWithoutRetainingWebIdlSymbols()
+    {
+        var tsLine = MakeSymbolLine("AlignSetting", "typeAlias", "matched");
+        var webIdlLine = MakeWebIdlLine("AlignSetting");
+        WriteManifest(1, tsLine + "\n", 1, webIdlLine + "\n");
+
+        var bundle = IrLoader.LoadForGeneration(_tempDir);
+
+        Assert.Single(bundle.TypescriptSymbols);
+        Assert.Empty(bundle.WebIdlSymbols);
+        Assert.Equal(1, bundle.Manifest.Counts.WebIdlSymbols);
+    }
+
+    [Fact]
+    public void LoadForGeneration_StillValidatesWebIdlHash()
+    {
+        var tsLine = MakeSymbolLine("AlignSetting", "typeAlias", "matched");
+        var webIdlLine = MakeWebIdlLine("AlignSetting");
+        WriteManifest(1, tsLine + "\n", 1, webIdlLine + "\n");
+        File.AppendAllText(
+            Path.Combine(_tempDir, "webidl-symbols.jsonl"),
+            "\n");
+
+        var ex = Assert.Throws<IrValidationException>(
+            () => IrLoader.LoadForGeneration(_tempDir));
+
+        Assert.Contains("SHA-256 mismatch", ex.Message);
+    }
+
+    [Fact]
+    public void LoadForGeneration_StillValidatesWebIdlJsonShape()
+    {
+        var tsLine = MakeSymbolLine("AlignSetting", "typeAlias", "matched");
+        WriteManifest(1, tsLine + "\n", 1, "[]\n");
+
+        var ex = Assert.Throws<IrValidationException>(
+            () => IrLoader.LoadForGeneration(_tempDir));
+
+        Assert.Contains("expected a JSON object", ex.Message);
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private static string MakeSymbolLine(string name, string declKind, string status)

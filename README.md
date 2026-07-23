@@ -157,6 +157,16 @@ builder.Services.AddClipboardCapability();
 
 The sample app includes an interactive DOM lab at `/dom-e2e` and a routed catalog of all 14 capabilities. Each page shows installation, registration, injection, generated contracts, a live browser workflow, operation facts, and the raw result envelope.
 
+### Building from source
+
+Install the SDK selected by [`global.json`](global.json), then build from the repository root:
+
+```console
+dotnet build
+```
+
+The checked-in [`NuGet.config`](NuGet.config) intentionally clears inherited machine-level package feeds and restores from NuGet.org. This keeps central package management deterministic across developer machines and CI. The shared DOM generation node is incremental; a clean build validates the pinned semantic inputs and generates all exhaustive and focused contracts under `artifacts/obj`.
+
 ## Using the `Blazor.SourceGenerators` package 📦
 
 As an example, the official [`Blazor.LocalStorage.WebAssembly`](https://www.nuget.org/packages/Blazor.LocalStorage.WebAssembly) package consumes the [`Blazor.SourceGenerators`](https://www.nuget.org/packages/Blazor.SourceGenerators) package. It exposes extension methods specific to Blazor WebAssembly and the [`localStorage`](https://developer.mozilla.org/docs/Web/API/Window/localStorage) Web API.

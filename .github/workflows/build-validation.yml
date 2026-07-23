@@ -14,6 +14,20 @@ on:
         default: Manual run
 
 jobs:
+  repository_build:
+    name: repository build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@main
+      with:
+        global-json-file: global.json
+
+    - name: Build from repository root
+      run: dotnet build --configuration Release
+
   build:
     name: build (Blazor.${{ matrix.component }}${{ matrix.variant }})
     runs-on: ubuntu-latest
@@ -177,6 +191,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() }}
     needs:
+    - repository_build
     - build
     - unit_tests
     - runtime_tests
@@ -185,13 +200,14 @@ jobs:
     steps:
     - name: Require every test matrix
       env:
+        REPOSITORY_BUILD: ${{ needs.repository_build.result }}
         BUILD: ${{ needs.build.result }}
         UNIT_TESTS: ${{ needs.unit_tests.result }}
         RUNTIME_TESTS: ${{ needs.runtime_tests.result }}
         COMPILATION_TESTS: ${{ needs.compilation_tests.result }}
         BROWSER_TESTS: ${{ needs.browser_tests.result }}
       run: |
-        for result in "$BUILD" "$UNIT_TESTS" "$RUNTIME_TESTS" "$COMPILATION_TESTS" "$BROWSER_TESTS"; do
+        for result in "$REPOSITORY_BUILD" "$BUILD" "$UNIT_TESTS" "$RUNTIME_TESTS" "$COMPILATION_TESTS" "$BROWSER_TESTS"; do
           if [ "$result" != "success" ]; then
             echo "A test matrix completed with status: $result"
             exit 1

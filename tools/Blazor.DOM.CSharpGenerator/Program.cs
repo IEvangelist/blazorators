@@ -13,6 +13,7 @@
 //   3 = byte-identity mismatch (--verify only)
 //   4 = generation had failures (generation proceeded but some symbols failed)
 //   5 = profile generation had failures
+//  10 = unexpected infrastructure or runtime failure
 
 using Blazor.DOM.CSharpGenerator;
 using Blazor.DOM.CSharpGenerator.Anchors;
@@ -31,20 +32,38 @@ if (cliArgs.ProfilesDirectory is not null)
 Console.WriteLine($"  Anchors   : {cliArgs.AnchorsDirectory}");
 Console.WriteLine();
 
+var canonicalOutputDirectory = Path.TrimEndingDirectorySeparator(
+    Path.GetFullPath(cliArgs.OutputDirectory));
+GenerationLock acquiredGenerationLock;
+try
+{
+    acquiredGenerationLock = GenerationLock.Acquire(canonicalOutputDirectory);
+}
+catch (Exception ex)
+{
+    return ReportUnexpectedFailure("generation lock acquisition", ex);
+}
+using var generationLock = acquiredGenerationLock;
+
 // ── Step 1: Load and validate the IR ─────────────────────────────────────────
 Console.Write("Loading IR...");
 IrBundle ir;
 try
 {
-    ir = IrLoader.Load(cliArgs.DataDirectory);
+    ir = IrLoader.LoadForGeneration(cliArgs.DataDirectory);
 }
 catch (IrValidationException ex)
 {
     Console.Error.WriteLine($"\nIR validation failed: {ex.Message}");
     return 1;
 }
+catch (Exception ex)
+{
+    return ReportUnexpectedFailure("IR loading", ex);
+}
 Console.WriteLine(
-    $" OK — {ir.TypescriptSymbols.Count} TS symbols, {ir.WebIdlSymbols.Count} WebIDL symbols.");
+    $" OK — {ir.TypescriptSymbols.Count} TS symbols, " +
+    $"{ir.Manifest.Counts.WebIdlSymbols} WebIDL symbols validated.");
 
 // ── Step 1b: Load emitter overrides ──────────────────────────────────────────
 Console.Write("Loading emitter overrides...");
@@ -57,6 +76,10 @@ catch (EmitterOverridesException ex)
 {
     Console.Error.WriteLine($"\nEmitter overrides validation failed: {ex.Message}");
     return 1;
+}
+catch (Exception ex)
+{
+    return ReportUnexpectedFailure("emitter override loading", ex);
 }
 Console.WriteLine($" OK — {overrides.Count} override(s) loaded.");
 
@@ -74,13 +97,14 @@ catch (Exception ex) when (
     Console.Error.WriteLine($"\nAnchor validation failed: {ex.Message}");
     return 1;
 }
+catch (Exception ex)
+{
+    return ReportUnexpectedFailure("handwritten anchor loading", ex);
+}
 Console.WriteLine($" OK — {anchors.Count} anchor(s) loaded.");
 
 // ── Step 2: Run full generation pipeline into sibling staging directories ─────
 // Sibling staging guarantees that the final directory renames stay on one volume.
-var canonicalOutputDirectory = Path.TrimEndingDirectorySeparator(
-    Path.GetFullPath(cliArgs.OutputDirectory));
-using var generationLock = GenerationLock.Acquire(canonicalOutputDirectory);
 var outputParent = Path.GetDirectoryName(canonicalOutputDirectory)
     ?? throw new InvalidOperationException(
         $"Output directory must have a parent: '{canonicalOutputDirectory}'.");
@@ -91,6 +115,7 @@ var stagingDir = Path.Combine(
 var stagingRun1 = Path.Combine(stagingDir, "run1");
 var stagingRun2 = Path.Combine(stagingDir, "run2");
 int exitCode = 0;
+var cleanupFailed = false;
 
 try
 {
@@ -214,6 +239,7 @@ try
     // ── Step 6 (optional): Profile generation ────────────────────────────────
     if (cliArgs.ProfilesDirectory is not null)
     {
+        ReclaimCompletedProjection();
         Console.WriteLine($"\nGenerating focused profiles from: {cliArgs.ProfilesDirectory}");
         var profiles = ProfileLoader.LoadAll(cliArgs.ProfilesDirectory);
         if (profiles.Count == 0)
@@ -268,8 +294,14 @@ try
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($" FAILED: {ex.Message}");
+                    Console.Error.WriteLine($" FAILED:{Environment.NewLine}{ex}");
                     profileFailures++;
+                }
+                finally
+                {
+                    // Each profile builds an isolated projection graph. Reclaim it
+                    // before the next profile so solution-wide builds stay bounded.
+                    ReclaimCompletedProjection();
                 }
             }
 
@@ -281,10 +313,27 @@ try
         }
     }
 }
+catch (Exception ex)
+{
+    return ReportUnexpectedFailure("DOM contract generation", ex);
+}
 finally
 {
-    OutputPromotion.DeleteDirectoryWithRetry(stagingDir);
+    try
+    {
+        OutputPromotion.DeleteDirectoryWithRetry(stagingDir);
+    }
+    catch (Exception ex)
+    {
+        cleanupFailed = true;
+        Console.Error.WriteLine(
+            $"{Environment.NewLine}Failed to clean generation staging output:" +
+            $"{Environment.NewLine}{ex}");
+    }
 }
+
+if (cleanupFailed)
+    return 10;
 
 if (exitCode != 0)
 {
@@ -294,6 +343,21 @@ if (exitCode != 0)
 
 Console.WriteLine("\nDone.");
 return 0;
+
+static int ReportUnexpectedFailure(string phase, Exception exception)
+{
+    Console.Error.WriteLine(
+        $"{Environment.NewLine}Unexpected failure during {phase}:" +
+        $"{Environment.NewLine}{exception}");
+    return 10;
+}
+
+static void ReclaimCompletedProjection()
+    => GC.Collect(
+        GC.MaxGeneration,
+        GCCollectionMode.Aggressive,
+        blocking: true,
+        compacting: true);
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 
