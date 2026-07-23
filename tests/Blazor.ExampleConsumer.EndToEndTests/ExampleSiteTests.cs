@@ -39,33 +39,45 @@ public sealed class ExampleSiteTests(
     ];
 
     public static IEnumerable<object[]> RouteData() =>
-        Routes.Select(route => new object[] { route });
+        Routes.Select(route => new object[]
+        {
+            route.Path,
+            route.TitleFragment,
+            route.Heading
+        });
 
     [Theory]
     [MemberData(nameof(RouteData))]
-    public async Task Route_IsAccessible_Responsive_AndOverflowSafe(PageRoute route)
+    public async Task Route_IsAccessible_Responsive_AndOverflowSafe(
+        string path,
+        string titleFragment,
+        string heading)
     {
-        await using var context = await NewContextAsync();
+        await using var context = await NewContextAsync(
+            reducedMotion: ReducedMotion.Reduce);
         var page = await context.NewPageAsync();
         var consoleErrors = TrackConsoleErrors(page);
 
-        await page.GotoAsync(site.UrlFor(route.Path), new PageGotoOptions
+        await page.GotoAsync(site.UrlFor(path), new PageGotoOptions
         {
             WaitUntil = WaitUntilState.NetworkIdle
         });
 
-        await ExpectHeadingAsync(page, route.Heading);
-        Assert.Contains(route.TitleFragment, await page.TitleAsync(), StringComparison.OrdinalIgnoreCase);
+        await ExpectHeadingAsync(page, heading);
+        Assert.Contains(
+            titleFragment,
+            await page.TitleAsync(),
+            StringComparison.OrdinalIgnoreCase);
 
-        if (route.Path.StartsWith("/dom-e2e/", StringComparison.Ordinal)
-            && route.Path != "/dom-e2e/capabilities")
+        if (path.StartsWith("/dom-e2e/", StringComparison.Ordinal)
+            && path != "/dom-e2e/capabilities")
         {
             await page.WaitForFunctionAsync(
                 """
                 () => ['ready', 'unavailable'].includes(
                     document.querySelector('[data-probe-phase]')?.dataset.probePhase)
                 """);
-            var expectedPhase = route.Path == "/dom-e2e/web-share"
+            var expectedPhase = path == "/dom-e2e/web-share"
                 ? new Regex("^(ready|unavailable)$")
                 : new Regex("^ready$");
             await Assertions.Expect(page.Locator("[data-probe-phase]"))
@@ -415,6 +427,7 @@ public sealed class ExampleSiteTests(
                 Height = viewportHeight
             },
             ReducedMotion = reducedMotion,
+            ColorScheme = ColorScheme.Light,
             Geolocation = new Geolocation
             {
                 Latitude = 47.6062f,

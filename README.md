@@ -1,5 +1,5 @@
 <img src="https://raw.githubusercontent.com/IEvangelist/blazorators/main/logo.png" align="right"></img>
-# Blazorators: Blazor C# Source Generators
+# Blazorators: Blazor JavaScript interop
 
 > Thank you for perusing my Blazor C# Source Generator repository. I'd really appreciate a ⭐ if you find this interesting.
 
@@ -14,7 +14,12 @@
 ![Alt](https://repobeats.axiom.co/api/embed/6d5b98efd6598a4482f1fa6391fbe651a06f77d9.svg "Repobeats analytics image")
 -->
 
-A C# source generator that creates fully functioning Blazor JavaScript interop code, targeting either the `IJSInProcessRuntime` or `IJSRuntime` types. This library provides several NuGet packages:
+Blazorators provides C# source generators and generated packages for strongly typed Blazor JavaScript interop, targeting either `IJSInProcessRuntime` or `IJSRuntime`. The repository supports two complementary generation paths:
+
+- `Blazor.SourceGenerators` for opt-in services generated from an attributed interface and TypeScript declarations.
+- `Blazor.DOM` and focused capability packages generated from a strict semantic model of the browser DOM.
+
+The repository provides several NuGet packages:
 
 **Core libraries**
 
@@ -48,8 +53,109 @@ A C# source generator that creates fully functioning Blazor JavaScript interop c
 
 > Targets the `IJSRuntime` type.
 
-> **Note**<br>
-> Two separate package sets ship for each Web API: WebAssembly-targeted (using `IJSInProcessRuntime`) and Server-targeted (using `IJSRuntime`). Both expose **asynchronous** `ValueTask`-based APIs; the difference is just which underlying JS runtime they dispatch through. WebAssembly can additionally take advantage of the in-process runtime to avoid the cross-process hop. The split could later be replaced by a single package with a build-time preprocessor switch (e.g. `IS_WEB_ASSEMBLY`).
+> **Legacy package note**<br>
+> The source-generator package pairs listed above ship separately for WebAssembly (`IJSInProcessRuntime`) and Server (`IJSRuntime`). Both expose **asynchronous** `ValueTask`-based APIs; the difference is which underlying JS runtime they dispatch through. The exhaustive DOM packages below use a newer host-specific runtime and projection model.
+
+## Exhaustive DOM interop
+
+The exhaustive DOM packages are generated from exact-pinned TypeScript and Web IDL inputs rather than the legacy declaration parser. The semantic pipeline preserves merged declarations, inheritance, overloads, generics, event maps, constructors, global paths, documentation, deprecations, exposure metadata, and explicit transport semantics.
+
+Generation runs once inside this repository's build graph and writes C# to intermediate `obj` output. Applications consuming the packages do **not** run Node.js, parse `lib.dom.d.ts`, or generate thousands of source files.
+
+The current Window profile accounts for:
+
+| Surface | Count |
+|---|---:|
+| TypeScript symbols | 2,183 |
+| Declarations | 3,022 |
+| Members | 12,217 |
+| Overloads | 3,880 |
+| Parameters | 6,522 |
+
+Every in-profile symbol and member must be generated, explicitly excluded with a reviewed reason, or fail generation. The current exhaustive profile projects every symbol cleanly with no excluded, deferred, or generation-failed outcomes. Worker, Service Worker, Shared Worker, and Worklet exposure is retained in the model but intentionally deferred to separate future profiles.
+
+### Host packages
+
+The host packages are mutually exclusive because they expose the same logical DOM surface with hosting-specific dispatch:
+
+| Package | Hosting model | Behavior |
+|---|---|---|
+| [`Blazor.DOM`](src/Blazor.DOM/README.md) | Blazor Server and hosting-neutral | Asynchronous, cancellable `ValueTask` dispatch through `IJSRuntime` and `IJSObjectReference`. |
+| [`Blazor.DOM.WebAssembly`](src/Blazor.DOM.WebAssembly/README.md) | Blazor WebAssembly | Synchronous non-Promise operations through in-process references; Promise and lifecycle operations remain asynchronous. |
+
+Both variants compile for `net8.0`, `net9.0`, and `net10.0`, with exact logical parity across 878 host symbols and 13,299 operations per host.
+
+Register one package and inject the single `IBrowser` root:
+
+```csharp
+// Blazor Server
+builder.Services.AddBlazorDOM();
+
+// Blazor WebAssembly
+builder.Services.AddBlazorDOMWebAssembly();
+```
+
+A Blazor Server component can then resolve and use a live document proxy:
+
+```razor
+@inject IBrowser Browser
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await using var document = await Browser.GetDocumentProxyAsync();
+        var title = await document.GetTitleAsync();
+    }
+}
+```
+
+Generated browser interfaces are live JavaScript-reference proxies, not JSON snapshots. The runtime validates JSON dictionaries, strongly typed unions, binary values, streams, transferables, callbacks, and returned references before dispatch. Owned proxies, event subscriptions, callback-scoped borrowed references, and stream handles have explicit disposal rules.
+
+### Focused capability packages
+
+Applications that do not need the complete DOM surface can reference a focused Server/WebAssembly pair generated from the same semantic model and runtime:
+
+| Capability | Package pair |
+|---|---|
+| Permissions | `Blazor.Permissions` / `Blazor.Permissions.WebAssembly` |
+| Clipboard | `Blazor.Clipboard` / `Blazor.Clipboard.WebAssembly` |
+| Web Share | `Blazor.Share` / `Blazor.Share.WebAssembly` |
+| Wake Lock | `Blazor.WakeLock` / `Blazor.WakeLock.WebAssembly` |
+| Storage management | `Blazor.StorageManagement` / `Blazor.StorageManagement.WebAssembly` |
+| Screen APIs | `Blazor.Screen` / `Blazor.Screen.WebAssembly` |
+| Performance | `Blazor.Performance` / `Blazor.Performance.WebAssembly` |
+| Web Crypto | `Blazor.WebCrypto` / `Blazor.WebCrypto.WebAssembly` |
+| Credentials and WebAuthn | `Blazor.Credentials` / `Blazor.Credentials.WebAssembly` |
+| Offline storage | `Blazor.OfflineStorage` / `Blazor.OfflineStorage.WebAssembly` |
+| Browser coordination | `Blazor.BrowserCoordination` / `Blazor.BrowserCoordination.WebAssembly` |
+| Media devices | `Blazor.MediaDevices` / `Blazor.MediaDevices.WebAssembly` |
+| Notifications | `Blazor.Notifications` / `Blazor.Notifications.WebAssembly` |
+| File System Access | `Blazor.FileSystemAccess` / `Blazor.FileSystemAccess.WebAssembly` |
+
+Together, these profiles account for 772 operations and 966 projected members. Each focused package exposes a generated capability facade, DI registration method, exact transitive type closure, host parity, feature metadata, and package-local static web assets. For example:
+
+```csharp
+builder.Services.AddClipboardCapability();
+```
+
+```razor
+@inject IClipboardCapability Capability
+
+@code {
+    async Task CopyAsync()
+    {
+        await using var clipboard = Capability.GetClipboard();
+        await clipboard.WriteTextAsync("Generated DOM interop");
+    }
+}
+```
+
+The sample app includes an interactive DOM lab at `/dom-e2e` and a routed catalog of all 14 capabilities. Each page shows installation, registration, injection, generated contracts, a live browser workflow, operation facts, and the raw result envelope.
 
 ## Using the `Blazor.SourceGenerators` package 📦
 
