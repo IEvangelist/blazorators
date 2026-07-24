@@ -39,6 +39,8 @@
     --border: 240 6% 90%;
     --border-strong: 240 6% 82%;
     --ring: 252 95% 60%;
+    --modal-backdrop: hsl(240 10% 4% / 0.32);
+    --modal-shadow: hsl(240 10% 4% / 0.22);
 
     /* shape */
     --radius-sm: 8px;
@@ -86,6 +88,8 @@
     --border: 240 6% 16%;
     --border-strong: 240 6% 22%;
     --ring: 252 95% 70%;
+    --modal-backdrop: hsl(278 35% 4% / 0.72);
+    --modal-shadow: hsl(278 50% 4% / 0.72);
 }
 
 /* ---------- reset ---------- */
@@ -275,6 +279,11 @@ hr {
         display: none;
     }
 
+    .desktop-nav-toggle {
+        position: absolute;
+        left: 1.5rem;
+    }
+
     .app.nav-toggled {
         grid-template-columns: var(--sidebar-w) 1fr;
     }
@@ -312,6 +321,12 @@ hr {
     backdrop-filter: saturate(180%) blur(12px);
     -webkit-backdrop-filter: saturate(180%) blur(12px);
     border-bottom: 1px solid hsl(var(--border));
+}
+
+@media (min-width: 901px) {
+    .app-header {
+        padding-left: max(4.25rem, calc((100% - var(--content-max)) / 2));
+    }
 }
 
 .app-header .crumb {

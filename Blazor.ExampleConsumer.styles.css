@@ -3002,17 +3002,17 @@
     margin: auto;
     padding: 0;
     overflow: hidden;
-    border: 1px solid hsl(var(--primary) / 0.35);
+    border: 1px solid hsl(var(--border-strong) / 0.75);
     border-radius: 1rem;
-    background: hsl(var(--surface-1));
+    background: hsl(var(--surface));
     color: hsl(var(--foreground));
     box-shadow:
-        0 2rem 6rem -2rem hsl(278 50% 4% / 0.72),
+        0 2rem 6rem -2rem var(--modal-shadow),
         0 0 0 1px hsl(var(--primary) / 0.08);
 }
 
 .site-search-dialog[b-kg8k7bjkwd]::backdrop {
-    background: hsl(278 35% 4% / 0.72);
+    background: var(--modal-backdrop);
     backdrop-filter: blur(7px);
 }
 
@@ -3121,7 +3121,7 @@
     border-top: 1px solid hsl(var(--border));
     background:
         radial-gradient(circle at 100% 0, hsl(var(--primary) / 0.08), transparent 16rem),
-        hsl(var(--surface-2) / 0.42);
+        hsl(var(--surface-2) / 0.72);
 }
 
 .search-result-summary[b-kg8k7bjkwd] {
@@ -3353,6 +3353,7 @@
     align-items: center;
     padding: 0.65rem 1rem;
     border-top: 1px solid hsl(var(--border));
+    background: hsl(var(--surface));
     color: hsl(var(--muted-foreground));
     font-size: 0.59rem;
 }
