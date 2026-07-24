@@ -1,0 +1,83 @@
+<section class="file-preview"
+         aria-labelledby="file-preview-heading"
+         data-file-preview-kind="@Preview.KindToken">
+    <header>
+        <span class="file-preview-icon" aria-hidden="true">
+            <Icon Name="@PreviewIcon" />
+        </span>
+        <div>
+            <span>Selected file preview</span>
+            <h5 id="file-preview-heading">@Preview.FileName</h5>
+        </div>
+        <dl aria-label="Selected file details">
+            <div>
+                <dt>Type</dt>
+                <dd>@Preview.MimeType</dd>
+            </div>
+            <div>
+                <dt>Size</dt>
+                <dd>@Preview.Size</dd>
+            </div>
+            <div>
+                <dt>Modified</dt>
+                <dd>@Preview.Modified</dd>
+            </div>
+        </dl>
+    </header>
+
+    <div class="file-preview-body">
+        @if (Preview.Kind == FilePreviewKind.Image)
+        {
+            <img src="@Preview.Content"
+                 alt="@($"Preview of {Preview.FileName}")"
+                 decoding="async" />
+        }
+        else if (Preview.Kind == FilePreviewKind.Pdf)
+        {
+            <object data="@Preview.Content"
+                    type="application/pdf"
+                    aria-label="@($"PDF preview of {Preview.FileName}")">
+                <p>
+                    This browser cannot embed the PDF preview, but the selected file metadata
+                    is still available above.
+                </p>
+            </object>
+        }
+        else if (Preview.Kind is FilePreviewKind.Code or FilePreviewKind.Text)
+        {
+            <CodeSnippet Source="@(Preview.Content ?? string.Empty)"
+                         Language="@(Preview.Language ?? "plaintext")"
+                         FileName="@Preview.FileName"
+                         Label="@($"Preview of {Preview.FileName}")" />
+        }
+        else
+        {
+            <div class="file-preview-unavailable">
+                <Icon Name="file" />
+                <div>
+                    <strong>Preview unavailable</strong>
+                    <p>@Preview.Message</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <footer>
+        <Icon Name="check" />
+        <span>The file stays in this browser session and is never uploaded.</span>
+    </footer>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public FilePreviewModel Preview { get; set; } = null!;
+
+    string PreviewIcon => Preview.Kind switch
+    {
+        FilePreviewKind.Image => "image",
+        FilePreviewKind.Pdf => "file",
+        FilePreviewKind.Code => "code",
+        FilePreviewKind.Text => "file",
+        _ => "info"
+    };
+}

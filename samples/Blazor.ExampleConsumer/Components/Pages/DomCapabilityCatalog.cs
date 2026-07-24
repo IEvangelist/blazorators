@@ -276,6 +276,7 @@ internal static class DomCapabilityCatalog
                 await using var crypto = Capability.GetCrypto();
                 var id = crypto.RandomUUID();
 
+                var bytes = "Blazorators"u8.ToArray();
                 await using var subtle = crypto.Subtle;
                 var digest = await subtle.DigestAsync(
                     AlgorithmIdentifier.FromString("SHA-256"), bytes);
@@ -312,9 +313,7 @@ internal static class DomCapabilityCatalog
 
                 await using var credentials =
                     Capability.GetCredentialsContainer();
-
-                await using var credential =
-                    await credentials.GetAsync(requestOptions);
+                await credentials.PreventSilentAccessAsync();
                 """
         },
         new()
@@ -475,16 +474,16 @@ internal static class DomCapabilityCatalog
             Slug = "file-system-access",
             Name = "File System Access",
             Category = "Specialized",
-            Icon = "code",
-            Summary = "Open browser-managed files and directories while preserving handle identity.",
-            UseCase = "Let a user choose a local file, then inspect metadata through its browser-owned handle.",
+            Icon = "file",
+            Summary = "Open local files and safely preview common formats without uploading them.",
+            UseCase = "Let a user choose a local file, then inspect metadata and preview an image, PDF, source file, or text in memory.",
             TrySteps =
             [
                 "Open the browser-owned picker from the button click.",
-                "Choose a disposable test file or cancel without side effects.",
-                "Inspect the selected file's name, MIME type, size, and modified time."
+                "Choose an image, PDF, source file, or plain-text file.",
+                "Inspect the embedded preview, metadata, type-aware handling, and size limits."
             ],
-            Success = "The selected file remains a live owned proxy and its exact metadata appears in the result.",
+            Success = "The handle is disposed after reading while a safe, in-memory preview and exact metadata remain on the page.",
             Package = "Blazor.FileSystemAccess.WebAssembly",
             Service = "IFileSystemAccessCapability",
             Registration = "AddFileSystemAccessCapability",
@@ -506,7 +505,7 @@ internal static class DomCapabilityCatalog
 
                 await using var handle = await handles.GetAsync(0);
                 await using var file = await handle.GetFileAsync();
-                var bytes = await file.BytesAsync();
+                var bytes = await file.ArrayBufferAsync();
                 """
         }
     ];

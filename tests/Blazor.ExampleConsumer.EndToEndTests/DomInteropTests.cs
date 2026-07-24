@@ -16,6 +16,35 @@ public sealed class DomInteropTests(
         yield return [DomHost.Server];
     }
 
+    public static IEnumerable<object[]> FilePreviewCases()
+    {
+        yield return
+        [
+            "Preview.cs",
+            "text/plain",
+            Convert.ToBase64String(
+                System.Text.Encoding.UTF8.GetBytes(
+                    "public sealed class Preview\n{\n    public string Status => \"Ready\";\n}")),
+            "code"
+        ];
+        yield return
+        [
+            "pixel.png",
+            "image/png",
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+            "image"
+        ];
+        yield return
+        [
+            "guide.pdf",
+            "application/pdf",
+            Convert.ToBase64String(
+                System.Text.Encoding.ASCII.GetBytes(
+                    "%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF")),
+            "pdf"
+        ];
+    }
+
     [Theory]
     [MemberData(nameof(Hosts))]
     public async Task GeneratedDomInteropRunsInARealBrowser(DomHost host)
@@ -206,6 +235,10 @@ public sealed class DomInteropTests(
         await Assertions.Expect(page.Locator(".setup-grid")).ToContainTextAsync(
             "AddWebCryptoCapability()");
         await Assertions.Expect(page.Locator(".setup-grid")).ToContainTextAsync(
+            "var builder = WebAssemblyHostBuilder.CreateDefault(args);");
+        await Assertions.Expect(page.Locator(".setup-grid")).ToContainTextAsync(
+            "await host.RunAsync();");
+        await Assertions.Expect(page.Locator(".setup-grid")).ToContainTextAsync(
             "@inject IWebCryptoCapability Capability");
         var setupTops = await page.Locator(".setup-grid article").EvaluateAllAsync<double[]>(
             "articles => articles.map(article => article.getBoundingClientRect().top)");
@@ -214,8 +247,13 @@ public sealed class DomInteropTests(
             && setupTops.Distinct().Count() == setupTops.Length,
             "Install, register, and inject steps must be vertically stacked.");
 
-        await Assertions.Expect(page.Locator(".detail-code code")).ToContainTextAsync(
+        var componentCode = page.Locator(".detail-code .code-snippet code");
+        await Assertions.Expect(componentCode).ToContainTextAsync(
             "var id = crypto.RandomUUID();");
+        await Assertions.Expect(componentCode).ToContainTextAsync(
+            "@inject IWebCryptoCapability Capability");
+        await Assertions.Expect(componentCode).ToContainTextAsync(
+            "private async Task RunAsync()");
 
         await page.Locator("#capability-action").ClickAsync();
         await Assertions.Expect(page.Locator("[data-demo-result='web-crypto']")).ToHaveTextAsync(
@@ -297,6 +335,76 @@ public sealed class DomInteropTests(
         }
     }
 
+    [Theory]
+    [MemberData(nameof(FilePreviewCases))]
+    public async Task FileSystemAccess_PreviewsKnownFilesWithoutRetainingBrowserProxies(
+        string fileName,
+        string mimeType,
+        string base64Content,
+        string previewKind)
+    {
+        await using var context = await browser.Browser.NewContextAsync();
+        var fileNameJson = System.Text.Json.JsonSerializer.Serialize(fileName);
+        var mimeTypeJson = System.Text.Json.JsonSerializer.Serialize(mimeType);
+        var contentJson = System.Text.Json.JsonSerializer.Serialize(base64Content);
+        await context.AddInitScriptAsync(
+            $$"""
+            (() => {
+                const bytes = Uint8Array.from(
+                    atob({{contentJson}}),
+                    character => character.charCodeAt(0));
+                const file = new File([bytes], {{fileNameJson}}, {
+                    type: {{mimeTypeJson}},
+                    lastModified: Date.UTC(2026, 0, 15, 12, 0, 0)
+                });
+                Object.defineProperty(globalThis, 'showOpenFilePicker', {
+                    configurable: true,
+                    value: async () => [{
+                        kind: 'file',
+                        name: {{fileNameJson}},
+                        getFile: async () => file
+                    }]
+                });
+            })();
+            """);
+        var page = await context.NewPageAsync();
+
+        await page.GotoAsync(webAssemblySite.UrlFor("/dom-e2e/file-system-access"));
+        await page.WaitForFunctionAsync(
+            "() => document.querySelector('[data-probe-phase]')?.dataset.probePhase === 'ready'");
+        await page.Locator("#capability-action").ClickAsync();
+        await page.WaitForFunctionAsync(
+            "() => document.querySelector('[data-file-preview-kind]') !== null",
+            null,
+            new PageWaitForFunctionOptions { Timeout = 15_000 });
+
+        var preview = page.Locator($"[data-file-preview-kind='{previewKind}']");
+        await Assertions.Expect(preview).ToBeVisibleAsync();
+        await Assertions.Expect(preview).ToContainTextAsync(fileName);
+        await Assertions.Expect(preview).ToContainTextAsync(
+            "never uploaded");
+        await Assertions.Expect(page.Locator(".raw-result code")).ToContainTextAsync(
+            $"\"preview\": \"{previewKind}\"");
+
+        if (previewKind == "code")
+        {
+            await Assertions.Expect(preview.Locator("code")).ToContainTextAsync(
+                "public sealed class Preview");
+        }
+        else if (previewKind == "image")
+        {
+            await Assertions.Expect(preview.Locator("img")).ToHaveAttributeAsync(
+                "src",
+                new Regex("^data:image/png;base64,"));
+        }
+        else
+        {
+            await Assertions.Expect(preview.Locator("object")).ToHaveAttributeAsync(
+                "data",
+                new Regex("^data:application/pdf;base64,"));
+        }
+    }
+
     [Fact]
     public async Task CodeSnippetsKeepContentAndReportCopyFailureWithoutCdnAccess()
     {
@@ -321,7 +429,7 @@ public sealed class DomInteropTests(
 
         await page.GotoAsync(webAssemblySite.UrlFor("/dom-e2e/web-crypto"));
 
-        await Assertions.Expect(page.Locator(".detail-code code")).ToContainTextAsync(
+        await Assertions.Expect(page.Locator(".detail-code .code-snippet code")).ToContainTextAsync(
             "var id = crypto.RandomUUID();");
         var copy = page.Locator(".detail-code .copy-btn");
         await copy.ClickAsync();

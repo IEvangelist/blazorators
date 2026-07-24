@@ -47,7 +47,7 @@
 }
 
 .nav-disclosure:hover,
-.nav-capabilities[open] > .nav-disclosure {
+.nav-capabilities.route-active > .nav-disclosure {
     background: hsl(var(--accent));
     color: hsl(var(--accent-foreground));
 }

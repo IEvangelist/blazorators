@@ -113,8 +113,17 @@ else
                 </p>
             </div>
 
+            <div class="sample-context">
+                <Icon Name="info" />
+                <p>
+                    <code>builder</code> belongs in <strong>Program.cs</strong>, where the
+                    Blazor WebAssembly host and service container are created. The component
+                    receives that registered service as <code>Capability</code>.
+                </p>
+            </div>
+
             <CodeSnippet @key="@($"{Definition.Slug}-sample")"
-                         Source="@Definition.Sample"
+                         Source="@ComponentCode"
                          Language="csharp"
                          FileName="@($"{Definition.Name.Replace(" ", "")}Lab.razor")"
                          Label="@($"{Definition.Name} example code")" />
@@ -149,7 +158,7 @@ else
                         <small>Program.cs</small>
                         <h3>Register the generated façade</h3>
                         <p>Register one capability root with the application's service container.</p>
-                        <CodeSnippet Source="@RegistrationCode"
+                        <CodeSnippet Source="@ProgramCode"
                                      Language="csharp"
                                      FileName="Program.cs"
                                      Label="@($"Register {Definition.Name}")" />
@@ -280,9 +289,81 @@ else
 
     string InstallCommand => $"dotnet add package {Definition!.Package}";
 
-    string RegistrationCode => $"builder.Services.{Definition!.Registration}();";
+    string ProgramCode =>
+        $$"""
+        using Blazor.DOM;
+        using Microsoft.AspNetCore.Components.Web;
+        using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+        using MyApp;
 
-    string InjectionCode => $"@inject {Definition!.Service} Capability";
+        // Create the host builder before registering application services.
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        builder.RootComponents.Add<App>("#app");
+
+        builder.Services.{{Definition!.Registration}}();
+
+        var host = builder.Build();
+        await host.RunAsync();
+        """;
+
+    string InjectionCode =>
+        $$"""
+        @using Blazor.DOM
+        @inject {{Definition!.Service}} Capability
+        """;
+
+    string ComponentCode
+    {
+        get
+        {
+            var navigationInjection = Definition!.Slug == "web-share"
+                ? $"{Environment.NewLine}@inject NavigationManager Navigation"
+                : string.Empty;
+
+            return $$"""
+                @using Blazor.DOM
+                @inject {{Definition.Service}} Capability{{navigationInjection}}
+
+                <button type="button" @onclick="RunAsync">Run browser call</button>
+                <output aria-live="polite">@_status</output>
+
+                @code {
+                    private string _status = "Ready.";
+
+                    private async Task RunAsync()
+                    {
+                {{Indent(ComponentActionCode, 8)}}
+                        _status = "Browser call completed.";
+                    }
+                }
+                """;
+        }
+    }
+
+    string ComponentActionCode
+    {
+        get
+        {
+            var body = Definition!.Sample
+                .ReplaceLineEndings("\n")
+                .Split('\n')
+                .SkipWhile(string.IsNullOrWhiteSpace)
+                .Skip(1)
+                .SkipWhile(string.IsNullOrWhiteSpace);
+
+            return string.Join(Environment.NewLine, body).TrimEnd();
+        }
+    }
+
+    static string Indent(string value, int spaces)
+    {
+        var prefix = new string(' ', spaces);
+        return string.Join(
+            Environment.NewLine,
+            value.ReplaceLineEndings("\n")
+                .Split('\n')
+                .Select(line => line.Length == 0 ? string.Empty : $"{prefix}{line}"));
+    }
 
     protected override void OnParametersSet() =>
         Definition = DomCapabilityCatalog.Find(Slug);

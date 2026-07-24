@@ -134,6 +134,15 @@ public static class DomDispatch
     {
         transport = ResolveTransport<TResult>(transport);
         Validate(proxy, name, transport);
+        if (transport.Kind == DomTransportKind.Binary)
+        {
+            return await InvokeBinaryAsync<TResult>(
+                proxy,
+                name,
+                arguments,
+                transport,
+                cancellationToken).ConfigureAwait(false);
+        }
         if (IsProxyContract<TResult>())
         {
             transport.RequireReference(nameof(transport));
@@ -254,6 +263,92 @@ public static class DomDispatch
 
     private static bool IsProxyContract<TResult>() =>
         typeof(IDomProxy).IsAssignableFrom(typeof(TResult));
+
+    private static async ValueTask<TResult> InvokeBinaryAsync<TResult>(
+        IDomDispatchProxy proxy,
+        string name,
+        object?[]? arguments,
+        DomTransportDescriptor transport,
+        CancellationToken cancellationToken)
+    {
+        var elementType = typeof(TResult).GetElementType();
+        var elementSize = GetBinaryElementSize(elementType);
+        if (elementSize == 0)
+        {
+            throw new DomTransportException(
+                $"Binary JavaScript value '{transport.SourceType}' cannot be materialized " +
+                $"as managed type '{typeof(TResult)}'.");
+        }
+
+        DomReadStream? stream = transport.Nullable
+            ? await proxy.DispatchRuntime.InvokeMethodNullableStreamAsync(
+                proxy.Reference,
+                name,
+                arguments,
+                transport,
+                int.MaxValue,
+                cancellationToken).ConfigureAwait(false)
+            : await proxy.DispatchRuntime.InvokeMethodStreamAsync(
+                proxy.Reference,
+                name,
+                arguments,
+                transport,
+                int.MaxValue,
+                cancellationToken).ConfigureAwait(false);
+        if (stream is null)
+        {
+            return default!;
+        }
+
+        await using (stream)
+        {
+            if (stream.Length > int.MaxValue)
+            {
+                throw new DomTransportException(
+                    $"Binary JavaScript value '{transport.SourceType}' is too large to " +
+                    "materialize as a managed array.");
+            }
+            if (stream.Length % elementSize != 0)
+            {
+                throw new DomTransportException(
+                    $"Binary JavaScript value '{transport.SourceType}' has a byte length " +
+                    $"that is not divisible by the managed element size ({elementSize}).");
+            }
+
+            var bytes = GC.AllocateUninitializedArray<byte>((int)stream.Length);
+            await stream.Stream.ReadExactlyAsync(bytes, cancellationToken)
+                .ConfigureAwait(false);
+            if (typeof(TResult) == typeof(byte[]))
+            {
+                return (TResult)(object)bytes;
+            }
+
+            var result = Array.CreateInstance(elementType!, bytes.Length / elementSize);
+            Buffer.BlockCopy(bytes, 0, result, 0, bytes.Length);
+            return (TResult)(object)result;
+        }
+    }
+
+    private static int GetBinaryElementSize(Type? elementType)
+    {
+        if (elementType == typeof(byte) || elementType == typeof(sbyte))
+            return 1;
+        if (elementType == typeof(short) || elementType == typeof(ushort))
+            return 2;
+        if (elementType == typeof(int)
+            || elementType == typeof(uint)
+            || elementType == typeof(float))
+        {
+            return 4;
+        }
+        if (elementType == typeof(long)
+            || elementType == typeof(ulong)
+            || elementType == typeof(double))
+        {
+            return 8;
+        }
+        return 0;
+    }
 
     private static TResult CreateProxy<TResult>(
         IDomDispatchProxy owner,

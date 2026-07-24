@@ -41,14 +41,47 @@
 </head>
 <body>
     <div id="app">
-        <div class="splash" role="status" aria-live="polite">
-            <div class="splash-logo" aria-hidden="true">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
+        <div class="splash">
+            <div class="splash-panel">
+                <div class="splash-brand">
+                    <div class="splash-mark" aria-hidden="true">
+                        <img src="logo.png" alt="" />
+                    </div>
+                    <div>
+                        <div class="splash-title">Blazorators</div>
+                        <div class="splash-sub">Preparing strongly typed browser APIs</div>
+                    </div>
+                </div>
+
+                <div class="splash-contract" aria-hidden="true">
+                    <div class="splash-contract-card">
+                        <small>Browser contract</small>
+                        <strong>lib.dom.d.ts</strong>
+                    </div>
+                    <span class="splash-contract-flow"><i></i></span>
+                    <div class="splash-contract-card is-output">
+                        <small>Generated app</small>
+                        <strong>Blazor + C#</strong>
+                    </div>
+                </div>
+
+                <div class="splash-status">
+                    <span id="splash-stage" role="status" aria-live="polite">Reading the boot manifest</span>
+                    <span id="splash-count">Preparing runtime files</span>
+                </div>
+                <div id="splash-progress"
+                     class="splash-progress"
+                     role="progressbar"
+                     aria-label="Blazor WebAssembly startup"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-valuenow="4">
+                    <span id="splash-progress-fill" style="width: 4%"></span>
+                </div>
+                <p id="splash-fact" class="splash-fact">
+                    Projecting browser promises into typed asynchronous C#.
+                </p>
             </div>
-            <div class="splash-title">Blazorators</div>
-            <div class="splash-sub">Booting Blazor WebAssembly…</div>
         </div>
     </div>
 
@@ -68,6 +101,25 @@
             const retryableStatusCodes = new Set([408, 429, 500, 502, 503, 504]);
             const maxBootResourceAttempts = 3;
             const errorUi = document.getElementById('blazor-error-ui');
+            const splashStage = document.getElementById('splash-stage');
+            const splashCount = document.getElementById('splash-count');
+            const splashProgress = document.getElementById('splash-progress');
+            const splashProgressFill = document.getElementById('splash-progress-fill');
+            const splashFact = document.getElementById('splash-fact');
+            const splashFacts = [
+                'Projecting browser promises into typed asynchronous C#.',
+                'Keeping browser-owned references explicit and disposable.',
+                'Mapping lib.dom.d.ts without handwritten JavaScript adapters.',
+                'Preserving unions, callbacks, events, and structured values.'
+            ];
+            let requestedResources = 0;
+            let loadedResources = 0;
+            let highestBootProgress = 4;
+            let factIndex = 0;
+            const factTimer = window.setInterval(() => {
+                factIndex = (factIndex + 1) % splashFacts.length;
+                splashFact.textContent = splashFacts[factIndex];
+            }, 1800);
 
             errorUi.querySelector('.reload').addEventListener('click', () => location.reload());
             errorUi.querySelector('.dismiss').addEventListener('click', () => {
@@ -75,12 +127,21 @@
                 errorUi.style.removeProperty('display');
             });
 
-            function loadBootResource(_type, _name, defaultUri, integrity) {
-                if (_type === 'dotnetjs') {
+            function loadBootResource(type, _name, defaultUri, integrity) {
+                updateBootStage(type);
+                if (type === 'dotnetjs') {
                     return defaultUri;
                 }
 
-                return fetchBootResourceWithRetry(defaultUri, integrity);
+                requestedResources++;
+                updateBootProgress();
+                return fetchBootResourceWithRetry(defaultUri, integrity).then(response => {
+                    if (response.ok) {
+                        loadedResources++;
+                        updateBootProgress();
+                    }
+                    return response;
+                });
             }
 
             async function fetchBootResourceWithRetry(defaultUri, integrity) {
@@ -115,11 +176,48 @@
                 }
             }
 
-            Blazor.start({ loadBootResource }).catch(error => {
-                console.error('Blazor failed to start.', error);
-                errorUi.hidden = false;
-                errorUi.style.display = 'flex';
-            });
+            function updateBootStage(type) {
+                splashStage.textContent = type === 'assembly' || type === 'pdb'
+                    ? 'Loading generated .NET assemblies'
+                    : type === 'dotnetjs' || type.includes('wasm')
+                        ? 'Starting the WebAssembly runtime'
+                        : type === 'globalization'
+                            ? 'Loading globalization data'
+                            : 'Loading application resources';
+            }
+
+            function updateBootProgress() {
+                const total = Math.max(requestedResources, 1);
+                const estimatedPercent =
+                    Math.min(92, 8 + Math.round((loadedResources / total) * 84));
+                highestBootProgress = Math.max(highestBootProgress, estimatedPercent);
+                setBootProgress(highestBootProgress);
+                splashCount.textContent =
+                    `${loadedResources} of ${requestedResources} runtime files ready`;
+            }
+
+            function setBootProgress(percent) {
+                splashProgress.setAttribute('aria-valuenow', String(percent));
+                splashProgressFill.style.width = `${percent}%`;
+            }
+
+            async function startApplication() {
+                splashStage.textContent = 'Loading application resources';
+
+                try {
+                    await Blazor.start({ loadBootResource });
+                } catch (error) {
+                    console.error('Blazor failed to start.', error);
+                    splashStage.textContent = 'Startup failed';
+                    splashFact.textContent = 'Reload to retry the application startup.';
+                    errorUi.hidden = false;
+                    errorUi.style.display = 'flex';
+                } finally {
+                    window.clearInterval(factTimer);
+                }
+            }
+
+            startApplication();
         })();
     </script>
 </body>

@@ -215,6 +215,126 @@ public sealed class ExampleSiteTests(
     }
 
     [Fact]
+    public async Task HeaderSearch_IsResponsive_KeyboardAccessible_AndReturnsRichResults()
+    {
+        await using var context = await NewContextAsync();
+        var page = await context.NewPageAsync();
+        await page.GotoAsync(site.UrlFor("/"));
+        await ExpectHeadingAsync(page, "Browser APIs");
+
+        var github = page.Locator(".github-action");
+        var theme = page.Locator(".theme-toggle");
+        var githubBox = await github.BoundingBoxAsync();
+        var themeBox = await theme.BoundingBoxAsync();
+        var githubIconBox = await github.Locator("svg").BoundingBoxAsync();
+        Assert.NotNull(githubBox);
+        Assert.NotNull(themeBox);
+        Assert.NotNull(githubIconBox);
+        Assert.InRange(Math.Abs(githubBox!.Height - themeBox!.Height), 0, 1);
+        Assert.True(githubIconBox!.Width >= 20, "The GitHub glyph should use the available control area.");
+
+        var searchTrigger = page.GetByRole(AriaRole.Button, new() { Name = "Search this site" });
+        var searchTriggerBox = await searchTrigger.BoundingBoxAsync();
+        var contentBox = await page.Locator(".app-main > .content.page-enter").BoundingBoxAsync();
+        var shortcutBox = await searchTrigger.Locator("kbd").BoundingBoxAsync();
+        Assert.NotNull(searchTriggerBox);
+        Assert.NotNull(contentBox);
+        Assert.NotNull(shortcutBox);
+        Assert.InRange(Math.Abs(searchTriggerBox!.X - contentBox!.X), 0, 40);
+        Assert.InRange(
+            Math.Abs(
+                (searchTriggerBox.Y + (searchTriggerBox.Height / 2))
+                - (shortcutBox!.Y + (shortcutBox.Height / 2))),
+            0,
+            1);
+
+        await page.Keyboard.PressAsync("Control+K");
+        var dialog = page.GetByRole(AriaRole.Dialog, new() { Name = "Find a browser API" });
+        await Assertions.Expect(dialog).ToBeVisibleAsync();
+
+        var searchInput = page.Locator("#site-search-input");
+        await searchInput.FillAsync("file preview");
+        Assert.Equal(
+            "none",
+            await searchInput.EvaluateAsync<string>("element => getComputedStyle(element).boxShadow"));
+        Assert.NotEqual(
+            "none",
+            await page.Locator(".search-input-shell")
+                .EvaluateAsync<string>("element => getComputedStyle(element).boxShadow"));
+        var fileResult = page.Locator(".search-results li")
+            .Filter(new() { HasTextString = "File System Access" });
+        await Assertions.Expect(fileResult).ToBeVisibleAsync();
+        await Assertions.Expect(fileResult).ToContainTextAsync("Choose a local file");
+        await Assertions.Expect(page.Locator(".search-result-summary")).ToContainTextAsync(
+            "Local catalog");
+        await AssertNoAxeViolationsAsync(page);
+
+        await page.Keyboard.PressAsync("Escape");
+        await Assertions.Expect(dialog).ToBeHiddenAsync();
+
+        await page.SetViewportSizeAsync(390, 844);
+        var searchBox = await searchTrigger.BoundingBoxAsync();
+        Assert.NotNull(searchBox);
+        Assert.InRange(searchBox!.Width, 35, 37);
+        await AssertNoDocumentOverflowAsync(page);
+
+        await searchTrigger.ClickAsync();
+        await Assertions.Expect(dialog).ToBeVisibleAsync();
+        await AssertNoDocumentOverflowAsync(page);
+    }
+
+    [Fact]
+    public async Task CapabilityNavigation_PreservesDisclosureWithinCatalog_AndResetsAfterLeaving()
+    {
+        await using var context = await NewContextAsync();
+        var page = await context.NewPageAsync();
+        await page.GotoAsync(site.UrlFor("/dom-e2e/web-crypto"));
+        await page.WaitForFunctionAsync(
+            "() => document.querySelector('[data-probe-phase]')?.dataset.probePhase === 'ready'");
+
+        var capabilities = page.Locator(".nav-capabilities");
+        await Assertions.Expect(capabilities).ToHaveClassAsync(new Regex(@"\broute-active\b"));
+        await capabilities.Locator("summary").ClickAsync();
+        Assert.True(await capabilities.EvaluateAsync<bool>("element => element.open"));
+
+        await page.Locator("#dom-file-system-access").ClickAsync();
+        await page.WaitForFunctionAsync(
+            "() => document.querySelector('[data-probe-phase]')?.dataset.probePhase === 'ready'");
+        await Assertions.Expect(page).ToHaveURLAsync(new Regex(@"/dom-e2e/file-system-access$"));
+        capabilities = page.Locator(".nav-capabilities");
+        Assert.True(await capabilities.EvaluateAsync<bool>("element => element.open"));
+
+        await page.Locator("#home").ClickAsync();
+        await ExpectHeadingAsync(page, "Browser APIs");
+
+        capabilities = page.Locator(".nav-capabilities");
+        await Assertions.Expect(capabilities).Not.ToHaveClassAsync(new Regex(@"\broute-active\b"));
+        Assert.False(await capabilities.EvaluateAsync<bool>("element => element.open"));
+    }
+
+    [Fact]
+    public async Task LandingDomLabCard_UsesADistinctWideContractFlow()
+    {
+        await using var context = await NewContextAsync();
+        var page = await context.NewPageAsync();
+        await page.GotoAsync(site.UrlFor("/"));
+        await ExpectHeadingAsync(page, "Browser APIs");
+
+        var domCard = page.Locator(".bento-dom");
+        var sandboxCard = page.Locator(".bento-card[href='sandbox']");
+        await Assertions.Expect(domCard.Locator(".bento-anim-contract")).ToBeVisibleAsync();
+        await Assertions.Expect(domCard.Locator(".bento-anim-orbit")).ToHaveCountAsync(0);
+
+        var domBox = await domCard.BoundingBoxAsync();
+        var sandboxBox = await sandboxCard.BoundingBoxAsync();
+        Assert.NotNull(domBox);
+        Assert.NotNull(sandboxBox);
+        Assert.True(
+            domBox!.Width >= sandboxBox!.Width * 1.75,
+            "The DOM lab should close the desktop bento row as a deliberately wide card.");
+    }
+
+    [Fact]
     public async Task TrackPage_AlignsMapAndLiveUpdatesPanel()
     {
         await using var context = await NewContextAsync();
@@ -436,6 +556,83 @@ public sealed class ExampleSiteTests(
         Assert.Contains(
             requestUrls,
             url => new Uri(url).Query.Contains("blazor-retry=", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task InitialSplash_ReportsRealBootWork_AndHonorsReducedMotion()
+    {
+        await using var context = await NewContextAsync(reducedMotion: ReducedMotion.Reduce);
+        var page = await context.NewPageAsync();
+        var resourceRequested = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseResource = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        await page.AddInitScriptAsync("""
+            window.__bootProgressValues = [];
+            new MutationObserver(mutations => {
+                const progress = document.getElementById('splash-progress');
+                for (const mutation of mutations) {
+                    if (mutation.target === progress && mutation.oldValue !== null) {
+                        window.__bootProgressValues.push(Number(mutation.oldValue));
+                    }
+                }
+
+                if (progress) {
+                    window.__bootProgressValues.push(
+                        Number(progress.getAttribute('aria-valuenow')));
+                }
+            }).observe(document, {
+                attributes: true,
+                attributeFilter: ['aria-valuenow'],
+                attributeOldValue: true,
+                subtree: true
+            });
+            """);
+
+        await page.RouteAsync(
+            "**/_framework/Microsoft.Extensions.Logging.Abstractions*.wasm*",
+            async route =>
+            {
+                resourceRequested.TrySetResult(true);
+                await releaseResource.Task;
+                await route.ContinueAsync();
+            });
+
+        try
+        {
+            await page.GotoAsync(site.UrlFor("/"), new PageGotoOptions
+            {
+                WaitUntil = WaitUntilState.Commit
+            });
+            await resourceRequested.Task.WaitAsync(TimeSpan.FromSeconds(30));
+
+            var splash = page.Locator(".splash");
+            await Assertions.Expect(splash).ToBeVisibleAsync();
+            await Assertions.Expect(page.Locator("#splash-stage")).ToContainTextAsync("Loading");
+            await Assertions.Expect(page.Locator("#splash-count")).ToContainTextAsync(
+                "runtime files");
+            await Assertions.Expect(page.Locator(".splash-contract-card")).ToHaveCountAsync(2);
+            await Assertions.Expect(page.Locator("#splash-progress"))
+                .ToHaveAttributeAsync("aria-valuenow", new Regex(@"^[1-9]\d*$"));
+            await Assertions.Expect(page.Locator(".splash-contract-flow i"))
+                .ToHaveCSSAsync("animation-name", "none");
+
+            var progressValues = await page.EvaluateAsync<int[]>(
+                "() => window.__bootProgressValues");
+            Assert.True(progressValues.Length >= 2);
+            Assert.True(
+                progressValues
+                    .Zip(progressValues.Skip(1), static (previous, current) => current >= previous)
+                    .All(static isMonotonic => isMonotonic),
+                $"Boot progress regressed: {string.Join(", ", progressValues)}");
+        }
+        finally
+        {
+            releaseResource.TrySetResult(true);
+        }
+
+        await ExpectHeadingAsync(page, "Browser APIs");
     }
 
     [Fact]

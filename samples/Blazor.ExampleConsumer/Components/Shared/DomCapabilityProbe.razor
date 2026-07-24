@@ -271,6 +271,11 @@
             </section>
         </div>
 
+        @if (Definition.Slug == "file-system-access" && _filePreview is not null)
+        {
+            <FilePreviewPane Preview="_filePreview" />
+        }
+
         @if (_result.Json is not null)
         {
             <details class="raw-result" open>
@@ -331,6 +336,7 @@
     NotificationPermission _notificationPermission = NotificationPermission.Default;
     IWakeLockSentinel? _wakeLockSentinel;
     INotification? _notification;
+    FilePreviewModel? _filePreview;
     List<MediaDeviceSnapshot> _mediaDevices = [];
     List<string> _uuidHistory = [];
 
@@ -1115,6 +1121,7 @@
 
     async Task<DemoResult> ChooseFileAsync()
     {
+        _filePreview = null;
         await using var window = await Browser.GetWindowProxyAsync();
         await using var handles = await window.ShowOpenFilePickerAsync(
             new OpenFilePickerOptions { Multiple = false });
@@ -1131,6 +1138,7 @@
         await using var handle = await handles.GetAsync(0);
         await using var file = await handle.GetFileAsync();
         var lastModified = DateTimeOffset.FromUnixTimeMilliseconds((long)file.LastModified);
+        _filePreview = await CreateFilePreviewAsync(file, lastModified);
         return CreateResult(
             $"Selected {file.Name} ({FormatBytes(file.Size)}).",
             "success",
@@ -1145,15 +1153,239 @@
                     sizeBytes = file.Size,
                     file.LastModified,
                     lastModifiedUtc = lastModified,
-                    file.WebkitRelativePath
+                    file.WebkitRelativePath,
+                    preview = _filePreview.KindToken
                 },
                 proxiesDisposed = true
             },
             new("Name", file.Name),
             new("MIME type", file.Type.Length == 0 ? "Not provided" : file.Type),
             new("Size", FormatBytes(file.Size)),
-            new("Modified", lastModified.ToLocalTime().ToString("g")));
+            new("Modified", lastModified.ToLocalTime().ToString("g")),
+            new("Preview", PreviewLabel(_filePreview.Kind)));
     }
+
+    static async Task<FilePreviewModel> CreateFilePreviewAsync(
+        IFile file,
+        DateTimeOffset lastModified)
+    {
+        const long binaryPreviewLimit = 10 * 1024 * 1024;
+        const long textPreviewLimit = 1024 * 1024;
+
+        var name = file.Name;
+        var reportedMimeType = file.Type;
+        var displayMimeType = reportedMimeType.Length == 0
+            ? "Not provided"
+            : reportedMimeType;
+        var extension = GetFileExtension(name);
+        var size = FormatBytes(file.Size);
+        var modified = lastModified.ToLocalTime().ToString("g");
+
+        if (IsPdf(reportedMimeType, extension))
+        {
+            if (file.Size > binaryPreviewLimit)
+            {
+                return UnavailablePreview(
+                    name,
+                    displayMimeType,
+                    size,
+                    modified,
+                    "PDF previews are limited to 10 MB to keep this browser demo responsive.");
+            }
+
+            return new(
+                name,
+                displayMimeType,
+                size,
+                modified,
+                FilePreviewKind.Pdf,
+                ToDataUrl("application/pdf", await file.ArrayBufferAsync()));
+        }
+
+        if (TryGetImageMimeType(reportedMimeType, extension, out var imageMimeType))
+        {
+            if (file.Size > binaryPreviewLimit)
+            {
+                return UnavailablePreview(
+                    name,
+                    displayMimeType,
+                    size,
+                    modified,
+                    "Image previews are limited to 10 MB to keep this browser demo responsive.");
+            }
+
+            return new(
+                name,
+                displayMimeType,
+                size,
+                modified,
+                FilePreviewKind.Image,
+                ToDataUrl(imageMimeType, await file.ArrayBufferAsync()));
+        }
+
+        if (TryGetCodeLanguage(reportedMimeType, extension, out var language))
+        {
+            if (file.Size > textPreviewLimit)
+            {
+                return UnavailablePreview(
+                    name,
+                    displayMimeType,
+                    size,
+                    modified,
+                    "Source previews are limited to 1 MB to avoid rendering very large files.");
+            }
+
+            return new(
+                name,
+                displayMimeType,
+                size,
+                modified,
+                FilePreviewKind.Code,
+                await file.TextAsync(),
+                language);
+        }
+
+        if (IsTextFile(reportedMimeType, extension))
+        {
+            if (file.Size > textPreviewLimit)
+            {
+                return UnavailablePreview(
+                    name,
+                    displayMimeType,
+                    size,
+                    modified,
+                    "Text previews are limited to 1 MB to avoid rendering very large files.");
+            }
+
+            return new(
+                name,
+                displayMimeType,
+                size,
+                modified,
+                FilePreviewKind.Text,
+                await file.TextAsync(),
+                "plaintext");
+        }
+
+        return UnavailablePreview(
+            name,
+            displayMimeType,
+            size,
+            modified,
+            "This file type has no safe inline preview. Its metadata is still available above.");
+    }
+
+    static FilePreviewModel UnavailablePreview(
+        string name,
+        string mimeType,
+        string size,
+        string modified,
+        string message)
+        => new(
+            name,
+            mimeType,
+            size,
+            modified,
+            FilePreviewKind.Unavailable,
+            Message: message);
+
+    static bool IsPdf(string mimeType, string extension)
+        => mimeType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase)
+            || extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase);
+
+    static bool TryGetImageMimeType(
+        string mimeType,
+        string extension,
+        out string imageMimeType)
+    {
+        if (mimeType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            imageMimeType = mimeType;
+            return true;
+        }
+
+        imageMimeType = extension.ToLowerInvariant() switch
+        {
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            ".bmp" => "image/bmp",
+            ".svg" => "image/svg+xml",
+            _ => string.Empty
+        };
+        return imageMimeType.Length > 0;
+    }
+
+    static bool TryGetCodeLanguage(
+        string mimeType,
+        string extension,
+        out string language)
+    {
+        language = extension.ToLowerInvariant() switch
+        {
+            ".cs" => "csharp",
+            ".razor" or ".cshtml" => "xml",
+            ".js" or ".mjs" or ".cjs" => "javascript",
+            ".ts" or ".tsx" => "typescript",
+            ".html" or ".htm" or ".xml" or ".svg" or ".csproj" or ".props"
+                or ".targets" => "xml",
+            ".css" or ".scss" => "css",
+            ".json" => "json",
+            ".md" or ".markdown" => "markdown",
+            ".py" => "python",
+            ".java" => "java",
+            ".go" => "go",
+            ".rs" => "rust",
+            ".sql" => "sql",
+            ".yml" or ".yaml" => "yaml",
+            ".ps1" or ".psm1" or ".psd1" => "powershell",
+            ".sh" or ".bash" or ".zsh" => "bash",
+            _ => string.Empty
+        };
+
+        if (language.Length > 0)
+        {
+            return true;
+        }
+
+        language = mimeType.ToLowerInvariant() switch
+        {
+            "application/json" => "json",
+            "application/javascript" or "text/javascript" => "javascript",
+            "application/xml" or "text/xml" => "xml",
+            "text/css" => "css",
+            "text/markdown" => "markdown",
+            "application/sql" => "sql",
+            "application/yaml" or "text/yaml" => "yaml",
+            _ => string.Empty
+        };
+        return language.Length > 0;
+    }
+
+    static bool IsTextFile(string mimeType, string extension)
+        => mimeType.StartsWith("text/", StringComparison.OrdinalIgnoreCase)
+            || extension.ToLowerInvariant() is ".txt" or ".log" or ".csv" or ".ini"
+                or ".editorconfig" or ".gitignore" or ".gitattributes";
+
+    static string GetFileExtension(string name)
+    {
+        var lastDot = name.LastIndexOf('.');
+        return lastDot >= 0 ? name[lastDot..] : string.Empty;
+    }
+
+    static string ToDataUrl(string mimeType, byte[] bytes)
+        => $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}";
+
+    static string PreviewLabel(FilePreviewKind kind)
+        => kind switch
+        {
+            FilePreviewKind.Image => "Embedded image",
+            FilePreviewKind.Pdf => "Embedded PDF",
+            FilePreviewKind.Code => "Highlighted source",
+            FilePreviewKind.Text => "Text",
+            _ => "Metadata only"
+        };
 
     static async Task<(string Label, string Value)> ProbePermissionsAsync(INavigator navigator)
     {

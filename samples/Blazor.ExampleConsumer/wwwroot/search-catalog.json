@@ -1,0 +1,242 @@
+[
+  {
+    "path": "",
+    "title": "Blazorators home",
+    "category": "Overview",
+    "summary": "Source-generated, strongly typed browser APIs for Blazor.",
+    "content": "Explore storage, location, speech, exhaustive DOM interop, focused capability packages, live demos, and setup guides.",
+    "keywords": ["home", "browser APIs", "source generator", "C#", "Blazor", "JavaScript interop"],
+    "icon": "home",
+    "weight": 100
+  },
+  {
+    "path": "todos",
+    "title": "Local storage",
+    "category": "Storage",
+    "summary": "Persist a typed todo collection through window.localStorage.",
+    "content": "Use ILocalStorageService to save, read, and remove JSON values without handwritten JavaScript glue.",
+    "keywords": ["localStorage", "todos", "persistence", "JSON", "ILocalStorageService"],
+    "icon": "database",
+    "weight": 90
+  },
+  {
+    "path": "geolocation",
+    "title": "Geolocation",
+    "category": "Location",
+    "summary": "Resolve the current browser position and display it on a vector map.",
+    "content": "Use source-generated geolocation bindings, typed coordinates, browser permissions, MapLibre, and OpenFreeMap.",
+    "keywords": ["location", "coordinates", "GPS", "map", "permissions"],
+    "icon": "map-pin",
+    "weight": 85
+  },
+  {
+    "path": "track",
+    "title": "Watch position",
+    "category": "Location",
+    "summary": "Subscribe to live geolocation updates with a disposable callback.",
+    "content": "Track movement, inspect event timing, stop the watcher, and preserve typed browser error results.",
+    "keywords": ["watchPosition", "tracking", "location", "events", "IDisposable"],
+    "icon": "route",
+    "weight": 82
+  },
+  {
+    "path": "speak",
+    "title": "Text-to-speech",
+    "category": "Speech",
+    "summary": "Speak text with the browser Speech Synthesis API.",
+    "content": "Choose a voice, set rate and pitch, pause, resume, and cancel browser-owned speech.",
+    "keywords": ["speech synthesis", "voice", "speak", "audio", "accessibility"],
+    "icon": "volume",
+    "weight": 80
+  },
+  {
+    "path": "listen",
+    "title": "Speech-to-text",
+    "category": "Speech",
+    "summary": "Capture live transcripts through the Web Speech API.",
+    "content": "Start and stop recognition, inspect typed results, and handle browser permission or support failures.",
+    "keywords": ["speech recognition", "microphone", "transcript", "dictation", "voice"],
+    "icon": "mic",
+    "weight": 80
+  },
+  {
+    "path": "audio",
+    "title": "Audio lab",
+    "category": "Speech",
+    "summary": "Experiment with speech recognition controls and live audio feedback.",
+    "content": "Use accessible microphone controls, status announcements, and a browser-backed recognition session.",
+    "keywords": ["audio", "microphone", "recognition", "lab", "waveform"],
+    "icon": "volume",
+    "weight": 70
+  },
+  {
+    "path": "sandbox",
+    "title": "Sandbox",
+    "category": "Playground",
+    "summary": "Try callback-style geolocation in a compact browser API playground.",
+    "content": "Inspect success and error payloads and render the selected location on the shared map stack.",
+    "keywords": ["sandbox", "playground", "callback", "geolocation", "map"],
+    "icon": "rocket",
+    "weight": 70
+  },
+  {
+    "path": "dom-e2e",
+    "title": "DOM API lab",
+    "category": "DOM labs",
+    "summary": "Run the exhaustive generated DOM surface in a real browser.",
+    "content": "Exercise Window, Document, Performance, Crypto, Storage, Media Devices, events, unions, callbacks, and live-reference transport.",
+    "keywords": ["DOM", "end to end", "Window", "Document", "generated contracts", "interop"],
+    "icon": "code",
+    "weight": 96
+  },
+  {
+    "path": "dom-e2e/capabilities",
+    "title": "DOM capability catalog",
+    "category": "DOM labs",
+    "summary": "Browse focused packages for fourteen browser capability profiles.",
+    "content": "Compare package roots, generated operations, projected symbols, browser requirements, setup, and live workflows.",
+    "keywords": ["capabilities", "packages", "catalog", "profiles", "DOM"],
+    "icon": "package",
+    "weight": 95
+  },
+  {
+    "path": "dom-e2e/permissions",
+    "title": "Permissions",
+    "category": "Essential DOM",
+    "summary": "Query typed browser permission state without triggering a prompt.",
+    "content": "Inspect PermissionState values, PermissionDescriptor options, generated roots, and state change subscriptions.",
+    "keywords": ["permissions", "granted", "prompt", "denied", "PermissionStatus"],
+    "icon": "check",
+    "weight": 78
+  },
+  {
+    "path": "dom-e2e/clipboard",
+    "title": "Clipboard",
+    "category": "Essential DOM",
+    "summary": "Write text and verify a real system clipboard round trip.",
+    "content": "Use navigator.clipboard, typed Promise transport, clipboard permissions, copy, paste, and exact value verification.",
+    "keywords": ["clipboard", "copy", "paste", "writeText", "readText"],
+    "icon": "copy",
+    "weight": 88
+  },
+  {
+    "path": "dom-e2e/web-share",
+    "title": "Web Share",
+    "category": "Essential DOM",
+    "summary": "Validate a typed payload and open the platform share sheet.",
+    "content": "Use navigator.canShare, navigator.share, ShareData dictionaries, secure context, and user activation.",
+    "keywords": ["share", "share sheet", "navigator", "ShareData", "mobile"],
+    "icon": "navigation",
+    "weight": 74
+  },
+  {
+    "path": "dom-e2e/wake-lock",
+    "title": "Wake Lock",
+    "category": "Essential DOM",
+    "summary": "Keep the display awake with an owned, disposable sentinel.",
+    "content": "Request and release a screen WakeLockSentinel while preserving live proxy identity and release events.",
+    "keywords": ["wake lock", "screen", "sentinel", "display", "release"],
+    "icon": "sun",
+    "weight": 76
+  },
+  {
+    "path": "dom-e2e/storage-management",
+    "title": "Storage management",
+    "category": "Essential DOM",
+    "summary": "Inspect origin usage, quota, persistence, and private storage.",
+    "content": "Use navigator.storage estimate, persisted, persist, and origin private file system APIs.",
+    "keywords": ["storage", "quota", "persistence", "OPFS", "estimate"],
+    "icon": "database",
+    "weight": 84
+  },
+  {
+    "path": "dom-e2e/screen",
+    "title": "Screen",
+    "category": "Essential DOM",
+    "summary": "Read display geometry and typed orientation state.",
+    "content": "Compare screen dimensions with viewport dimensions and observe orientation changes.",
+    "keywords": ["screen", "viewport", "orientation", "width", "height"],
+    "icon": "monitor",
+    "weight": 72
+  },
+  {
+    "path": "dom-e2e/performance",
+    "title": "Performance",
+    "category": "Platform DOM",
+    "summary": "Measure work with the browser high-resolution monotonic clock.",
+    "content": "Use performance.now, marks, entries, observers, navigation timing, and resource timing.",
+    "keywords": ["performance", "timing", "measure", "marks", "observer"],
+    "icon": "refresh",
+    "weight": 82
+  },
+  {
+    "path": "dom-e2e/web-crypto",
+    "title": "Web Crypto",
+    "category": "Platform DOM",
+    "summary": "Generate secure UUIDs and run typed SubtleCrypto operations.",
+    "content": "Use crypto.randomUUID, random values, SHA-256 digest, BufferSource transport, and live CryptoKey proxies.",
+    "keywords": ["crypto", "UUID", "SHA-256", "digest", "security", "SubtleCrypto"],
+    "icon": "check",
+    "weight": 90
+  },
+  {
+    "path": "dom-e2e/credentials",
+    "title": "Credentials and WebAuthn",
+    "category": "Platform DOM",
+    "summary": "Preserve credential and authenticator response identity.",
+    "content": "Use Credential Management, passkeys, WebAuthn, preventSilentAccess, typed request options, and binary authenticator data.",
+    "keywords": ["credentials", "WebAuthn", "passkeys", "authentication", "sign in"],
+    "icon": "compass",
+    "weight": 86
+  },
+  {
+    "path": "dom-e2e/offline-storage",
+    "title": "Offline storage",
+    "category": "Platform DOM",
+    "summary": "Use Cache Storage and IndexedDB with browser-owned objects.",
+    "content": "Create, inspect, and delete named caches while retaining typed IndexedDB requests and structured clone boundaries.",
+    "keywords": ["offline", "cache", "IndexedDB", "PWA", "storage"],
+    "icon": "database",
+    "weight": 84
+  },
+  {
+    "path": "dom-e2e/browser-coordination",
+    "title": "Browser coordination",
+    "category": "Platform DOM",
+    "summary": "Coordinate tabs with Web Locks, BroadcastChannel, and visibility.",
+    "content": "Inspect held and pending locks, own channel lifecycle, and subscribe to messages and page visibility.",
+    "keywords": ["coordination", "tabs", "Web Locks", "BroadcastChannel", "visibility"],
+    "icon": "route",
+    "weight": 78
+  },
+  {
+    "path": "dom-e2e/media-devices",
+    "title": "Media devices",
+    "category": "Platform DOM",
+    "summary": "Enumerate cameras and microphones with typed live ownership.",
+    "content": "Use navigator.mediaDevices, enumerateDevices, streams, tracks, constraints, settings, and privacy-redacted labels.",
+    "keywords": ["camera", "microphone", "media devices", "stream", "getUserMedia"],
+    "icon": "mic",
+    "weight": 84
+  },
+  {
+    "path": "dom-e2e/notifications",
+    "title": "Notifications",
+    "category": "Platform DOM",
+    "summary": "Request permission and create a typed browser notification.",
+    "content": "Author a title and body, inspect NotificationPermission, and own notification lifecycle events.",
+    "keywords": ["notifications", "permission", "alerts", "desktop", "NotificationOptions"],
+    "icon": "info",
+    "weight": 80
+  },
+  {
+    "path": "dom-e2e/file-system-access",
+    "title": "File System Access",
+    "category": "Specialized DOM",
+    "summary": "Choose a local file and preview images, PDFs, source code, or text.",
+    "content": "Use showOpenFilePicker with owned handles, File and Blob reads, syntax highlighting, embedded media previews, metadata, and safe size limits.",
+    "keywords": ["files", "file picker", "PDF", "image preview", "syntax highlighting", "source code", "Blob", "directory"],
+    "icon": "file",
+    "weight": 92
+  }
+]

@@ -1,0 +1,302 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<button type="button"
+        class="header-search-trigger"
+        aria-label="Search this site"
+        aria-haspopup="dialog"
+        aria-keyshortcuts="Control+K Meta+K"
+        @onclick="OpenAsync">
+    <Icon Name="search" />
+    <span>Search</span>
+    <kbd>Ctrl K</kbd>
+</button>
+
+<dialog id="@DialogId"
+        class="site-search-dialog"
+        aria-labelledby="site-search-title"
+        @onclose="ResetDialog">
+    <div class="site-search-shell">
+        <div class="search-dialog-header">
+            <div>
+                <span>Sitewide search</span>
+                <h2 id="site-search-title">Find a browser API</h2>
+            </div>
+            <button type="button"
+                    class="search-close"
+                    aria-label="Close search"
+                    @onclick="CloseAsync">
+                <Icon Name="x" />
+            </button>
+        </div>
+
+        <label class="search-input-shell" for="site-search-input">
+            <Icon Name="search" />
+            <input id="site-search-input"
+                   type="search"
+                   aria-label="Search all examples"
+                   value="@_query"
+                   placeholder="Search demos, APIs, packages, and setup"
+                   autocomplete="off"
+                   spellcheck="false"
+                   @oninput="OnSearchInputAsync" />
+            <kbd>Esc</kbd>
+        </label>
+
+        <div class="search-results" aria-busy="@_searching">
+            @if (string.IsNullOrWhiteSpace(_query))
+            {
+                <div class="search-empty">
+                    <span class="search-empty-icon"><Icon Name="search" /></span>
+                    <h3>Search every demo and capability</h3>
+                    <p>Jump straight to a live workflow, package setup, or generated browser contract.</p>
+                    <div class="search-suggestions" aria-label="Suggested searches">
+                        @foreach (var suggestion in Suggestions)
+                        {
+                            <button type="button" @onclick="@(() => UseSuggestionAsync(suggestion))">
+                                @suggestion
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+            else if (_searching)
+            {
+                <div class="search-skeleton" aria-hidden="true">
+                    @for (var index = 0; index < 3; index++)
+                    {
+                        <div>
+                            <span></span>
+                            <p><i></i><i></i></p>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_error is not null)
+            {
+                <div class="search-message is-error" role="alert">
+                    <Icon Name="alert-circle" />
+                    <div>
+                        <strong>Search is unavailable</strong>
+                        <p>@_error</p>
+                    </div>
+                </div>
+            }
+            else if (_results.Count > 0)
+            {
+                <div class="search-result-summary" role="status" aria-live="polite">
+                    <span>@ResultSummary</span>
+                    <span>@_provider</span>
+                </div>
+                <ol>
+                    @foreach (var result in _results)
+                    {
+                        <li>
+                            <a href="@result.Url" @onclick="CloseAsync">
+                                <span class="search-result-icon" aria-hidden="true">
+                                    <Icon Name="@result.Icon" />
+                                </span>
+                                <span class="search-result-copy">
+                                    <small>@result.Category</small>
+                                    <strong>@result.Title</strong>
+                                    <span>@result.Summary</span>
+                                </span>
+                                <span class="search-result-route">@DisplayRoute(result.Url)</span>
+                                <Icon Name="arrow-right" Class="search-result-arrow" />
+                            </a>
+                        </li>
+                    }
+                </ol>
+            }
+            else
+            {
+                <div class="search-message" role="status" aria-live="polite">
+                    <Icon Name="info" />
+                    <div>
+                        <strong>No matches for "@_query"</strong>
+                        <p>Try a package name, browser API, or workflow such as clipboard, storage, or files.</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="search-dialog-footer">
+            <span><kbd>Ctrl K</kbd> open</span>
+            <span><kbd>Esc</kbd> close</span>
+            <span class="search-footer-note">Private, on-device search</span>
+        </div>
+    </div>
+</dialog>
+
+@code {
+    const string DialogId = "site-search";
+    static readonly string[] Suggestions = ["File previews", "Web Crypto", "Clipboard"];
+
+    readonly List<SearchResult> _results = [];
+    IJSObjectReference? _module;
+    DotNetObjectReference<SearchDialog>? _selfReference;
+    CancellationTokenSource? _searchCts;
+    int? _shortcutSubscription;
+    string _query = string.Empty;
+    string _provider = "Local catalog";
+    string? _error;
+    bool _searching;
+
+    string ResultSummary => $"{_results.Count} {(_results.Count == 1 ? "result" : "results")}";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./search.js");
+        _selfReference = DotNetObjectReference.Create(this);
+        _shortcutSubscription = await _module.InvokeAsync<int>(
+            "initialize",
+            DialogId,
+            _selfReference);
+    }
+
+    async Task OpenAsync()
+    {
+        if (_module is null)
+        {
+            return;
+        }
+
+        await _module.InvokeVoidAsync("showDialog", DialogId);
+    }
+
+    [JSInvokable]
+    public Task OpenFromShortcutAsync() => OpenAsync();
+
+    async Task CloseAsync()
+    {
+        if (_module is not null)
+        {
+            await _module.InvokeVoidAsync("closeDialog", DialogId);
+        }
+    }
+
+    void ResetDialog()
+    {
+        _searchCts?.Cancel();
+        _query = string.Empty;
+        _results.Clear();
+        _error = null;
+        _searching = false;
+    }
+
+    async Task UseSuggestionAsync(string suggestion)
+    {
+        _query = suggestion;
+        await SearchAsync();
+    }
+
+    async Task OnSearchInputAsync(ChangeEventArgs args)
+    {
+        _query = args.Value?.ToString() ?? string.Empty;
+        await SearchAsync();
+    }
+
+    async Task SearchAsync()
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        _searchCts = new CancellationTokenSource();
+        var cancellationToken = _searchCts.Token;
+
+        _results.Clear();
+        _error = null;
+
+        if (_query.Trim().Length < 2)
+        {
+            _searching = false;
+            return;
+        }
+
+        _searching = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            await Task.Delay(120, cancellationToken);
+            if (_module is null)
+            {
+                throw new InvalidOperationException("The search module has not initialized.");
+            }
+
+            var response = await _module.InvokeAsync<SearchResponse>(
+                "search",
+                cancellationToken,
+                _query);
+
+            _provider = response.Provider;
+            _results.AddRange(response.Results);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+        catch (JSException ex)
+        {
+            _error = ex.Message.Split('\n', 2)[0];
+        }
+        finally
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                _searching = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    static string DisplayRoute(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || url == "/")
+        {
+            return "Home";
+        }
+
+        var path = Uri.TryCreate(url, UriKind.Absolute, out var absolute)
+            ? absolute.AbsolutePath
+            : url;
+        return path.Trim('/').Replace("/", " / ");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+
+        if (_module is not null && _shortcutSubscription is int subscription)
+        {
+            await _module.InvokeVoidAsync("dispose", subscription);
+        }
+
+        _selfReference?.Dispose();
+
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+    }
+
+    sealed class SearchResponse
+    {
+        public string Provider { get; set; } = "Local catalog";
+        public List<SearchResult> Results { get; set; } = [];
+    }
+
+    sealed class SearchResult
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public string Icon { get; set; } = "file";
+    }
+}

@@ -374,6 +374,35 @@
     gap: 0.3rem;
 }
 
+.sample-context {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    max-width: 52rem;
+    padding: 0.85rem 1rem;
+    border-left: 3px solid hsl(var(--primary));
+    border-radius: 0 0.75rem 0.75rem 0;
+    background: hsl(var(--primary) / 0.07);
+    color: hsl(var(--muted-foreground));
+    font-size: 0.84rem;
+    line-height: 1.6;
+}
+
+.sample-context p {
+    margin: 0;
+}
+
+.sample-context ::deep svg {
+    flex: 0 0 auto;
+    margin-top: 0.2rem;
+    color: hsl(var(--primary));
+}
+
+.sample-context code,
+.sample-context strong {
+    color: hsl(var(--foreground));
+}
+
 .detail-code ::deep .codeblock {
     overflow: hidden;
     border-radius: 1.15rem;

@@ -1,0 +1,14 @@
+{
+  "name": "@blazorators/example-search",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build-index.mjs"
+  },
+  "devDependencies": {
+    "pagefind": "1.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

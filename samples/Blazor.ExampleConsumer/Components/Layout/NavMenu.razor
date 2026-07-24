@@ -1,3 +1,4 @@
+@implements IDisposable
 @inject NavigationManager Nav
 @using Blazor.ExampleConsumer.Components.Pages
 
@@ -40,7 +41,8 @@
     <NavLink id="dom-lab" href="dom-e2e" Match="NavLinkMatch.All" @onclick=@(_ => OnNavigate.InvokeAsync())>
         <Icon Name="code" /> <span>DOM API lab</span>
     </NavLink>
-    <details class="nav-capabilities">
+    <details @key="IsCapabilitiesRoute"
+             class="nav-capabilities @(IsCapabilitiesRoute ? "route-active" : null)">
         <summary class="nav-disclosure">
             <Icon Name="package" Size="18" />
             <span class="nav-disclosure-label">Capabilities</span>
@@ -100,4 +102,32 @@
 
 @code {
     [Parameter] public EventCallback OnNavigate { get; set; }
+
+    bool IsCapabilitiesRoute
+    {
+        get
+        {
+            if (CurrentRoute.Equals(
+                "dom-e2e/capabilities",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            const string prefix = "dom-e2e/";
+            return CurrentRoute.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                && DomCapabilityCatalog.Find(CurrentRoute[prefix.Length..]) is not null;
+        }
+    }
+
+    string CurrentRoute => Nav.ToBaseRelativePath(Nav.Uri).Trim('/');
+
+    protected override void OnInitialized()
+        => Nav.LocationChanged += HandleLocationChanged;
+
+    void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+        => Nav.LocationChanged -= HandleLocationChanged;
 }

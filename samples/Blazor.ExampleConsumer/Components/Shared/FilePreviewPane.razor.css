@@ -1,0 +1,196 @@
+.file-preview {
+    overflow: hidden;
+    border: 1px solid hsl(var(--primary) / 0.3);
+    border-radius: 1rem;
+    background: hsl(var(--surface-1));
+}
+
+.file-preview > header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(var(--primary) / 0.05);
+}
+
+.file-preview-icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid hsl(var(--primary) / 0.28);
+    border-radius: 0.7rem;
+    background: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+}
+
+.file-preview > header > div {
+    min-width: 0;
+}
+
+.file-preview > header > div > span {
+    display: block;
+    margin-bottom: 0.1rem;
+    color: hsl(var(--primary));
+    font-size: 0.59rem;
+    font-weight: 750;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.file-preview h5 {
+    overflow: hidden;
+    margin: 0;
+    font-size: 0.9rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-preview dl {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem 0.85rem;
+    margin: 0;
+}
+
+.file-preview dl > div {
+    display: grid;
+    gap: 0.05rem;
+    min-width: 4rem;
+}
+
+.file-preview dt {
+    color: hsl(var(--muted-foreground));
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.file-preview dd {
+    max-width: 12rem;
+    overflow: hidden;
+    margin: 0;
+    color: hsl(var(--foreground));
+    font-size: 0.65rem;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-preview-body {
+    min-height: 10rem;
+    padding: 0.85rem;
+    background:
+        linear-gradient(hsl(var(--border) / 0.22) 1px, transparent 1px),
+        linear-gradient(90deg, hsl(var(--border) / 0.22) 1px, transparent 1px),
+        hsl(var(--background));
+    background-size: 24px 24px;
+}
+
+.file-preview-body > img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 34rem;
+    margin: 0 auto;
+    border-radius: 0.75rem;
+    object-fit: contain;
+    box-shadow: 0 1.25rem 3rem -2rem hsl(var(--primary) / 0.55);
+}
+
+.file-preview-body > object {
+    display: block;
+    width: 100%;
+    min-height: min(38rem, 70vh);
+    border: 0;
+    border-radius: 0.75rem;
+    background: hsl(var(--surface-2));
+}
+
+.file-preview-body > object p {
+    max-width: 34rem;
+    margin: 2rem auto;
+    color: hsl(var(--muted-foreground));
+    text-align: center;
+}
+
+.file-preview-body ::deep .codeblock {
+    margin: 0;
+    border-color: hsl(var(--border));
+    box-shadow: 0 1.25rem 3rem -2.2rem hsl(var(--primary) / 0.5);
+}
+
+.file-preview-body ::deep .codeblock > pre {
+    max-height: 34rem;
+}
+
+.file-preview-unavailable {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    max-width: 36rem;
+    min-height: 9rem;
+    margin: 0 auto;
+    padding: 1rem;
+    color: hsl(var(--muted-foreground));
+}
+
+.file-preview-unavailable ::deep svg {
+    flex: 0 0 auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: hsl(var(--primary));
+}
+
+.file-preview-unavailable strong {
+    color: hsl(var(--foreground));
+}
+
+.file-preview-unavailable p {
+    margin: 0.25rem 0 0;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75rem;
+}
+
+.file-preview > footer {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border-top: 1px solid hsl(var(--border));
+    color: hsl(var(--muted-foreground));
+    font-size: 0.65rem;
+}
+
+.file-preview > footer ::deep svg {
+    color: hsl(var(--success));
+}
+
+@media (max-width: 760px) {
+    .file-preview > header {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .file-preview dl {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+    }
+
+    .file-preview dd {
+        max-width: 100%;
+    }
+
+    .file-preview-body {
+        padding: 0.6rem;
+    }
+
+    .file-preview-body > object {
+        min-height: 28rem;
+    }
+}

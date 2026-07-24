@@ -1990,6 +1990,37 @@ public sealed class TransportRuntimeTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Binary_dispatch_materializes_and_disposes_managed_array(bool wasm)
+    {
+        var host = CreateHost(wasm);
+        var factory = CreateFactory(host.Runtime);
+        var owner = new FixtureBlobProxy(
+            new FakeJSObjectReference(),
+            host.Runtime,
+            factory);
+        var content = new TrackingStream([1, 0, 2, 0]);
+        var streamReference = new FakeJSStreamReference(4, content);
+        host.Module.InvocationHandlers["invokeMethodDotNetStreamReference"] =
+            DeliverStream(streamReference, handlerIndex: 3);
+
+        var result = await DomDispatch.InvokeAsync<ushort[]>(
+            owner,
+            "values",
+            null,
+            DomTransportDescriptor.Binary("Uint16Array"));
+
+        Assert.Equal([1, 2], result);
+        Assert.Equal(int.MaxValue, streamReference.MaximumLength);
+        Assert.True(content.IsDisposed);
+        Assert.Equal(1, streamReference.DisposeCallCount);
+        Assert.DoesNotContain(
+            host.Module.Invocations,
+            item => item.Identifier == "invokeMethod");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Nullable_binary_result_distinguishes_null_from_empty(bool wasm)
     {
         var host = CreateHost(wasm);

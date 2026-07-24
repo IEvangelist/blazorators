@@ -4,6 +4,8 @@ on:
     branches: [ main ]
     paths:
       - 'samples/**'
+      - 'tools/Blazor.ExampleConsumer.Search/**'
+      - '.github/workflows/publish-to-gh-pages.yml'
   workflow_dispatch:
     inputs:
       reason:
@@ -23,12 +25,23 @@ jobs:
       uses: actions/setup-dotnet@main
       with:
         global-json-file: global.json
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: tools/Blazor.ExampleConsumer.Search/package-lock.json
     - name: Publish .NET Core Project
       run: dotnet publish samples/Blazor.ExampleConsumer/Blazor.ExampleConsumer.csproj -c Release -o release --nologo
 
     # Changes the base-tag in index.html from '/' to '/blazorators' to match GitHub Pages repository subdirectory
     - name: Change base-tag in index.html from / to /blazorators
       run: sed -i 's/<base href="\/" \/>/<base href="\/blazorators\/" \/>/g' release/wwwroot/index.html
+
+    - name: Build Pagefind search index
+      run: |
+        npm ci --prefix tools/Blazor.ExampleConsumer.Search
+        node tools/Blazor.ExampleConsumer.Search/build-index.mjs release/wwwroot/pagefind release/wwwroot/index.html
 
     # Copy index.html to 404.html to serve the same file when a file is not found
     - name: copy index.html to 404.html
