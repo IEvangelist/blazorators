@@ -1,37 +1,63 @@
-// highlight.js — modern syntax highlighting loaded on-demand via Blazor JS interop.
-// Uses highlight.js's tree-shakeable core + only the grammars we need so the network
-// payload stays small. Tokens are emitted as `.hljs-*` spans and themed via site.css.
+// Load highlight.js and only the grammar requested by the rendered snippet.
 
-let _loader;
+const version = '11.10.0';
+const languageModules = new Set([
+    'bash',
+    'csharp',
+    'css',
+    'go',
+    'java',
+    'javascript',
+    'json',
+    'markdown',
+    'powershell',
+    'python',
+    'rust',
+    'sql',
+    'typescript',
+    'xml',
+    'yaml',
+]);
+const aliases = new Map([
+    ['cs', 'csharp'],
+    ['html', 'xml'],
+    ['md', 'markdown'],
+    ['ps1', 'powershell'],
+    ['razor', 'xml'],
+    ['shell', 'bash'],
+    ['sh', 'bash'],
+]);
 
-function load() {
-    if (_loader) {
-        return _loader;
+let coreLoader;
+const grammarLoaders = new Map();
+
+function loadCore() {
+    coreLoader ??= import(`https://esm.sh/highlight.js@${version}/lib/core`)
+        .then(module => module.default);
+    return coreLoader;
+}
+
+async function loadGrammar(language) {
+    const normalized = aliases.get(language) ?? language;
+    if (!languageModules.has(normalized)) {
+        return null;
     }
 
-    _loader = (async () => {
-        const core = (await import('https://esm.sh/highlight.js@11.10.0/lib/core')).default;
-        const [json, csharp, xml, css, bash] = await Promise.all([
-            import('https://esm.sh/highlight.js@11.10.0/lib/languages/json').then(m => m.default),
-            import('https://esm.sh/highlight.js@11.10.0/lib/languages/csharp').then(m => m.default),
-            import('https://esm.sh/highlight.js@11.10.0/lib/languages/xml').then(m => m.default),
-            import('https://esm.sh/highlight.js@11.10.0/lib/languages/css').then(m => m.default),
-            import('https://esm.sh/highlight.js@11.10.0/lib/languages/bash').then(m => m.default),
-        ]);
+    const core = await loadCore();
+    if (!core.getLanguage(normalized)) {
+        if (!grammarLoaders.has(normalized)) {
+            grammarLoaders.set(
+                normalized,
+                import(`https://esm.sh/highlight.js@${version}/lib/languages/${normalized}`)
+                    .then(module => {
+                        core.registerLanguage(normalized, module.default);
+                        return normalized;
+                    }));
+        }
+        await grammarLoaders.get(normalized);
+    }
 
-        core.registerLanguage('json', json);
-        core.registerLanguage('csharp', csharp);
-        core.registerLanguage('cs', csharp);
-        core.registerLanguage('html', xml);
-        core.registerLanguage('xml', xml);
-        core.registerLanguage('css', css);
-        core.registerLanguage('bash', bash);
-        core.registerLanguage('shell', bash);
-
-        return core;
-    })();
-
-    return _loader;
+    return { core, language: normalized };
 }
 
 export async function highlight(code, lang) {
@@ -39,19 +65,29 @@ export async function highlight(code, lang) {
         return '';
     }
 
-    try {
-        const hljs = await load();
-        const language = hljs.getLanguage(lang) ? lang : 'json';
-        const result = hljs.highlight(code, { language, ignoreIllegals: true });
-        return result.value;
+    const language = String(lang ?? '').trim().toLowerCase();
+    if (language === 'plaintext' || language === 'text') {
+        return escapeHtml(code);
     }
-    catch (e) {
-        console.warn('[highlight] failed, falling back to plain text', e);
+
+    try {
+        const grammar = await loadGrammar(language);
+        if (!grammar) {
+            return escapeHtml(code);
+        }
+
+        return grammar.core.highlight(code, {
+            language: grammar.language,
+            ignoreIllegals: true,
+        }).value;
+    }
+    catch (error) {
+        console.warn('[highlight] failed, falling back to plain text', error);
         return escapeHtml(code);
     }
 }
 
-function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 }
