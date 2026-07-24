@@ -14,6 +14,12 @@ on:
   push:
     tags:
       - '**'
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: 'Existing release tag or commit to publish'
+        required: true
+        type: string
 
 jobs:
   publish:
@@ -28,6 +34,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
+          ref: ${{ inputs.release_ref || github.ref }}
 
       - uses: actions/setup-dotnet@main
         with:
@@ -44,7 +51,23 @@ jobs:
         with:
           user: dpine
 
-      - run: |
-          dotnet nuget push --skip-duplicate artifacts/package/release/*.nupkg \
+      - name: Publish packages
+        run: |
+          shopt -s nullglob
+          packages=()
+          for package in artifacts/package/release/*.nupkg; do
+            if [[ "$(basename "$package")" == Blazor.Notifications.[0-9]*.nupkg ]]; then
+              echo "::notice::Skipping Blazor.Notifications because that NuGet ID is owned by another publisher."
+              continue
+            fi
+            packages+=("$package")
+          done
+
+          if (( ${#packages[@]} == 0 )); then
+            echo "::error::No publishable NuGet packages were produced."
+            exit 1
+          fi
+
+          dotnet nuget push --skip-duplicate "${packages[@]}" \
             --source "https://api.nuget.org/v3/index.json" \
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
