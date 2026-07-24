@@ -323,12 +323,6 @@ hr {
     border-bottom: 1px solid hsl(var(--border));
 }
 
-@media (min-width: 901px) {
-    .app-header {
-        padding-left: max(4.25rem, calc((100% - var(--content-max)) / 2));
-    }
-}
-
 .app-header .crumb {
     display: flex;
     align-items: center;
@@ -351,6 +345,22 @@ hr {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+@media (min-width: 901px) {
+    .app-header {
+        padding-left: max(11.75rem, calc((100% - var(--content-max)) / 2));
+    }
+
+    .app-header .crumb {
+        position: absolute;
+        left: 4.25rem;
+        flex: none;
+    }
+
+    .app-header .actions {
+        margin-left: auto;
+    }
 }
 
 .github-action {
