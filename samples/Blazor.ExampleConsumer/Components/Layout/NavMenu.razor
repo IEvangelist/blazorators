@@ -72,7 +72,7 @@
                 {
                     <NavLink id="@($"dom-{capability.Slug}")"
                              class="nav-subitem"
-                             href="@capability.Href.TrimStart('/')"
+                             href="@capability.Href"
                              @onclick=@(_ => OnNavigate.InvokeAsync())>
                         <Icon Name="@capability.Icon" />
                         <span>@capability.Name</span>

@@ -555,5 +555,5 @@ public sealed record DomCapabilityDefinition
     public int Exclusions { get; init; }
     public bool SecureContext { get; init; }
     public bool UserActivation { get; init; }
-    public string Href => $"/dom-e2e/{Slug}";
+    public string Href => $"dom-e2e/{Slug}";
 }

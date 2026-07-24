@@ -109,6 +109,7 @@ public sealed class DomInteropTests(
             await Assertions.Expect(root.Locator("section.dom-section")).ToHaveCountAsync(5);
             await Assertions.Expect(root.Locator(".dom-section-nav a")).ToHaveCountAsync(5);
             await Assertions.Expect(root.Locator(".dom-package-card")).ToHaveCountAsync(14);
+            await AssertCapabilityLinksAreBaseRelativeAsync(root.Locator(".dom-package-card"));
         }
         else
         {
@@ -220,6 +221,7 @@ public sealed class DomInteropTests(
 
         await page.GotoAsync(webAssemblySite.UrlFor("/dom-e2e/capabilities"));
         await Assertions.Expect(page.Locator("[data-capability]")).ToHaveCountAsync(14);
+        await AssertCapabilityLinksAreBaseRelativeAsync(page.Locator("[data-capability]"));
 
         await page.Locator("[data-capability='web-crypto']").ClickAsync();
         await Assertions.Expect(page).ToHaveURLAsync(new Regex(@"/dom-e2e/web-crypto$"));
@@ -228,6 +230,8 @@ public sealed class DomInteropTests(
 
         await Assertions.Expect(page.Locator(".setup-grid article")).ToHaveCountAsync(3);
         await Assertions.Expect(page.Locator(".nav-submenu .nav-subitem")).ToHaveCountAsync(14);
+        await AssertCapabilityLinksAreBaseRelativeAsync(
+            page.Locator(".detail-pagination a[href]"));
         await Assertions.Expect(page.Locator("#dom-web-crypto")).ToHaveClassAsync(
             new Regex(@"\bactive\b"));
         await Assertions.Expect(page.Locator(".setup-grid")).ToContainTextAsync(
@@ -275,6 +279,19 @@ public sealed class DomInteropTests(
         await Assertions.Expect(page.Locator(".detail-code"))
             .Not.ToContainTextAsync("GetBroadcastChannelFactory");
         Assert.Empty(errors);
+    }
+
+    static async Task AssertCapabilityLinksAreBaseRelativeAsync(ILocator links)
+    {
+        var hrefs = await links.EvaluateAllAsync<string[]>(
+            "elements => elements.map(element => element.getAttribute('href') ?? '')");
+
+        Assert.NotEmpty(hrefs);
+        Assert.All(
+            hrefs,
+            href => Assert.True(
+                href.StartsWith("dom-e2e/", StringComparison.Ordinal),
+                $"Capability link '{href}' must be relative to the application's base path."));
     }
 
     [Fact]
