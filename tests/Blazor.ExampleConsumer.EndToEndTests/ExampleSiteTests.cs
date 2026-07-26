@@ -248,6 +248,18 @@ public sealed class ExampleSiteTests(
             0,
             1);
 
+        await page.SetViewportSizeAsync(1920, 1000);
+        var menuBox = await page.Locator(".desktop-nav-toggle").BoundingBoxAsync();
+        var runtimeBox = await page.Locator(".app-header .crumb").BoundingBoxAsync();
+        searchTriggerBox = await searchTrigger.BoundingBoxAsync();
+        contentBox = await page.Locator(".app-main > .content.page-enter").BoundingBoxAsync();
+        Assert.NotNull(menuBox);
+        Assert.NotNull(runtimeBox);
+        Assert.NotNull(searchTriggerBox);
+        Assert.NotNull(contentBox);
+        Assert.InRange(runtimeBox!.X - (menuBox!.X + menuBox.Width), 7, 9);
+        Assert.InRange(Math.Abs(searchTriggerBox!.X - contentBox!.X), 0, 1);
+
         await page.Keyboard.PressAsync("Control+K");
         var dialog = page.GetByRole(AriaRole.Dialog, new() { Name = "Find a browser API" });
         await Assertions.Expect(dialog).ToBeVisibleAsync();
