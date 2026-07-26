@@ -349,16 +349,31 @@ hr {
 
 @media (min-width: 901px) {
     .app-header {
-        padding-left: max(11.75rem, calc((100% - var(--content-max)) / 2));
+        padding-left: max(4.25rem, calc((100% - var(--content-max)) / 2));
     }
+}
 
-    .app-header .crumb {
+/* Move the runtime badge into the leading gutter only when it cannot overlap search. */
+@media (min-width: 1500px) {
+    .app.sidebar-collapsed .app-header .crumb {
         position: absolute;
         left: 4.25rem;
         flex: none;
     }
 
-    .app-header .actions {
+    .app.sidebar-collapsed .app-header .actions {
+        margin-left: auto;
+    }
+}
+
+@media (min-width: 1760px) {
+    .app:not(.sidebar-collapsed) .app-header .crumb {
+        position: absolute;
+        left: 4.25rem;
+        flex: none;
+    }
+
+    .app:not(.sidebar-collapsed) .app-header .actions {
         margin-left: auto;
     }
 }
