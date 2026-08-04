@@ -3,7 +3,7 @@
     align-items: center;
     gap: 0.55rem;
     height: 36px;
-    min-width: 10.5rem;
+    min-width: 24rem;
     padding: 0 0.45rem 0 0.7rem;
     border: 1px solid hsl(var(--border));
     border-radius: 999px;

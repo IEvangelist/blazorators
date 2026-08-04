@@ -205,6 +205,44 @@ public sealed class DomInteropTests(
     }
 
     [Fact]
+    public async Task CapabilityCatalogGroupLinksStayOnTheCatalogPage()
+    {
+        await using var context = await browser.Browser.NewContextAsync();
+        var page = await context.NewPageAsync();
+        await page.GotoAsync(webAssemblySite.UrlFor("/dom-e2e/capabilities"));
+
+        var groupLinks = page.Locator(".catalog-jump-nav a");
+        await Assertions.Expect(groupLinks).ToHaveCountAsync(3);
+        await Assertions.Expect(
+            page.Locator(".catalog-jump-nav a[aria-current='location']"))
+            .ToHaveTextAsync("Essentials");
+
+        foreach (var category in new[] { "Essentials", "Platform", "Specialized" })
+        {
+            var section = category.ToLowerInvariant();
+            var link = groupLinks.GetByText(category, new() { Exact = true });
+
+            await Assertions.Expect(link).ToHaveAttributeAsync(
+                "href",
+                $"dom-e2e/capabilities#{section}");
+            await link.ClickAsync();
+            await Assertions.Expect(page).ToHaveURLAsync(
+                new Regex($@"/dom-e2e/capabilities#{section}$"));
+            await Assertions.Expect(page.Locator($"#{section}")).ToBeFocusedAsync();
+            await Assertions.Expect(
+                page.Locator(".catalog-jump-nav a[aria-current='location']"))
+                .ToHaveTextAsync(category);
+        }
+
+        await page.GoBackAsync();
+        await Assertions.Expect(page).ToHaveURLAsync(new Regex(@"#platform$"));
+        await Assertions.Expect(page.Locator("#platform")).ToBeFocusedAsync();
+        await Assertions.Expect(
+            page.Locator(".catalog-jump-nav a[aria-current='location']"))
+            .ToHaveTextAsync("Platform");
+    }
+
+    [Fact]
     public async Task CapabilityCatalogRoutesToAnInteractiveGeneratedDemo()
     {
         await using var context = await browser.Browser.NewContextAsync();

@@ -180,13 +180,23 @@
 }
 
 .catalog-jump-nav a:hover,
-.catalog-jump-nav a:focus-visible {
+.catalog-jump-nav a:focus-visible,
+.catalog-jump-nav a.is-active {
     background: hsl(var(--primary) / 0.12);
-    color: hsl(var(--foreground));
+    color: hsl(var(--primary));
 }
 
 .catalog-group {
     scroll-margin-top: 10rem;
+}
+
+.catalog-group:focus {
+    outline: none;
+}
+
+.catalog-group:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 0.5rem;
 }
 
 .catalog-group-heading {

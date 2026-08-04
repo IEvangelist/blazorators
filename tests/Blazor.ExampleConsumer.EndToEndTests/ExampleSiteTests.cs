@@ -241,6 +241,7 @@ public sealed class ExampleSiteTests(
         Assert.NotNull(contentBox);
         Assert.NotNull(shortcutBox);
         Assert.InRange(Math.Abs(searchTriggerBox!.X - contentBox!.X), 0, 40);
+        Assert.InRange(searchTriggerBox.Width, 383, 385);
         Assert.InRange(
             Math.Abs(
                 (searchTriggerBox.Y + (searchTriggerBox.Height / 2))
@@ -293,6 +294,37 @@ public sealed class ExampleSiteTests(
         await searchTrigger.ClickAsync();
         await Assertions.Expect(dialog).ToBeVisibleAsync();
         await AssertNoDocumentOverflowAsync(page);
+    }
+
+    [Fact]
+    public async Task ScrollToTop_AppearsAfterScrolling_AndReturnsFocusToMain()
+    {
+        await using var context = await NewContextAsync();
+        var page = await context.NewPageAsync();
+        await page.SetViewportSizeAsync(1280, 720);
+        await page.GotoAsync(site.UrlFor("/dom-e2e/capabilities"), new PageGotoOptions
+        {
+            WaitUntil = WaitUntilState.NetworkIdle
+        });
+
+        var scrollToTop = page.GetByRole(
+            AriaRole.Button,
+            new() { Name = "Scroll to top", IncludeHidden = true });
+        await Assertions.Expect(scrollToTop).ToBeHiddenAsync();
+        await Assertions.Expect(scrollToTop).ToHaveAttributeAsync("tabindex", "-1");
+
+        await page.Locator("#specialized").ScrollIntoViewIfNeededAsync();
+        await Assertions.Expect(scrollToTop).ToBeVisibleAsync();
+        await Assertions.Expect(scrollToTop).ToHaveAttributeAsync("aria-hidden", "false");
+
+        await scrollToTop.ClickAsync();
+        await page.WaitForFunctionAsync("() => window.scrollY === 0");
+        await Assertions.Expect(scrollToTop).ToBeHiddenAsync();
+        await Assertions.Expect(page.Locator("#main")).ToBeFocusedAsync();
+        Assert.True(
+            await scrollToTop.EvaluateAsync<bool>(
+                "button => button.getBoundingClientRect().top >= window.innerHeight"),
+            "The hidden scroll-to-top button should finish below the viewport.");
     }
 
     [Fact]

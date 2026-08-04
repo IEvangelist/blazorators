@@ -1,0 +1,38 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<button @ref="_button"
+        class="scroll-to-top"
+        type="button"
+        aria-label="Scroll to top"
+        aria-hidden="true"
+        tabindex="-1"
+        title="Scroll to top">
+    <Icon Name="arrow-up" />
+</button>
+
+@code {
+    ElementReference _button;
+    IJSObjectReference? _module;
+    int? _subscription;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./scroll-to-top.js");
+        _subscription = await _module.InvokeAsync<int>("initialize", _button);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null && _subscription is int subscription)
+        {
+            await _module.InvokeVoidAsync("dispose", subscription);
+            await _module.DisposeAsync();
+        }
+    }
+}

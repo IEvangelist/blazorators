@@ -1,4 +1,9 @@
 @page "/dom-e2e/capabilities"
+@implements IAsyncDisposable
+@using Blazor.DOM
+@using Blazor.DOM.AdvancedTypes
+@inject IBrowser Browser
+@inject NavigationManager Navigation
 
 <PageTitle>DOM capability catalog · Blazorators</PageTitle>
 
@@ -21,7 +26,10 @@
                 runtime requirements, public surface, and a live browser reading.
             </p>
             <div class="catalog-actions">
-                <a class="btn btn-primary" href="#essentials">
+                <a class="btn btn-primary"
+                   href="@SectionHref("essentials")"
+                   @onclick="@(() => NavigateToSectionAsync("essentials"))"
+                   @onclick:preventDefault="true">
                     Browse packages <Icon Name="arrow-right" />
                 </a>
                 <a class="btn btn-ghost" href="dom-e2e">
@@ -51,7 +59,12 @@
     <nav class="catalog-jump-nav" aria-label="Capability groups">
         @foreach (var category in DomCapabilityCatalog.Categories)
         {
-            <a href="#@CategoryId(category)">@category</a>
+            var section = CategoryId(category);
+            <a class="@SectionClass(section)"
+               aria-current="@SectionCurrent(section)"
+               href="@SectionHref(section)"
+               @onclick="@(() => NavigateToSectionAsync(section))"
+               @onclick:preventDefault="true">@category</a>
         }
     </nav>
 
@@ -63,7 +76,8 @@
 
         <section id="@CategoryId(category)"
                  class="catalog-group"
-                 aria-labelledby="@($"{CategoryId(category)}-heading")">
+                 aria-labelledby="@($"{CategoryId(category)}-heading")"
+                 tabindex="-1">
             <div class="catalog-group-heading">
                 <span>@GroupNumber(category) / @category</span>
                 <h2 id="@($"{CategoryId(category)}-heading")">@GroupTitle(category)</h2>
@@ -111,8 +125,101 @@
 </div>
 
 @code {
+    string _activeSection = "essentials";
+    IWindow? _window;
+    IDocument? _document;
+
     static string CategoryId(string category) =>
         category.ToLowerInvariant();
+
+    static string SectionHref(string section) =>
+        $"dom-e2e/capabilities#{section}";
+
+    string? SectionClass(string section) =>
+        _activeSection == section ? "is-active" : null;
+
+    string? SectionCurrent(string section) =>
+        _activeSection == section ? "location" : null;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        _activeSection = SectionFromUri(Navigation.Uri) ?? "essentials";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _window = await Browser.GetWindowProxyAsync();
+        _document = _window.Document;
+        if (SectionFromUri(Navigation.Uri) is { } section)
+        {
+            await ScrollToSectionAsync(section);
+        }
+    }
+
+    async Task NavigateToSectionAsync(string section)
+    {
+        _activeSection = section;
+        var destination = Navigation.ToAbsoluteUri(SectionHref(section)).AbsoluteUri;
+        if (string.Equals(Navigation.Uri, destination, StringComparison.Ordinal))
+        {
+            await ScrollToSectionAsync(section);
+            StateHasChanged();
+            return;
+        }
+
+        Navigation.NavigateTo(SectionHref(section));
+        await ScrollToSectionAsync(section);
+        StateHasChanged();
+    }
+
+    async Task ScrollToSectionAsync(string section)
+    {
+        if (_document?.GetElementById(section) is not { } target)
+        {
+            return;
+        }
+
+        await using (target)
+        {
+            target.Focus(new FocusOptions { PreventScroll = true });
+            target.ScrollIntoView(
+                ElementScrollIntoViewArgBooleanOrScrollIntoViewOptionsUnion
+                    .FromScrollIntoViewOptions(
+                    new ScrollIntoViewOptions
+                    {
+                        Behavior = ScrollBehavior.Smooth,
+                        Block = ScrollLogicalPosition.Start,
+                        Inline = ScrollLogicalPosition.Nearest
+                    }));
+        }
+    }
+
+    void OnLocationChanged(
+        object? sender,
+        Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
+    {
+        var section = SectionFromUri(args.Location) ?? "essentials";
+        _activeSection = section;
+        _ = InvokeAsync(async () =>
+        {
+            await ScrollToSectionAsync(section);
+            StateHasChanged();
+        });
+    }
+
+    static string? SectionFromUri(string uri)
+    {
+        var fragment = new Uri(uri).Fragment.TrimStart('#');
+        return fragment is "essentials" or "platform" or "specialized"
+            ? fragment
+            : null;
+    }
 
     static string GroupNumber(string category) => category switch
     {
@@ -137,4 +244,17 @@
         _ =>
             "Specialized APIs that rely on user activation and preserve browser object identity."
     };
+
+    public async ValueTask DisposeAsync()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        if (_document is not null)
+        {
+            await _document.DisposeAsync();
+        }
+        if (_window is not null)
+        {
+            await _window.DisposeAsync();
+        }
+    }
 }
