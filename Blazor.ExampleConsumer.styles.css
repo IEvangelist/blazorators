@@ -343,13 +343,23 @@
 }
 
 .catalog-jump-nav a:hover[b-8exl653g3x],
-.catalog-jump-nav a:focus-visible[b-8exl653g3x] {
+.catalog-jump-nav a:focus-visible[b-8exl653g3x],
+.catalog-jump-nav a.is-active[b-8exl653g3x] {
     background: hsl(var(--primary) / 0.12);
-    color: hsl(var(--foreground));
+    color: hsl(var(--primary));
 }
 
 .catalog-group[b-8exl653g3x] {
     scroll-margin-top: 10rem;
+}
+
+.catalog-group:focus[b-8exl653g3x] {
+    outline: none;
+}
+
+.catalog-group:focus-visible[b-8exl653g3x] {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 0.5rem;
 }
 
 .catalog-group-heading[b-8exl653g3x] {
@@ -2932,13 +2942,90 @@
         min-height: 28rem;
     }
 }
+/* /Components/Shared/ScrollToTop.razor.rz.scp.css */
+.scroll-to-top[b-mkm46ka3rp] {
+    --scroll-to-top-bottom: max(1.25rem, env(safe-area-inset-bottom));
+
+    position: fixed;
+    right: max(1.25rem, env(safe-area-inset-right));
+    bottom: var(--scroll-to-top-bottom);
+    z-index: 35;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: 1px solid hsl(var(--primary) / 0.45);
+    border-radius: 50%;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1rem 2.5rem -1rem hsl(var(--primary) / 0.7);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    cursor: pointer;
+    transform:
+        translateY(calc(100% + var(--scroll-to-top-bottom) + 0.5rem))
+        scale(0.94);
+    will-change: opacity, transform;
+    transition:
+        opacity 180ms cubic-bezier(0.4, 0, 1, 1) 140ms,
+        transform 360ms cubic-bezier(0.4, 0, 0.7, 1),
+        visibility 0s linear 360ms;
+}
+
+.scroll-to-top.is-visible[b-mkm46ka3rp] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    transition:
+        opacity 220ms cubic-bezier(0, 0, 0.2, 1),
+        transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
+        visibility 0s linear;
+}
+
+.scroll-to-top:hover[b-mkm46ka3rp] {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 1.2rem 3rem -1rem hsl(var(--primary) / 0.85);
+}
+
+.scroll-to-top:active[b-mkm46ka3rp] {
+    transform: translateY(0) scale(0.98);
+}
+
+.scroll-to-top:focus-visible[b-mkm46ka3rp] {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+}
+
+.scroll-to-top[b-mkm46ka3rp]  .icon {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+@media (max-width: 720px) {
+    .scroll-to-top[b-mkm46ka3rp] {
+        --scroll-to-top-bottom: max(1rem, env(safe-area-inset-bottom));
+
+        right: max(1rem, env(safe-area-inset-right));
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-to-top[b-mkm46ka3rp] {
+        transition: none;
+    }
+}
 /* /Components/Shared/SearchDialog.razor.rz.scp.css */
 .header-search-trigger[b-kg8k7bjkwd] {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
     height: 36px;
-    min-width: 10.5rem;
+    min-width: 24rem;
     padding: 0 0.45rem 0 0.7rem;
     border: 1px solid hsl(var(--border));
     border-radius: 999px;
