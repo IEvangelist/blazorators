@@ -43,6 +43,9 @@ jobs:
         npm ci --prefix tools/Blazor.ExampleConsumer.Search
         node tools/Blazor.ExampleConsumer.Search/build-index.mjs release/wwwroot/pagefind release/wwwroot/index.html
 
+    - name: Fingerprint HTML entry assets
+      run: node tools/Blazor.ExampleConsumer.Search/fingerprint-entry-assets.mjs release/wwwroot release/wwwroot/index.html
+
     # Copy index.html to 404.html to serve the same file when a file is not found
     - name: copy index.html to 404.html
       run: cp release/wwwroot/index.html release/wwwroot/404.html
