@@ -49,7 +49,7 @@ public abstract class BlazorSiteFixture(
         var startInfo = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"run --no-build --no-restore --configuration {configuration} --project \"{projectPath}\" --framework net10.0 --no-launch-profile --urls {BaseUrl}",
+            Arguments = $"run --no-build --no-restore --configuration {configuration} --project \"{projectPath}\" --framework net11.0 --no-launch-profile --urls {BaseUrl}",
             WorkingDirectory = repoRoot,
             UseShellExecute = false,
             RedirectStandardOutput = true,

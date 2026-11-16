@@ -1,0 +1,6 @@
+<Project>
+  <!-- Library wrappers intentionally let JS interop exceptions flow to callers (.NET 11 analyzer BL0016). -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);BL0016</NoWarn>
+  </PropertyGroup>
+</Project>

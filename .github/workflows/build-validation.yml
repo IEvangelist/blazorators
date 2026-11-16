@@ -108,7 +108,7 @@ jobs:
         global-json-file: global.json
 
     - name: Test
-      run: dotnet test ./tests/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --framework net10.0 --verbosity normal
+      run: dotnet test ./tests/${{ matrix.project }}/${{ matrix.project }}.csproj --configuration Release --framework net11.0 --verbosity normal
 
   runtime_tests:
     name: DOM runtime tests (${{ matrix.framework }})
@@ -116,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [ net8.0, net9.0, net10.0 ]
+        framework: [ net8.0, net9.0, net10.0, net11.0 ]
 
     steps:
     - uses: actions/checkout@main
@@ -128,6 +128,7 @@ jobs:
           8.0.x
           9.0.x
           10.0.x
+          11.0.x
 
     - name: Test
       run: dotnet test ./tests/Blazor.DOM.Tests/Blazor.DOM.Tests.csproj --configuration Release --framework ${{ matrix.framework }} --verbosity normal

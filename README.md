@@ -83,7 +83,7 @@ The host packages are mutually exclusive because they expose the same logical DO
 | [`Blazor.DOM`](src/Blazor.DOM/README.md) | Blazor Server and hosting-neutral | Asynchronous, cancellable `ValueTask` dispatch through `IJSRuntime` and `IJSObjectReference`. |
 | [`Blazor.DOM.WebAssembly`](src/Blazor.DOM.WebAssembly/README.md) | Blazor WebAssembly | Synchronous non-Promise operations through in-process references; Promise and lifecycle operations remain asynchronous. |
 
-Both variants compile for `net8.0`, `net9.0`, and `net10.0`, with exact logical parity across 878 host symbols and 13,299 operations per host.
+Both variants compile for `net8.0`, `net9.0`, `net10.0`, and `net11.0`, with exact logical parity across 878 host symbols and 13,299 operations per host.
 
 Register one package and inject the single `IBrowser` root:
 
